@@ -87,3 +87,22 @@
 - git index lock file can persist - use `pkill -9 git` to kill stuck processes
 
 ---
+
+## [2026-02-13 00:34:00] - US-005
+[Session: ]
+- Session completion triggers a short notch animation (0.3s spring effect with scale 1.05 and green border)
+- Completion feedback does not steal keyboard focus (visual only, no alerts/modals)
+- Next state (break or idle) is clearly shown (currentSessionType: "Focus" or "Break")
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US005Tests.swift (added)
+- Tests: All 27 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003 + 5 US-004 + 6 US-005)
+**Learnings for future iterations:**
+- Completion animation uses SwiftUI's spring animation with response: 0.3 and dampingFraction: 0.7
+- Visual feedback doesn't steal keyboard focus - avoid alerts/sheets/modals for completion
+- Animation triggered via onChange(of: viewModel.isSessionComplete) modifier in NotchCompanionView
+- Next state shown through computed property currentSessionType which returns "Break" after work or "Focus" after break
+- SwiftUI animation modifiers: .scaleEffect() and .overlay() with stroke
+- Green border appears when isSessionComplete is true (Color.green.opacity(0.5), lineWidth: 2)
+
+---
