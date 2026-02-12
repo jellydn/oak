@@ -4,6 +4,7 @@ enum SessionState: Equatable {
     case idle
     case running(remainingSeconds: Int, isWorkSession: Bool)
     case paused(remainingSeconds: Int, isWorkSession: Bool)
+    case completed(isWorkSession: Bool)
 }
 
 enum Preset: CaseIterable {

@@ -2,13 +2,17 @@ import SwiftUI
 import AppKit
 
 class NotchWindowController: NSWindowController {
-    private let viewModel = FocusSessionViewModel()
+    private let collapsedWidth: CGFloat = 192
+    private let expandedWidth: CGFloat = 400
+    private let notchHeight: CGFloat = 80
 
     convenience init() {
-        let window = NotchWindow()
+        let window = NotchWindow(width: 192, height: 80)
         self.init(window: window)
 
-        let contentView = NotchCompanionView()
+        let contentView = NotchCompanionView { [weak self] expanded in
+            self?.setExpanded(expanded)
+        }
         window.contentView = NSHostingView(rootView: contentView)
 
         window.makeKeyAndOrderFront(nil)
@@ -17,17 +21,27 @@ class NotchWindowController: NSWindowController {
     func cleanup() {
         (window?.contentView as? NSHostingView<NotchCompanionView>)?.rootView.viewModel.cleanup()
     }
+
+    private func setExpanded(_ expanded: Bool) {
+        guard let window else { return }
+
+        let targetWidth = expanded ? expandedWidth : collapsedWidth
+        let screenFrame = NSScreen.main?.frame ?? .zero
+        let yPosition = screenFrame.height - notchHeight
+        let xPosition = (screenFrame.width - targetWidth) / 2
+        let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
+
+        window.setFrame(newFrame, display: true, animate: true)
+    }
 }
 
 class NotchWindow: NSWindow {
-    init() {
+    init(width: CGFloat, height: CGFloat) {
         let screenFrame = NSScreen.main?.frame ?? .zero
-        let notchWidth: CGFloat = 300
-        let notchHeight: CGFloat = 80
-        let xPosition = (screenFrame.width - notchWidth) / 2
+        let xPosition = (screenFrame.width - width) / 2
 
         super.init(
-            contentRect: NSRect(x: xPosition, y: screenFrame.height - notchHeight, width: notchWidth, height: notchHeight),
+            contentRect: NSRect(x: xPosition, y: screenFrame.height - height, width: width, height: height),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false

@@ -1,10 +1,22 @@
 import SwiftUI
 
 struct NotchCompanionView: View {
+    let onExpansionChanged: (Bool) -> Void
+
     @StateObject var viewModel = FocusSessionViewModel()
     @State private var showAudioMenu = false
     @State private var showProgressMenu = false
     @State private var animateCompletion: Bool = false
+    @State private var isHovering = false
+    @State private var isPinnedExpanded = false
+
+    init(onExpansionChanged: @escaping (Bool) -> Void = { _ in }) {
+        self.onExpansionChanged = onExpansionChanged
+    }
+
+    private var isExpanded: Bool {
+        isPinnedExpanded || isHovering || showAudioMenu || showProgressMenu
+    }
 
     var body: some View {
         ZStack {
@@ -15,24 +27,42 @@ struct NotchCompanionView: View {
                         .stroke(viewModel.isSessionComplete ? Color.green.opacity(0.5) : Color.white.opacity(0.2), lineWidth: viewModel.isSessionComplete ? 2 : 1)
                 )
 
-            HStack(spacing: 16) {
-                if viewModel.canStart {
-                    startView
+            HStack(spacing: 12) {
+                if isExpanded {
+                    if viewModel.canStart {
+                        startView
+                    } else {
+                        sessionView
+                    }
+
+                    Spacer()
+
+                    audioButton
+                    progressButton
                 } else {
-                    sessionView
+                    compactView
                 }
 
-                Spacer()
-
-                audioButton
-                progressButton
+                expandToggleButton
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
-        .frame(width: 380, height: 60)
+        .frame(width: isExpanded ? 380 : 172, height: 60)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovering = hovering
+            }
+        }
+        .onChange(of: isExpanded) { _, expanded in
+            onExpansionChanged(expanded)
+        }
+        .onAppear {
+            onExpansionChanged(isExpanded)
+        }
         .onChange(of: viewModel.isSessionComplete) { _, newValue in
             if newValue {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -53,6 +83,31 @@ struct NotchCompanionView: View {
         .popover(isPresented: $showProgressMenu) {
             ProgressMenuView(viewModel: viewModel)
                 .frame(width: 200)
+        }
+    }
+
+    private var compactView: some View {
+        HStack(spacing: 10) {
+            if viewModel.canStart {
+                Text(viewModel.selectedPreset.displayName)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                Button(action: {
+                    viewModel.startSession()
+                }) {
+                    Image(systemName: "play.fill")
+                        .foregroundColor(.white)
+                        .frame(width: 28, height: 28)
+                        .background(Color.green)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+            } else {
+                Text(viewModel.displayTime)
+                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                    .foregroundColor(viewModel.isPaused ? .orange : .primary)
+            }
         }
     }
 
@@ -114,6 +169,17 @@ struct NotchCompanionView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
+            } else if viewModel.canStartNext {
+                Button(action: {
+                    viewModel.startNextSession()
+                }) {
+                    Image(systemName: "forward.fill")
+                        .foregroundColor(.white)
+                        .frame(width: 32, height: 32)
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -156,6 +222,21 @@ struct NotchCompanionView: View {
             }
         }
         .buttonStyle(.plain)
+    }
+
+    private var expandToggleButton: some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isPinnedExpanded.toggle()
+            }
+        }) {
+            Image(systemName: isExpanded ? "chevron.compact.left" : "chevron.compact.right")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.secondary)
+                .frame(width: 20, height: 32)
+        }
+        .buttonStyle(.plain)
+        .help(isExpanded ? "Collapse" : "Expand")
     }
 }
 

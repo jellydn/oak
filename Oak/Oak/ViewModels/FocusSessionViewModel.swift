@@ -21,6 +21,13 @@ class FocusSessionViewModel: ObservableObject {
         return false
     }
 
+    var canStartNext: Bool {
+        if case .completed = sessionState {
+            return true
+        }
+        return false
+    }
+
     var canPause: Bool {
         if case .running = sessionState {
             return true
@@ -46,6 +53,13 @@ class FocusSessionViewModel: ObservableObject {
         case .running(let remaining, _), .paused(let remaining, _):
             minutes = remaining / 60
             seconds = remaining % 60
+        case .completed(let isWorkSession):
+            if isWorkSession {
+                minutes = selectedPreset.breakDuration / 60
+            } else {
+                minutes = selectedPreset.workDuration / 60
+            }
+            seconds = 0
         }
 
         return String(format: "%02d:%02d", minutes, seconds)
@@ -71,6 +85,8 @@ class FocusSessionViewModel: ObservableObject {
             return "Ready"
         case .running(_, let isWork), .paused(_, let isWork):
             return isWork ? "Focus" : "Break"
+        case .completed(let isWorkSession):
+            return isWorkSession ? "Break" : "Focus"
         }
     }
 
@@ -105,6 +121,18 @@ class FocusSessionViewModel: ObservableObject {
         startTimer()
     }
 
+    func startNextSession() {
+        guard case .completed(let completedWorkSession) = sessionState else {
+            return
+        }
+
+        isWorkSession = !completedWorkSession
+        currentRemainingSeconds = isWorkSession ? selectedPreset.workDuration : selectedPreset.breakDuration
+        sessionStartSeconds = currentRemainingSeconds
+        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        startTimer()
+    }
+
     private func startTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
@@ -128,22 +156,19 @@ class FocusSessionViewModel: ObservableObject {
         isSessionComplete = true
 
         if isWorkSession {
-            // Work session complete - record progress and start break
+            // Work session complete - record progress
             let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
             if durationMinutes > 0 {
                 progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
             }
-
-            isWorkSession = false
-            currentRemainingSeconds = selectedPreset.breakDuration
-            sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: false)
         } else {
-            // Break session complete - return to idle
-            timer?.invalidate()
-            timer = nil
-            sessionState = .idle
+            // Break session complete - stop audio
             audioManager.stop()
         }
+
+        timer?.invalidate()
+        timer = nil
+        sessionState = .completed(isWorkSession: isWorkSession)
 
         // Reset animation state after 1.5 seconds
         Task {
