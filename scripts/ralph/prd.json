@@ -29,7 +29,7 @@
         "Session state changes to running within 500 ms of user click.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 1
     },
     {
