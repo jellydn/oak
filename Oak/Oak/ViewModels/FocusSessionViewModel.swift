@@ -107,7 +107,10 @@ class FocusSessionViewModel: ObservableObject {
         selectedPreset = preset
     }
 
-    func startSession() {
+    func startSession(using preset: Preset? = nil) {
+        if let preset {
+            selectedPreset = preset
+        }
         currentRemainingSeconds = selectedPreset.workDuration
         isWorkSession = true
         sessionStartSeconds = currentRemainingSeconds
@@ -136,6 +139,17 @@ class FocusSessionViewModel: ObservableObject {
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
+    }
+
+    func resetSession() {
+        timer?.invalidate()
+        timer = nil
+        currentRemainingSeconds = 0
+        isWorkSession = true
+        sessionStartSeconds = 0
+        isSessionComplete = false
+        audioManager.stop()
+        sessionState = .idle
     }
 
     private func startTimer() {
@@ -186,8 +200,6 @@ class FocusSessionViewModel: ObservableObject {
     }
 
     func cleanup() {
-        timer?.invalidate()
-        timer = nil
-        audioManager.stop()
+        resetSession()
     }
 }
