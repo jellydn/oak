@@ -55,7 +55,7 @@
         "Next state (break or idle) is clearly shown.",
         "Typecheck/lint passes."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-006",
@@ -67,7 +67,7 @@
         "Data persists across app relaunch.",
         "Typecheck/lint passes."
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }

@@ -2,10 +2,7 @@
   "projectName": "Oak - macOS Focus Companion App",
   "branchName": "ralph/macos-focus-companion",
   "reviewDate": "2026-02-13",
-  "knownIssues": [
-    "There are two Xcode projects in the repo root and subfolder; launching the wrong one can show stale UI behavior.",
-    "Ensure development and run flows use Oak/Oak.xcodeproj (the converged modular source path)."
-  ],
+  "knownIssues": [],
   "userStories": [
     {
       "id": "US-000",
@@ -27,6 +24,7 @@
         "Notch companion is visible and interactive when app is running.",
         "One primary action starts a 25-minute focus session.",
         "Session state changes to running within 500 ms of user click.",
+        "No default global keyboard shortcut is configured in MVP (KISS).",
         "Typecheck/lint passes."
       ],
       "passes": true,

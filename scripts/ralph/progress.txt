@@ -309,3 +309,36 @@ Session: N/A
   - Story was already implemented in previous iteration (2026-02-12 23:47)
   - Verification confirms all acceptance criteria are met
   - No code changes required - only PRD status update needed
+
+## [2026-02-13 00:42] - US-002
+[Session: N/A]
+- What was implemented
+  - Removed preset-to-viewModel publish on segmented control click to avoid SwiftUI "Publishing changes from within view updates" warning.
+  - Preset is now committed when starting a session (`startSession(using:)`) rather than during picker selection.
+  - Moved legacy root XcodeGen artifacts out of repository root to avoid opening the wrong project (`legacy/Oak-root.xcodeproj`, `legacy/project.root.yml`).
+  - Updated PRD status: `knownIssues` cleared and `US-002` set to `passes: true`.
+- Files changed
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift
+  - Oak/Oak/Views/NotchCompanionView.swift
+  - scripts/ralph/prd.json
+  - scripts/ralph/progress.txt
+  - legacy/Oak-root.xcodeproj/*
+  - legacy/project.root.yml
+- **Learnings for future iterations:**
+  - For SwiftUI segmented controls, avoid mutating `@Published` view-model state directly from picker change callbacks when warnings appear; keep selection local and commit on explicit actions.
+  - Keep only one active Xcode project location in normal workflows (`Oak/Oak.xcodeproj`) to prevent stale behavior confusion.
+---
+
+## [2026-02-13 00:47] - US-002 (reset edge case)
+[Session: N/A]
+- What was implemented
+  - Added explicit session reset path so users can stop a running/paused/completed session and return to idle before selecting another preset.
+  - Added `stop.fill` reset control in session UI.
+  - Start flow still commits selected preset on start, so switching from `25/5` to `50/10` now works after reset.
+- Files changed
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift
+  - Oak/Oak/Views/NotchCompanionView.swift
+  - scripts/ralph/progress.txt
+- **Learnings for future iterations:**
+  - Completed state needs a deterministic escape hatch to idle, otherwise preset changes are blocked by state guards.
+---
