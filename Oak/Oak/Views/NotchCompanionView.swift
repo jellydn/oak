@@ -3,9 +3,10 @@ import SwiftUI
 struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
 
-    @StateObject var viewModel = FocusSessionViewModel()
+    @StateObject private var viewModel: FocusSessionViewModel
     @State private var showAudioMenu = false
     @State private var showProgressMenu = false
+    @State private var showSettingsMenu = false
     @State private var animateCompletion: Bool = false
     @State private var isExpandedByToggle = false
     @State private var presetSelection: Preset = .short
@@ -17,7 +18,17 @@ struct NotchCompanionView: View {
     private let contentSpacing: CGFloat = 8
     private let controlSize: CGFloat = 18
 
+    init(
+        viewModel: FocusSessionViewModel,
+        onExpansionChanged: @escaping (Bool) -> Void = { _ in }
+    ) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.onExpansionChanged = onExpansionChanged
+    }
+
+    @MainActor
     init(onExpansionChanged: @escaping (Bool) -> Void = { _ in }) {
+        _viewModel = StateObject(wrappedValue: FocusSessionViewModel())
         self.onExpansionChanged = onExpansionChanged
     }
 
@@ -61,6 +72,7 @@ struct NotchCompanionView: View {
                     
                     audioButton
                     progressButton
+                    settingsButton
                 } else {
                     compactView
                 }
@@ -106,12 +118,33 @@ struct NotchCompanionView: View {
             ProgressMenuView(viewModel: viewModel)
                 .frame(width: 200)
         }
+        .popover(isPresented: $showSettingsMenu) {
+            SettingsMenuView(presetSettings: viewModel.presetSettings)
+                .frame(width: 280)
+        }
+        .contextMenu {
+            if #available(macOS 14.0, *) {
+                SettingsLink {
+                    Text("Settings...")
+                }
+            } else {
+                Button("Settings...") {
+                    NSApp.sendAction(NSSelectorFromString("showSettingsWindow:"), to: nil, from: nil)
+                }
+            }
+
+            Divider()
+
+            Button("Quit Oak") {
+                NSApp.terminate(nil)
+            }
+        }
     }
 
     private var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {
-                Text(presetSelection.displayName)
+                Text(presetLabel(for: presetSelection))
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.white.opacity(0.62))
 
@@ -259,6 +292,24 @@ struct NotchCompanionView: View {
         .buttonStyle(.plain)
     }
 
+    private var settingsButton: some View {
+        Button(action: {
+            showSettingsMenu.toggle()
+        }) {
+            ZStack {
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: controlSize, height: controlSize)
+
+                Image(systemName: "gearshape.fill")
+                    .foregroundColor(.white.opacity(0.7))
+                    .font(.system(size: 9))
+            }
+        }
+        .buttonStyle(.plain)
+        .help("Settings")
+    }
+
     private var expandToggleButton: some View {
         Button(action: {
             withAnimation(.easeInOut(duration: 0.15)) {
@@ -268,6 +319,7 @@ struct NotchCompanionView: View {
                 if !shouldExpand {
                     showAudioMenu = false
                     showProgressMenu = false
+                    showSettingsMenu = false
                 }
             }
         }) {
@@ -303,16 +355,108 @@ struct NotchCompanionView: View {
         return Button(action: {
             presetSelection = preset
         }) {
-            Text(preset.displayName)
+            Text(presetLabel(for: preset))
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(isSelected ? .white : .white.opacity(0.62))
-                .frame(width: 42, height: 18)
+                .frame(width: 54, height: 18)
                 .background(
                     Capsule(style: .continuous)
                         .fill(isSelected ? Color.white.opacity(0.16) : Color.clear)
                 )
         }
         .buttonStyle(.plain)
+    }
+
+    private func presetLabel(for preset: Preset) -> String {
+        viewModel.presetSettings.displayName(for: preset)
+    }
+}
+
+struct SettingsMenuView: View {
+    @ObservedObject var presetSettings: PresetSettingsStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Settings")
+                .font(.headline)
+
+            VStack(spacing: 10) {
+                presetEditor(title: "Preset A", preset: .short)
+                presetEditor(title: "Preset B", preset: .long)
+            }
+
+            Text("Valid range: Focus 1-180 min, Break 1-90 min")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+
+            HStack {
+                Button("Reset defaults") {
+                    presetSettings.resetToDefault()
+                }
+                .buttonStyle(.link)
+
+                Spacer()
+
+                Text(currentVersion)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(14)
+    }
+
+    private func presetEditor(title: String, preset: Preset) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("\(title) (\(presetSettings.displayName(for: preset)))")
+                .font(.system(size: 11, weight: .semibold))
+
+            HStack(spacing: 8) {
+                Text("Focus")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(width: 40, alignment: .leading)
+
+                Stepper(value: workMinutesBinding(for: preset), in: 1...180) {
+                    Text("\(presetSettings.workMinutes(for: preset)) min")
+                        .font(.caption)
+                }
+            }
+
+            HStack(spacing: 8) {
+                Text("Break")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(width: 40, alignment: .leading)
+
+                Stepper(value: breakMinutesBinding(for: preset), in: 1...90) {
+                    Text("\(presetSettings.breakMinutes(for: preset)) min")
+                        .font(.caption)
+                }
+            }
+        }
+        .padding(8)
+        .background(Color.primary.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func workMinutesBinding(for preset: Preset) -> Binding<Int> {
+        Binding(
+            get: { presetSettings.workMinutes(for: preset) },
+            set: { presetSettings.setWorkMinutes($0, for: preset) }
+        )
+    }
+
+    private func breakMinutesBinding(for preset: Preset) -> Binding<Int> {
+        Binding(
+            get: { presetSettings.breakMinutes(for: preset) },
+            set: { presetSettings.setBreakMinutes($0, for: preset) }
+        )
+    }
+
+    private var currentVersion: String {
+        let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+        return "v\(shortVersion) (\(buildVersion))"
     }
 }
 

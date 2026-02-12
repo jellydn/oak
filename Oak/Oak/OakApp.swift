@@ -4,10 +4,13 @@ import AppKit
 @main
 struct OakApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var presetSettings = PresetSettingsStore.shared
 
     var body: some Scene {
         Settings {
-            EmptyView()
+            SettingsMenuView(presetSettings: presetSettings)
+                .frame(width: 320)
+                .padding(8)
         }
     }
 }

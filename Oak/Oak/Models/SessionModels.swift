@@ -12,16 +12,24 @@ enum Preset: CaseIterable {
     case long
 
     var workDuration: Int {
-        switch self {
-        case .short: return 25 * 60
-        case .long: return 50 * 60
-        }
+        defaultWorkMinutes * 60
     }
 
     var breakDuration: Int {
+        defaultBreakMinutes * 60
+    }
+
+    var defaultWorkMinutes: Int {
         switch self {
-        case .short: return 5 * 60
-        case .long: return 10 * 60
+        case .short: return 25
+        case .long: return 50
+        }
+    }
+
+    var defaultBreakMinutes: Int {
+        switch self {
+        case .short: return 5
+        case .long: return 10
         }
     }
 
