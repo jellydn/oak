@@ -18,7 +18,7 @@ final class US005Tests: XCTestCase {
         presetSuiteName = suiteName
         presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         viewModel = FocusSessionViewModel(presetSettings: presetSettings)
-        view = NotchCompanionView()
+        view = NotchCompanionView(viewModel: viewModel)
     }
 
     override func tearDown() async throws {

@@ -358,7 +358,7 @@ struct NotchCompanionView: View {
             Text(presetLabel(for: preset))
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(isSelected ? .white : .white.opacity(0.62))
-                .frame(width: 54, height: 18)
+                .frame(minWidth: 54, minHeight: 18)
                 .background(
                     Capsule(style: .continuous)
                         .fill(isSelected ? Color.white.opacity(0.16) : Color.clear)
@@ -454,9 +454,24 @@ struct SettingsMenuView: View {
     }
 
     private var currentVersion: String {
-        let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
-        let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
-        return "v\(shortVersion) (\(buildVersion))"
+        func getVersion(from bundle: Bundle) -> (String, String)? {
+            guard let shortVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String,
+                  let buildVersion = bundle.infoDictionary?["CFBundleVersion"] as? String else {
+                return nil
+            }
+            return (shortVersion, buildVersion)
+        }
+        
+        let appBundle = Bundle.main
+        let fallbackBundle = Bundle(identifier: "com.oak.app") ?? Bundle(for: FocusSessionViewModel.self)
+        
+        if let (shortVersion, buildVersion) = getVersion(from: appBundle) {
+            return "v\(shortVersion) (\(buildVersion))"
+        } else if let (shortVersion, buildVersion) = getVersion(from: fallbackBundle) {
+            return "v\(shortVersion) (\(buildVersion))"
+        }
+        
+        return "v0.0.0 (0)"
     }
 }
 

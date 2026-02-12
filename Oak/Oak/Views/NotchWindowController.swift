@@ -6,11 +6,18 @@ class NotchWindowController: NSWindowController {
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool?
-    private let viewModel = FocusSessionViewModel()
+    private let viewModel: FocusSessionViewModel
 
     convenience init() {
+        self.init(presetSettings: nil)
+    }
+
+    init(presetSettings: PresetSettingsStore?) {
+        let settings = presetSettings ?? PresetSettingsStore.shared
+        self.viewModel = FocusSessionViewModel(presetSettings: settings)
+        
         let window = NotchWindow(width: 144, height: 33)
-        self.init(window: window)
+        super.init(window: window)
 
         let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
             self?.handleExpansionChange(expanded)
@@ -18,6 +25,10 @@ class NotchWindowController: NSWindowController {
         window.contentView = NSHostingView(rootView: contentView)
 
         window.orderFrontRegardless()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     func cleanup() {
