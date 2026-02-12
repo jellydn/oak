@@ -222,3 +222,17 @@ Session: N/A
   - Build command: `just build` (succeeds with no errors)
   - Lint check: `cd Oak && swiftlint lint --quiet` (has pre-existing warnings, no errors)
   - Test command: `just test` (all tests pass)
+
+## [2026-02-13 00:20] - US-001 (verification)
+Session: N/A
+- What was verified:
+  - Notch companion is visible and interactive when app is running (window.orderFrontRegardless())
+  - Primary action (play button) starts 25-minute focus session (calls viewModel.startSession())
+  - Session state changes to running immediately (sessionState set to .running with no delay)
+  - Typecheck/lint passes (already verified)
+- Files changed:
+  - scripts/ralph/prd.json - Updated US-001 passes to true
+- **Learnings for future iterations:**
+  - Story was already implemented in previous iteration (2026-02-12 23:23)
+  - Verification confirms all acceptance criteria are met
+  - No code changes required - only PRD status update needed
