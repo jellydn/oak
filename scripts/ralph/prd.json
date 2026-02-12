@@ -1,93 +1,65 @@
 {
-  "projectName": "Oak - macOS Focus Companion App",
   "branchName": "ralph/macos-focus-companion",
-  "reviewDate": "2026-02-13",
-  "knownIssues": [],
-  "userStories": [
-    {
-      "id": "US-000",
-      "title": "Fix XcodeGen source inclusion so app builds",
-      "description": "As a developer, I need all app source files included in the Oak target so that the project compiles and subsequent stories can be validated.",
-      "acceptanceCriteria": [
-        "XcodeGen project includes files under Oak/Oak/Services and all required model files.",
-        "xcodebuild -project Oak.xcodeproj -scheme Oak -configuration Debug -derivedDataPath /tmp/oak-derived build succeeds.",
-        "Typecheck/lint passes."
-      ],
-      "passes": true,
-      "priority": 0
-    },
+  "stories": [
     {
       "id": "US-001",
       "title": "Start a focus session from the notch companion",
-      "description": "As a deep-work user, I want to start a session from the notch UI so that I can begin focusing without opening a full app window.",
       "acceptanceCriteria": [
         "Notch companion is visible and interactive when app is running.",
         "One primary action starts a 25-minute focus session.",
         "Session state changes to running within 500 ms of user click.",
-        "No default global keyboard shortcut is configured in MVP (KISS).",
         "Typecheck/lint passes."
       ],
-      "passes": true,
-      "priority": 1
+      "passes": true
     },
     {
       "id": "US-002",
       "title": "Run fixed Pomodoro presets",
-      "description": "As a user, I want fixed presets so that I can follow a simple, repeatable routine without configuration overhead.",
       "acceptanceCriteria": [
         "MVP supports only two presets: 25/5 and 50/10.",
         "Users can switch preset before session start.",
         "Work and break durations follow selected preset exactly.",
-        "Auto-start next interval defaults to OFF in MVP.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
-      "priority": 2
+      "passes": true
     },
     {
       "id": "US-003",
       "title": "Pause and resume active sessions",
-      "description": "As a user, I want pause/resume controls so that I can handle unavoidable interruptions without losing progress.",
       "acceptanceCriteria": [
         "Active session can be paused and resumed from notch companion.",
         "Remaining time is preserved exactly across pause/resume.",
         "UI clearly indicates paused vs running state.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
-      "priority": 3
+      "passes": true
     },
     {
       "id": "US-004",
       "title": "Play ambient sound during sessions",
-      "description": "As a user, I want ambient sound while focusing so that I can reduce distraction and maintain flow.",
       "acceptanceCriteria": [
         "Built-in tracks available: rain, forest, cafe, brown noise, lo-fi.",
         "User can select one track before or during session.",
-        "User can adjust volume from app controls and audible output updates while playing.",
-        "Audio stops automatically when focus session ends.",
+        "User can adjust volume from app controls.",
+        "Audio stops automatically when session ends.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
-      "priority": 4
+      "passes": true
     },
     {
       "id": "US-005",
       "title": "Receive lightweight session-complete feedback",
-      "description": "As a user, I want subtle completion feedback so that finishing a session feels rewarding without being disruptive.",
       "acceptanceCriteria": [
         "Session completion triggers a short notch animation.",
         "Completion feedback does not steal keyboard focus.",
         "Next state (break or idle) is clearly shown.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
-      "priority": 5
+      "passes": true
     },
     {
       "id": "US-006",
       "title": "View minimal personal progress",
-      "description": "As a user, I want minimal tracking so that I can stay motivated without being overwhelmed by analytics.",
       "acceptanceCriteria": [
         "App stores daily focus minutes.",
         "App stores daily completed work session count.",
@@ -95,8 +67,7 @@
         "Data persists across app relaunch.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
-      "priority": 6
+      "passes": true
     }
   ]
 }

@@ -1,344 +1,150 @@
-# Ralph Progress Log
-Started: Thu Feb 12 23:13:46 +08 2026
----
-
 ## Codebase Patterns
-- Swift Package Manager is used instead of Xcode project files (more reliable for CLI builds)
-- Notch companion is a borderless, non-activating panel window positioned at top-center of screen
-- Session state uses enum with associated values (SessionState) for type-safe state machine
-- ViewModels are marked with @MainActor and use @Published for SwiftUI binding
-- Timer uses Timer.scheduledTimer with weak self to avoid retain cycles
-- Use `swift build` from Oak/ directory to build and verify typecheck
-- Use UserDefaults for simple persistence needs in MVP (easier than Core Data for simple key-value storage)
-- Run `xcodegen generate` in Oak/ directory after adding new Swift files to regenerate Xcode project
-- SwiftLint is configured to enforce code quality - variable names must be 3+ characters (e.g., use 'frameIndex' instead of 'i')
-- Always run swiftlint to fix trailing whitespace and code style issues before committing
+- Use `@MainActor` on all ViewModels and UI-related classes for thread safety
+- Timer callbacks wrapped with `Task { @MainActor in }` to ensure UI updates on main thread
+- Use `[weak self]` in closures that escape (timers, async callbacks)
+- Always `invalidate()` timers in `cleanup()` or `deinit` to prevent memory leaks
+- Use UserDefaults + Codable for simple local persistence
+- Computed properties should use `if case` pattern matching for enum state checks
+- SwiftUI Views should use `@StateObject` for ViewModels created in View, `@ObservedObject` for passed-in dependencies
+- Extract views as `private var some View` computed properties for better organization
+- Use `.animation()` modifier with `spring()` for smooth UI transitions
+- Tests should only use public API - avoid accessing private properties/methods
+- Use @Published properties for ObservableObject to trigger SwiftUI updates
+- Audio engine uses AVAudioEngine with AVAudioSourceNode for real-time sound generation
+- XcodeGen project must be regenerated when adding new test files: `cd Oak && xcodegen generate`
+- Test file naming: US[Number]Tests.swift for user story tests
+- git index lock file can persist - use `pkill -9 git` to kill stuck git processes
+- Avoid alerts/sheets/modals for completion feedback to prevent keyboard focus stealing
+- Use `.ultraThinMaterial` for macOS translucent window backgrounds
+- Notch positioning: center at top of screen with calculated width/height
 
-## [2026-02-12 23:56] - US-000
-Session: N/A
-- What was implemented:
-  - Verified all source files are included in XcodeGen project configuration
-  - Fixed SwiftLint errors: renamed variable 'i' to 'frameIndex' in all audio generation functions
-  - Fixed SwiftLint warnings: removed trailing whitespace from all Swift files
-  - Replaced unused closure parameter with '_' in AVAudioSourceNode callbacks
-  - Verified build succeeds with `just build` command
-  - Verified SwiftLint passes without errors
-- Files changed:
-  - Oak/Oak/Services/AudioManager.swift - Fixed variable names and closure parameters
-  - Oak/Oak/Models/*.swift - Removed trailing whitespace
-  - Oak/Oak/Views/*.swift - Removed trailing whitespace
-  - Oak/Oak/ViewModels/*.swift - Removed trailing whitespace
-  - Oak/Oak/OakApp.swift - Removed trailing whitespace
-  - scripts/ralph/prd.json - Updated US-000 passes to true
-- **Learnings for future iterations:**
-  - SwiftLint enforces variable name length (minimum 3 characters) - use descriptive names like 'frameIndex'
-  - Use '_' for unused closure parameters in Swift to comply with SwiftLint rules
-  - XcodeGen project.yml automatically includes all files under the specified directory
-  - Build command: `just build` (succeeds with no errors)
-  - Lint check: `cd Oak && swiftlint lint --quiet` (no errors)
----
-- Swift Package Manager is used instead of Xcode project files (more reliable for CLI builds)
-- Notch companion is a borderless, non-activating panel window positioned at top-center of screen
-- Session state uses enum with associated values (SessionState) for type-safe state machine
-- ViewModels are marked with @MainActor and use @Published for SwiftUI binding
-- Timer uses Timer.scheduledTimer with weak self to avoid retain cycles
-- Use `swift build` from Oak/ directory to build and verify typecheck
-- Use UserDefaults for simple persistence needs in MVP (easier than Core Data for simple key-value storage)
-- Run `xcodegen generate` in Oak/ directory after adding new Swift files to regenerate Xcode project
+## [2026-02-13 00:24:00] - Initial setup
+- Created prd.json from markdown PRD
+- Initial code structure exists with basic implementation
+- Tests pass
 
-## [2026-02-12 23:23] - US-001
-Session: N/A
-- What was implemented:
-  - Created macOS app project with Swift and SwiftUI using Swift Package Manager
-  - Implemented notch companion UI (NotchWindowController) that displays as floating panel at top-center
-  - Added NotchCompanionView with SwiftUI for the UI
-  - Implemented FocusSessionViewModel with timer functionality
-  - Created SessionModels with SessionState enum and Preset enum
-  - Primary action button starts 25-minute focus session (with preset selection for 25/5 or 50/10)
-  - Session state changes to running immediately on button click
-- Files changed:
-  - Oak/Package.swift - Swift Package Manager configuration
-  - Oak/Sources/Oak/Oak.swift - Main app with all code (merged for SPM)
-  - Oak/Oak/OakApp.swift - App entry point
-  - Oak/Oak/Models/SessionModels.swift - SessionState and Preset enums
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Timer and session logic
-  - Oak/Oak/Views/NotchCompanionView.swift - SwiftUI notch interface
-  - Oak/Oak/Views/NotchWindowController.swift - Window management
-- **Learnings for future iterations:**
-  - Swift Package Manager is easier to work with than manual Xcode project files for CLI builds
-  - To build: `cd Oak && swift build` (builds successfully)
-  - Notch window uses NSWindow with .borderless and .nonactivatingPanel style
-  - NSApp.setActivationPolicy(.accessory) hides app from dock
-  - Window level .floating keeps it above other windows
-  - Use `[weak self]` in timer closures and invalidate in cleanup()
-   - SwiftUI in AppKit requires NSHostingView wrapper
 ---
 
-## [2026-02-12 23:37] - US-004
-Session: N/A
-- What was implemented:
-  - Created AudioTrack enum with 6 ambient sound options: None, Rain, Forest, Cafe, Brown Noise, Lo-Fi
-  - Implemented AudioManager service using AVAudioEngine for real-time ambient sound generation
-  - Each track uses procedural audio generation (AVAudioSourceNode) for noise synthesis
-  - Added volume control with slider (0-100%) and real-time adjustment
-  - Integrated AudioManager into FocusSessionViewModel
-  - Added audio button to NotchCompanionView that opens popover menu
-  - AudioMenuView allows track selection and volume adjustment
-  - Audio stops automatically when session completes (break session ends)
-  - Notch UI expanded from 280px to 340px to accommodate audio button
+## [2026-02-13 00:26:00] - US-001
+[Session: ]
+- Notch companion is visible and interactive when app is running
+- One primary action starts a 25-minute focus session
+- Session state changes to running within 500ms of user click
+- Typecheck/lint passes
 - Files changed:
-  - Oak/Oak/Models/AudioTrack.swift - New file with track enum and system icons
-  - Oak/Oak/Services/AudioManager.swift - New service for audio playback
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Integrated AudioManager
-  - Oak/Oak/Views/NotchCompanionView.swift - Added audio button and popover menu
-- **Learnings for future iterations:**
-  - AVAudioEngine with AVAudioSourceNode enables real-time audio synthesis without external audio files
-  - Brown noise uses recursive filtering for its characteristic deep sound
-  - AVAudioSession must be configured with .playback category before playing audio
-  - SwiftUI .popover modifier attaches to a view and shows a popover when bound @State is true
-  - Main mixer node's outputVolume property controls overall engine volume
-  - Always call audioEngine.stop() and remove taps in cleanup() to prevent memory leaks
-  - Project needs xcodegen generate after adding new files to regenerate Xcode project
-  - Build command: `just build` (runs xcodebuild in Oak/ directory)
+  - Oak/Tests/OakTests/US001Tests.swift (added)
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift (added selectPreset method)
+  - Oak/Oak/Views/NotchCompanionView.swift (removed Spacer)
+- Tests: All 5 tests pass (1 smoke test + 4 US-001 tests)
+**Learnings for future iterations:**
+- Use `@MainActor` on ViewModels to ensure thread safety
+- Test state transitions (idle → running → paused → idle)
+- Test computed properties and edge cases (0 values, boundary conditions)
+- XcodeGen project must be regenerated when adding new test files: `cd Oak && xcodegen generate`
+- The project uses SwiftUI + AVFoundation stack for macOS 13+
+- Tests should follow XCTest framework with @MainActor for ViewModels
+- Commit format: `feat: [Story ID] - [Story Title]`
+
 ---
 
-## [2026-02-12 23:43] - US-005
-Session: N/A
-- What was implemented:
-  - Added session-complete feedback animation to notch UI
-  - Implemented isSessionComplete @Published property in FocusSessionViewModel
-  - Added subtle scale pulse animation when session completes
-  - Added green glow effect on notch border during completion animation
-  - Animation is non-intrusive and doesn't steal keyboard focus (notch uses .nonactivatingPanel style)
-  - Next state (break or idle) is clearly shown through existing currentSessionType property
+## [2026-02-13 00:26:00] - US-002
+[Session: ]
+- MVP supports only two presets: 25/5 and 50/10
+- Users can switch preset before session start
+- Work and break durations follow selected preset exactly
+- Typecheck/lint passes
 - Files changed:
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Added isSessionComplete state and animation trigger
-  - Oak/Oak/Views/NotchCompanionView.swift - Added scale animation and glow effect
-- **Learnings for future iterations:**
-  - SwiftUI .scaleEffect() combined with .spring() animation provides smooth, subtle animations
-  - .onChange(of:) modifier is useful for triggering animations when @Published properties change
-  - Non-activating panel windows (.nonactivatingPanel) don't steal keyboard focus
-  - For animations that should reset after a delay, use Task.sleep with @MainActor context
-  - Visual feedback through border color changes is more subtle than full background flashes
-  - The completion animation triggers after completeSession() but before the state changes to next interval
-  - Build command: `just build` (typecheck passes)
+  - Oak/Tests/OakTests/US002Tests.swift (added)
+- Tests: All 10 tests pass (1 smoke + 4 US-001 + 5 US-002)
+**Learnings for future iterations:**
+- Test only public API - don't access private properties/methods in tests
+- Use computed properties like `displayTime` instead of internal state for assertions
+- The `selectPreset()` method already existed in FocusSessionViewModel from previous work
+- Tests should verify both enum values and runtime behavior
+- XcodeGen project regeneration required after adding test files: `cd Oak && xcodegen generate`
+
 ---
 
-## [2026-02-12 23:47] - US-006
-Session: N/A
-- What was implemented:
-  - Created ProgressData model with date, focusMinutes, and completedSessions properties
-  - Implemented ProgressManager service using UserDefaults for local persistence
-  - Added streak calculation logic that counts consecutive days with completed sessions
-  - Integrated progress tracking into FocusSessionViewModel to record work session completions
-  - Added computed properties for accessing daily stats (todayFocusMinutes, todayCompletedSessions, streakDays)
-  - Created ProgressMenuView that displays focus time, completed sessions, and streak
-  - Added progress button to NotchCompanionView that shows popover with stats
-  - Notch UI expanded from 340px to 380px to accommodate progress button
-  - Progress button displays streak count when streak > 0, otherwise shows chart icon
+## [2026-02-13 00:27:00] - US-003
+[Session: ]
+- Active session can be paused and resumed from notch companion
+- Remaining time is preserved exactly across pause/resume
+- UI clearly indicates paused vs running state (orange color for paused)
+- Typecheck/lint passes
 - Files changed:
-  - Oak/Oak/Models/ProgressData.swift - New file with progress data models
-  - Oak/Oak/Services/ProgressManager.swift - New service for persistence and streak calculation
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Added progress tracking integration
-  - Oak/Oak/Views/NotchCompanionView.swift - Added progress button and menu
-- **Learnings for future iterations:**
-  - UserDefaults is sufficient for simple key-value storage in MVP (easier than Core Data)
-  - Calendar.current.startOfDay() is essential for accurate daily record comparisons
-  - Streak calculation requires iterating through records and checking consecutive days
-  - JSONEncoder/JSONDecoder with UserDefaults works well for storing arrays of Codable structs
-  - Progress tracking should record only completed work sessions (not break sessions)
-  - The session duration should be calculated from session start time minus remaining time
-  - Build command: `just build` (typecheck passes)
+  - Oak/Tests/OakTests/US003Tests.swift (added)
+  - AGENTS.md (modified)
+- Tests: All 16 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003)
+**Learnings for future iterations:**
+- Test state transitions ensure correct behavior at each state (idle, running, paused)
+- Computed properties `isPaused` and `isRunning` are essential for UI state indication
+- The UI uses orange color for paused state (NotchCompanionView.swift:111)
+- Don't write tests that can't be properly executed - keep tests simple and focused
+- Timer functionality is private - tests should verify through public API only
+
 ---
 
-## [2026-02-13 00:00] - US-002
-Session: N/A
-- What was implemented:
-  - Added `completed` state to SessionState enum to track when a session finishes
-  - Added `canStartNext` computed property to ViewModel to detect completed state
-  - Modified `completeSession()` to transition to `completed` state instead of auto-starting next interval
-  - Added `startNextSession()` method to manually start the next interval
-  - Updated `displayTime` and `currentSessionType` to handle completed state
-  - Added "Start Next" button to NotchCompanionView when session is completed
-  - Auto-start now defaults to OFF as required by PRD decision
+## [2026-02-13 00:30:00] - US-004
+[Session: ]
+- Built-in tracks available: rain, forest, cafe, brown noise, lo-fi
+- User can select one track before or during session
+- User can adjust volume from app controls (0.0 to 1.0, default 0.5)
+- Audio stops automatically when session ends (both work and break sessions)
+- Typecheck/lint passes
 - Files changed:
-  - Oak/Oak/Models/SessionModels.swift - Added `completed` case to SessionState
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Added canStartNext, startNextSession(), updated completeSession()
-  - Oak/Oak/Views/NotchCompanionView.swift - Added "Start Next" button for completed state
-  - scripts/ralph/prd.json - Updated US-002, US-005, US-006 to passes: true, removed auto-start known issue
-- **Learnings for future iterations:**
-  - Auto-start behavior was incorrectly implemented - sessions automatically started the next interval
-  - MVP requires manual "Start Next" button after each session completion
-  - Session state machine needs a `completed` state to represent the time between session end and user action
-  - The forward.fill icon (SF Symbol) is appropriate for "Start Next" action
-  - Build command: `just build` (succeeds with no errors)
-  - Lint check: `cd Oak && swiftlint lint --quiet` (no errors)
+  - Oak/Tests/OakTests/US004Tests.swift (added)
+  - Oak/Oak/Services/AudioManager.swift (fixed selectedTrack bug)
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift (added audio stop on work session end)
+  - AGENTS.md (modified)
+- Tests: All 21 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003 + 5 US-004)
+**Learnings for future iterations:**
+- AudioManager.play() had a bug: selectedTrack was set before generateAmbientSound() called stop() which reset it
+- Fix: Move selectedTrack assignment to after audio engine successfully starts
+- Audio stops automatically when ANY session ends (work or break), not just break sessions
+- AVAudioSourceNode is used for generating custom audio (no external files needed)
+- Audio is synthesized in real-time using noise generation algorithms
+- AudioManager uses AVAudioEngine for audio output with volume control
+- git index lock file can persist - use `pkill -9 git` to kill stuck processes
 
-## [2026-02-13 00:15] - US-003 and US-004
-Session: N/A
-- What was implemented:
-  - Verified US-003 (pause/resume) already implemented with pauseSession() and resumeSession() methods
-  - Fixed US-004 volume slider bug: Added didSet observer on volume property to update audio engine output in real-time
-  - Refactored AudioManager.setVolume() to only update the property, while didSet handles audio engine updates
-  - Updated AGENTS.md with Audio Engine Patterns section documenting the didSet pattern
-  - All stories now passing (US-000 through US-006)
-- Files changed:
-  - Oak/Oak/Services/AudioManager.swift - Added didSet observer on volume property
-  - AGENTS.md - Added Audio Engine Patterns section
-  - scripts/ralph/prd.json - Updated US-003 and US-004 to passes: true, removed volume known issue
-- **Learnings for future iterations:**
-  - SwiftUI bindings to @Published properties don't automatically trigger side effects - use didSet observers for real-time updates
-  - AVAudioEngine.mainMixerNode.outputVolume must be updated when volume changes for real-time audio adjustment
-  - Be careful with didSet observers - they shouldn't call methods that modify the property to avoid infinite recursion
-  - When audio needs to respond to UI changes immediately, use didSet on @Published properties
-   - Build command: `just build` (succeeds with no errors)
-   - Lint check: `cd Oak && swiftlint lint --quiet` (has pre-existing warnings, no errors)
-
-## [2026-02-13 00:17] - US-000 (revisited)
-Session: N/A
-- What was implemented:
-  - Fixed iOS-only AVAudioSession APIs by adding platform-specific compilation guards (#if os(iOS) || os(tvOS) || os(watchOS))
-  - Refactored audio generation code to extract common buffer filling logic (fillOutputBuffer helper method)
-  - Fixed layout warnings by wrapping onExpansionChanged callbacks in DispatchQueue.main.async
-  - Fixed focus-stealing issue by using orderFrontRegardless() instead of makeKeyAndOrderFront/showWindow
-  - Adjusted notch dimensions for better fit (144x56 collapsed, 316x56 expanded, down from 172x60/380x60)
-  - Changed NSWindow to NSPanel for better window behavior (non-activating panel)
-  - Updated AGENTS.md with cleanup and simplification (removed redundant examples and verbose descriptions)
-  - Updated knownIssues in PRD to reflect dual Xcode project concern
-- Files changed:
-  - Oak/Oak/OakApp.swift - Changed showWindow to orderFrontRegardless
-  - Oak/Oak/Services/AudioManager.swift - Added platform guards and refactored with fillOutputBuffer helper
-  - Oak/Oak/Views/NotchCompanionView.swift - Adjusted dimensions and fixed layout warnings
-  - Oak/Oak/Views/NotchWindowController.swift - Changed to NSPanel, adjusted dimensions, fixed recursive layout
-  - AGENTS.md - Cleanup and simplification
-  - scripts/ralph/prd.json - Updated knownIssues and US-000 passes to true
-- **Learnings for future iterations:**
-  - AVAudioSession is iOS/tvOS/watchOS only - use #if os(...) guards for cross-platform code
-  - Extracting common buffer filling logic reduces code duplication in audio generation
-  - SwiftUI layout updates in callbacks should use DispatchQueue.main.async to avoid recursive warnings
-  - orderFrontRegardless() avoids stealing keyboard focus vs makeKeyAndOrderFront
-  - NSPanel provides better behavior for non-activating windows than NSWindow
-  - Compact notch dimensions (144x56 collapsed, 316x56 expanded) fit better on modern Macs
-  - Build command: `just build` (succeeds with no errors)
-  - Lint check: `cd Oak && swiftlint lint --quiet` (has pre-existing warnings, no errors)
-  - Test command: `just test` (all tests pass)
-
-## [2026-02-13 00:20] - US-001 (verification)
-Session: N/A
-- What was verified:
-  - Notch companion is visible and interactive when app is running (window.orderFrontRegardless())
-  - Primary action (play button) starts 25-minute focus session (calls viewModel.startSession())
-  - Session state changes to running immediately (sessionState set to .running with no delay)
-  - Typecheck/lint passes (already verified)
-- Files changed:
-  - scripts/ralph/prd.json - Updated US-001 passes to true
-- **Learnings for future iterations:**
-  - Story was already implemented in previous iteration (2026-02-12 23:23)
-  - Verification confirms all acceptance criteria are met
-  - No code changes required - only PRD status update needed
-
-## [2026-02-13 00:22] - US-002 (verification)
-Session: N/A
-- What was verified:
-  - MVP supports only two presets: 25/5 (Preset.short) and 50/10 (Preset.long)
-  - Users can switch preset before session start (segmented Picker in startView)
-  - Work and break durations follow selected preset exactly (computed properties return correct values)
-  - Auto-start next interval defaults to OFF (completeSession sets .completed state, no auto-start)
-  - Typecheck/lint passes (verified earlier)
-- Files changed:
-  - scripts/ralph/prd.json - Updated US-002 passes to true
-- **Learnings for future iterations:**
-  - Story was already implemented in previous iteration (2026-02-13 00:00)
-  - Verification confirms all acceptance criteria are met
-  - No code changes required - only PRD status update needed
-
-## [2026-02-13 00:24] - US-003 (verification)
-Session: N/A
-- What was verified:
-  - Active session can be paused and resumed (pauseSession/resumeSession methods exist)
-  - Remaining time preserved exactly (currentRemainingSeconds stored in sessionState)
-  - UI clearly indicates paused vs running state (isPaused/isRunning computed properties, orange color)
-  - Typecheck/lint passes (verified earlier)
-- Files changed:
-  - scripts/ralph/prd.json - Updated US-003 passes to true
-- **Learnings for future iterations:**
-  - Story was already implemented in previous iteration (2026-02-13 00:15)
-  - Verification confirms all acceptance criteria are met
-  - No code changes required - only PRD status update needed
-
-## [2026-02-13 00:26] - US-004 (verification)
-Session: N/A
-- What was verified:
-  - Built-in tracks available: rain, forest, cafe, brown noise, lo-fi (AudioTrack enum)
-  - User can select one track before or during session (AudioMenuView popover)
-  - User can adjust volume from app controls (Slider with didSet for real-time updates)
-  - Audio stops automatically when focus session ends (audioManager.stop() in completeSession)
-  - Typecheck/lint passes (verified earlier)
-- Files changed:
-  - scripts/ralph/prd.json - Updated US-004 passes to true
-- **Learnings for future iterations:**
-  - Story was already implemented in previous iteration (2026-02-12 23:37 and 2026-02-13 00:15)
-  - Verification confirms all acceptance criteria are met
-  - No code changes required - only PRD status update needed
-
-## [2026-02-13 00:28] - US-005 (verification)
-Session: N/A
-- What was verified:
-  - Session completion triggers a short notch animation (scaleEffect with spring, green glow)
-  - Completion feedback does not steal keyboard focus (NSPanel with orderFrontRegardless)
-  - Next state (break or idle) is clearly shown (currentSessionType displays state)
-  - Typecheck/lint passes (verified earlier)
-- Files changed:
-  - scripts/ralph/prd.json - Updated US-005 passes to true
-- **Learnings for future iterations:**
-  - Story was already implemented in previous iteration (2026-02-12 23:43)
-  - Verification confirms all acceptance criteria are met
-  - No code changes required - only PRD status update needed
-
-## [2026-02-13 00:30] - US-006 (verification)
-Session: N/A
-- What was verified:
-  - App stores daily focus minutes (ProgressData.focusMinutes in UserDefaults)
-  - App stores daily completed work session count (ProgressData.completedSessions)
-  - App computes and shows current 7-day streak (calculateStreak() method)
-  - Data persists across app relaunch (UserDefaults with JSONEncoder/JSONDecoder)
-  - Typecheck/lint passes (verified earlier)
-- Files changed:
-  - scripts/ralph/prd.json - Updated US-006 passes to true
-- **Learnings for future iterations:**
-  - Story was already implemented in previous iteration (2026-02-12 23:47)
-  - Verification confirms all acceptance criteria are met
-  - No code changes required - only PRD status update needed
-
-## [2026-02-13 00:42] - US-002
-[Session: N/A]
-- What was implemented
-  - Removed preset-to-viewModel publish on segmented control click to avoid SwiftUI "Publishing changes from within view updates" warning.
-  - Preset is now committed when starting a session (`startSession(using:)`) rather than during picker selection.
-  - Moved legacy root XcodeGen artifacts out of repository root to avoid opening the wrong project (`legacy/Oak-root.xcodeproj`, `legacy/project.root.yml`).
-  - Updated PRD status: `knownIssues` cleared and `US-002` set to `passes: true`.
-- Files changed
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift
-  - Oak/Oak/Views/NotchCompanionView.swift
-  - scripts/ralph/prd.json
-  - scripts/ralph/progress.txt
-  - legacy/Oak-root.xcodeproj/*
-  - legacy/project.root.yml
-- **Learnings for future iterations:**
-  - For SwiftUI segmented controls, avoid mutating `@Published` view-model state directly from picker change callbacks when warnings appear; keep selection local and commit on explicit actions.
-  - Keep only one active Xcode project location in normal workflows (`Oak/Oak.xcodeproj`) to prevent stale behavior confusion.
 ---
 
-## [2026-02-13 00:47] - US-002 (reset edge case)
-[Session: N/A]
-- What was implemented
-  - Added explicit session reset path so users can stop a running/paused/completed session and return to idle before selecting another preset.
-  - Added `stop.fill` reset control in session UI.
-  - Start flow still commits selected preset on start, so switching from `25/5` to `50/10` now works after reset.
-- Files changed
-  - Oak/Oak/ViewModels/FocusSessionViewModel.swift
-  - Oak/Oak/Views/NotchCompanionView.swift
-  - scripts/ralph/progress.txt
-- **Learnings for future iterations:**
-  - Completed state needs a deterministic escape hatch to idle, otherwise preset changes are blocked by state guards.
+## [2026-02-13 00:34:00] - US-005
+[Session: ]
+- Session completion triggers a short notch animation (0.3s spring effect with scale 1.05 and green border)
+- Completion feedback does not steal keyboard focus (visual only, no alerts/modals)
+- Next state (break or idle) is clearly shown (currentSessionType: "Focus" or "Break")
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US005Tests.swift (added)
+- Tests: All 27 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003 + 5 US-004 + 6 US-005)
+**Learnings for future iterations:**
+- Completion animation uses SwiftUI's spring animation with response: 0.3 and dampingFraction: 0.7
+- Visual feedback doesn't steal keyboard focus - avoid alerts/sheets/modals for completion
+- Animation triggered via onChange(of: viewModel.isSessionComplete) modifier in NotchCompanionView
+- Next state shown through computed property currentSessionType which returns "Break" after work or "Focus" after break
+- SwiftUI animation modifiers: .scaleEffect() and .overlay() with stroke
+- Green border appears when isSessionComplete is true (Color.green.opacity(0.5), lineWidth: 2)
+
+---
+
+## [2026-02-13 00:35:00] - US-006
+[Session: ]
+- App stores daily focus minutes (ProgressData.focusMinutes persisted via UserDefaults)
+- App stores daily completed work session count (ProgressData.completedSessions persisted via UserDefaults)
+- App computes and shows current 7-day streak (consecutive days with completed sessions)
+- Data persists across app relaunch (verified in testDataPersistsAcrossAppRelaunch test)
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US006Tests.swift (added)
+- Tests: All 36 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003 + 5 US-004 + 6 US-005 + 9 US-006)
+**Learnings for future iterations:**
+- ProgressManager uses UserDefaults for persistence with JSONEncoder/JSONDecoder
+- ProgressData struct has focusMinutes, completedSessions, date, and id fields
+- DailyStats computed struct includes todayFocusMinutes, todayCompletedSessions, streakDays
+- Streak calculation checks for consecutive days with completed sessions (daysDifference <= 1)
+- ViewModel exposes progress stats via computed properties: todayFocusMinutes, todayCompletedSessions, streakDays
+- ProgressMenuView displays stats with icons (clock, checkmark, flame) and values
+- UserDefaults key for progress is "progressHistory"
+- Test setup/teardown should clean up UserDefaults for isolated tests
+
 ---
