@@ -104,7 +104,7 @@ Oak/
 - Test files mirror source structure with `Tests` suffix
 - Use XCTest framework
 - Test state transitions (idle → running → paused → idle)
-- Test computed properties and edge cases
+- Test computed properties and edge cases (0 values, boundary conditions)
 
 ---
 

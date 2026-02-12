@@ -21,6 +21,7 @@
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
+		F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732AEE30E8FEC2D900C8224A /* US005Tests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
 		6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressManager.swift; sourceTree = "<group>"; };
+		732AEE30E8FEC2D900C8224A /* US005Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US005Tests.swift; sourceTree = "<group>"; };
 		841F3EFAB628759B783D66D3 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
 		85C93F37E0AC4AA71C304FDD /* US003Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US003Tests.swift; sourceTree = "<group>"; };
 		B74BB88C04B3824E97E3C561 /* US001Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US001Tests.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 				26934C0C6B7C8A90F9D57916 /* US002Tests.swift */,
 				85C93F37E0AC4AA71C304FDD /* US003Tests.swift */,
 				DBFE863ED8125FD3D3029341 /* US004Tests.swift */,
+				732AEE30E8FEC2D900C8224A /* US005Tests.swift */,
 			);
 			name = OakTests;
 			path = Tests/OakTests;
@@ -225,6 +228,7 @@
 				DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */,
 				B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */,
 				8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */,
+				F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
