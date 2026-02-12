@@ -150,3 +150,26 @@ Session: N/A
   - The session duration should be calculated from session start time minus remaining time
   - Build command: `just build` (typecheck passes)
 ---
+
+## [2026-02-13 00:00] - US-002
+Session: N/A
+- What was implemented:
+  - Added `completed` state to SessionState enum to track when a session finishes
+  - Added `canStartNext` computed property to ViewModel to detect completed state
+  - Modified `completeSession()` to transition to `completed` state instead of auto-starting next interval
+  - Added `startNextSession()` method to manually start the next interval
+  - Updated `displayTime` and `currentSessionType` to handle completed state
+  - Added "Start Next" button to NotchCompanionView when session is completed
+  - Auto-start now defaults to OFF as required by PRD decision
+- Files changed:
+  - Oak/Oak/Models/SessionModels.swift - Added `completed` case to SessionState
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Added canStartNext, startNextSession(), updated completeSession()
+  - Oak/Oak/Views/NotchCompanionView.swift - Added "Start Next" button for completed state
+  - scripts/ralph/prd.json - Updated US-002, US-005, US-006 to passes: true, removed auto-start known issue
+- **Learnings for future iterations:**
+  - Auto-start behavior was incorrectly implemented - sessions automatically started the next interval
+  - MVP requires manual "Start Next" button after each session completion
+  - Session state machine needs a `completed` state to represent the time between session end and user action
+  - The forward.fill icon (SF Symbol) is appropriate for "Start Next" action
+  - Build command: `just build` (succeeds with no errors)
+  - Lint check: `cd Oak && swiftlint lint --quiet` (no errors)
