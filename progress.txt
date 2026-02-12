@@ -44,3 +44,22 @@
 - XcodeGen project regeneration required after adding test files: `cd Oak && xcodegen generate`
 
 ---
+
+## [2026-02-13 00:27:00] - US-003
+[Session: ]
+- Active session can be paused and resumed from notch companion
+- Remaining time is preserved exactly across pause/resume
+- UI clearly indicates paused vs running state (orange color for paused)
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US003Tests.swift (added)
+  - AGENTS.md (modified)
+- Tests: All 16 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003)
+**Learnings for future iterations:**
+- Test state transitions ensure correct behavior at each state (idle, running, paused)
+- Computed properties `isPaused` and `isRunning` are essential for UI state indication
+- The UI uses orange color for paused state (NotchCompanionView.swift:111)
+- Don't write tests that can't be properly executed - keep tests simple and focused
+- Timer functionality is private - tests should verify through public API only
+
+---
