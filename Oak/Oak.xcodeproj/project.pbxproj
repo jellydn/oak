@@ -17,6 +17,7 @@
 		BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451C36F9BC7A6103BF32362C /* OakApp.swift */; };
 		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
+		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 		0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
+		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
 		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 			children = (
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
+				26934C0C6B7C8A90F9D57916 /* US002Tests.swift */,
 			);
 			name = OakTests;
 			path = Tests/OakTests;
@@ -213,6 +216,7 @@
 			files = (
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
 				1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */,
+				DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
