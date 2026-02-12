@@ -97,7 +97,7 @@
         "Data persists across app relaunch.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 6
     }
   ]
