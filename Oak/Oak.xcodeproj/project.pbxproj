@@ -13,6 +13,7 @@
 		8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFE863ED8125FD3D3029341 /* US004Tests.swift */; };
 		8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */; };
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
+		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
 		B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3EFAB628759B783D66D3 /* AudioTrack.swift */; };
 		B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C93F37E0AC4AA71C304FDD /* US003Tests.swift */; };
 		B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */; };
@@ -41,6 +42,7 @@
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
+		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
 		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				85C93F37E0AC4AA71C304FDD /* US003Tests.swift */,
 				DBFE863ED8125FD3D3029341 /* US004Tests.swift */,
 				732AEE30E8FEC2D900C8224A /* US005Tests.swift */,
+				37E445602CAD3F9843BA531B /* US006Tests.swift */,
 			);
 			name = OakTests;
 			path = Tests/OakTests;
@@ -229,6 +232,7 @@
 				B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */,
 				8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */,
 				F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */,
+				AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

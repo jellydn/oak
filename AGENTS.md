@@ -120,7 +120,9 @@ Oak/
 
 - Use `///` for public API documentation
 - ADRs go in `doc/adr/` with sequential numbering
-- Commit format: `type(scope): brief description` (types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`)
+- Commit format: `type(scope): brief description`
+  - Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
+  - Scope: `timer`, `audio`, `ui`, `persistence`, etc.
 
 ---
 
