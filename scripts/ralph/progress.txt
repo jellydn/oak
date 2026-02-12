@@ -236,3 +236,18 @@ Session: N/A
   - Story was already implemented in previous iteration (2026-02-12 23:23)
   - Verification confirms all acceptance criteria are met
   - No code changes required - only PRD status update needed
+
+## [2026-02-13 00:22] - US-002 (verification)
+Session: N/A
+- What was verified:
+  - MVP supports only two presets: 25/5 (Preset.short) and 50/10 (Preset.long)
+  - Users can switch preset before session start (segmented Picker in startView)
+  - Work and break durations follow selected preset exactly (computed properties return correct values)
+  - Auto-start next interval defaults to OFF (completeSession sets .completed state, no auto-start)
+  - Typecheck/lint passes (verified earlier)
+- Files changed:
+  - scripts/ralph/prd.json - Updated US-002 passes to true
+- **Learnings for future iterations:**
+  - Story was already implemented in previous iteration (2026-02-13 00:00)
+  - Verification confirms all acceptance criteria are met
+  - No code changes required - only PRD status update needed
