@@ -9,6 +9,7 @@ class FocusSessionViewModel: ObservableObject {
     private var timer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
+    let audioManager = AudioManager()
     
     var canStart: Bool {
         if case .idle = sessionState {
@@ -61,6 +62,15 @@ class FocusSessionViewModel: ObservableObject {
         return false
     }
     
+    var currentSessionType: String {
+        switch sessionState {
+        case .idle:
+            return "Ready"
+        case .running(_, let isWork), .paused(_, let isWork):
+            return isWork ? "Focus" : "Break"
+        }
+    }
+    
     func startSession() {
         currentRemainingSeconds = selectedPreset.workDuration
         isWorkSession = true
@@ -99,13 +109,23 @@ class FocusSessionViewModel: ObservableObject {
     }
     
     private func completeSession() {
-        timer?.invalidate()
-        timer = nil
-        sessionState = .idle
+        if isWorkSession {
+            // Work session complete - start break
+            isWorkSession = false
+            currentRemainingSeconds = selectedPreset.breakDuration
+            sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: false)
+        } else {
+            // Break session complete - return to idle
+            timer?.invalidate()
+            timer = nil
+            sessionState = .idle
+            audioManager.stop()
+        }
     }
     
     func cleanup() {
         timer?.invalidate()
         timer = nil
+        audioManager.stop()
     }
 }
