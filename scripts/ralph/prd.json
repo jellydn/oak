@@ -15,8 +15,8 @@
         "Typecheck/lint passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented with Swift Package Manager. Notch companion displays at top center of screen. Build passes with `swift build`."
     },
     {
       "id": "US-002",

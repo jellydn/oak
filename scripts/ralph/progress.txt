@@ -1,3 +1,39 @@
 # Ralph Progress Log
 Started: Thu Feb 12 23:13:46 +08 2026
 ---
+
+## Codebase Patterns
+- Swift Package Manager is used instead of Xcode project files (more reliable for CLI builds)
+- Notch companion is a borderless, non-activating panel window positioned at top-center of screen
+- Session state uses enum with associated values (SessionState) for type-safe state machine
+- ViewModels are marked with @MainActor and use @Published for SwiftUI binding
+- Timer uses Timer.scheduledTimer with weak self to avoid retain cycles
+- Use `swift build` from Oak/ directory to build and verify typecheck
+
+## [2026-02-12 23:23] - US-001
+Session: N/A
+- What was implemented:
+  - Created macOS app project with Swift and SwiftUI using Swift Package Manager
+  - Implemented notch companion UI (NotchWindowController) that displays as floating panel at top-center
+  - Added NotchCompanionView with SwiftUI for the UI
+  - Implemented FocusSessionViewModel with timer functionality
+  - Created SessionModels with SessionState enum and Preset enum
+  - Primary action button starts 25-minute focus session (with preset selection for 25/5 or 50/10)
+  - Session state changes to running immediately on button click
+- Files changed:
+  - Oak/Package.swift - Swift Package Manager configuration
+  - Oak/Sources/Oak/Oak.swift - Main app with all code (merged for SPM)
+  - Oak/Oak/OakApp.swift - App entry point
+  - Oak/Oak/Models/SessionModels.swift - SessionState and Preset enums
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Timer and session logic
+  - Oak/Oak/Views/NotchCompanionView.swift - SwiftUI notch interface
+  - Oak/Oak/Views/NotchWindowController.swift - Window management
+- **Learnings for future iterations:**
+  - Swift Package Manager is easier to work with than manual Xcode project files for CLI builds
+  - To build: `cd Oak && swift build` (builds successfully)
+  - Notch window uses NSWindow with .borderless and .nonactivatingPanel style
+  - NSApp.setActivationPolicy(.accessory) hides app from dock
+  - Window level .floating keeps it above other windows
+  - Use `[weak self]` in timer closures and invalidate in cleanup()
+  - SwiftUI in AppKit requires NSHostingView wrapper
+---
