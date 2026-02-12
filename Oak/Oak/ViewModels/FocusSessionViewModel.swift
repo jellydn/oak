@@ -102,6 +102,11 @@ class FocusSessionViewModel: ObservableObject {
         progressManager.dailyStats.streakDays
     }
 
+    func selectPreset(_ preset: Preset) {
+        guard canStart else { return }
+        selectedPreset = preset
+    }
+
     func startSession() {
         currentRemainingSeconds = selectedPreset.workDuration
         isWorkSession = true

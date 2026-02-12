@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */; };
+		1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74BB88C04B3824E97E3C561 /* US001Tests.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */; };
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
@@ -40,6 +41,7 @@
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
 		6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressManager.swift; sourceTree = "<group>"; };
 		841F3EFAB628759B783D66D3 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
+		B74BB88C04B3824E97E3C561 /* US001Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US001Tests.swift; sourceTree = "<group>"; };
 		B93F85CD94F4CCB44AC7296C /* OakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C348F7E99471145836A04408 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -89,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
+				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
 			);
 			name = OakTests;
 			path = Tests/OakTests;
@@ -209,6 +212,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
+				1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

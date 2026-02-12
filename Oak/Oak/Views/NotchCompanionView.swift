@@ -9,6 +9,7 @@ struct NotchCompanionView: View {
     @State private var animateCompletion: Bool = false
     @State private var isHovering = false
     @State private var isPinnedExpanded = false
+    @State private var presetSelection: Preset = .short
 
     init(onExpansionChanged: @escaping (Bool) -> Void = { _ in }) {
         self.onExpansionChanged = onExpansionChanged
@@ -34,9 +35,7 @@ struct NotchCompanionView: View {
                     } else {
                         sessionView
                     }
-
-                    Spacer()
-
+                    
                     audioButton
                     progressButton
                 } else {
@@ -66,6 +65,7 @@ struct NotchCompanionView: View {
             DispatchQueue.main.async {
                 onExpansionChanged(isExpanded)
             }
+            presetSelection = viewModel.selectedPreset
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
             if isComplete {
@@ -117,7 +117,7 @@ struct NotchCompanionView: View {
 
     private var startView: some View {
         HStack(spacing: 8) {
-            Picker("", selection: $viewModel.selectedPreset) {
+            Picker("", selection: $presetSelection) {
                 ForEach(Preset.allCases, id: \.self) { preset in
                     Text(preset.displayName)
                         .tag(preset)
@@ -125,6 +125,11 @@ struct NotchCompanionView: View {
             }
             .pickerStyle(.segmented)
             .frame(width: 90)
+            .onChange(of: presetSelection) { newPreset in
+                DispatchQueue.main.async {
+                    viewModel.selectPreset(newPreset)
+                }
+            }
 
             Button(action: {
                 viewModel.startSession()
