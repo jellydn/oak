@@ -11,3 +11,17 @@ targets:
       INFOPLIST_KEY_LSUIElement: true
       INFOPLIST_KEY_LSBackgroundOnly: true
       GENERATE_INFOPLIST_FILE: true
+    scheme:
+      testTargets:
+        - OakTests
+
+  OakTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - Tests/OakTests
+    dependencies:
+      - target: Oak
+    settings:
+      GENERATE_INFOPLIST_FILE: true

@@ -8,11 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		25E829306FC0F6D57A52010A /* Oak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F65C6D610B738716780996 /* Oak.swift */; };
+		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8BAC2127C583B49DDB260159 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39608D010831B013089075A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC7E40F4DC44200CB4F10CC2;
+			remoteInfo = Oak;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		03D90651E33152E3C952CE1D /* Oak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Oak.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		34F65C6D610B738716780996 /* Oak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oak.swift; sourceTree = "<group>"; };
+		B93F85CD94F4CCB44AC7296C /* OakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -20,6 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				64E95FFCFED6BE5E5E74A2EC /* Oak */,
+				7A59316AAFB96A57EDCA1D15 /* OakTests */,
 				71E68205C3AB6B6E9D8871A5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -37,13 +51,41 @@
 			isa = PBXGroup;
 			children = (
 				03D90651E33152E3C952CE1D /* Oak.app */,
+				B93F85CD94F4CCB44AC7296C /* OakTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7A59316AAFB96A57EDCA1D15 /* OakTests */ = {
+			isa = PBXGroup;
+			children = (
+				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
+			);
+			name = OakTests;
+			path = Tests/OakTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		65A3406A257DA2D6DB99007E /* OakTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F8189E569CB0018A5135913B /* Build configuration list for PBXNativeTarget "OakTests" */;
+			buildPhases = (
+				EEC54261045B64070CE7D302 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				84409F5F66D917BD164F9658 /* PBXTargetDependency */,
+			);
+			name = OakTests;
+			packageProductDependencies = (
+			);
+			productName = OakTests;
+			productReference = B93F85CD94F4CCB44AC7296C /* OakTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		FC7E40F4DC44200CB4F10CC2 /* Oak */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8088C0641197DC0293BF52D3 /* Build configuration list for PBXNativeTarget "Oak" */;
@@ -85,6 +127,7 @@
 			projectRoot = "";
 			targets = (
 				FC7E40F4DC44200CB4F10CC2 /* Oak */,
+				65A3406A257DA2D6DB99007E /* OakTests */,
 			);
 		};
 /* End PBXProject section */
@@ -98,7 +141,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EEC54261045B64070CE7D302 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		84409F5F66D917BD164F9658 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC7E40F4DC44200CB4F10CC2 /* Oak */;
+			targetProxy = 8BAC2127C583B49DDB260159 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		94DE8B0C0ACCE13FFED8A534 /* Debug */ = {
@@ -218,6 +277,23 @@
 			};
 			name = Release;
 		};
+		BBD558B8D0EFE12F84124E0A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Oak.app/Contents/MacOS/Oak";
+			};
+			name = Release;
+		};
 		C75A8792663368D3B947F63F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -233,6 +309,23 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oak.app;
 				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E5A469C4782EDE86AACBBCF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Oak.app/Contents/MacOS/Oak";
 			};
 			name = Debug;
 		};
@@ -271,6 +364,15 @@
 			buildConfigurations = (
 				C75A8792663368D3B947F63F /* Debug */,
 				EDC9A163EB8869FC1ADAA8D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F8189E569CB0018A5135913B /* Build configuration list for PBXNativeTarget "OakTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E5A469C4782EDE86AACBBCF4 /* Debug */,
+				BBD558B8D0EFE12F84124E0A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
