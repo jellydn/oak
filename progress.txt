@@ -106,3 +106,25 @@
 - Green border appears when isSessionComplete is true (Color.green.opacity(0.5), lineWidth: 2)
 
 ---
+
+## [2026-02-13 00:35:00] - US-006
+[Session: ]
+- App stores daily focus minutes (ProgressData.focusMinutes persisted via UserDefaults)
+- App stores daily completed work session count (ProgressData.completedSessions persisted via UserDefaults)
+- App computes and shows current 7-day streak (consecutive days with completed sessions)
+- Data persists across app relaunch (verified in testDataPersistsAcrossAppRelaunch test)
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US006Tests.swift (added)
+- Tests: All 36 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003 + 5 US-004 + 6 US-005 + 9 US-006)
+**Learnings for future iterations:**
+- ProgressManager uses UserDefaults for persistence with JSONEncoder/JSONDecoder
+- ProgressData struct has focusMinutes, completedSessions, date, and id fields
+- DailyStats computed struct includes todayFocusMinutes, todayCompletedSessions, streakDays
+- Streak calculation checks for consecutive days with completed sessions (daysDifference <= 1)
+- ViewModel exposes progress stats via computed properties: todayFocusMinutes, todayCompletedSessions, streakDays
+- ProgressMenuView displays stats with icons (clock, checkmark, flame) and values
+- UserDefaults key for progress is "progressHistory"
+- Test setup/teardown should clean up UserDefaults for isolated tests
+
+---
