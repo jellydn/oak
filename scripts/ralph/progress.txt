@@ -35,5 +35,34 @@ Session: N/A
   - NSApp.setActivationPolicy(.accessory) hides app from dock
   - Window level .floating keeps it above other windows
   - Use `[weak self]` in timer closures and invalidate in cleanup()
-  - SwiftUI in AppKit requires NSHostingView wrapper
+   - SwiftUI in AppKit requires NSHostingView wrapper
 ---
+
+## [2026-02-12 23:37] - US-004
+Session: N/A
+- What was implemented:
+  - Created AudioTrack enum with 6 ambient sound options: None, Rain, Forest, Cafe, Brown Noise, Lo-Fi
+  - Implemented AudioManager service using AVAudioEngine for real-time ambient sound generation
+  - Each track uses procedural audio generation (AVAudioSourceNode) for noise synthesis
+  - Added volume control with slider (0-100%) and real-time adjustment
+  - Integrated AudioManager into FocusSessionViewModel
+  - Added audio button to NotchCompanionView that opens popover menu
+  - AudioMenuView allows track selection and volume adjustment
+  - Audio stops automatically when session completes (break session ends)
+  - Notch UI expanded from 280px to 340px to accommodate audio button
+- Files changed:
+  - Oak/Oak/Models/AudioTrack.swift - New file with track enum and system icons
+  - Oak/Oak/Services/AudioManager.swift - New service for audio playback
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Integrated AudioManager
+  - Oak/Oak/Views/NotchCompanionView.swift - Added audio button and popover menu
+- **Learnings for future iterations:**
+  - AVAudioEngine with AVAudioSourceNode enables real-time audio synthesis without external audio files
+  - Brown noise uses recursive filtering for its characteristic deep sound
+  - AVAudioSession must be configured with .playback category before playing audio
+  - SwiftUI .popover modifier attaches to a view and shows a popover when bound @State is true
+  - Main mixer node's outputVolume property controls overall engine volume
+  - Always call audioEngine.stop() and remove taps in cleanup() to prevent memory leaks
+  - Project needs xcodegen generate after adding new files to regenerate Xcode project
+  - Build command: `just build` (runs xcodebuild in Oak/ directory)
+---
+
