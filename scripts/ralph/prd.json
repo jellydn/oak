@@ -43,7 +43,7 @@
         "Auto-start next interval defaults to OFF in MVP.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 2
     },
     {
