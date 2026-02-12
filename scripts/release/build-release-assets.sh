@@ -16,6 +16,13 @@ APP_PATH="$ARCHIVE_PATH/Products/Applications/${APP_NAME}.app"
 DMG_PATH="$BUILD_ROOT/${APP_NAME}-${VERSION}.dmg"
 ZIP_PATH="$BUILD_ROOT/${APP_NAME}-${VERSION}.zip"
 STAGING_DIR="$(mktemp -d "$BUILD_ROOT/dmg-root.XXXXXX")"
+APP_ICON_PATH="$APP_PATH/Contents/Resources/AppIcon.icns"
+DMG_ICON_PATH="$STAGING_DIR/.VolumeIcon.icns"
+
+cleanup() {
+  rm -rf "$STAGING_DIR"
+}
+trap cleanup EXIT
 
 xcodebuild archive \
   -project "$PROJECT_PATH" \
@@ -30,6 +37,12 @@ xcodebuild archive \
 
 cp -R "$APP_PATH" "$STAGING_DIR/"
 ln -s /Applications "$STAGING_DIR/Applications"
+
+# Reuse the built app icon as the DMG volume icon.
+if [[ -f "$APP_ICON_PATH" ]] && command -v SetFile >/dev/null; then
+  cp "$APP_ICON_PATH" "$DMG_ICON_PATH"
+  SetFile -a C "$STAGING_DIR"
+fi
 
 hdiutil create \
   -volname "$APP_NAME" \

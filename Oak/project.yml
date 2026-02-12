@@ -10,6 +10,11 @@ targets:
           - "**/*.entitlements"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.oak.app
+      MARKETING_VERSION: 0.1.0
+      CURRENT_PROJECT_VERSION: 1
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      INFOPLIST_KEY_CFBundleShortVersionString: $(MARKETING_VERSION)
+      INFOPLIST_KEY_CFBundleVersion: $(CURRENT_PROJECT_VERSION)
       INFOPLIST_KEY_LSUIElement: true
       INFOPLIST_KEY_LSBackgroundOnly: true
       GENERATE_INFOPLIST_FILE: true
