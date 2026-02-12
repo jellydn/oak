@@ -265,3 +265,18 @@ Session: N/A
   - Story was already implemented in previous iteration (2026-02-13 00:15)
   - Verification confirms all acceptance criteria are met
   - No code changes required - only PRD status update needed
+
+## [2026-02-13 00:26] - US-004 (verification)
+Session: N/A
+- What was verified:
+  - Built-in tracks available: rain, forest, cafe, brown noise, lo-fi (AudioTrack enum)
+  - User can select one track before or during session (AudioMenuView popover)
+  - User can adjust volume from app controls (Slider with didSet for real-time updates)
+  - Audio stops automatically when focus session ends (audioManager.stop() in completeSession)
+  - Typecheck/lint passes (verified earlier)
+- Files changed:
+  - scripts/ralph/prd.json - Updated US-004 passes to true
+- **Learnings for future iterations:**
+  - Story was already implemented in previous iteration (2026-02-12 23:37 and 2026-02-13 00:15)
+  - Verification confirms all acceptance criteria are met
+  - No code changes required - only PRD status update needed
