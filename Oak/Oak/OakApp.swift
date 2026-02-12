@@ -14,12 +14,14 @@ struct OakApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
+    var updateChecker: UpdateChecking = UpdateChecker()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
 
         notchWindowController = NotchWindowController()
         notchWindowController?.window?.orderFrontRegardless()
+        updateChecker.checkForUpdatesOnLaunch()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
