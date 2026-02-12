@@ -24,12 +24,14 @@ class AudioManager: ObservableObject {
 
         selectedTrack = track
 
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Failed to set up audio session: \(error)")
-        }
+        #if os(iOS) || os(tvOS) || os(watchOS)
+            do {
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Failed to set up audio session: \(error)")
+            }
+        #endif
 
         generateAmbientSound(for: track)
     }
@@ -107,91 +109,59 @@ class AudioManager: ObservableObject {
 
     private func createBrownNoiseNode() -> AVAudioSourceNode {
         return AVAudioSourceNode { _, _, _, outputBuffer in
-            let ablPointer = UnsafeMutableAudioBufferListIterator(outputBuffer)
-
-            for buffer in ablPointer {
-                guard let data = buffer.mData else { continue }
-                let frames = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-
-                for frameIndex in 0..<frames {
-                    let sample = self.generateBrownNoise()
-                    data.advanced(by: frameIndex * MemoryLayout<Float>.size).assumingMemoryBound(to: Float.self).pointee = sample
-                }
+            self.fillOutputBuffer(outputBuffer) {
+                self.generateBrownNoise()
             }
-
             return noErr
         }
     }
 
     private func createRainNode() -> AVAudioSourceNode {
         return AVAudioSourceNode { _, _, _, outputBuffer in
-            let ablPointer = UnsafeMutableAudioBufferListIterator(outputBuffer)
-
-            for buffer in ablPointer {
-                guard let data = buffer.mData else { continue }
-                let frames = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-
-                for frameIndex in 0..<frames {
-                    let sample = self.generateRainNoise()
-                    data.advanced(by: frameIndex * MemoryLayout<Float>.size).assumingMemoryBound(to: Float.self).pointee = sample
-                }
+            self.fillOutputBuffer(outputBuffer) {
+                self.generateRainNoise()
             }
-
             return noErr
         }
     }
 
     private func createForestNode() -> AVAudioSourceNode {
         return AVAudioSourceNode { _, _, _, outputBuffer in
-            let ablPointer = UnsafeMutableAudioBufferListIterator(outputBuffer)
-
-            for buffer in ablPointer {
-                guard let data = buffer.mData else { continue }
-                let frames = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-
-                for frameIndex in 0..<frames {
-                    let sample = self.generateForestNoise()
-                    data.advanced(by: frameIndex * MemoryLayout<Float>.size).assumingMemoryBound(to: Float.self).pointee = sample
-                }
+            self.fillOutputBuffer(outputBuffer) {
+                self.generateForestNoise()
             }
-
             return noErr
         }
     }
 
     private func createCafeNode() -> AVAudioSourceNode {
         return AVAudioSourceNode { _, _, _, outputBuffer in
-            let ablPointer = UnsafeMutableAudioBufferListIterator(outputBuffer)
-
-            for buffer in ablPointer {
-                guard let data = buffer.mData else { continue }
-                let frames = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-
-                for frameIndex in 0..<frames {
-                    let sample = self.generateCafeNoise()
-                    data.advanced(by: frameIndex * MemoryLayout<Float>.size).assumingMemoryBound(to: Float.self).pointee = sample
-                }
+            self.fillOutputBuffer(outputBuffer) {
+                self.generateCafeNoise()
             }
-
             return noErr
         }
     }
 
     private func createLofiNode() -> AVAudioSourceNode {
         return AVAudioSourceNode { _, _, _, outputBuffer in
-            let ablPointer = UnsafeMutableAudioBufferListIterator(outputBuffer)
-
-            for buffer in ablPointer {
-                guard let data = buffer.mData else { continue }
-                let frames = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-
-                for frameIndex in 0..<frames {
-                    let sample = self.generateLofiNoise()
-                    data.advanced(by: frameIndex * MemoryLayout<Float>.size).assumingMemoryBound(to: Float.self).pointee = sample
-                }
+            self.fillOutputBuffer(outputBuffer) {
+                self.generateLofiNoise()
             }
-
             return noErr
+        }
+    }
+
+    private func fillOutputBuffer(_ outputBuffer: UnsafeMutablePointer<AudioBufferList>, sample: () -> Float) {
+        let bufferList = UnsafeMutableAudioBufferListPointer(outputBuffer)
+        for buffer in bufferList {
+            guard let mData = buffer.mData else { continue }
+            let frameCount = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
+            let samples = mData.assumingMemoryBound(to: Float.self)
+
+            for index in 0..<frameCount {
+                samples[index] = sample()
+            }
         }
     }
 

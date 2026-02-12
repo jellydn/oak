@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
 
         notchWindowController = NotchWindowController()
-        notchWindowController?.showWindow(nil)
+        notchWindowController?.window?.orderFrontRegardless()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

@@ -2,12 +2,13 @@ import SwiftUI
 import AppKit
 
 class NotchWindowController: NSWindowController {
-    private let collapsedWidth: CGFloat = 192
-    private let expandedWidth: CGFloat = 400
-    private let notchHeight: CGFloat = 80
+    private let collapsedWidth: CGFloat = 144
+    private let expandedWidth: CGFloat = 316
+    private let notchHeight: CGFloat = 56
+    private var lastExpandedState: Bool?
 
     convenience init() {
-        let window = NotchWindow(width: 192, height: 80)
+        let window = NotchWindow(width: 144, height: 56)
         self.init(window: window)
 
         let contentView = NotchCompanionView { [weak self] expanded in
@@ -15,7 +16,7 @@ class NotchWindowController: NSWindowController {
         }
         window.contentView = NSHostingView(rootView: contentView)
 
-        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
     }
 
     func cleanup() {
@@ -24,6 +25,8 @@ class NotchWindowController: NSWindowController {
 
     private func setExpanded(_ expanded: Bool) {
         guard let window else { return }
+        guard lastExpandedState != expanded else { return }
+        lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
         let screenFrame = NSScreen.main?.frame ?? .zero
@@ -31,11 +34,14 @@ class NotchWindowController: NSWindowController {
         let xPosition = (screenFrame.width - targetWidth) / 2
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
-        window.setFrame(newFrame, display: true, animate: true)
+        // Avoid recursive layout warnings by resizing outside the current update cycle.
+        DispatchQueue.main.async {
+            window.setFrame(newFrame, display: true, animate: false)
+        }
     }
 }
 
-class NotchWindow: NSWindow {
+class NotchWindow: NSPanel {
     init(width: CGFloat, height: CGFloat) {
         let screenFrame = NSScreen.main?.frame ?? .zero
         let xPosition = (screenFrame.width - width) / 2

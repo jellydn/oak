@@ -27,7 +27,7 @@ struct NotchCompanionView: View {
                         .stroke(viewModel.isSessionComplete ? Color.green.opacity(0.5) : Color.white.opacity(0.2), lineWidth: viewModel.isSessionComplete ? 2 : 1)
                 )
 
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 if isExpanded {
                     if viewModel.canStart {
                         startView
@@ -45,12 +45,12 @@ struct NotchCompanionView: View {
 
                 expandToggleButton
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
-        .frame(width: isExpanded ? 380 : 172, height: 60)
+        .frame(width: isExpanded ? 300 : 132, height: 48)
         .contentShape(Rectangle())
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
@@ -58,10 +58,14 @@ struct NotchCompanionView: View {
             }
         }
         .onChange(of: isExpanded) { expanded in
-            onExpansionChanged(expanded)
+            DispatchQueue.main.async {
+                onExpansionChanged(expanded)
+            }
         }
         .onAppear {
-            onExpansionChanged(isExpanded)
+            DispatchQueue.main.async {
+                onExpansionChanged(isExpanded)
+            }
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
             if isComplete {
@@ -87,10 +91,10 @@ struct NotchCompanionView: View {
     }
 
     private var compactView: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             if viewModel.canStart {
                 Text(viewModel.selectedPreset.displayName)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondary)
 
                 Button(action: {
@@ -98,21 +102,21 @@ struct NotchCompanionView: View {
                 }) {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
-                        .frame(width: 28, height: 28)
+                        .frame(width: 22, height: 22)
                         .background(Color.green)
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
             } else {
                 Text(viewModel.displayTime)
-                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
                     .foregroundColor(viewModel.isPaused ? .orange : .primary)
             }
         }
     }
 
     private var startView: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             Picker("", selection: $viewModel.selectedPreset) {
                 ForEach(Preset.allCases, id: \.self) { preset in
                     Text(preset.displayName)
@@ -120,14 +124,14 @@ struct NotchCompanionView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .frame(width: 100)
+            .frame(width: 90)
 
             Button(action: {
                 viewModel.startSession()
             }) {
                 Image(systemName: "play.fill")
                     .foregroundColor(.white)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 28, height: 28)
                     .background(Color.green)
                     .clipShape(Circle())
             }
@@ -136,14 +140,14 @@ struct NotchCompanionView: View {
     }
 
     private var sessionView: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(viewModel.displayTime)
-                    .font(.system(size: 22, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
                     .foregroundColor(viewModel.isPaused ? .orange : .primary)
 
                 Text(viewModel.currentSessionType)
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.system(size: 9, weight: .medium))
                     .foregroundColor(.secondary)
             }
 
@@ -153,7 +157,7 @@ struct NotchCompanionView: View {
                 }) {
                     Image(systemName: "pause.fill")
                         .foregroundColor(.white)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 26, height: 26)
                         .background(Color.orange)
                         .clipShape(Circle())
                 }
@@ -164,7 +168,7 @@ struct NotchCompanionView: View {
                 }) {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 26, height: 26)
                         .background(Color.green)
                         .clipShape(Circle())
                 }
@@ -175,7 +179,7 @@ struct NotchCompanionView: View {
                 }) {
                     Image(systemName: "forward.fill")
                         .foregroundColor(.white)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 26, height: 26)
                         .background(Color.blue)
                         .clipShape(Circle())
                 }
@@ -191,11 +195,11 @@ struct NotchCompanionView: View {
             ZStack {
                 Circle()
                     .fill(viewModel.audioManager.isPlaying ? Color.blue.opacity(0.2) : Color.clear)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 24, height: 24)
 
                 Image(systemName: viewModel.audioManager.selectedTrack.systemImageName)
                     .foregroundColor(viewModel.audioManager.isPlaying ? .blue : .secondary)
-                    .font(.system(size: 14))
+                    .font(.system(size: 12))
             }
         }
         .buttonStyle(.plain)
@@ -208,16 +212,16 @@ struct NotchCompanionView: View {
             ZStack {
                 Circle()
                     .fill(viewModel.streakDays > 0 ? Color.orange.opacity(0.2) : Color.clear)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 24, height: 24)
 
                 if viewModel.streakDays > 0 {
                     Text("\(viewModel.streakDays)")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.orange)
                 } else {
                     Image(systemName: "chart.bar.fill")
                         .foregroundColor(.secondary)
-                        .font(.system(size: 14))
+                        .font(.system(size: 12))
                 }
             }
         }
@@ -231,9 +235,9 @@ struct NotchCompanionView: View {
             }
         }) {
             Image(systemName: isExpanded ? "chevron.compact.left" : "chevron.compact.right")
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.secondary)
-                .frame(width: 20, height: 32)
+                .frame(width: 16, height: 24)
         }
         .buttonStyle(.plain)
         .help(isExpanded ? "Collapse" : "Expand")
