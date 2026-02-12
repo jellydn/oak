@@ -4,7 +4,7 @@
 
 Oak is a lightweight macOS focus companion app built with Swift and SwiftUI. It provides a notch-based UI for Pomodoro-style focus sessions with ambient audio support.
 
-**Stack**: Swift 5.9+, SwiftUI, AVFoundation, Core Data (planned)  
+**Stack**: Swift 5.9+, SwiftUI, AVFoundation  
 **Platform**: macOS 13+ (Apple Silicon target)  
 **Architecture**: MVVM with `@MainActor` for UI layer
 
@@ -39,11 +39,8 @@ just build-release
 # Run tests with verbose output
 just test-verbose
 
-# Check for compilation errors without building
+# Check for compilation errors
 just check
-
-# List all available commands
-just
 ```
 
 Alternative: Use `xcodebuild` directly:
@@ -57,8 +54,7 @@ xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' test
 **Note:** Project uses XcodeGen (project.yml). Regenerate Xcode project if needed:
 
 ```bash
-cd Oak
-xcodegen generate
+cd Oak && xcodegen generate
 ```
 
 ---
@@ -77,7 +73,6 @@ xcodegen generate
 - 120 character line limit (soft)
 - Trailing newline at end of files
 - One blank line between type declarations
-- No trailing whitespace
 
 ### Types & Naming
 
@@ -85,7 +80,6 @@ xcodegen generate
 - **Functions/Variables**: camelCase (`startSession`, `remainingSeconds`)
 - **Constants**: lowerCamelCase for instance, PascalCase for static
 - **Enums**: PascalCase with lowerCamelCase cases
-- **Associated values**: Descriptive labels (`remainingSeconds: Int`)
 - **Boolean properties**: Start with is/has/should (`isWorkSession`, `canStart`)
 
 ### SwiftUI Conventions
@@ -97,14 +91,7 @@ xcodegen generate
 
 ### State Management
 
-- Use enums with associated values for finite state machines:
-  ```swift
-  enum SessionState {
-      case idle
-      case running(remainingSeconds: Int, isWorkSession: Bool)
-      case paused(remainingSeconds: Int, isWorkSession: Bool)
-  }
-  ```
+- Use enums with associated values for finite state machines
 - Use pattern matching with `if case` for state checks
 - Keep state transitions explicit and side-effect-free
 
@@ -113,25 +100,11 @@ xcodegen generate
 - Use Swift's `Result` type for async operations that can fail
 - Prefer early returns/guard clauses over nested if-else
 - Log errors with `os.log` (not print statements in production)
-- For timer-based operations, handle edge cases (zero/negative values)
 
 ### Memory Management
 
 - Use `[weak self]` in closures that escape (timers, async callbacks)
 - Always `invalidate()` timers in `cleanup()` or `deinit`
-- Avoid retain cycles in ViewModel -> Service dependencies
-
-### Audio Engine Patterns
-
-- For AVAudioEngine volume control, use `didSet` observers on `@Published` properties to automatically update the engine:
-  ```swift
-  @Published var volume: Double = 0.5 {
-      didSet {
-          mainMixerNode.outputVolume = Float(volume)
-      }
-  }
-  ```
-- This ensures volume changes from SwiftUI bindings (sliders) immediately affect audio output
 
 ### File Organization
 
@@ -150,29 +123,23 @@ Oak/
 
 - Test files mirror source structure with `Tests` suffix
 - Use XCTest framework
-- Test state transitions thoroughly (idle → running → paused → idle)
-- Mock time-based operations where possible
+- Test state transitions (idle → running → paused → idle)
 - Test computed properties and edge cases (0 values, boundary conditions)
 
 ---
 
 ## Performance Requirements
 
-Per PRD requirements:
-
-- Launch time < 1 second on target hardware
+- Launch time < 1 second
 - Idle CPU < 3% in release builds
 - Timer accuracy under backgrounding and sleep/wake
-- Minimal memory footprint for always-available companion
 
 ---
 
 ## Documentation
 
 - Use `///` for public API documentation
-- Include parameter descriptions for non-obvious functions
 - ADRs go in `doc/adr/` with sequential numbering
-- User-facing documentation in `README.md`
 - Detailed requirements in `tasks/prd-macos-focus-companion-app.md`
 
 ---
@@ -182,15 +149,13 @@ Per PRD requirements:
 ```
 type(scope): brief description
 
-Body explaining what and why (not how)
+Body explaining what and why
 
 Fixes #issue-number
 ```
 
 Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`  
 Scope: `timer`, `audio`, `ui`, `persistence`, etc.
-
-Example: `feat(timer): add pause/resume functionality`
 
 ---
 
@@ -203,8 +168,6 @@ Example: `feat(timer): add pause/resume functionality`
 - Built-in audio tracks only (no user imports)
 - Local persistence only (no cloud sync)
 - Free MVP (no paywall code yet)
-
-See ADR-0001 in `doc/adr/` for detailed rationale.
 
 ---
 

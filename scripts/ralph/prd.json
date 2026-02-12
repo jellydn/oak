@@ -3,9 +3,8 @@
   "branchName": "ralph/macos-focus-companion",
   "reviewDate": "2026-02-13",
   "knownIssues": [
-    "Convergence to Oak/Oak/* is complete, but the app build currently fails in AudioManager on macOS.",
-    "AudioManager uses iOS-only AVAudioSession APIs (sharedInstance/setCategory/setActive) that are unavailable on macOS.",
-    "AudioManager depends on UnsafeMutableAudioBufferListIterator, which is currently unresolved in this target."
+    "There are two Xcode projects in the repo root and subfolder; launching the wrong one can show stale UI behavior.",
+    "Ensure development and run flows use Oak/Oak.xcodeproj (the converged modular source path)."
   ],
   "userStories": [
     {
@@ -17,7 +16,7 @@
         "xcodebuild -project Oak.xcodeproj -scheme Oak -configuration Debug -derivedDataPath /tmp/oak-derived build succeeds.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 0
     },
     {
