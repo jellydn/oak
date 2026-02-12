@@ -6,14 +6,26 @@ import SwiftUI
 final class US005Tests: XCTestCase {
     var viewModel: FocusSessionViewModel!
     var view: NotchCompanionView!
+    var presetSettings: PresetSettingsStore!
+    var presetSuiteName: String!
 
     override func setUp() async throws {
-        viewModel = FocusSessionViewModel()
-        view = NotchCompanionView()
+        let suiteName = "OakTests.US005.\(UUID().uuidString)"
+        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+            throw NSError(domain: "US005Tests", code: 1)
+        }
+        userDefaults.removePersistentDomain(forName: suiteName)
+        presetSuiteName = suiteName
+        presetSettings = PresetSettingsStore(userDefaults: userDefaults)
+        viewModel = FocusSessionViewModel(presetSettings: presetSettings)
+        view = NotchCompanionView(viewModel: viewModel)
     }
 
     override func tearDown() async throws {
         viewModel.cleanup()
+        if let presetSuiteName {
+            UserDefaults(suiteName: presetSuiteName)?.removePersistentDomain(forName: presetSuiteName)
+        }
     }
 
     func testSessionCompletionTriggersAnimation() {

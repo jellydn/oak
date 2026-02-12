@@ -7,12 +7,25 @@ class FocusSessionViewModel: ObservableObject {
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
 
+    let presetSettings: PresetSettingsStore
     private var timer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
     private var sessionStartSeconds: Int = 0
+    private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager = ProgressManager()
+
+    init(presetSettings: PresetSettingsStore) {
+        self.presetSettings = presetSettings
+        self.presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+    }
+
+    convenience init() {
+        self.init(presetSettings: PresetSettingsStore.shared)
+    }
 
     var canStart: Bool {
         if case .idle = sessionState {
@@ -48,16 +61,16 @@ class FocusSessionViewModel: ObservableObject {
 
         switch sessionState {
         case .idle:
-            minutes = selectedPreset.workDuration / 60
+            minutes = presetSettings.workDuration(for: selectedPreset) / 60
             seconds = 0
         case .running(let remaining, _), .paused(let remaining, _):
             minutes = remaining / 60
             seconds = remaining % 60
         case .completed(let isWorkSession):
             if isWorkSession {
-                minutes = selectedPreset.breakDuration / 60
+                minutes = presetSettings.breakDuration(for: selectedPreset) / 60
             } else {
-                minutes = selectedPreset.workDuration / 60
+                minutes = presetSettings.workDuration(for: selectedPreset) / 60
             }
             seconds = 0
         }
@@ -111,7 +124,7 @@ class FocusSessionViewModel: ObservableObject {
         if let preset {
             selectedPreset = preset
         }
-        currentRemainingSeconds = selectedPreset.workDuration
+        currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
         isWorkSession = true
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
@@ -135,7 +148,9 @@ class FocusSessionViewModel: ObservableObject {
         }
 
         isWorkSession = !completedWorkSession
-        currentRemainingSeconds = isWorkSession ? selectedPreset.workDuration : selectedPreset.breakDuration
+        currentRemainingSeconds = isWorkSession
+            ? presetSettings.workDuration(for: selectedPreset)
+            : presetSettings.breakDuration(for: selectedPreset)
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
@@ -197,6 +212,10 @@ class FocusSessionViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 1_500_000_000)
             isSessionComplete = false
         }
+    }
+
+    deinit {
+        presetSettingsCancellable?.cancel()
     }
 
     func cleanup() {

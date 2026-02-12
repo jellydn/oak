@@ -6,12 +6,20 @@ class NotchWindowController: NSWindowController {
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool?
+    private let viewModel: FocusSessionViewModel
 
     convenience init() {
-        let window = NotchWindow(width: 144, height: 33)
-        self.init(window: window)
+        self.init(presetSettings: nil)
+    }
 
-        let contentView = NotchCompanionView { [weak self] expanded in
+    init(presetSettings: PresetSettingsStore?) {
+        let settings = presetSettings ?? PresetSettingsStore.shared
+        self.viewModel = FocusSessionViewModel(presetSettings: settings)
+        
+        let window = NotchWindow(width: 144, height: 33)
+        super.init(window: window)
+
+        let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
             self?.handleExpansionChange(expanded)
         }
         window.contentView = NSHostingView(rootView: contentView)
@@ -19,8 +27,12 @@ class NotchWindowController: NSWindowController {
         window.orderFrontRegardless()
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     func cleanup() {
-        (window?.contentView as? NSHostingView<NotchCompanionView>)?.rootView.viewModel.cleanup()
+        viewModel.cleanup()
     }
 
     func handleExpansionChange(_ expanded: Bool) {
@@ -66,23 +78,6 @@ class NotchWindow: NSPanel {
     }
 
     override func rightMouseDown(with event: NSEvent) {
-        let menu = NSMenu()
-
-        let settingsItem = NSMenuItem(title: "Settings...", action: nil, keyEquivalent: ",")
-        settingsItem.isEnabled = false
-        menu.addItem(settingsItem)
-
-        menu.addItem(.separator())
-
-        let quitItem = NSMenuItem(
-            title: "Quit Oak",
-            action: #selector(NSApplication.terminate(_:)),
-            keyEquivalent: "q"
-        )
-        quitItem.target = NSApp
-        menu.addItem(quitItem)
-
-        guard let contentView else { return }
-        NSMenu.popUpContextMenu(menu, with: event, for: contentView)
+        super.rightMouseDown(with: event)
     }
 }

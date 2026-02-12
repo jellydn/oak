@@ -128,7 +128,11 @@ final class US006Tests: XCTestCase {
 
     func testViewModelExposesProgressStats() {
         // Test that ViewModel exposes progress stats
-        let viewModel = FocusSessionViewModel()
+        let suiteName = "OakTests.US006.\(UUID().uuidString)"
+        let userDefaults = UserDefaults(suiteName: suiteName)!
+        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
+        let viewModel = FocusSessionViewModel(presetSettings: presetSettings)
         let manager = viewModel.progressManager
 
         // Record a session
@@ -144,7 +148,11 @@ final class US006Tests: XCTestCase {
 
     func testProgressMenuDisplaysStats() {
         // Test that ProgressMenuView can be created and displays stats
-        let viewModel = FocusSessionViewModel()
+        let suiteName = "OakTests.US006.\(UUID().uuidString)"
+        let userDefaults = UserDefaults(suiteName: suiteName)!
+        defer { userDefaults.removePersistentDomain(forName: suiteName) }
+        let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
+        let viewModel = FocusSessionViewModel(presetSettings: presetSettings)
 
         // Record some progress
         viewModel.progressManager.recordSessionCompletion(durationMinutes: 25)

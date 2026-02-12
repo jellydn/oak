@@ -28,15 +28,20 @@ just clean && just open    # Clean and open in Xcode
 **Single test command examples:**
 
 ```bash
-just test-method FocusSessionViewModelTests testStartSession
-just test-method FocusSessionViewModelTests testPauseSession
-just test-method AudioServiceTests testPlayAndStop
+just test-method FocusSessionViewModelTests "testStartSession"
+just test-method FocusSessionViewModelTests "testPauseSession"
+just test-method AudioServiceTests "testPlayAndStop"
 ```
 
 **Manual xcodebuild:**
 
 ```bash
+# Build
 cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build
+
+# Run specific test
+cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' \
+  -only-testing:OakTests/FocusSessionViewModelTests/testStartSession test
 ```
 
 **Regenerate Xcode project:** `cd Oak && xcodegen generate`
@@ -66,7 +71,6 @@ cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=m
 - ViewModels: `@MainActor class X: ObservableObject` with `@Published`
 - Prefer `private` for internal state, `private(set)` for read-only published
 - Use computed properties for derived state (`displayTime`, `canPause`)
-- **Ownership**: `@StateObject` for ViewModels created in View, `@ObservedObject` for dependencies
 - Extract views as `private var some View` computed properties
 
 ### State Management
@@ -85,12 +89,7 @@ cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=m
 
 - Use `[weak self]` in escaping closures (timers, async callbacks)
 - Always `invalidate()` timers in `cleanup()` or `deinit`
-- Wrap timer callbacks with `Task { @MainActor in }`:
-  ```swift
-  timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-      Task { @MainActor in self?.tick() }
-  }
-  ```
+- Wrap timer callbacks with `Task { @MainActor in self?.tick() }`
 
 ### Persistence
 
@@ -109,9 +108,9 @@ Oak/
 │   ├── Models/              # Data models, enums, protocols
 │   ├── Views/               # SwiftUI Views
 │   ├── ViewModels/          # ObservableObject classes
-│   ├── Services/           # Business logic, audio, persistence
-│   ├── Resources/           # Assets, sounds, config files
-│   └── OakApp.swift        # App entry point
+│   ├── Services/            # Business logic, audio, persistence
+│   ├── Resources/            # Assets, sounds, config files
+│   └── OakApp.swift         # App entry point
 ├── Oak.xcodeproj/
 ├── project.yml              # XcodeGen config
 └── Tests/                   # Unit tests
@@ -124,7 +123,7 @@ Oak/
 - Test files mirror source structure with `Tests` suffix
 - Use XCTest framework
 - Test state transitions: idle → running → paused → idle
-- Test computed properties and edge cases (0 values, boundary conditions)
+- Test computed properties and edge cases (0 values, boundaries)
 
 ---
 
@@ -141,20 +140,27 @@ Oak/
 
 ## Performance Requirements
 
-- Launch time < 1 second
-- Idle CPU < 3% in release builds
+- Launch time < 1 second, idle CPU < 3% in release
 - Timer accuracy under backgrounding and sleep/wake
 
 ---
 
 ## Commit Message Style
 
-```
-type(scope): brief description
-```
+`type(scope): brief description`
 
 - **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
 - **Scope**: `timer`, `audio`, `ui`, `persistence`, etc.
+
+---
+
+## What Agents Should Know
+
+- Always run `just build` after making changes to verify compilation
+- Run relevant tests before submitting changes: `just test-method ViewModelTests "testName"`
+- Verify changes don't break existing UI constraints (notch-only display)
+- Use `os.log` for logging in production, `print()` for debugging
+- When in doubt, check the PRD at `tasks/prd-macos-focus-companion-app.md`
 
 ---
 
