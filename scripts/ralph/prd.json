@@ -70,7 +70,7 @@
         "Audio stops automatically when focus session ends.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 4
     },
     {
