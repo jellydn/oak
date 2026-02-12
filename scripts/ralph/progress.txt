@@ -191,5 +191,34 @@ Session: N/A
   - AVAudioEngine.mainMixerNode.outputVolume must be updated when volume changes for real-time audio adjustment
   - Be careful with didSet observers - they shouldn't call methods that modify the property to avoid infinite recursion
   - When audio needs to respond to UI changes immediately, use didSet on @Published properties
+   - Build command: `just build` (succeeds with no errors)
+   - Lint check: `cd Oak && swiftlint lint --quiet` (has pre-existing warnings, no errors)
+
+## [2026-02-13 00:17] - US-000 (revisited)
+Session: N/A
+- What was implemented:
+  - Fixed iOS-only AVAudioSession APIs by adding platform-specific compilation guards (#if os(iOS) || os(tvOS) || os(watchOS))
+  - Refactored audio generation code to extract common buffer filling logic (fillOutputBuffer helper method)
+  - Fixed layout warnings by wrapping onExpansionChanged callbacks in DispatchQueue.main.async
+  - Fixed focus-stealing issue by using orderFrontRegardless() instead of makeKeyAndOrderFront/showWindow
+  - Adjusted notch dimensions for better fit (144x56 collapsed, 316x56 expanded, down from 172x60/380x60)
+  - Changed NSWindow to NSPanel for better window behavior (non-activating panel)
+  - Updated AGENTS.md with cleanup and simplification (removed redundant examples and verbose descriptions)
+  - Updated knownIssues in PRD to reflect dual Xcode project concern
+- Files changed:
+  - Oak/Oak/OakApp.swift - Changed showWindow to orderFrontRegardless
+  - Oak/Oak/Services/AudioManager.swift - Added platform guards and refactored with fillOutputBuffer helper
+  - Oak/Oak/Views/NotchCompanionView.swift - Adjusted dimensions and fixed layout warnings
+  - Oak/Oak/Views/NotchWindowController.swift - Changed to NSPanel, adjusted dimensions, fixed recursive layout
+  - AGENTS.md - Cleanup and simplification
+  - scripts/ralph/prd.json - Updated knownIssues and US-000 passes to true
+- **Learnings for future iterations:**
+  - AVAudioSession is iOS/tvOS/watchOS only - use #if os(...) guards for cross-platform code
+  - Extracting common buffer filling logic reduces code duplication in audio generation
+  - SwiftUI layout updates in callbacks should use DispatchQueue.main.async to avoid recursive warnings
+  - orderFrontRegardless() avoids stealing keyboard focus vs makeKeyAndOrderFront
+  - NSPanel provides better behavior for non-activating windows than NSWindow
+  - Compact notch dimensions (144x56 collapsed, 316x56 expanded) fit better on modern Macs
   - Build command: `just build` (succeeds with no errors)
   - Lint check: `cd Oak && swiftlint lint --quiet` (has pre-existing warnings, no errors)
+  - Test command: `just test` (all tests pass)
