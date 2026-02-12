@@ -77,6 +77,30 @@ just clean
 just open
 ```
 
+## CI/CD and Releases
+
+- CI runs on GitHub Actions (`.github/workflows/ci.yml`) for `push` to `main` and all PRs.
+- Release workflow (`.github/workflows/release.yml`) builds and publishes unsigned artifacts on:
+  - tag push: `v*` (example: `v0.1.0`)
+  - manual dispatch with a `version` input (example: `v0.1.0`)
+
+### Create a Release
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The release uploads:
+- `Oak-<version>.dmg`
+- `Oak-<version>.zip`
+
+### No Apple Account Notes
+
+- Artifacts are built unsigned (`CODE_SIGNING_ALLOWED=NO`).
+- The app is not notarized.
+- Users will need to bypass Gatekeeper on first launch (Right-click app -> Open).
+
 ## 📁 Project Structure
 
 ```
