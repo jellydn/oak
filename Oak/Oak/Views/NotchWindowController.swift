@@ -60,4 +60,25 @@ class NotchWindow: NSPanel {
         self.hasShadow = false
         self.ignoresMouseEvents = false
     }
+
+    override func rightMouseDown(with event: NSEvent) {
+        let menu = NSMenu()
+
+        let settingsItem = NSMenuItem(title: "Settings...", action: nil, keyEquivalent: ",")
+        settingsItem.isEnabled = false
+        menu.addItem(settingsItem)
+
+        menu.addItem(.separator())
+
+        let quitItem = NSMenuItem(
+            title: "Quit Oak",
+            action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q"
+        )
+        quitItem.target = NSApp
+        menu.addItem(quitItem)
+
+        guard let contentView else { return }
+        NSMenu.popUpContextMenu(menu, with: event, for: contentView)
+    }
 }
