@@ -5,7 +5,11 @@ import Combine
 @MainActor
 class AudioManager: ObservableObject {
     @Published var selectedTrack: AudioTrack = .none
-    @Published var volume: Double = 0.5
+    @Published var volume: Double = 0.5 {
+        didSet {
+            updateAudioEngineVolume()
+        }
+    }
     @Published var isPlaying: Bool = false
 
     private var audioPlayer: AVAudioPlayer?
@@ -43,13 +47,16 @@ class AudioManager: ObservableObject {
         selectedTrack = .none
     }
 
-    func setVolume(_ newVolume: Double) {
-        volume = max(0, min(1, newVolume))
+    private func updateAudioEngineVolume() {
         audioPlayer?.volume = Float(volume)
 
         if let mainMixerNode = audioEngine?.mainMixerNode {
             mainMixerNode.outputVolume = Float(volume)
         }
+    }
+
+    func setVolume(_ newVolume: Double) {
+        volume = max(0, min(1, newVolume))
     }
 
     private func generateAmbientSound(for track: AudioTrack) {

@@ -2,9 +2,7 @@
   "projectName": "Oak - macOS Focus Companion App",
   "branchName": "ralph/macos-focus-companion",
   "reviewDate": "2026-02-12",
-  "knownIssues": [
-    "Ambient audio volume slider is not wired to update engine output while playing."
-  ],
+  "knownIssues": [],
   "userStories": [
     {
       "id": "US-000",
@@ -55,7 +53,7 @@
         "UI clearly indicates paused vs running state.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 3
     },
     {
@@ -69,7 +67,7 @@
         "Audio stops automatically when focus session ends.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 4
     },
     {

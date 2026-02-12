@@ -121,6 +121,18 @@ xcodegen generate
 - Always `invalidate()` timers in `cleanup()` or `deinit`
 - Avoid retain cycles in ViewModel -> Service dependencies
 
+### Audio Engine Patterns
+
+- For AVAudioEngine volume control, use `didSet` observers on `@Published` properties to automatically update the engine:
+  ```swift
+  @Published var volume: Double = 0.5 {
+      didSet {
+          mainMixerNode.outputVolume = Float(volume)
+      }
+  }
+  ```
+- This ensures volume changes from SwiftUI bindings (sliders) immediately affect audio output
+
 ### File Organization
 
 ```
