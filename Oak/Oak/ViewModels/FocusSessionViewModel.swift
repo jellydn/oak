@@ -12,11 +12,15 @@ class FocusSessionViewModel: ObservableObject {
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
     private var sessionStartSeconds: Int = 0
+    private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager = ProgressManager()
 
     init(presetSettings: PresetSettingsStore) {
         self.presetSettings = presetSettings
+        self.presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     convenience init() {
@@ -208,6 +212,10 @@ class FocusSessionViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 1_500_000_000)
             isSessionComplete = false
         }
+    }
+
+    deinit {
+        presetSettingsCancellable?.cancel()
     }
 
     func cleanup() {
