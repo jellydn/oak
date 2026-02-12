@@ -12,7 +12,7 @@ class NotchWindowController: NSWindowController {
         self.init(window: window)
 
         let contentView = NotchCompanionView { [weak self] expanded in
-            self?.setExpanded(expanded)
+            self?.handleExpansionChange(expanded)
         }
         window.contentView = NSHostingView(rootView: contentView)
 
@@ -21,6 +21,10 @@ class NotchWindowController: NSWindowController {
 
     func cleanup() {
         (window?.contentView as? NSHostingView<NotchCompanionView>)?.rootView.viewModel.cleanup()
+    }
+
+    func handleExpansionChange(_ expanded: Bool) {
+        setExpanded(expanded)
     }
 
     private func setExpanded(_ expanded: Bool) {
