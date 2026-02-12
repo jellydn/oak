@@ -5,7 +5,9 @@ targets:
     platform: macOS
     deploymentTarget: "13.0"
     sources:
-      - Sources/Oak
+      - path: Oak
+        excludes:
+          - "**/*.entitlements"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.oak.app
       INFOPLIST_KEY_LSUIElement: true

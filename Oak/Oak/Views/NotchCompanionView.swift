@@ -57,14 +57,14 @@ struct NotchCompanionView: View {
                 isHovering = hovering
             }
         }
-        .onChange(of: isExpanded) { _, expanded in
+        .onChange(of: isExpanded) { expanded in
             onExpansionChanged(expanded)
         }
         .onAppear {
             onExpansionChanged(isExpanded)
         }
-        .onChange(of: viewModel.isSessionComplete) { _, newValue in
-            if newValue {
+        .onChange(of: viewModel.isSessionComplete) { isComplete in
+            if isComplete {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     animateCompletion = true
                 }

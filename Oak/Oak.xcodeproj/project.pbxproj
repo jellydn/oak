@@ -7,8 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		25E829306FC0F6D57A52010A /* Oak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F65C6D610B738716780996 /* Oak.swift */; };
+		16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */; };
+		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
+		8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */; };
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
+		B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3EFAB628759B783D66D3 /* AudioTrack.swift */; };
+		B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */; };
+		BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451C36F9BC7A6103BF32362C /* OakApp.swift */; };
+		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
+		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
+		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,12 +31,30 @@
 
 /* Begin PBXFileReference section */
 		03D90651E33152E3C952CE1D /* Oak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Oak.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchCompanionView.swift; sourceTree = "<group>"; };
 		0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
-		34F65C6D610B738716780996 /* Oak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oak.swift; sourceTree = "<group>"; };
+		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
+		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
+		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
+		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
+		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
+		6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressManager.swift; sourceTree = "<group>"; };
+		841F3EFAB628759B783D66D3 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
 		B93F85CD94F4CCB44AC7296C /* OakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C348F7E99471145836A04408 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		01D9F58885F69FCDA63E90F6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				841F3EFAB628759B783D66D3 /* AudioTrack.swift */,
+				1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */,
+				23F2FC6738FCAE0999D42A11 /* SessionModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		4D1B4FE5542163CFB6A40F76 = {
 			isa = PBXGroup;
 			children = (
@@ -41,10 +67,13 @@
 		64E95FFCFED6BE5E5E74A2EC /* Oak */ = {
 			isa = PBXGroup;
 			children = (
-				34F65C6D610B738716780996 /* Oak.swift */,
+				451C36F9BC7A6103BF32362C /* OakApp.swift */,
+				01D9F58885F69FCDA63E90F6 /* Models */,
+				A433A3CADD138B6EE89589F9 /* Services */,
+				A30996A53B7CC97E1A61818B /* ViewModels */,
+				9B4DD5BBE504192643738A6D /* Views */,
 			);
-			name = Oak;
-			path = Sources/Oak;
+			path = Oak;
 			sourceTree = "<group>";
 		};
 		71E68205C3AB6B6E9D8871A5 /* Products */ = {
@@ -63,6 +92,32 @@
 			);
 			name = OakTests;
 			path = Tests/OakTests;
+			sourceTree = "<group>";
+		};
+		9B4DD5BBE504192643738A6D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */,
+				3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A30996A53B7CC97E1A61818B /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A433A3CADD138B6EE89589F9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C348F7E99471145836A04408 /* AudioManager.swift */,
+				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -137,7 +192,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				25E829306FC0F6D57A52010A /* Oak.swift in Sources */,
+				D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */,
+				B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */,
+				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
+				8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */,
+				B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */,
+				BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */,
+				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
+				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
+				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,8 +1,12 @@
 {
   "projectName": "Oak - macOS Focus Companion App",
   "branchName": "ralph/macos-focus-companion",
-  "reviewDate": "2026-02-12",
-  "knownIssues": [],
+  "reviewDate": "2026-02-13",
+  "knownIssues": [
+    "Convergence to Oak/Oak/* is complete, but the app build currently fails in AudioManager on macOS.",
+    "AudioManager uses iOS-only AVAudioSession APIs (sharedInstance/setCategory/setActive) that are unavailable on macOS.",
+    "AudioManager depends on UnsafeMutableAudioBufferListIterator, which is currently unresolved in this target."
+  ],
   "userStories": [
     {
       "id": "US-000",
@@ -13,7 +17,7 @@
         "xcodebuild -project Oak.xcodeproj -scheme Oak -configuration Debug -derivedDataPath /tmp/oak-derived build succeeds.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 0
     },
     {
@@ -26,7 +30,7 @@
         "Session state changes to running within 500 ms of user click.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 1
     },
     {
@@ -40,7 +44,7 @@
         "Auto-start next interval defaults to OFF in MVP.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 2
     },
     {
@@ -53,7 +57,7 @@
         "UI clearly indicates paused vs running state.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 3
     },
     {
@@ -67,7 +71,7 @@
         "Audio stops automatically when focus session ends.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 4
     },
     {
@@ -80,7 +84,7 @@
         "Next state (break or idle) is clearly shown.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 5
     },
     {
@@ -94,7 +98,7 @@
         "Data persists across app relaunch.",
         "Typecheck/lint passes."
       ],
-      "passes": true,
+      "passes": false,
       "priority": 6
     }
   ]

@@ -10,7 +10,8 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "Oak",
-            swiftSettings: [.unsafeFlags(["-parse-as-library"])]
+            path: "Oak",
+            exclude: ["Oak.entitlements"]
         )
     ]
 )
