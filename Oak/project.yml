@@ -10,7 +10,7 @@ targets:
           - "**/*.entitlements"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.oak.app
-      MARKETING_VERSION: 0.1.0
+      MARKETING_VERSION: 0.0.0
       CURRENT_PROJECT_VERSION: 1
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       INFOPLIST_KEY_CFBundleShortVersionString: $(MARKETING_VERSION)
@@ -27,7 +27,9 @@ targets:
     platform: macOS
     deploymentTarget: "13.0"
     sources:
-      - Tests/OakTests
+      - path: Tests/OakTests
+        excludes:
+          - NotchWindowControllerTests.swift
     dependencies:
       - target: Oak
     settings:

@@ -19,6 +19,27 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Resolve build version
+        id: vars
+        run: |
+          git fetch --force --tags
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            marketing_version="${GITHUB_REF_NAME#v}"
+          else
+            latest_tag="$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || true)"
+            if [[ -n "$latest_tag" ]]; then
+              marketing_version="${latest_tag#v}"
+            else
+              marketing_version="0.0.0"
+            fi
+          fi
+
+          build_number="${GITHUB_RUN_NUMBER}"
+
+          echo "marketing_version=$marketing_version" >> "$GITHUB_OUTPUT"
+          echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
+
       - name: Build (unsigned)
         run: |
           xcodebuild \
@@ -27,6 +48,8 @@ jobs:
             -destination 'platform=macOS' \
             -derivedDataPath /tmp/oak-derived \
             build \
+            MARKETING_VERSION="${{ steps.vars.outputs.marketing_version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.vars.outputs.build_number }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
@@ -39,6 +62,8 @@ jobs:
             -destination 'platform=macOS' \
             -derivedDataPath /tmp/oak-derived \
             test \
+            MARKETING_VERSION="${{ steps.vars.outputs.marketing_version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.vars.outputs.build_number }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""

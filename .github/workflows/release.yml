@@ -29,21 +29,36 @@ jobs:
       - name: Resolve release tag
         id: vars
         run: |
+          git fetch --force --tags
+
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             tag="${GITHUB_REF_NAME}"
           else
-            tag="${{ github.event.inputs.version }}"
+            input_tag="${{ github.event.inputs.version }}"
+            if [[ -n "$input_tag" ]]; then
+              tag="$input_tag"
+            else
+              tag="$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || true)"
+            fi
+          fi
+
+          if [[ -z "$tag" ]]; then
+            echo "Unable to resolve release tag. Provide workflow input version (e.g. v0.1.0) or create a v* tag."
+            exit 1
           fi
 
           version="${tag#v}"
+          build_number="${GITHUB_RUN_NUMBER}"
 
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
 
       - name: Build DMG and ZIP
         id: assets
         env:
           VERSION: ${{ steps.vars.outputs.version }}
+          BUILD_NUMBER: ${{ steps.vars.outputs.build_number }}
         run: scripts/release/build-release-assets.sh
 
       - name: Upload workflow artifacts
