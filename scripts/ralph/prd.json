@@ -83,7 +83,7 @@
         "Next state (break or idle) is clearly shown.",
         "Typecheck/lint passes."
       ],
-      "passes": false,
+      "passes": true,
       "priority": 5
     },
     {
