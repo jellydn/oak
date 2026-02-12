@@ -44,7 +44,7 @@
         "Audio stops automatically when session ends.",
         "Typecheck/lint passes."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-005",
