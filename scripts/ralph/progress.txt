@@ -11,6 +11,40 @@ Started: Thu Feb 12 23:13:46 +08 2026
 - Use `swift build` from Oak/ directory to build and verify typecheck
 - Use UserDefaults for simple persistence needs in MVP (easier than Core Data for simple key-value storage)
 - Run `xcodegen generate` in Oak/ directory after adding new Swift files to regenerate Xcode project
+- SwiftLint is configured to enforce code quality - variable names must be 3+ characters (e.g., use 'frameIndex' instead of 'i')
+- Always run swiftlint to fix trailing whitespace and code style issues before committing
+
+## [2026-02-12 23:56] - US-000
+Session: N/A
+- What was implemented:
+  - Verified all source files are included in XcodeGen project configuration
+  - Fixed SwiftLint errors: renamed variable 'i' to 'frameIndex' in all audio generation functions
+  - Fixed SwiftLint warnings: removed trailing whitespace from all Swift files
+  - Replaced unused closure parameter with '_' in AVAudioSourceNode callbacks
+  - Verified build succeeds with `just build` command
+  - Verified SwiftLint passes without errors
+- Files changed:
+  - Oak/Oak/Services/AudioManager.swift - Fixed variable names and closure parameters
+  - Oak/Oak/Models/*.swift - Removed trailing whitespace
+  - Oak/Oak/Views/*.swift - Removed trailing whitespace
+  - Oak/Oak/ViewModels/*.swift - Removed trailing whitespace
+  - Oak/Oak/OakApp.swift - Removed trailing whitespace
+  - scripts/ralph/prd.json - Updated US-000 passes to true
+- **Learnings for future iterations:**
+  - SwiftLint enforces variable name length (minimum 3 characters) - use descriptive names like 'frameIndex'
+  - Use '_' for unused closure parameters in Swift to comply with SwiftLint rules
+  - XcodeGen project.yml automatically includes all files under the specified directory
+  - Build command: `just build` (succeeds with no errors)
+  - Lint check: `cd Oak && swiftlint lint --quiet` (no errors)
+---
+- Swift Package Manager is used instead of Xcode project files (more reliable for CLI builds)
+- Notch companion is a borderless, non-activating panel window positioned at top-center of screen
+- Session state uses enum with associated values (SessionState) for type-safe state machine
+- ViewModels are marked with @MainActor and use @Published for SwiftUI binding
+- Timer uses Timer.scheduledTimer with weak self to avoid retain cycles
+- Use `swift build` from Oak/ directory to build and verify typecheck
+- Use UserDefaults for simple persistence needs in MVP (easier than Core Data for simple key-value storage)
+- Run `xcodegen generate` in Oak/ directory after adding new Swift files to regenerate Xcode project
 
 ## [2026-02-12 23:23] - US-001
 Session: N/A
