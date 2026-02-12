@@ -2,10 +2,9 @@
 
 ## Project Overview
 
-Oak is a lightweight macOS focus companion app built with Swift and SwiftUI. It provides a notch-based UI for Pomodoro-style focus sessions with ambient audio support.
+Oak is a lightweight macOS focus companion app with notch-based Pomodoro-style focus sessions and ambient audio.
 
-**Stack**: Swift 5.9+, SwiftUI, AVFoundation
-**Platform**: macOS 13+ (Apple Silicon target)
+**Stack**: Swift 5.9+, SwiftUI, AVFoundation | **Platform**: macOS 13+ (Apple Silicon)
 **Architecture**: MVVM with `@MainActor` for UI layer
 
 ---
@@ -15,21 +14,32 @@ Oak is a lightweight macOS focus companion app built with Swift and SwiftUI. It 
 Use `just` for common tasks (requires [just](https://github.com/casey/just)):
 
 ```bash
-just                              # Show available commands
-just --list                       # Show available commands (same as above)
-just build                          # Build the project
-just build-release                 # Build release version
-just test                           # Run all tests
-just test-verbose                   # Run tests with verbose output
-just test-class FocusSessionViewModelTests    # Run specific test class
-just test-method FocusSessionViewModelTests testStartSession  # Run specific test method
-just check                         # Check for compilation errors without building
-just clean && just open             # Clean and open in Xcode
+just                        # Show available commands
+just build                  # Build the project
+just build-release         # Build release version
+just test                   # Run all tests
+just test-verbose          # Run tests with verbose output
+just test-class Tests      # Run specific test class
+just test-method Tests methodName  # Run specific test method
+just check                 # Check compilation errors
+just clean && just open    # Clean and open in Xcode
 ```
 
-Alternative: `cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build`
+**Single test command examples:**
 
-**Note:** Project uses XcodeGen. Regenerate with: `cd Oak && xcodegen generate`
+```bash
+just test-method FocusSessionViewModelTests testStartSession
+just test-method FocusSessionViewModelTests testPauseSession
+just test-method AudioServiceTests testPlayAndStop
+```
+
+**Manual xcodebuild:**
+
+```bash
+cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build
+```
+
+**Regenerate Xcode project:** `cd Oak && xcodegen generate`
 
 ---
 
@@ -37,26 +47,26 @@ Alternative: `cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destinati
 
 ### Imports & Formatting
 
-- Group imports: Foundation first, then SwiftUI/AppKit, then Apple frameworks, then project imports
-- No blank lines between import statements
-- 4 spaces for indentation (no tabs), 120 character line limit (soft)
-- Trailing newline at end of files, one blank line between type declarations
+- Group: Foundation → SwiftUI/AppKit → Apple frameworks → project imports
+- No blank lines between imports, one blank line between type declarations
+- 4 spaces indentation (no tabs), 120 char line limit (soft)
+- Trailing newline at end of files
 
 ### Types & Naming
 
 - **Types**: PascalCase (`FocusSessionViewModel`, `SessionState`)
 - **Functions/Variables**: camelCase (`startSession`, `remainingSeconds`)
-- **Constants**: lowerCamelCase for instance, PascalCase for static
+- **Constants**: lowerCamelCase (instance), PascalCase (static)
 - **Enums**: PascalCase with lowerCamelCase cases
-- **Boolean properties**: Start with is/has/should (`isWorkSession`, `canStart`)
+- **Booleans**: Start with is/has/should (`isWorkSession`, `canStart`)
 
 ### SwiftUI Conventions
 
 - Use `@MainActor` on all ViewModels and UI-related classes
-- ViewModels: `@MainActor class X: ObservableObject` with `@Published` properties
-- Prefer `private` for internal state, `private(set)` for read-only published state
-- Use computed properties for derived state (e.g., `displayTime`, `canPause`)
-- **Ownership**: `@StateObject` for ViewModels created in View, `@ObservedObject` for passed-in dependencies
+- ViewModels: `@MainActor class X: ObservableObject` with `@Published`
+- Prefer `private` for internal state, `private(set)` for read-only published
+- Use computed properties for derived state (`displayTime`, `canPause`)
+- **Ownership**: `@StateObject` for ViewModels created in View, `@ObservedObject` for dependencies
 - Extract views as `private var some View` computed properties
 
 ### State Management
@@ -69,11 +79,11 @@ Alternative: `cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destinati
 
 - Use Swift's `Result` type for async operations that can fail
 - Prefer early returns/guard clauses over nested if-else
-- **Logging**: Use `os.log` in production; `print()` acceptable during development/debugging
+- **Logging**: Use `os.log` in production; `print()` acceptable in dev/debug
 
-### Memory Management & Concurrency
+### Memory & Concurrency
 
-- Use `[weak self]` in closures that escape (timers, async callbacks)
+- Use `[weak self]` in escaping closures (timers, async callbacks)
 - Always `invalidate()` timers in `cleanup()` or `deinit`
 - Wrap timer callbacks with `Task { @MainActor in }`:
   ```swift
@@ -84,28 +94,27 @@ Alternative: `cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destinati
 
 ### Persistence
 
-Use UserDefaults + Codable for simple local storage:
-
 ```swift
 guard let data = userDefaults.data(forKey: key),
       let records = try? JSONDecoder().decode([T].self, from: data) else { return [] }
 ```
 
-### File Organization
+---
+
+## File Organization
 
 ```
 Oak/
 ├── Oak/
 │   ├── Models/              # Data models, enums, protocols
-│   ├── Views/              # SwiftUI Views
-│   ├── ViewModels/         # ObservableObject classes
+│   ├── Views/               # SwiftUI Views
+│   ├── ViewModels/          # ObservableObject classes
 │   ├── Services/           # Business logic, audio, persistence
-│   ├── Resources/          # Assets, sounds, config files
+│   ├── Resources/           # Assets, sounds, config files
 │   └── OakApp.swift        # App entry point
 ├── Oak.xcodeproj/
-├── Package.swift
-├── project.yml             # XcodeGen config
-└── Tests/                  # Unit tests
+├── project.yml              # XcodeGen config
+└── Tests/                   # Unit tests
 ```
 
 ---
@@ -114,37 +123,8 @@ Oak/
 
 - Test files mirror source structure with `Tests` suffix
 - Use XCTest framework
-- Test state transitions (idle → running → paused → idle)
+- Test state transitions: idle → running → paused → idle
 - Test computed properties and edge cases (0 values, boundary conditions)
-
----
-
-## Performance Requirements
-
-- Launch time < 1 second
-- Idle CPU < 3% in release builds
-- Timer accuracy under backgrounding and sleep/wake
-
----
-
-## Documentation
-
-- Use `///` for public API documentation
-- ADRs go in `doc/adr/` with sequential numbering
-- PRD: `tasks/prd-macos-focus-companion-app.md`
-
----
-
-## Commit Message Style
-
-```
-
-type(scope): brief description
-
-```
-
-- **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
-- **Scope**: `timer`, `audio`, `ui`, `persistence`, etc.
 
 ---
 
@@ -159,7 +139,27 @@ type(scope): brief description
 
 ---
 
+## Performance Requirements
+
+- Launch time < 1 second
+- Idle CPU < 3% in release builds
+- Timer accuracy under backgrounding and sleep/wake
+
+---
+
+## Commit Message Style
+
+```
+type(scope): brief description
+```
+
+- **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
+- **Scope**: `timer`, `audio`, `ui`, `persistence`, etc.
+
+---
+
 ## References
 
 - PRD: `tasks/prd-macos-focus-companion-app.md`
 - ADRs: `doc/adr/`
+- Use `///` for public API documentation
