@@ -12,26 +12,47 @@ Oak is a lightweight macOS focus companion app built with Swift and SwiftUI. It 
 
 ## Build/Test Commands
 
+Use `just` for common tasks (requires [just](https://github.com/casey/just)):
+
 ```bash
-# Build the project (run from Oak/ directory)
-swift build
+# Build the project
+just build
 
-# Alternative: Build with xcodebuild (requires Xcode project)
-xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build
+# Run all tests
+just test
 
-# Run tests
-swift test
+# Run a specific test class
+just test-class FocusSessionViewModelTests
 
-# Open in Xcode (generate project first if needed)
-open Oak.xcodeproj
+# Run a specific test method
+just test-method FocusSessionViewModelTests testStartSession
+
+# Clean build artifacts
+just clean
+
+# Open in Xcode
+just open
+
+# Build release version
+just build-release
+
+# List all available commands
+just
 ```
 
-**Note:** Project uses Swift Package Manager. To generate an Xcode project:
+Alternative: Use `xcodebuild` directly:
 
 ```bash
 cd Oak
-swift package generate-xcodeproj  # If using XcodeGen, or:
-xcodegen generate  # If project.yml exists
+xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build
+xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' test
+```
+
+**Note:** Project uses XcodeGen (project.yml). Regenerate Xcode project if needed:
+
+```bash
+cd Oak
+xcodegen generate
 ```
 
 ---
@@ -40,7 +61,7 @@ xcodegen generate  # If project.yml exists
 
 ### Imports
 
-- Group imports: Foundation first, then SwiftUI, then Apple frameworks, then project imports
+- Group imports: Foundation first, then SwiftUI/AppKit, then Apple frameworks, then project imports
 - No blank lines between import statements
 - Use `@preconcurrency` imports only when necessary for Objective-C interop
 
@@ -134,6 +155,7 @@ Per PRD requirements:
 - Include parameter descriptions for non-obvious functions
 - ADRs go in `doc/adr/` with sequential numbering
 - User-facing documentation in `README.md`
+- Detailed requirements in `tasks/prd-macos-focus-companion-app.md`
 
 ---
 
@@ -164,8 +186,11 @@ Example: `feat(timer): add pause/resume functionality`
 - Local persistence only (no cloud sync)
 - Free MVP (no paywall code yet)
 
+See ADR-0001 in `doc/adr/` for detailed rationale.
+
 ---
 
 ## Questions?
 
-Check the PRD in `tasks/prd-macos-focus-companion-app.md` for detailed requirements.
+- Check the PRD: `tasks/prd-macos-focus-companion-app.md`
+- Review ADRs: `doc/adr/`

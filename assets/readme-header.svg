@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <title>Oak - Focus Companion for macOS</title>
+  <desc>A minimalist macOS focus companion app with notch-based UI and ambient audio support</desc>
+
+  <!-- Definitions for gradients and filters -->
+  <defs>
+    <!-- Background gradient: macOS dark mode style -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1C1C1E"/>
+      <stop offset="100%" style="stop-color:#2C2C2E"/>
+    </linearGradient>
+
+    <!-- Ambient wave gradient -->
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#34C759;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#34C759;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#34C759;stop-opacity:0"/>
+    </linearGradient>
+
+    <!-- Glow effect for notch -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Material blur suggestion -->
+    <filter id="materialBlur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" fill="url(#bgGradient)" rx="12"/>
+
+  <!-- Ambient wave forms (subtle, suggesting focus/audio) -->
+  <g opacity="0.4">
+    <path d="M280 120 Q330 100 380 120 T480 120" stroke="url(#waveGradient)" stroke-width="2" fill="none"/>
+    <path d="M300 130 Q350 110 400 130 T500 130" stroke="url(#waveGradient)" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M320 140 Q370 125 420 140 T520 140" stroke="url(#waveGradient)" stroke-width="1" fill="none" opacity="0.5"/>
+  </g>
+
+  <!-- Left Section: Brand Identity -->
+  <g transform="translate(60, 60)">
+    <!-- Notch silhouette logo -->
+    <g transform="translate(0, 10)" filter="url(#softGlow)">
+      <!-- Outer notch shape -->
+      <path d="M0 20 L0 8 Q0 0 8 0 L52 0 Q60 0 60 8 L60 20 Z" fill="#3A3A3C" stroke="#5A5A5C" stroke-width="1.5"/>
+      <!-- Inner camera dot -->
+      <circle cx="30" cy="10" r="4" fill="#1C1C1E" stroke="#34C759" stroke-width="1.5"/>
+    </g>
+
+    <!-- App name -->
+    <text x="80" y="32" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="42" font-weight="700" fill="#FFFFFF">Oak</text>
+
+    <!-- Tagline -->
+    <text x="80" y="58" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="16" font-weight="400" fill="#EBEBF5">Focus companion for macOS</text>
+  </g>
+
+  <!-- Center: Stylized notch companion suggestion -->
+  <g transform="translate(320, 75)" opacity="0.8">
+    <!-- Material capsule -->
+    <rect x="0" y="0" width="160" height="50" rx="20" fill="#3A3A3C" stroke="#5A5A5C" stroke-width="1"/>
+    <!-- Play button suggestion -->
+    <circle cx="30" cy="25" r="12" fill="#34C759"/>
+    <path d="M26 19 L36 25 L26 31 Z" fill="#FFFFFF"/>
+    <!-- Timer placeholder -->
+    <text x="55" y="32" font-family="'SF Mono', Monaco, 'Cascadia Code', monospace" font-size="20" font-weight="600" fill="#FFFFFF">25:00</text>
+  </g>
+
+  <!-- Right Section: Feature badges -->
+  <g transform="translate(540, 70)">
+    <!-- Badge 1: Pomodoro -->
+    <g transform="translate(0, 0)">
+      <rect width="180" height="28" rx="6" fill="#3A3A3C" stroke="#5A5A5C" stroke-width="0.5"/>
+      <text x="15" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" fill="#EBEBF5">⏱ Pomodoro 25/5, 50/10</text>
+    </g>
+
+    <!-- Badge 2: Ambient sounds -->
+    <g transform="translate(0, 36)">
+      <rect width="180" height="28" rx="6" fill="#3A3A3C" stroke="#5A5A5C" stroke-width="0.5"/>
+      <text x="15" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" fill="#EBEBF5">🔊 Rain · Forest · Cafe</text>
+    </g>
+
+    <!-- Badge 3: Notch-first -->
+    <g transform="translate(0, 72)">
+      <rect width="180" height="28" rx="6" fill="#3A3A3C" stroke="#5A5A5C" stroke-width="0.5"/>
+      <text x="15" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" fill="#EBEBF5">📍 Notch-first UI</text>
+    </g>
+  </g>
+
+  <!-- Bottom accent line (subtle green) -->
+  <rect x="0" y="198" width="800" height="2" fill="#34C759" opacity="0.6"/>
+</svg>

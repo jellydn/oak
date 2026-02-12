@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <title>Oak App Icon (Small)</title>
+  <desc>Simplified app icon for small sizes (dock, menu bar)</desc>
+
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34C759"/>
+      <stop offset="100%" style="stop-color:#28A745"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="#2C2C2E"/>
+
+  <!-- Oak leaf (simplified for small size) -->
+  <path d="M16 26
+           Q10 20 8 12
+           Q6 4 16 4
+           Q26 4 24 12
+           Q22 20 16 26 Z"
+        fill="url(#leafGrad)"/>
+
+  <!-- Leaf vein (single line for clarity) -->
+  <path d="M16 23 L16 6" stroke="#1C1C1E" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Notch suggestion (subtle top curve) -->
+  <path d="M10 8 Q16 6 22 8" stroke="#3A3A3C" stroke-width="2" fill="none"/>
+</svg>

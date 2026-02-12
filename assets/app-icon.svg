@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Oak App Icon</title>
+  <desc>A minimalist app icon featuring a notch silhouette with oak leaf design, representing the macOS focus companion</desc>
+
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1C1C1E"/>
+      <stop offset="50%" style="stop-color:#252528"/>
+      <stop offset="100%" style="stop-color:#2C2C2E"/>
+    </linearGradient>
+
+    <!-- Leaf gradient -->
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34C759"/>
+      <stop offset="100%" style="stop-color:#28A745"/>
+    </linearGradient>
+
+    <!-- Inner glow for depth -->
+    <radialGradient id="innerGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0"/>
+    </radialGradient>
+
+    <!-- Soft shadow -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="16" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+
+    <!-- Subtle inner shadow for notch -->
+    <filter id="notchInnerShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+      <feOffset in="blur" dx="0" dy="1" result="offsetBlur"/>
+      <feComposite in="SourceGraphic" in2="offsetBlur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background with rounded corners (macOS app icon style) -->
+  <g filter="url(#softShadow)">
+    <rect width="1024" height="1024" rx="224" fill="url(#iconBg)"/>
+    <rect width="1024" height="1024" rx="224" fill="url(#innerGlow)"/>
+  </g>
+
+  <!-- Main design: Notch with integrated oak leaf -->
+  <g transform="translate(512, 512)">
+    <!-- Notch silhouette shape -->
+    <g transform="translate(-180, -140)">
+      <!-- Main notch body -->
+      <path d="M0 40 L0 24 Q0 0 24 0 L336 0 Q360 0 360 24 L360 40 Z" fill="#3A3A3C" stroke="#5A5A5C" stroke-width="4"/>
+
+      <!-- Camera dot with oak leaf accent -->
+      <circle cx="180" cy="20" r="16" fill="#1C1C1E" stroke="url(#leafGradient)" stroke-width="6"/>
+    </g>
+
+    <!-- Oak leaf emerging from camera dot area -->
+    <g transform="translate(0, 20)">
+      <!-- Main leaf shape -->
+      <path d="M0 180
+               Q-60 140 -80 80
+               Q-100 20 -60 -40
+               Q-20 -80 0 -120
+               Q20 -80 60 -40
+               Q100 20 80 80
+               Q60 140 0 180 Z"
+            fill="url(#leafGradient)" opacity="0.95"/>
+
+      <!-- Leaf vein details (subtle) -->
+      <path d="M0 170 L0 0" stroke="#1C1C1E" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+      <path d="M0 140 Q-30 100 -40 60" stroke="#1C1C1E" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+      <path d="M0 140 Q30 100 40 60" stroke="#1C1C1E" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+      <path d="M0 100 Q-40 70 -50 40" stroke="#1C1C1E" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+      <path d="M0 100 Q40 70 50 40" stroke="#1C1C1E" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+      <path d="M0 60 Q-30 40 -30 20" stroke="#1C1C1E" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+      <path d="M0 60 Q30 40 30 20" stroke="#1C1C1E" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+
+      <!-- Leaf stem -->
+      <path d="M0 180 L0 200" stroke="url(#leafGradient)" stroke-width="12" stroke-linecap="round"/>
+    </g>
+
+    <!-- Ambient wave suggestion (subtle, at bottom) -->
+    <g transform="translate(0, 240)" opacity="0.3">
+      <path d="M-150 0 Q-75 -20 0 0 Q75 -20 150 0" stroke="#34C759" stroke-width="6" fill="none"/>
+      <path d="M-120 15 Q-60 0 0 15 Q60 0 120 15" stroke="#34C759" stroke-width="4" fill="none" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- Subtle top highlight for polish -->
+  <rect width="1024" height="1024" rx="224" fill="none" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="2"/>
+</svg>

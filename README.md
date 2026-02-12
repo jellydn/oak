@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="assets/readme-header.svg" alt="Oak - Focus Companion for macOS" width="800"/>
+  <br/>
+  <img src="assets/app-icon.svg" alt="Oak App Icon" width="256"/>
+</div>
+
 # Oak
 
 A lightweight macOS focus companion designed for deep work.
