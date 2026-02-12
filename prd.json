@@ -32,7 +32,7 @@
         "UI clearly indicates paused vs running state.",
         "Typecheck/lint passes."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-004",

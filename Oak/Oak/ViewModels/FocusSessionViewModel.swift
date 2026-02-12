@@ -171,6 +171,9 @@ class FocusSessionViewModel: ObservableObject {
             audioManager.stop()
         }
 
+        // Stop audio when any session ends
+        audioManager.stop()
+
         timer?.invalidate()
         timer = nil
         sessionState = .completed(isWorkSession: isWorkSession)

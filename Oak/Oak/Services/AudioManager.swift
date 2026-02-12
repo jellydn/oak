@@ -22,8 +22,6 @@ class AudioManager: ObservableObject {
             return
         }
 
-        selectedTrack = track
-
         #if os(iOS) || os(tvOS) || os(watchOS)
             do {
                 try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
@@ -102,6 +100,7 @@ class AudioManager: ObservableObject {
         do {
             try engine.start()
             isPlaying = true
+            selectedTrack = track
         } catch {
             print("Failed to start audio engine: \(error)")
         }
