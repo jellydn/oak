@@ -1,0 +1,101 @@
+{
+  "project": "Oak - macOS Focus Companion",
+  "branchName": "ralph/macos-focus-companion",
+  "description": "A lightweight, native macOS focus companion that helps users start deep work quickly and sustain attention through simple timed sessions and ambient reinforcement.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Start a focus session from the notch companion",
+      "description": "As a deep-work user, I want to start a session from the notch UI so that I can begin focusing without opening a full app window.",
+      "acceptanceCriteria": [
+        "Create macOS app project with Swift and SwiftUI",
+        "Implement notch companion UI that is visible when app is running",
+        "Add primary action button to start a 25-minute focus session",
+        "Session state changes to running within 500ms of user click",
+        "Typecheck/lint passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Run fixed Pomodoro presets",
+      "description": "As a user, I want fixed presets so that I can follow a simple, repeatable routine without configuration overhead.",
+      "acceptanceCriteria": [
+        "Implement timer engine with work/break state management",
+        "Support 25/5 preset (25 min work, 5 min break)",
+        "Support 50/10 preset (50 min work, 10 min break)",
+        "Allow preset selection before session start",
+        "Work and break durations follow selected preset exactly",
+        "Typecheck/lint passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Pause and resume active sessions",
+      "description": "As a user, I want pause/resume controls so that I can handle unavoidable interruptions without losing progress.",
+      "acceptanceCriteria": [
+        "Add pause button to active session UI in notch companion",
+        "Add resume button when session is paused",
+        "Remaining time is preserved exactly across pause/resume",
+        "UI clearly indicates paused vs running state with visual distinction",
+        "Typecheck/lint passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Play ambient sound during sessions",
+      "description": "As a user, I want ambient sound while focusing so that I can reduce distraction and maintain flow.",
+      "acceptanceCriteria": [
+        "Create audio engine using AVFoundation",
+        "Include 5 built-in ambient tracks: rain, forest, cafe, brown noise, lo-fi",
+        "Add audio track selector UI",
+        "Implement volume control slider",
+        "Audio stops automatically when session ends",
+        "Typecheck/lint passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Receive lightweight session-complete feedback",
+      "description": "As a user, I want subtle completion feedback so that finishing a session feels rewarding without being disruptive.",
+      "acceptanceCriteria": [
+        "Implement session completion animation in notch UI",
+        "Animation triggers when work or break session completes",
+        "Completion feedback does not steal keyboard focus",
+        "Next state (break or idle) is clearly shown after animation",
+        "Typecheck/lint passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "View minimal personal progress",
+      "description": "As a user, I want minimal tracking so that I can stay motivated without being overwhelmed by analytics.",
+      "acceptanceCriteria": [
+        "Implement local persistence using Core Data or equivalent",
+        "Track daily focus minutes total",
+        "Track daily completed work session count",
+        "Calculate and display current 7-day streak",
+        "Data persists across app relaunch",
+        "Add minimal progress view to notch companion",
+        "Typecheck/lint passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
