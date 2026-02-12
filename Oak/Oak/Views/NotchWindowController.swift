@@ -3,12 +3,12 @@ import AppKit
 
 class NotchWindowController: NSWindowController {
     private let collapsedWidth: CGFloat = 144
-    private let expandedWidth: CGFloat = 316
-    private let notchHeight: CGFloat = 56
+    private let expandedWidth: CGFloat = 372
+    private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool?
 
     convenience init() {
-        let window = NotchWindow(width: 144, height: 56)
+        let window = NotchWindow(width: 144, height: 33)
         self.init(window: window)
 
         let contentView = NotchCompanionView { [weak self] expanded in
