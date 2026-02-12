@@ -26,3 +26,21 @@
 - Commit format: `feat: [Story ID] - [Story Title]`
 
 ---
+
+## [2026-02-13 00:26:00] - US-002
+[Session: ]
+- MVP supports only two presets: 25/5 and 50/10
+- Users can switch preset before session start
+- Work and break durations follow selected preset exactly
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US002Tests.swift (added)
+- Tests: All 10 tests pass (1 smoke + 4 US-001 + 5 US-002)
+**Learnings for future iterations:**
+- Test only public API - don't access private properties/methods in tests
+- Use computed properties like `displayTime` instead of internal state for assertions
+- The `selectPreset()` method already existed in FocusSessionViewModel from previous work
+- Tests should verify both enum values and runtime behavior
+- XcodeGen project regeneration required after adding test files: `cd Oak && xcodegen generate`
+
+---
