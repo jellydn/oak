@@ -5,3 +5,24 @@
 
 ---
 
+## [2026-02-13 00:26:00] - US-001
+[Session: ]
+- Notch companion is visible and interactive when app is running
+- One primary action starts a 25-minute focus session
+- Session state changes to running within 500ms of user click
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US001Tests.swift (added)
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift (added selectPreset method)
+  - Oak/Oak/Views/NotchCompanionView.swift (removed Spacer)
+- Tests: All 5 tests pass (1 smoke test + 4 US-001 tests)
+**Learnings for future iterations:**
+- Use `@MainActor` on ViewModels to ensure thread safety
+- Test state transitions (idle → running → paused → idle)
+- Test computed properties and edge cases (0 values, boundary conditions)
+- XcodeGen project must be regenerated when adding new test files: `cd Oak && xcodegen generate`
+- The project uses SwiftUI + AVFoundation stack for macOS 13+
+- Tests should follow XCTest framework with @MainActor for ViewModels
+- Commit format: `feat: [Story ID] - [Story Title]`
+
+---
