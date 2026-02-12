@@ -3,6 +3,7 @@ import SwiftUI
 struct NotchCompanionView: View {
     @StateObject var viewModel = FocusSessionViewModel()
     @State private var showAudioMenu = false
+    @State private var animateCompletion: Bool = false
     
     var body: some View {
         ZStack {
@@ -10,7 +11,7 @@ struct NotchCompanionView: View {
                 .fill(.ultraThinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(viewModel.isSessionComplete ? Color.green.opacity(0.5) : Color.white.opacity(0.2), lineWidth: viewModel.isSessionComplete ? 2 : 1)
                 )
             
             HStack(spacing: 16) {
@@ -24,8 +25,23 @@ struct NotchCompanionView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
+            .scaleEffect(animateCompletion ? 1.05 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
         .frame(width: 340, height: 60)
+        .onChange(of: viewModel.isSessionComplete) { _, newValue in
+            if newValue {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    animateCompletion = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        animateCompletion = false
+                    }
+                }
+            }
+        }
         .popover(isPresented: $showAudioMenu) {
             AudioMenuView(audioManager: viewModel.audioManager)
                 .frame(width: 200)

@@ -5,6 +5,7 @@ import Combine
 class FocusSessionViewModel: ObservableObject {
     @Published var sessionState: SessionState = .idle
     @Published var selectedPreset: Preset = .short
+    @Published var isSessionComplete: Bool = false
     
     private var timer: Timer?
     private var currentRemainingSeconds: Int = 0
@@ -109,6 +110,8 @@ class FocusSessionViewModel: ObservableObject {
     }
     
     private func completeSession() {
+        isSessionComplete = true
+        
         if isWorkSession {
             // Work session complete - start break
             isWorkSession = false
@@ -120,6 +123,12 @@ class FocusSessionViewModel: ObservableObject {
             timer = nil
             sessionState = .idle
             audioManager.stop()
+        }
+        
+        // Reset animation state after 1.5 seconds
+        Task {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            isSessionComplete = false
         }
     }
     
