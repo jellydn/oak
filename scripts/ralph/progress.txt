@@ -9,6 +9,8 @@ Started: Thu Feb 12 23:13:46 +08 2026
 - ViewModels are marked with @MainActor and use @Published for SwiftUI binding
 - Timer uses Timer.scheduledTimer with weak self to avoid retain cycles
 - Use `swift build` from Oak/ directory to build and verify typecheck
+- Use UserDefaults for simple persistence needs in MVP (easier than Core Data for simple key-value storage)
+- Run `xcodegen generate` in Oak/ directory after adding new Swift files to regenerate Xcode project
 
 ## [2026-02-12 23:23] - US-001
 Session: N/A
@@ -66,3 +68,51 @@ Session: N/A
   - Build command: `just build` (runs xcodebuild in Oak/ directory)
 ---
 
+## [2026-02-12 23:43] - US-005
+Session: N/A
+- What was implemented:
+  - Added session-complete feedback animation to notch UI
+  - Implemented isSessionComplete @Published property in FocusSessionViewModel
+  - Added subtle scale pulse animation when session completes
+  - Added green glow effect on notch border during completion animation
+  - Animation is non-intrusive and doesn't steal keyboard focus (notch uses .nonactivatingPanel style)
+  - Next state (break or idle) is clearly shown through existing currentSessionType property
+- Files changed:
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Added isSessionComplete state and animation trigger
+  - Oak/Oak/Views/NotchCompanionView.swift - Added scale animation and glow effect
+- **Learnings for future iterations:**
+  - SwiftUI .scaleEffect() combined with .spring() animation provides smooth, subtle animations
+  - .onChange(of:) modifier is useful for triggering animations when @Published properties change
+  - Non-activating panel windows (.nonactivatingPanel) don't steal keyboard focus
+  - For animations that should reset after a delay, use Task.sleep with @MainActor context
+  - Visual feedback through border color changes is more subtle than full background flashes
+  - The completion animation triggers after completeSession() but before the state changes to next interval
+  - Build command: `just build` (typecheck passes)
+---
+
+## [2026-02-12 23:47] - US-006
+Session: N/A
+- What was implemented:
+  - Created ProgressData model with date, focusMinutes, and completedSessions properties
+  - Implemented ProgressManager service using UserDefaults for local persistence
+  - Added streak calculation logic that counts consecutive days with completed sessions
+  - Integrated progress tracking into FocusSessionViewModel to record work session completions
+  - Added computed properties for accessing daily stats (todayFocusMinutes, todayCompletedSessions, streakDays)
+  - Created ProgressMenuView that displays focus time, completed sessions, and streak
+  - Added progress button to NotchCompanionView that shows popover with stats
+  - Notch UI expanded from 340px to 380px to accommodate progress button
+  - Progress button displays streak count when streak > 0, otherwise shows chart icon
+- Files changed:
+  - Oak/Oak/Models/ProgressData.swift - New file with progress data models
+  - Oak/Oak/Services/ProgressManager.swift - New service for persistence and streak calculation
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift - Added progress tracking integration
+  - Oak/Oak/Views/NotchCompanionView.swift - Added progress button and menu
+- **Learnings for future iterations:**
+  - UserDefaults is sufficient for simple key-value storage in MVP (easier than Core Data)
+  - Calendar.current.startOfDay() is essential for accurate daily record comparisons
+  - Streak calculation requires iterating through records and checking consecutive days
+  - JSONEncoder/JSONDecoder with UserDefaults works well for storing arrays of Codable structs
+  - Progress tracking should record only completed work sessions (not break sessions)
+  - The session duration should be calculated from session start time minus remaining time
+  - Build command: `just build` (typecheck passes)
+---
