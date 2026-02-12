@@ -1,3 +1,23 @@
+## Codebase Patterns
+- Use `@MainActor` on all ViewModels and UI-related classes for thread safety
+- Timer callbacks wrapped with `Task { @MainActor in }` to ensure UI updates on main thread
+- Use `[weak self]` in closures that escape (timers, async callbacks)
+- Always `invalidate()` timers in `cleanup()` or `deinit` to prevent memory leaks
+- Use UserDefaults + Codable for simple local persistence
+- Computed properties should use `if case` pattern matching for enum state checks
+- SwiftUI Views should use `@StateObject` for ViewModels created in View, `@ObservedObject` for passed-in dependencies
+- Extract views as `private var some View` computed properties for better organization
+- Use `.animation()` modifier with `spring()` for smooth UI transitions
+- Tests should only use public API - avoid accessing private properties/methods
+- Use @Published properties for ObservableObject to trigger SwiftUI updates
+- Audio engine uses AVAudioEngine with AVAudioSourceNode for real-time sound generation
+- XcodeGen project must be regenerated when adding new test files: `cd Oak && xcodegen generate`
+- Test file naming: US[Number]Tests.swift for user story tests
+- git index lock file can persist - use `pkill -9 git` to kill stuck git processes
+- Avoid alerts/sheets/modals for completion feedback to prevent keyboard focus stealing
+- Use `.ultraThinMaterial` for macOS translucent window backgrounds
+- Notch positioning: center at top of screen with calculated width/height
+
 ## [2026-02-13 00:24:00] - Initial setup
 - Created prd.json from markdown PRD
 - Initial code structure exists with basic implementation
