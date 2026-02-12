@@ -21,7 +21,7 @@
         "Work and break durations follow selected preset exactly.",
         "Typecheck/lint passes."
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-003",
