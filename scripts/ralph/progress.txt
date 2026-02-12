@@ -173,3 +173,23 @@ Session: N/A
   - The forward.fill icon (SF Symbol) is appropriate for "Start Next" action
   - Build command: `just build` (succeeds with no errors)
   - Lint check: `cd Oak && swiftlint lint --quiet` (no errors)
+
+## [2026-02-13 00:15] - US-003 and US-004
+Session: N/A
+- What was implemented:
+  - Verified US-003 (pause/resume) already implemented with pauseSession() and resumeSession() methods
+  - Fixed US-004 volume slider bug: Added didSet observer on volume property to update audio engine output in real-time
+  - Refactored AudioManager.setVolume() to only update the property, while didSet handles audio engine updates
+  - Updated AGENTS.md with Audio Engine Patterns section documenting the didSet pattern
+  - All stories now passing (US-000 through US-006)
+- Files changed:
+  - Oak/Oak/Services/AudioManager.swift - Added didSet observer on volume property
+  - AGENTS.md - Added Audio Engine Patterns section
+  - scripts/ralph/prd.json - Updated US-003 and US-004 to passes: true, removed volume known issue
+- **Learnings for future iterations:**
+  - SwiftUI bindings to @Published properties don't automatically trigger side effects - use didSet observers for real-time updates
+  - AVAudioEngine.mainMixerNode.outputVolume must be updated when volume changes for real-time audio adjustment
+  - Be careful with didSet observers - they shouldn't call methods that modify the property to avoid infinite recursion
+  - When audio needs to respond to UI changes immediately, use didSet on @Published properties
+  - Build command: `just build` (succeeds with no errors)
+  - Lint check: `cd Oak && swiftlint lint --quiet` (has pre-existing warnings, no errors)
