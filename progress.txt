@@ -63,3 +63,27 @@
 - Timer functionality is private - tests should verify through public API only
 
 ---
+
+## [2026-02-13 00:30:00] - US-004
+[Session: ]
+- Built-in tracks available: rain, forest, cafe, brown noise, lo-fi
+- User can select one track before or during session
+- User can adjust volume from app controls (0.0 to 1.0, default 0.5)
+- Audio stops automatically when session ends (both work and break sessions)
+- Typecheck/lint passes
+- Files changed:
+  - Oak/Tests/OakTests/US004Tests.swift (added)
+  - Oak/Oak/Services/AudioManager.swift (fixed selectedTrack bug)
+  - Oak/Oak/ViewModels/FocusSessionViewModel.swift (added audio stop on work session end)
+  - AGENTS.md (modified)
+- Tests: All 21 tests pass (1 smoke + 4 US-001 + 5 US-002 + 6 US-003 + 5 US-004)
+**Learnings for future iterations:**
+- AudioManager.play() had a bug: selectedTrack was set before generateAmbientSound() called stop() which reset it
+- Fix: Move selectedTrack assignment to after audio engine successfully starts
+- Audio stops automatically when ANY session ends (work or break), not just break sessions
+- AVAudioSourceNode is used for generating custom audio (no external files needed)
+- Audio is synthesized in real-time using noise generation algorithms
+- AudioManager uses AVAudioEngine for audio output with volume control
+- git index lock file can persist - use `pkill -9 git` to kill stuck processes
+
+---
