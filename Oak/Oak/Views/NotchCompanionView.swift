@@ -385,7 +385,7 @@ struct SettingsMenuView: View {
                 presetEditor(title: "Preset B", preset: .long)
             }
 
-            Text("Valid range: Focus 1-180 min, Break 1-90 min")
+            Text("Valid range: Focus \(PresetSettingsStore.minWorkMinutes)-\(PresetSettingsStore.maxWorkMinutes) min, Break \(PresetSettingsStore.minBreakMinutes)-\(PresetSettingsStore.maxBreakMinutes) min")
                 .font(.caption2)
                 .foregroundColor(.secondary)
 
@@ -416,7 +416,7 @@ struct SettingsMenuView: View {
                     .foregroundColor(.secondary)
                     .frame(width: 40, alignment: .leading)
 
-                Stepper(value: workMinutesBinding(for: preset), in: 1...180) {
+                Stepper(value: workMinutesBinding(for: preset), in: PresetSettingsStore.minWorkMinutes...PresetSettingsStore.maxWorkMinutes) {
                     Text("\(presetSettings.workMinutes(for: preset)) min")
                         .font(.caption)
                 }
@@ -428,7 +428,7 @@ struct SettingsMenuView: View {
                     .foregroundColor(.secondary)
                     .frame(width: 40, alignment: .leading)
 
-                Stepper(value: breakMinutesBinding(for: preset), in: 1...90) {
+                Stepper(value: breakMinutesBinding(for: preset), in: PresetSettingsStore.minBreakMinutes...PresetSettingsStore.maxBreakMinutes) {
                     Text("\(presetSettings.breakMinutes(for: preset)) min")
                         .font(.caption)
                 }

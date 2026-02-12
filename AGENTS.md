@@ -158,7 +158,7 @@ Oak/
 
 - Always run `just build` after making changes to verify compilation
 - Run relevant tests before submitting changes: `just test-method ViewModelTests "testName"`
-- Do NOT modify MVP constraints (fixed 25/5 and 50/10 presets, notch-only UI)
+- Verify changes don't break existing UI constraints (notch-only display)
 - Use `os.log` for logging in production, `print()` for debugging
 - When in doubt, check the PRD at `tasks/prd-macos-focus-companion-app.md`
 

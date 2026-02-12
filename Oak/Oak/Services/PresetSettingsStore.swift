@@ -4,6 +4,11 @@ import SwiftUI
 final class PresetSettingsStore: ObservableObject {
     static let shared = PresetSettingsStore()
 
+    public static let minWorkMinutes = 1
+    public static let maxWorkMinutes = 180
+    public static let minBreakMinutes = 1
+    public static let maxBreakMinutes = 90
+
     @Published private(set) var shortWorkMinutes: Int
     @Published private(set) var shortBreakMinutes: Int
     @Published private(set) var longWorkMinutes: Int
@@ -21,20 +26,18 @@ final class PresetSettingsStore: ObservableObject {
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
 
-        let defaultShortWork = Preset.short.defaultWorkMinutes
-        let defaultShortBreak = Preset.short.defaultBreakMinutes
-        let defaultLongWork = Preset.long.defaultWorkMinutes
-        let defaultLongBreak = Preset.long.defaultBreakMinutes
+        let defaults: [String: Any] = [
+            Keys.shortWorkMinutes: Preset.short.defaultWorkMinutes,
+            Keys.shortBreakMinutes: Preset.short.defaultBreakMinutes,
+            Keys.longWorkMinutes: Preset.long.defaultWorkMinutes,
+            Keys.longBreakMinutes: Preset.long.defaultBreakMinutes,
+        ]
+        userDefaults.register(defaults: defaults)
 
-        let storedShortWork = userDefaults.integer(forKey: Keys.shortWorkMinutes)
-        let storedShortBreak = userDefaults.integer(forKey: Keys.shortBreakMinutes)
-        let storedLongWork = userDefaults.integer(forKey: Keys.longWorkMinutes)
-        let storedLongBreak = userDefaults.integer(forKey: Keys.longBreakMinutes)
-
-        shortWorkMinutes = Self.validatedWorkMinutes(storedShortWork == 0 ? defaultShortWork : storedShortWork)
-        shortBreakMinutes = Self.validatedBreakMinutes(storedShortBreak == 0 ? defaultShortBreak : storedShortBreak)
-        longWorkMinutes = Self.validatedWorkMinutes(storedLongWork == 0 ? defaultLongWork : storedLongWork)
-        longBreakMinutes = Self.validatedBreakMinutes(storedLongBreak == 0 ? defaultLongBreak : storedLongBreak)
+        shortWorkMinutes = Self.validatedWorkMinutes(userDefaults.integer(forKey: Keys.shortWorkMinutes))
+        shortBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.shortBreakMinutes))
+        longWorkMinutes = Self.validatedWorkMinutes(userDefaults.integer(forKey: Keys.longWorkMinutes))
+        longBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.longBreakMinutes))
     }
 
     func workDuration(for preset: Preset) -> Int {
@@ -97,10 +100,10 @@ final class PresetSettingsStore: ObservableObject {
     }
 
     private static func validatedWorkMinutes(_ value: Int) -> Int {
-        max(1, min(180, value))
+        max(Self.minWorkMinutes, min(Self.maxWorkMinutes, value))
     }
 
     private static func validatedBreakMinutes(_ value: Int) -> Int {
-        max(1, min(90, value))
+        max(Self.minBreakMinutes, min(Self.maxBreakMinutes, value))
     }
 }
