@@ -10,7 +10,9 @@ class FocusSessionViewModel: ObservableObject {
     private var timer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
+    private var sessionStartSeconds: Int = 0
     let audioManager = AudioManager()
+    let progressManager = ProgressManager()
     
     var canStart: Bool {
         if case .idle = sessionState {
@@ -72,9 +74,22 @@ class FocusSessionViewModel: ObservableObject {
         }
     }
     
+    var todayFocusMinutes: Int {
+        progressManager.dailyStats.todayFocusMinutes
+    }
+    
+    var todayCompletedSessions: Int {
+        progressManager.dailyStats.todayCompletedSessions
+    }
+    
+    var streakDays: Int {
+        progressManager.dailyStats.streakDays
+    }
+    
     func startSession() {
         currentRemainingSeconds = selectedPreset.workDuration
         isWorkSession = true
+        sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
     }
@@ -113,7 +128,12 @@ class FocusSessionViewModel: ObservableObject {
         isSessionComplete = true
         
         if isWorkSession {
-            // Work session complete - start break
+            // Work session complete - record progress and start break
+            let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
+            if durationMinutes > 0 {
+                progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
+            }
+            
             isWorkSession = false
             currentRemainingSeconds = selectedPreset.breakDuration
             sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: false)

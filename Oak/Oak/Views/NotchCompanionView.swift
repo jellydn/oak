@@ -3,6 +3,7 @@ import SwiftUI
 struct NotchCompanionView: View {
     @StateObject var viewModel = FocusSessionViewModel()
     @State private var showAudioMenu = false
+    @State private var showProgressMenu = false
     @State private var animateCompletion: Bool = false
     
     var body: some View {
@@ -21,14 +22,17 @@ struct NotchCompanionView: View {
                     sessionView
                 }
                 
+                Spacer()
+                
                 audioButton
+                progressButton
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
-        .frame(width: 340, height: 60)
+        .frame(width: 380, height: 60)
         .onChange(of: viewModel.isSessionComplete) { _, newValue in
             if newValue {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -44,6 +48,10 @@ struct NotchCompanionView: View {
         }
         .popover(isPresented: $showAudioMenu) {
             AudioMenuView(audioManager: viewModel.audioManager)
+                .frame(width: 200)
+        }
+        .popover(isPresented: $showProgressMenu) {
+            ProgressMenuView(viewModel: viewModel)
                 .frame(width: 200)
         }
     }
@@ -126,6 +134,29 @@ struct NotchCompanionView: View {
         }
         .buttonStyle(.plain)
     }
+    
+    private var progressButton: some View {
+        Button(action: {
+            showProgressMenu.toggle()
+        }) {
+            ZStack {
+                Circle()
+                    .fill(viewModel.streakDays > 0 ? Color.orange.opacity(0.2) : Color.clear)
+                    .frame(width: 32, height: 32)
+                
+                if viewModel.streakDays > 0 {
+                    Text("\(viewModel.streakDays)")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.orange)
+                } else {
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 14))
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 struct AudioMenuView: View {
@@ -184,6 +215,69 @@ struct AudioMenuView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+            
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+struct ProgressMenuView: View {
+    @ObservedObject var viewModel: FocusSessionViewModel
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Today's Progress")
+                .font(.headline)
+                .padding(.top, 8)
+            
+            VStack(spacing: 12) {
+                HStack {
+                    Image(systemName: "clock.fill")
+                        .foregroundColor(.blue)
+                        .frame(width: 24)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(viewModel.todayFocusMinutes) min")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                        Text("Focus Time")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+                
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .frame(width: 24)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(viewModel.todayCompletedSessions) session\(viewModel.todayCompletedSessions == 1 ? "" : "s")")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                        Text("Completed")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+                
+                HStack {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(.orange)
+                        .frame(width: 24)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(viewModel.streakDays) day\(viewModel.streakDays == 1 ? "" : "s")")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                        Text("Streak")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+            }
+            .padding(.horizontal, 8)
             
             Spacer()
         }
