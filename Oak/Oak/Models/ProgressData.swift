@@ -5,7 +5,7 @@ struct ProgressData: Codable, Identifiable {
     let date: Date
     var focusMinutes: Int
     var completedSessions: Int
-    
+
     init(date: Date = Date(), focusMinutes: Int = 0, completedSessions: Int = 0) {
         self.id = UUID()
         self.date = date

@@ -36,6 +36,12 @@ just open
 # Build release version
 just build-release
 
+# Run tests with verbose output
+just test-verbose
+
+# Check for compilation errors without building
+just check
+
 # List all available commands
 just
 ```

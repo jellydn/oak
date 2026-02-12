@@ -8,9 +8,9 @@ enum AudioTrack: String, CaseIterable, Identifiable {
     case cafe = "Cafe"
     case brownNoise = "Brown Noise"
     case lofi = "Lo-Fi"
-    
+
     var id: String { rawValue }
-    
+
     var systemImageName: String {
         switch self {
         case .none: return "speaker.slash"

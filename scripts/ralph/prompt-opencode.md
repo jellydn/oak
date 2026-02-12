@@ -5,14 +5,17 @@ You are an autonomous coding agent working on a software project.
 ## Your Task
 
 1. Read the PRD at `prd.json` (in the same directory as this file)
+   - Also read optional `knownIssues` (array of strings). Treat these as active blockers or gaps.
 2. Read the progress log at `progress.txt` (check Codebase Patterns section first)
 3. Check you're on the correct branch from PRD `branchName`. If not, check it out or create from main.
-4. Pick the **highest priority** user story where `passes: false`
+4. Pick the **highest priority** user story where `passes: false`.
+   - If `knownIssues` exists, prioritize a story that directly resolves one of those issues.
 5. Implement that single user story
 6. Run quality checks (e.g., typecheck, lint, test - use whatever your project requires)
 7. Update AGENTS.md files if you discover reusable patterns (see below)
 8. If checks pass, commit ALL changes with message: `feat: [Story ID] - [Story Title]`
 9. Update the PRD to set `passes: true` for the completed story
+   - If the story resolves a `knownIssues` item, remove or rewrite that issue to reflect the new state.
 10. Append your progress to `progress.txt`
 
 ## Progress Report Format
@@ -102,12 +105,12 @@ A frontend story is NOT complete until browser verification passes (or MCP not a
 
 ## Stop Condition
 
-After completing a user story, check if ALL stories have `passes: true`.
+After completing a user story, check if ALL stories have `passes: true` and `knownIssues` is empty (or absent).
 
 If ALL stories are complete and passing, reply with:
 <promise>COMPLETE</promise>
 
-If there are still stories with `passes: false`, end your response normally (another iteration will pick up the next story).
+If there are still stories with `passes: false` OR unresolved `knownIssues`, end your response normally (another iteration will pick up the next story).
 
 ## Important
 

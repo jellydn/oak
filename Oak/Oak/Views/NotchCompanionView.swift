@@ -5,7 +5,7 @@ struct NotchCompanionView: View {
     @State private var showAudioMenu = false
     @State private var showProgressMenu = false
     @State private var animateCompletion: Bool = false
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
@@ -14,16 +14,16 @@ struct NotchCompanionView: View {
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(viewModel.isSessionComplete ? Color.green.opacity(0.5) : Color.white.opacity(0.2), lineWidth: viewModel.isSessionComplete ? 2 : 1)
                 )
-            
+
             HStack(spacing: 16) {
                 if viewModel.canStart {
                     startView
                 } else {
                     sessionView
                 }
-                
+
                 Spacer()
-                
+
                 audioButton
                 progressButton
             }
@@ -38,7 +38,7 @@ struct NotchCompanionView: View {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     animateCompletion = true
                 }
-                
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         animateCompletion = false
@@ -55,7 +55,7 @@ struct NotchCompanionView: View {
                 .frame(width: 200)
         }
     }
-    
+
     private var startView: some View {
         HStack(spacing: 12) {
             Picker("", selection: $viewModel.selectedPreset) {
@@ -66,7 +66,7 @@ struct NotchCompanionView: View {
             }
             .pickerStyle(.segmented)
             .frame(width: 100)
-            
+
             Button(action: {
                 viewModel.startSession()
             }) {
@@ -79,19 +79,19 @@ struct NotchCompanionView: View {
             .buttonStyle(.plain)
         }
     }
-    
+
     private var sessionView: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(viewModel.displayTime)
                     .font(.system(size: 22, weight: .semibold, design: .monospaced))
                     .foregroundColor(viewModel.isPaused ? .orange : .primary)
-                
+
                 Text(viewModel.currentSessionType)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(.secondary)
             }
-            
+
             if viewModel.canPause {
                 Button(action: {
                     viewModel.pauseSession()
@@ -117,7 +117,7 @@ struct NotchCompanionView: View {
             }
         }
     }
-    
+
     private var audioButton: some View {
         Button(action: {
             showAudioMenu.toggle()
@@ -126,7 +126,7 @@ struct NotchCompanionView: View {
                 Circle()
                     .fill(viewModel.audioManager.isPlaying ? Color.blue.opacity(0.2) : Color.clear)
                     .frame(width: 32, height: 32)
-                
+
                 Image(systemName: viewModel.audioManager.selectedTrack.systemImageName)
                     .foregroundColor(viewModel.audioManager.isPlaying ? .blue : .secondary)
                     .font(.system(size: 14))
@@ -134,7 +134,7 @@ struct NotchCompanionView: View {
         }
         .buttonStyle(.plain)
     }
-    
+
     private var progressButton: some View {
         Button(action: {
             showProgressMenu.toggle()
@@ -143,7 +143,7 @@ struct NotchCompanionView: View {
                 Circle()
                     .fill(viewModel.streakDays > 0 ? Color.orange.opacity(0.2) : Color.clear)
                     .frame(width: 32, height: 32)
-                
+
                 if viewModel.streakDays > 0 {
                     Text("\(viewModel.streakDays)")
                         .font(.system(size: 12, weight: .semibold))
@@ -162,13 +162,13 @@ struct NotchCompanionView: View {
 struct AudioMenuView: View {
     @ObservedObject var audioManager: AudioManager
     @State private var showVolumeControl = false
-    
+
     var body: some View {
         VStack(spacing: 16) {
             Text("Ambient Sound")
                 .font(.headline)
                 .padding(.top, 8)
-            
+
             VStack(spacing: 8) {
                 ForEach(AudioTrack.allCases) { track in
                     Button(action: {
@@ -198,7 +198,7 @@ struct AudioMenuView: View {
                     .buttonStyle(.plain)
                 }
             }
-            
+
             VStack(spacing: 8) {
                 HStack {
                     Image(systemName: "speaker.fill")
@@ -215,7 +215,7 @@ struct AudioMenuView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-            
+
             Spacer()
         }
         .padding()
@@ -224,13 +224,13 @@ struct AudioMenuView: View {
 
 struct ProgressMenuView: View {
     @ObservedObject var viewModel: FocusSessionViewModel
-    
+
     var body: some View {
         VStack(spacing: 16) {
             Text("Today's Progress")
                 .font(.headline)
                 .padding(.top, 8)
-            
+
             VStack(spacing: 12) {
                 HStack {
                     Image(systemName: "clock.fill")
@@ -246,7 +246,7 @@ struct ProgressMenuView: View {
                     }
                     Spacer()
                 }
-                
+
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
@@ -261,7 +261,7 @@ struct ProgressMenuView: View {
                     }
                     Spacer()
                 }
-                
+
                 HStack {
                     Image(systemName: "flame.fill")
                         .foregroundColor(.orange)
@@ -278,7 +278,7 @@ struct ProgressMenuView: View {
                 }
             }
             .padding(.horizontal, 8)
-            
+
             Spacer()
         }
         .padding()
