@@ -46,26 +46,52 @@ open Oak.xcodeproj
 ### Build Commands
 
 ```bash
+# Show available commands
+just
+
 # Build the project
 just build
+
+# Build release version
+just build-release
 
 # Run all tests
 just test
 
+# Run tests with verbose output
+just test-verbose
+
+# Run a specific test class
+just test-class FocusSessionViewModelTests
+
+# Run a specific test method
+just test-method FocusSessionViewModelTests testStartSession
+
+# Check for compilation errors
+just check
+
 # Clean build artifacts
 just clean
+
+# Open in Xcode
+just open
 ```
 
 ## 📁 Project Structure
 
 ```
 Oak/
-├── Models/          # Data models, enums, protocols
-├── Views/           # SwiftUI Views
-├── ViewModels/      # ObservableObject classes
-├── Services/        # Business logic, audio, persistence
-├── Resources/       # Assets, sounds, config files
-└── OakTests/       # Test files
+├── Oak/
+│   ├── Models/              # Data models, enums, protocols
+│   ├── Views/               # SwiftUI Views
+│   ├── ViewModels/          # ObservableObject classes
+│   ├── Services/            # Business logic, audio, persistence
+│   ├── Resources/           # Assets, sounds, config files
+│   └── OakApp.swift        # App entry point
+├── Oak.xcodeproj/
+├── Package.swift
+├── project.yml              # XcodeGen config
+└── Tests/                   # Unit tests
 ```
 
 ## 📝 Documentation

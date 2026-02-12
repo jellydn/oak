@@ -15,10 +15,15 @@ Oak is a lightweight macOS focus companion app built with Swift and SwiftUI. It 
 Use `just` for common tasks (requires [just](https://github.com/casey/just)):
 
 ```bash
+just                              # Show available commands
+just --list                       # Show available commands (same as above)
 just build                          # Build the project
+just build-release                 # Build release version
 just test                           # Run all tests
+just test-verbose                   # Run tests with verbose output
 just test-class FocusSessionViewModelTests    # Run specific test class
 just test-method FocusSessionViewModelTests testStartSession  # Run specific test method
+just check                         # Check for compilation errors without building
 just clean && just open             # Clean and open in Xcode
 ```
 
@@ -90,11 +95,17 @@ guard let data = userDefaults.data(forKey: key),
 
 ```
 Oak/
-├── Models/          # Data models, enums, protocols
-├── Views/           # SwiftUI Views
-├── ViewModels/      # ObservableObject classes
-├── Services/        # Business logic, audio, persistence
-└── Resources/       # Assets, sounds, config files
+├── Oak/
+│   ├── Models/              # Data models, enums, protocols
+│   ├── Views/              # SwiftUI Views
+│   ├── ViewModels/         # ObservableObject classes
+│   ├── Services/           # Business logic, audio, persistence
+│   ├── Resources/          # Assets, sounds, config files
+│   └── OakApp.swift        # App entry point
+├── Oak.xcodeproj/
+├── Package.swift
+├── project.yml             # XcodeGen config
+└── Tests/                  # Unit tests
 ```
 
 ---
@@ -127,7 +138,9 @@ Oak/
 ## Commit Message Style
 
 ```
+
 type(scope): brief description
+
 ```
 
 - **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
