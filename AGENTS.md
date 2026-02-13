@@ -34,7 +34,7 @@ just check-style           # Run lint and format checks
 ```
 
 **Single test**: `just test-method FocusSessionViewModelTests "testStartSession"`
-**Manual build**: `cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build`
+**Manual build**: `xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build`
 **Regenerate project**: `cd Oak && xcodegen generate`
 
 ---
@@ -62,10 +62,9 @@ just check-style           # Run lint and format checks
 ### SwiftUI Conventions
 
 - Use `@MainActor` on all ViewModels and UI-related classes
-- **CRITICAL**: Keep `@MainActor` on all `ObservableObject` classes with `@Published` properties - removing it can cause runtime crashes since `@Published` mutations must happen on the main thread
-- ViewModels: `@MainActor class X: ObservableObject` with `@Published`
+- **CRITICAL**: Keep `@MainActor` on all `ObservableObject` classes with `@Published` properties
 - Prefer `private` for internal state, `private(set)` for read-only published
-- Extract views as `private var some View` computed properties
+- Extract views as `private var someView: some View` computed properties
 
 ### State Management
 
@@ -85,19 +84,15 @@ just check-style           # Run lint and format checks
 
 ### View Update Safety
 
-- **Never publish changes from within view updates**: When binding setters or `.onChange` modifiers modify `@Published` properties, wrap them in `DispatchQueue.main.async`:
+- **Never publish changes from within view updates**: Wrap in `DispatchQueue.main.async`:
 
 ```swift
 // ❌ Wrong - causes "Publishing changes from within view updates"
-.onChange(of: value) { newValue in
-    viewModel.update(newValue)
-}
+.onChange(of: value) { newValue in viewModel.update(newValue) }
 
 // ✅ Correct - defers to next run loop
 .onChange(of: value) { newValue in
-    DispatchQueue.main.async {
-        viewModel.update(newValue)
-    }
+    DispatchQueue.main.async { viewModel.update(newValue) }
 }
 ```
 

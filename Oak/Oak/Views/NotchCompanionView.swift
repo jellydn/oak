@@ -20,7 +20,6 @@ internal struct NotchCompanionView: View {
     private let controlSize: CGFloat = 18
     private let compactRingSize: CGFloat = 20
     private let expandedRingSize: CGFloat = 28
-
     init(
         viewModel: FocusSessionViewModel,
         onExpansionChanged: @escaping (Bool) -> Void = { _ in }
@@ -106,8 +105,6 @@ internal struct NotchCompanionView: View {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     animateCompletion = true
                 }
-
-                // Show confetti only for completed work sessions
                 if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
                     showConfetti = true
 
@@ -229,12 +226,14 @@ internal struct NotchCompanionView: View {
                     )
                     .frame(width: size, height: size)
                     if showSessionType {
-                        Text(viewModel.currentSessionType)
-                            .font(.system(size: fontSize * 0.55, weight: .semibold))
+                        let sessionType = viewModel.currentSessionType
+                        Text(sessionType == "Long Break" ? "Long\nBreak" : sessionType)
+                            .font(.system(size: fontSize * 0.5, weight: .semibold))
                             .foregroundColor(.white.opacity(0.9))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
-                            .frame(width: size - 6)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.65)
+                            .multilineTextAlignment(.center)
+                            .frame(width: size - 4)
                     }
                 }
             } else {

@@ -24,6 +24,7 @@ internal struct SettingsMenuView: View {
             VStack(spacing: 10) {
                 displayTargetPicker
                 countdownDisplayModePicker
+                longBreakCycleEditor
                 presetEditor(title: "Preset A", preset: .short)
                 presetEditor(title: "Preset B", preset: .long)
                 notificationSettings
@@ -105,6 +106,39 @@ internal struct SettingsMenuView: View {
                     Text("\(presetSettings.breakMinutes(for: preset)) min")
                         .font(.caption)
                 }
+            }
+
+            HStack(spacing: 8) {
+                Text("Long")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(width: 40, alignment: .leading)
+
+                Stepper(
+                    value: longBreakMinutesBinding(for: preset),
+                    in: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
+                ) {
+                    Text("\(presetSettings.longBreakMinutes(for: preset)) min")
+                        .font(.caption)
+                }
+            }
+        }
+        .padding(8)
+        .background(Color.primary.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var longBreakCycleEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Long Break Cycle")
+                .font(.system(size: 11, weight: .semibold))
+
+            Stepper(
+                value: roundsBeforeLongBreakBinding,
+                in: PresetSettingsStore.minRoundsBeforeLongBreak ... PresetSettingsStore.maxRoundsBeforeLongBreak
+            ) {
+                Text("Every \(presetSettings.roundsBeforeLongBreak) focus sessions")
+                    .font(.caption)
             }
         }
         .padding(8)
@@ -227,6 +261,13 @@ internal struct SettingsMenuView: View {
         )
     }
 
+    private func longBreakMinutesBinding(for preset: Preset) -> Binding<Int> {
+        Binding(
+            get: { presetSettings.longBreakMinutes(for: preset) },
+            set: { presetSettings.setLongBreakMinutes($0, for: preset) }
+        )
+    }
+
     private var displayTargetBinding: Binding<DisplayTarget> {
         Binding(
             get: { selectedDisplayTarget },
@@ -243,6 +284,13 @@ internal struct SettingsMenuView: View {
                     presetSettings.setCountdownDisplayMode(newValue)
                 }
             }
+        )
+    }
+
+    private var roundsBeforeLongBreakBinding: Binding<Int> {
+        Binding(
+            get: { presetSettings.roundsBeforeLongBreak },
+            set: { presetSettings.setRoundsBeforeLongBreak($0) }
         )
     }
 
@@ -271,7 +319,9 @@ internal struct SettingsMenuView: View {
     private var validRangeDescription: String {
         let focusRange = "\(PresetSettingsStore.minWorkMinutes)-\(PresetSettingsStore.maxWorkMinutes)"
         let breakRange = "\(PresetSettingsStore.minBreakMinutes)-\(PresetSettingsStore.maxBreakMinutes)"
-        return "Valid range: Focus \(focusRange) min, Break \(breakRange) min"
+        let cycleRange = "\(PresetSettingsStore.minRoundsBeforeLongBreak)"
+            + "-\(PresetSettingsStore.maxRoundsBeforeLongBreak)"
+        return "Valid range: Focus \(focusRange) min, Break \(breakRange) min, Long cycle \(cycleRange) sessions"
     }
 
     private var notificationStatusText: String {
