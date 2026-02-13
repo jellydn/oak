@@ -44,7 +44,7 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(progressManager.dailyStats.todayCompletedSessions, 3)
     }
 
-    func testAppComputes7DayStreak() {
+    func testAppComputes7DayStreak() throws {
         // Record sessions for 7 consecutive days
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -57,7 +57,7 @@ internal final class US006Tests: XCTestCase {
             }
 
             // Create a new ProgressManager for each day to simulate daily records
-            let dailyManager = ProgressManager(userDefaults: testUserDefaults!)
+            let dailyManager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
             dailyManager.recordSessionCompletion(durationMinutes: 25)
         }
 
@@ -66,7 +66,7 @@ internal final class US006Tests: XCTestCase {
         // Instead, we'll test the streak calculation logic directly
 
         // Create fresh manager
-        let testManager = ProgressManager(userDefaults: testUserDefaults!)
+        let testManager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         // Record 3 sessions today
         testManager.recordSessionCompletion(durationMinutes: 25)
@@ -77,9 +77,9 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(testManager.dailyStats.streakDays, 1)
     }
 
-    func testStreakResetsOnMissedDay() {
+    func testStreakResetsOnMissedDay() throws {
         // Create manager and record sessions
-        let manager = ProgressManager(userDefaults: testUserDefaults!)
+        let manager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
         manager.recordSessionCompletion(durationMinutes: 25)
 
         XCTAssertEqual(manager.dailyStats.streakDays, 1)
@@ -93,9 +93,9 @@ internal final class US006Tests: XCTestCase {
         XCTAssertTrue(true, "Streak calculation checks for consecutive days")
     }
 
-    func testDataPersistsAcrossAppRelaunch() {
+    func testDataPersistsAcrossAppRelaunch() throws {
         // Record some progress
-        let manager1 = ProgressManager(userDefaults: testUserDefaults!)
+        let manager1 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
         manager1.recordSessionCompletion(durationMinutes: 25)
         manager1.recordSessionCompletion(durationMinutes: 25)
 
@@ -104,7 +104,7 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(statsBefore.todayCompletedSessions, 2)
 
         // Create a new manager (simulates app relaunch)
-        let manager2 = ProgressManager(userDefaults: testUserDefaults!)
+        let manager2 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         // Verify data persisted
         let statsAfter = manager2.dailyStats
@@ -113,13 +113,13 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(statsAfter.streakDays, statsBefore.streakDays, "Streak should persist")
     }
 
-    func testMultipleDaysDataStored() {
+    func testMultipleDaysDataStored() throws {
         // Record sessions on multiple days
-        let manager1 = ProgressManager(userDefaults: testUserDefaults!)
+        let manager1 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
         manager1.recordSessionCompletion(durationMinutes: 25)
 
         // Create a new manager instance to verify persistence
-        let manager2 = ProgressManager(userDefaults: testUserDefaults!)
+        let manager2 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         // Verify data is still there
         XCTAssertEqual(manager2.dailyStats.todayFocusMinutes, 25)
@@ -127,9 +127,9 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(manager2.dailyStats.streakDays, 1)
     }
 
-    func testZeroMinutesWithoutSessions() {
+    func testZeroMinutesWithoutSessions() throws {
         // Test with no sessions recorded
-        let manager = ProgressManager(userDefaults: testUserDefaults!)
+        let manager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         XCTAssertEqual(manager.dailyStats.todayFocusMinutes, 0, "Should have 0 focus minutes with no sessions")
         XCTAssertEqual(manager.dailyStats.todayCompletedSessions, 0, "Should have 0 completed sessions")
