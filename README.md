@@ -128,11 +128,17 @@ just check-style
 ## CI/CD and Releases
 
 - CI runs on GitHub Actions (`.github/workflows/ci.yml`) for `push` to `main` and all PRs.
-- Release workflow (`.github/workflows/release.yml`) builds and publishes unsigned artifacts on:
+- **Auto-release** (`.github/workflows/auto-release.yml`) automatically creates a new release when changes are merged to `main`:
+  - Automatically increments the patch version (e.g., `v0.1.0` → `v0.1.1`)
+  - Creates a Git tag
+  - Builds and publishes artifacts to GitHub Releases
+- Manual release workflow (`.github/workflows/release.yml`) builds and publishes unsigned artifacts on:
   - tag push: `v*` (example: `v0.1.0`)
   - manual dispatch with a `version` input (example: `v0.1.0`)
 
-### Create a Release
+### Create a Manual Release
+
+If you need to create a specific version manually:
 
 ```bash
 git tag v0.1.0
