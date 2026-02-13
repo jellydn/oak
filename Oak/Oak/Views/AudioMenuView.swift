@@ -2,7 +2,6 @@ import SwiftUI
 
 struct AudioMenuView: View {
     @ObservedObject var audioManager: AudioManager
-    @State private var showVolumeControl = false
 
     var body: some View {
         VStack(spacing: 16) {
