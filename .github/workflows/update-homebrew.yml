@@ -33,11 +33,22 @@ jobs:
         env:
           DMG_URL: ${{ steps.release.outputs.dmg_url }}
         run: |
-          # Download the DMG file with error handling
-          if ! curl -sfL "$DMG_URL" -o /tmp/Oak.dmg; then
-            echo "Error: Failed to download DMG from $DMG_URL"
-            exit 1
-          fi
+          # Download the DMG file with retry logic to handle asset upload race conditions
+          max_attempts=5
+          attempt=1
+          while :; do
+            echo "Attempt ${attempt}/${max_attempts} to download DMG from $DMG_URL"
+            if curl -sfL "$DMG_URL" -o /tmp/Oak.dmg; then
+              break
+            fi
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "Error: Failed to download DMG from $DMG_URL after ${max_attempts} attempts"
+              exit 1
+            fi
+            attempt=$((attempt + 1))
+            echo "DMG not available yet, retrying in 10 seconds..."
+            sleep 10
+          done
           
           # Verify the file exists and has content
           if [[ ! -s /tmp/Oak.dmg ]]; then
