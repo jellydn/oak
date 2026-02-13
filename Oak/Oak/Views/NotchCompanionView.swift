@@ -5,6 +5,7 @@ internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
 
     @StateObject private var viewModel: FocusSessionViewModel
+    @StateObject private var notificationService = NotificationService.shared
     @State private var showAudioMenu = false
     @State private var showProgressMenu = false
     @State private var showSettingsMenu = false
@@ -130,8 +131,11 @@ internal struct NotchCompanionView: View {
                 .frame(width: 200)
         }
         .popover(isPresented: $showSettingsMenu) {
-            SettingsMenuView(presetSettings: viewModel.presetSettings)
-                .frame(width: 280)
+            SettingsMenuView(
+                presetSettings: viewModel.presetSettings,
+                notificationService: notificationService
+            )
+            .frame(width: 280)
         }
         .contextMenu {
             if #available(macOS 14.0, *) {
@@ -175,6 +179,28 @@ internal struct NotchCompanionView: View {
                     }
                 )
                 .buttonStyle(.plain)
+            } else if viewModel.canStartNext {
+                Text(viewModel.displayTime)
+                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.95))
+
+                Button(
+                    action: {
+                        viewModel.startNextSession()
+                    },
+                    label: {
+                        Image(systemName: "forward.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 9, weight: .bold))
+                            .frame(width: 16, height: 16)
+                            .background(
+                                Circle()
+                                    .fill(Color.blue.opacity(0.88))
+                            )
+                    }
+                )
+                .buttonStyle(.plain)
+                .help("Start \(viewModel.currentSessionType)")
             } else {
                 Text(viewModel.displayTime)
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
