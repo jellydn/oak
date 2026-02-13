@@ -23,6 +23,7 @@ just test-verbose          # Run tests with verbose output
 just test-class Tests      # Run specific test class
 just test-method Tests methodName  # Run specific test method
 just check                 # Check compilation errors
+just clean                 # Clean build artifacts
 just lint                  # Run SwiftLint
 just lint-fix              # Auto-fix linting issues
 just format                # Format with SwiftFormat
@@ -40,10 +41,7 @@ just test-method AudioServiceTests "testPlayAndStop"
 **Manual xcodebuild:**
 
 ```bash
-# Build
 cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build
-
-# Run specific test
 cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' \
   -only-testing:OakTests/FocusSessionViewModelTests/testStartSession test
 ```
@@ -56,25 +54,27 @@ cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=m
 
 ### Imports & Formatting
 
-- Group: Foundation → SwiftUI/AppKit → Apple frameworks → project imports
+- **Order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → @testable import Oak
 - No blank lines between imports, one blank line between type declarations
 - 4 spaces indentation, 120 char line limit (soft)
 - Trailing newline at end of files
+- Use `///` for documentation comments
 
 ### Types & Naming
 
 - **Types**: PascalCase (`FocusSessionViewModel`, `SessionState`)
 - **Functions/Variables**: camelCase (`startSession`, `remainingSeconds`)
 - **Constants**: lowerCamelCase (instance), PascalCase (static)
-- **Enums**: PascalCase with lowerCamelCase cases
+- **Enums**: PascalCase type with lowerCamelCase cases
 - **Booleans**: Start with is/has/should (`isWorkSession`, `canStart`)
+- **Access control**: Explicit `internal` keyword (e.g., `internal class`, `internal enum`)
 
 ### SwiftUI Conventions
 
 - Use `@MainActor` on all ViewModels and UI-related classes
 - ViewModels: `@MainActor class X: ObservableObject` with `@Published`
 - Prefer `private` for internal state, `private(set)` for read-only published
-- Use computed properties for derived state (`displayTime`, `canPause`)
+- Use computed properties for derived state (`displayTime`, `canPause`, `isRunning`)
 - Extract views as `private var some View` computed properties
 
 ### State Management
@@ -125,7 +125,33 @@ Oak/
 ## Testing Guidelines
 
 - Test files mirror source structure with `Tests` suffix
-- Use XCTest framework
+- Use XCTest framework with `@MainActor` on test classes
+- Test methods are `async throws`
+- Use `setUp()` and `tearDown()` for fixtures
+- Isolate UserDefaults with unique suite names per test:
+
+```swift
+@MainActor
+internal final class FeatureTests: XCTestCase {
+    var viewModel: ViewModel!
+    var suiteName: String!
+
+    override func setUp() async throws {
+        suiteName = "OakTests.Feature.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else { throw ... }
+        defaults.removePersistentDomain(forName: suiteName)
+        viewModel = ViewModel(userDefaults: defaults)
+    }
+
+    override func tearDown() async throws {
+        viewModel.cleanup()
+        if let suiteName {
+            UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
+        }
+    }
+}
+```
+
 - Test state transitions: idle → running → paused → idle
 - Test computed properties and edge cases (0 values, boundaries)
 
