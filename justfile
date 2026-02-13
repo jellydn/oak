@@ -39,4 +39,4 @@ test-verbose:
 
 # Check for compilation errors without building
 check:
-    cd Oak && swift build 2>&1 | head -50 || echo "Note: swift build may require Package.swift"
+    cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} -quiet clean build
