@@ -33,8 +33,17 @@ jobs:
         env:
           DMG_URL: ${{ steps.release.outputs.dmg_url }}
         run: |
-          # Download the DMG file
-          curl -sL "$DMG_URL" -o /tmp/Oak.dmg
+          # Download the DMG file with error handling
+          if ! curl -sfL "$DMG_URL" -o /tmp/Oak.dmg; then
+            echo "Error: Failed to download DMG from $DMG_URL"
+            exit 1
+          fi
+          
+          # Verify the file exists and has content
+          if [[ ! -s /tmp/Oak.dmg ]]; then
+            echo "Error: Downloaded file is empty"
+            exit 1
+          fi
           
           # Calculate SHA256
           SHA256=$(shasum -a 256 /tmp/Oak.dmg | awk '{print $1}')
@@ -48,12 +57,9 @@ jobs:
           VERSION: ${{ steps.release.outputs.version }}
           SHA256: ${{ steps.sha256.outputs.sha256 }}
         run: |
-          # Update the version and sha256 in the cask file
-          sed -i.bak "s/version \".*\"/version \"$VERSION\"/" Casks/oak.rb
-          sed -i.bak "s/sha256 \".*\"/sha256 \"$SHA256\"/" Casks/oak.rb
-          
-          # Clean up backup files
-          rm -f Casks/oak.rb.bak
+          # Update the version and sha256 in the cask file using portable sed syntax
+          sed -i '' "s/version \".*\"/version \"$VERSION\"/" Casks/oak.rb
+          sed -i '' "s/sha256 \".*\"/sha256 \"$SHA256\"/" Casks/oak.rb
           
           # Show the changes
           echo "Updated Cask formula:"
