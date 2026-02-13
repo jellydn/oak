@@ -56,10 +56,12 @@ jobs:
           
           echo "New version: $new_version"
           echo "New tag: $new_tag"
+
+          build_number="$((major * 1000000 + minor * 1000 + patch))"
           
           echo "version=$new_version" >> "$GITHUB_OUTPUT"
           echo "tag=$new_tag" >> "$GITHUB_OUTPUT"
-          echo "build_number=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
         if: steps.check_tag.outputs.skip != 'true'

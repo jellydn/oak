@@ -48,7 +48,14 @@ jobs:
           fi
 
           version="${tag#v}"
-          build_number="${GITHUB_RUN_NUMBER}"
+          IFS='.' read -r major minor patch <<< "$version"
+          for part in "$major" "$minor" "$patch"; do
+            if ! [[ "$part" =~ ^[0-9]+$ ]]; then
+              echo "Invalid semantic version: $version"
+              exit 1
+            fi
+          done
+          build_number="$((major * 1000000 + minor * 1000 + patch))"
 
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
