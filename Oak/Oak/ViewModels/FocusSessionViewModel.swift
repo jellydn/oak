@@ -1,6 +1,5 @@
 import Combine
 import SwiftUI
-import UserNotifications
 
 @MainActor
 internal class FocusSessionViewModel: ObservableObject {
@@ -16,11 +15,12 @@ internal class FocusSessionViewModel: ObservableObject {
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager: ProgressManager
-    let notificationService = NotificationService.shared
+    let notificationService: NotificationService
 
-    init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil) {
+    init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil, notificationService: NotificationService? = nil) {
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
+        self.notificationService = notificationService ?? NotificationService.shared
         presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
@@ -190,8 +190,6 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     private func completeSession() {
-        isSessionComplete = true
-
         if isWorkSession {
             // Work session complete - record progress
             let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
@@ -211,6 +209,9 @@ internal class FocusSessionViewModel: ObservableObject {
         timer?.invalidate()
         timer = nil
         sessionState = .completed(isWorkSession: isWorkSession)
+        
+        // Trigger UI animations after state is updated
+        isSessionComplete = true
 
         // Reset animation state after 1.5 seconds
         Task {

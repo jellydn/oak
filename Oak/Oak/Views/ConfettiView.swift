@@ -5,6 +5,7 @@ internal struct ConfettiView: View {
     
     let count: Int
     @State private var animating = false
+    @State private var particles: [ConfettiParticle] = []
     
     init(count: Int = 30) {
         self.count = count
@@ -12,42 +13,53 @@ internal struct ConfettiView: View {
     
     var body: some View {
         ZStack {
-            ForEach(0..<count, id: \.self) { index in
-                ConfettiPiece(index: index)
+            ForEach(particles) { particle in
+                ConfettiPiece(color: particle.color)
                     .offset(
-                        x: animating ? randomX() : 0,
-                        y: animating ? randomY() : 0
+                        x: animating ? particle.targetX : 0,
+                        y: animating ? particle.targetY : 0
                     )
                     .opacity(animating ? 0 : 1)
                     .scaleEffect(animating ? 0 : 1)
-                    .rotationEffect(.degrees(animating ? Double.random(in: 0...360) : 0))
+                    .rotationEffect(.degrees(animating ? particle.rotation : 0))
             }
         }
         .onAppear {
+            particles = (0..<count).map { index in
+                ConfettiParticle(
+                    id: index,
+                    targetX: CGFloat.random(in: -150...150),
+                    targetY: CGFloat.random(in: -100...200),
+                    rotation: Double.random(in: 0...360),
+                    color: ConfettiPiece.colors[index % ConfettiPiece.colors.count]
+                )
+            }
+            
             withAnimation(.easeOut(duration: ConfettiView.animationDuration)) {
                 animating = true
             }
         }
     }
-    
-    private func randomX() -> CGFloat {
-        CGFloat.random(in: -150...150)
-    }
-    
-    private func randomY() -> CGFloat {
-        CGFloat.random(in: -100...200)
-    }
+}
+
+private struct ConfettiParticle: Identifiable {
+    let id: Int
+    let targetX: CGFloat
+    let targetY: CGFloat
+    let rotation: Double
+    let color: Color
 }
 
 private struct ConfettiPiece: View {
-    let index: Int
-    private let colors: [Color] = [
+    static let colors: [Color] = [
         .green, .blue, .orange, .pink, .purple, .yellow, .red
     ]
     
+    let color: Color
+    
     var body: some View {
         Circle()
-            .fill(colors[index % colors.count])
+            .fill(color)
             .frame(width: 6, height: 6)
     }
 }

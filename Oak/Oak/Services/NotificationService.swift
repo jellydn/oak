@@ -1,4 +1,5 @@
 import Foundation
+import os
 import UserNotifications
 
 @MainActor
@@ -7,7 +8,9 @@ internal class NotificationService: ObservableObject {
     
     @Published var isAuthorized: Bool = false
     
-    init() {
+    private let logger = Logger(subsystem: "com.oak.app", category: "NotificationService")
+    
+    private init() {
         checkAuthorizationStatus()
     }
     
@@ -43,7 +46,7 @@ internal class NotificationService: ObservableObject {
         UNUserNotificationCenter.current().add(request) { error in
             if let error {
                 Task { @MainActor in
-                    print("Error sending notification: \(error.localizedDescription)")
+                    self.logger.error("Failed to send notification: \(error.localizedDescription)")
                 }
             }
         }
