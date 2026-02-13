@@ -109,8 +109,11 @@ internal final class US004Tests: XCTestCase {
     func testDisplayTargetIsPersisted() {
         presetSettings.setDisplayTarget(.notchedDisplay)
 
-        let reloadedDefaults = UserDefaults(suiteName: presetSuiteName)
-        let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults ?? .standard)
+        guard let reloadedDefaults = UserDefaults(suiteName: presetSuiteName) else {
+            XCTFail("Failed to create UserDefaults with suite name")
+            return
+        }
+        let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults)
         XCTAssertEqual(reloadedStore.displayTarget, .notchedDisplay)
     }
 
