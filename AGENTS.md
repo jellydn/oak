@@ -60,7 +60,8 @@ just check-style           # Run lint and format checks
 
 ### SwiftUI Conventions
 
-- `@MainActor` on all ViewModels and UI-related classes
+- Use `@MainActor` on all ViewModels and UI-related classes
+- **CRITICAL**: Keep `@MainActor` on all `ObservableObject` classes with `@Published` properties - removing it can cause runtime crashes since `@Published` mutations must happen on the main thread
 - ViewModels: `@MainActor class X: ObservableObject` with `@Published`
 - Prefer `private` for internal state, `private(set)` for read-only published
 - Extract views as `private var some View` computed properties

@@ -76,6 +76,10 @@ internal class NotchWindowController: NSWindowController {
     }
 
     deinit {
+        let vm = viewModel
+        Task { @MainActor in
+            vm.cleanup()
+        }
         NotificationCenter.default.removeObserver(self)
         displayTargetCancellable?.cancel()
     }
