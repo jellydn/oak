@@ -157,7 +157,7 @@ jobs:
           # Replace variables in the template
           sed -i '' "s/\${VERSION}/$VERSION/g" /tmp/new_item.xml
           sed -i '' "s/\${TAG}/$TAG/g" /tmp/new_item.xml
-          sed -i '' "s/\${REPO}/$REPO/g" /tmp/new_item.xml
+          sed -i '' "s|\${REPO}|$REPO|g" /tmp/new_item.xml
           sed -i '' "s|\${DMG_URL}|$DMG_URL|g" /tmp/new_item.xml
           sed -i '' "s/\${FILE_SIZE}/$FILE_SIZE/g" /tmp/new_item.xml
           sed -i '' "s/\${ED_SIGNATURE}/$ED_SIGNATURE/g" /tmp/new_item.xml
