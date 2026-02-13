@@ -31,6 +31,7 @@
 		935A6BD932F4EC629908FE05 /* ambient_lofi.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 63539C12247302E14148BE07 /* ambient_lofi.m4a */; };
 		9756D44804BF478285073F0C /* ambient_rain.wav in Resources */ = {isa = PBXBuildFile; fileRef = 17D6B30DEDC9126B5A3E77DF /* ambient_rain.wav */; };
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
+		A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */; };
 		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
 		AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */; };
 		ADE41CB716798207A29851E9 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F287A617D7BF92425C7BD22A /* ConfettiView.swift */; };
@@ -86,6 +87,7 @@
 		23364F4B016E445E5657BF63 /* SettingsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuView.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
+		309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppcastVersionParserTests.swift; sourceTree = "<group>"; };
 		32954184C5B3930CBE019533 /* ambient_forest.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_forest.wav; sourceTree = "<group>"; };
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
 		3912FED25041D62DE77347EA /* NotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTests.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 		7A59316AAFB96A57EDCA1D15 /* OakTests */ = {
 			isa = PBXGroup;
 			children = (
+				309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */,
 				14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */,
 				F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */,
 				83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */,
@@ -401,6 +404,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */,
 				EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */,
 				EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */,
 				4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */,
@@ -576,7 +580,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.0.0;
+				MARKETING_VERSION = 0.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -612,7 +616,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.0.0;
+				MARKETING_VERSION = 0.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";

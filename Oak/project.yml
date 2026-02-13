@@ -21,7 +21,7 @@ targets:
         product: Sparkle
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.productsway.oak.app
-      MARKETING_VERSION: 0.0.0
+      MARKETING_VERSION: 0.4.3
       CURRENT_PROJECT_VERSION: 1
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       INFOPLIST_FILE: Oak/Info.plist
