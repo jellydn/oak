@@ -24,6 +24,7 @@ A lightweight macOS focus companion designed for deep work.
 
 - 🎯 **Notch-first** focus companion UI
 - ⏱️ **Fixed Pomodoro** presets: `25/5` and `50/10`
+- 🔄 **Long breaks**: Automatic 15/20 min breaks after 4 focus rounds
 - ▶️ **Session controls**: start, pause, resume
 - 🎵 **Ambient sounds**: rain, forest, cafe, brown noise, lo-fi
 - 📊 **Local tracking**: daily focus minutes, completed sessions, 7-day streak
@@ -45,6 +46,7 @@ brew install --cask oak
 #### From Source
 
 **Prerequisites:**
+
 - macOS 13+ (Apple Silicon recommended)
 - XcodeGen (`brew install xcodegen`)
 - SwiftLint (optional, for code linting: `brew install swiftlint`)
@@ -157,6 +159,7 @@ git push origin v0.1.0
 ```
 
 The release uploads:
+
 - `Oak-<version>.dmg`
 - `Oak-<version>.zip`
 
