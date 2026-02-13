@@ -34,11 +34,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Prepare Pages content
+        run: |
+          rm -rf public
+          mkdir public
+          if [ -d docs ]; then cp -R docs public/; fi
+          if [ -d assets ]; then cp -R assets public/; fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Upload only the generated site content
+          path: 'public'
 
       - name: Deploy to GitHub Pages
         id: deployment
