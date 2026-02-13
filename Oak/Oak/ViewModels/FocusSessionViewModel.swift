@@ -31,8 +31,6 @@ internal class FocusSessionViewModel: ObservableObject {
     let notificationService: any SessionCompletionNotifying
     let completionSoundPlayer: any SessionCompletionSoundPlaying
 
-    private let roundsBeforeLongBreak = 4
-
     init(
         presetSettings: PresetSettingsStore,
         progressManager: ProgressManager? = nil,
@@ -81,6 +79,7 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var displayTime: String {
+        let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
         let minutes: Int
         let seconds: Int
 
@@ -135,6 +134,7 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var currentSessionType: String {
+        let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
         switch sessionState {
         case .idle:
             return "Ready"
@@ -200,6 +200,7 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     func startNextSession() {
+        let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
         guard case let .completed(completedWorkSession) = sessionState else {
             return
         }
