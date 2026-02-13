@@ -99,6 +99,18 @@ internal class FocusSessionViewModel: ObservableObject {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    var progressPercentage: Double {
+        switch sessionState {
+        case .idle:
+            return 0.0
+        case let .running(remaining, _), let .paused(remaining, _):
+            guard sessionStartSeconds > 0 else { return 0.0 }
+            return Double(sessionStartSeconds - remaining) / Double(sessionStartSeconds)
+        case .completed:
+            return 1.0
+        }
+    }
+
     var isPaused: Bool {
         if case .paused = sessionState {
             return true

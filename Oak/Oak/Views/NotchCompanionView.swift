@@ -179,9 +179,7 @@ internal struct NotchCompanionView: View {
                 )
                 .buttonStyle(.plain)
             } else if viewModel.canStartNext {
-                Text(viewModel.displayTime)
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.95))
+                countdownDisplay(size: 20, fontSize: 13)
 
                 Button(
                     action: {
@@ -201,8 +199,30 @@ internal struct NotchCompanionView: View {
                 .buttonStyle(.plain)
                 .help("Start \(viewModel.currentSessionType)")
             } else {
+                countdownDisplay(size: 20, fontSize: 13)
+            }
+        }
+    }
+
+    private func countdownDisplay(size: CGFloat, fontSize: CGFloat) -> some View {
+        Group {
+            if viewModel.presetSettings.countdownDisplayMode == .circleRing {
+                ZStack {
+                    CircularProgressRing(
+                        progress: viewModel.progressPercentage,
+                        lineWidth: 2.5,
+                        ringColor: viewModel.isPaused ? .orange : .white,
+                        backgroundColor: .white.opacity(0.2)
+                    )
+                    .frame(width: size, height: size)
+
+                    Text(viewModel.displayTime)
+                        .font(.system(size: fontSize * 0.4, weight: .semibold, design: .monospaced))
+                        .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
+                }
+            } else {
                 Text(viewModel.displayTime)
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
                     .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
             }
         }
@@ -231,14 +251,36 @@ internal struct NotchCompanionView: View {
 
     private var sessionView: some View {
         HStack(spacing: 6) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(viewModel.displayTime)
-                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                    .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
+            if viewModel.presetSettings.countdownDisplayMode == .circleRing {
+                VStack(alignment: .leading, spacing: 2) {
+                    ZStack {
+                        CircularProgressRing(
+                            progress: viewModel.progressPercentage,
+                            lineWidth: 2.5,
+                            ringColor: viewModel.isPaused ? .orange : .white,
+                            backgroundColor: .white.opacity(0.2)
+                        )
+                        .frame(width: 28, height: 28)
 
-                Text(viewModel.currentSessionType)
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundColor(.white.opacity(0.52))
+                        Text(viewModel.displayTime)
+                            .font(.system(size: 6, weight: .semibold, design: .monospaced))
+                            .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
+                    }
+
+                    Text(viewModel.currentSessionType)
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundColor(.white.opacity(0.52))
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(viewModel.displayTime)
+                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                        .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
+
+                    Text(viewModel.currentSessionType)
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundColor(.white.opacity(0.52))
+                }
             }
 
             if viewModel.canPause {
