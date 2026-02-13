@@ -23,6 +23,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var timer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
+    private var isLongBreak: Bool = false
     private var sessionStartSeconds: Int = 0
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
@@ -141,12 +142,7 @@ internal class FocusSessionViewModel: ObservableObject {
             if isWork {
                 return "Focus"
             } else {
-                // Check if this is a long break by looking at the duration
-                if currentRemainingSeconds > presetSettings.breakDuration(for: selectedPreset) {
-                    return "Long Break"
-                } else {
-                    return "Break"
-                }
+                return isLongBreak ? "Long Break" : "Break"
             }
         case let .completed(isWorkSession):
             if isWorkSession {
@@ -185,6 +181,7 @@ internal class FocusSessionViewModel: ObservableObject {
         }
         currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
         isWorkSession = true
+        isLongBreak = false
         sessionStartSeconds = currentRemainingSeconds
         completedRounds = 0
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
@@ -212,14 +209,17 @@ internal class FocusSessionViewModel: ObservableObject {
         if isWorkSession {
             // Starting a new work session
             currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
+            isLongBreak = false
         } else {
             // Starting a break session
             // Check if we should use long break
             if completedRounds >= roundsBeforeLongBreak {
                 currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
+                isLongBreak = true
                 completedRounds = 0 // Reset rounds after long break
             } else {
                 currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
+                isLongBreak = false
             }
         }
 
@@ -233,6 +233,7 @@ internal class FocusSessionViewModel: ObservableObject {
         timer = nil
         currentRemainingSeconds = 0
         isWorkSession = true
+        isLongBreak = false
         sessionStartSeconds = 0
         isSessionComplete = false
         completedRounds = 0

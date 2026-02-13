@@ -138,10 +138,16 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions
-        for _ in 1...4 {
-            viewModel.startSession()
+        for round in 1...4 {
+            if round == 1 {
+                viewModel.startSession()
+            } else {
+                viewModel.startNextSession()
+            }
             viewModel.completeSessionForTesting()
-            if viewModel.completedRounds < 4 {
+
+            // Complete break after rounds 1-3
+            if round < 4 {
                 viewModel.startNextSession()
                 viewModel.completeSessionForTesting()
             }
@@ -244,9 +250,19 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions to reach long break
-        for _ in 1...4 {
-            viewModel.startSession()
+        for round in 1...4 {
+            if round == 1 {
+                viewModel.startSession()
+            } else {
+                viewModel.startNextSession()
+            }
             viewModel.completeSessionForTesting()
+
+            // Complete break after rounds 1-3
+            if round < 4 {
+                viewModel.startNextSession()
+                viewModel.completeSessionForTesting()
+            }
         }
 
         // Verify label shows "Long Break" in completed state
