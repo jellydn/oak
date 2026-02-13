@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   auto-release:
@@ -99,3 +100,33 @@ jobs:
           files: |
             ${{ steps.assets.outputs.dmg_path }}
             ${{ steps.assets.outputs.zip_path }}
+
+      - name: Trigger appcast update workflow
+        if: steps.check_tag.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'update-appcast.yml',
+              ref: 'main',
+              inputs: {
+                tag: '${{ steps.version.outputs.tag }}'
+              }
+            })
+
+      - name: Trigger Homebrew update workflow
+        if: steps.check_tag.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'update-homebrew.yml',
+              ref: 'main',
+              inputs: {
+                tag: '${{ steps.version.outputs.tag }}'
+              }
+            })
