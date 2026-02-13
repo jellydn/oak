@@ -7,18 +7,19 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
     <item>
-      <title>Version 0.3.4</title>
-      <link>https://github.com/jellydn/oak/releases/tag/v0.3.4</link>
-      <sparkle:version>0.3.4</sparkle:version>
-      <sparkle:shortVersionString>0.3.4</sparkle:shortVersionString>
+      <title>Version 0.4.1</title>
+      <link>https://github.com/jellydn/oak/releases/tag/v0.4.1</link>
+      <sparkle:version>0.4.1</sparkle:version>
+      <sparkle:shortVersionString>0.4.1</sparkle:shortVersionString>
       <description><![CDATA[
-        <h2>Oak 0.3.4</h2>
+        <h2>Oak 0.4.1</h2>
         <p>Latest release of Oak focus companion app.</p>
       ]]></description>
-      <pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate>
-      <enclosure url="https://github.com/jellydn/oak/releases/download/v0.3.4/Oak-0.3.4.dmg"
-                 sparkle:version="0.3.4"
-                 sparkle:shortVersionString="0.3.4"
+      <pubDate>Thu, 13 Feb 2026 13:41:00 +0000</pubDate>
+      <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.1/Oak-0.4.1.dmg"
+                 sparkle:version="0.4.1"
+                 sparkle:shortVersionString="0.4.1"
+                 length="85259810"
                  type="application/octet-stream" />
     </item>
   </channel>
