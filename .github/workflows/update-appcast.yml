@@ -171,7 +171,8 @@ jobs:
           sed -i '' "s|\${REPO}|$REPO|g" /tmp/new_item.xml
           sed -i '' "s|\${DMG_URL}|$DMG_URL|g" /tmp/new_item.xml
           sed -i '' "s/\${FILE_SIZE}/$FILE_SIZE/g" /tmp/new_item.xml
-          sed -i '' "s/\${ED_SIGNATURE}/$ED_SIGNATURE/g" /tmp/new_item.xml
+          # Use perl for signature replacement because EdDSA output can include sed-sensitive characters.
+          perl -i -pe 's/\$\{ED_SIGNATURE\}/$ENV{ED_SIGNATURE}/g' /tmp/new_item.xml
           sed -i '' "s/\${RELEASE_DATE}/$RELEASE_DATE/g" /tmp/new_item.xml
           
           # Escape and insert release notes using perl for better handling of special characters
