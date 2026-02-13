@@ -196,8 +196,7 @@ class FocusSessionViewModel: ObservableObject {
                 progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
             }
         } else {
-            // Break session complete - stop audio
-            audioManager.stop()
+            // Break session complete
         }
 
         // Stop audio when any session ends
