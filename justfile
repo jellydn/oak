@@ -40,3 +40,30 @@ test-verbose:
 # Check for compilation errors (incremental build)
 check:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} build
+
+# Lint Swift code with SwiftLint
+lint:
+    @command -v swiftlint >/dev/null 2>&1 || { echo "SwiftLint is not installed. Install with: brew install swiftlint"; exit 1; }
+    swiftlint lint --strict
+
+# Auto-fix linting issues where possible
+lint-fix:
+    @command -v swiftlint >/dev/null 2>&1 || { echo "SwiftLint is not installed. Install with: brew install swiftlint"; exit 1; }
+    swiftlint lint --fix
+
+# Format Swift code with SwiftFormat
+format:
+    @command -v swiftformat >/dev/null 2>&1 || { echo "SwiftFormat is not installed. Install with: brew install swiftformat"; exit 1; }
+    swiftformat .
+
+# Check if code is formatted correctly without modifying
+format-check:
+    @command -v swiftformat >/dev/null 2>&1 || { echo "SwiftFormat is not installed. Install with: brew install swiftformat"; exit 1; }
+    swiftformat --lint .
+
+# Run both lint and format checks
+check-style:
+    @echo "Running SwiftLint..."
+    just lint
+    @echo "Running SwiftFormat check..."
+    just format-check

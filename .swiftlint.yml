@@ -1,0 +1,83 @@
+# SwiftLint Configuration for Oak
+
+# Paths to exclude from linting
+excluded:
+  - Oak.xcodeproj
+  - .build
+  - .swiftpm
+  - DerivedData
+  - .planning
+
+# Paths to include in linting
+included:
+  - Oak
+
+# Rules to enable
+opt_in_rules:
+  - explicit_init
+  - explicit_top_level_acl
+  - trailing_closure
+  - vertical_parameter_alignment_on_call
+  - unneeded_parentheses_in_closure_argument
+  - closure_spacing
+  - empty_count
+  - explicit_self
+  - file_header
+  - first_where
+  - sorted_first_last
+  - modifier_order
+  - redundant_type_annotation
+  - toggle_bool
+  - unused_import
+  - yoda_condition
+
+# Rules to disable
+disabled_rules:
+  - todo
+  - trailing_whitespace
+
+# Customize rule settings
+line_length:
+  warning: 120
+  error: 150
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 500
+  error: 1000
+
+type_body_length:
+  warning: 300
+  error: 500
+
+function_body_length:
+  warning: 50
+  error: 100
+
+identifier_name:
+  min_length:
+    warning: 2
+  max_length:
+    warning: 50
+    error: 60
+  excluded:
+    - id
+    - x
+    - y
+
+type_name:
+  min_length: 3
+  max_length:
+    warning: 50
+    error: 60
+
+# Custom rules
+custom_rules:
+  no_print_statements:
+    name: "No Print Statements in Production"
+    regex: '^\s*print\('
+    match_kinds:
+      - identifier
+    message: "Use os.log for logging in production code"
+    severity: warning
