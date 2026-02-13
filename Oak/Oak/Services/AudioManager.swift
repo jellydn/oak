@@ -107,7 +107,10 @@ class AudioManager: ObservableObject {
     }
 
     private func createBrownNoiseNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { _, _, _, outputBuffer in
+        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
+            guard let self else {
+                return noErr
+            }
             self.fillOutputBuffer(outputBuffer) {
                 self.generateBrownNoise()
             }
@@ -116,7 +119,10 @@ class AudioManager: ObservableObject {
     }
 
     private func createRainNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { _, _, _, outputBuffer in
+        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
+            guard let self else {
+                return noErr
+            }
             self.fillOutputBuffer(outputBuffer) {
                 self.generateRainNoise()
             }
@@ -125,7 +131,10 @@ class AudioManager: ObservableObject {
     }
 
     private func createForestNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { _, _, _, outputBuffer in
+        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
+            guard let self else {
+                return noErr
+            }
             self.fillOutputBuffer(outputBuffer) {
                 self.generateForestNoise()
             }
@@ -134,7 +143,10 @@ class AudioManager: ObservableObject {
     }
 
     private func createCafeNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { _, _, _, outputBuffer in
+        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
+            guard let self else {
+                return noErr
+            }
             self.fillOutputBuffer(outputBuffer) {
                 self.generateCafeNoise()
             }
@@ -143,7 +155,10 @@ class AudioManager: ObservableObject {
     }
 
     private func createLofiNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { _, _, _, outputBuffer in
+        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
+            guard let self else {
+                return noErr
+            }
             self.fillOutputBuffer(outputBuffer) {
                 self.generateLofiNoise()
             }
