@@ -12,6 +12,7 @@
 		1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74BB88C04B3824E97E3C561 /* US001Tests.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155853CBF9374645092FE699 /* UpdateChecker.swift */; };
+		5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */; };
 		716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23364F4B016E445E5657BF63 /* SettingsMenuView.swift */; };
 		8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFE863ED8125FD3D3029341 /* US004Tests.swift */; };
 		8C831319B8AF05D32A0F8608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08E0A4A56EADCDB21276DE81 /* Assets.xcassets */; };
@@ -55,6 +56,7 @@
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
+		3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+DisplayTarget.swift"; sourceTree = "<group>"; };
 		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
@@ -89,6 +91,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		24245D90328E2484C7585C5A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		4D1B4FE5542163CFB6A40F76 = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				451C36F9BC7A6103BF32362C /* OakApp.swift */,
+				24245D90328E2484C7585C5A /* Extensions */,
 				01D9F58885F69FCDA63E90F6 /* Models */,
 				219030ABF2A7EE847D85CBB1 /* Resources */,
 				A433A3CADD138B6EE89589F9 /* Services */,
@@ -255,6 +266,7 @@
 				B5C9AD5FC22FACC36FAA5620 /* AudioMenuView.swift in Sources */,
 				B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */,
 				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
+				5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */,
 				8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */,
 				B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */,
 				BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */,

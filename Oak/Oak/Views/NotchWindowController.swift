@@ -2,32 +2,6 @@ import AppKit
 import Combine
 import SwiftUI
 
-// MARK: - Screen Detection Helper
-
-internal extension NSScreen {
-    static func screen(for target: DisplayTarget) -> NSScreen? {
-        if target == .mainDisplay, let mainScreen = NSScreen.main {
-            return mainScreen
-        }
-
-        if target == .notchedDisplay {
-            for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
-                return screen
-            }
-        }
-
-        if let mainScreen = NSScreen.main {
-            return mainScreen
-        }
-
-        for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
-            return screen
-        }
-
-        return NSScreen.screens.first
-    }
-}
-
 // MARK: - NotchWindowController
 
 @MainActor
@@ -80,6 +54,7 @@ internal class NotchWindowController: NSWindowController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        displayTargetCancellable?.cancel()
     }
 
     func cleanup() {
