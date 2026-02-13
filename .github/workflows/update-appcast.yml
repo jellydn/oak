@@ -69,7 +69,10 @@ jobs:
           FILE_SIZE=$(stat -f%z /tmp/Oak.dmg)
           echo "file_size=$FILE_SIZE" >> "$GITHUB_OUTPUT"
           
-          # Calculate SHA256
+          # Calculate SHA256 for verification
+          # Note: SHA256 is calculated for download verification but not currently used in appcast.
+          # Sparkle supports EdDSA signatures (sparkle:edSignature) for cryptographic verification,
+          # which requires code signing. For unsigned builds, file size and HTTPS are used for basic integrity.
           SHA256=$(shasum -a 256 /tmp/Oak.dmg | awk '{print $1}')
           echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
           
