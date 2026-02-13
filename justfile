@@ -39,4 +39,4 @@ test-verbose:
 
 # Check for compilation errors without building
 check:
-    cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} -quiet clean build
+    cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} build
