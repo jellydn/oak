@@ -16,11 +16,22 @@ brew install --cask oak
 
 ## Automatic Updates
 
-The cask formula is automatically updated when a new release is published via the `.github/workflows/update-homebrew.yml` workflow.
+The cask formula is automatically updated when:
+- A new GitHub Release is published
+- A version tag (e.g., `v0.4.2`) is pushed to the repository
+
+This is handled by the `.github/workflows/update-homebrew.yml` workflow.
 
 ## Manual Updates
 
-If you need to manually update the cask:
+If you need to manually trigger an update (e.g., for a release that was published before the workflow was added):
+
+1. Go to the [Update Homebrew Cask workflow](https://github.com/jellydn/oak/actions/workflows/update-homebrew.yml)
+2. Click "Run workflow"
+3. Enter the tag name (e.g., `v0.4.2`)
+4. Click "Run workflow"
+
+Alternatively, you can manually update the cask file:
 
 1. Update the `version` field to match the new release tag (without the 'v' prefix)
 2. Download the DMG from the release
