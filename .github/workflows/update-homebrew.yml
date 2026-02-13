@@ -21,11 +21,11 @@ jobs:
         id: release
         run: |
           # Extract version from tag (remove 'v' prefix)
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${{ github.event.release.tag_name }}"; VERSION="${VERSION#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           
           # Get the DMG download URL
-          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/Oak-${VERSION}.dmg"
+          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Oak-${VERSION}.dmg"
           echo "dmg_url=$DMG_URL" >> "$GITHUB_OUTPUT"
 
       - name: Download DMG and calculate SHA256
