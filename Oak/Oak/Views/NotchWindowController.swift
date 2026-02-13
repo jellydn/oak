@@ -5,7 +5,7 @@ import AppKit
 
 extension NSScreen {
     static func screenWithNotch() -> NSScreen? {
-        // Prefer main screen if it has a notch
+        // Prefer main screen if it has a notch (macOS 12+)
         if let mainScreen = NSScreen.main {
             if #available(macOS 12.0, *) {
                 if mainScreen.auxiliaryTopLeftArea != nil {
@@ -14,8 +14,7 @@ extension NSScreen {
             }
         }
         
-        // Try to find any other screen with auxiliaryTopLeftArea (indicates notch)
-        // This property is available on macOS 12+ and returns non-nil for screens with notch
+        // Check other screens for notch
         for screen in NSScreen.screens {
             if #available(macOS 12.0, *) {
                 if screen.auxiliaryTopLeftArea != nil {
@@ -24,7 +23,6 @@ extension NSScreen {
             }
         }
         
-        // Fallback: return main screen or first screen
         return NSScreen.main ?? NSScreen.screens.first
     }
 }
@@ -36,8 +34,6 @@ class NotchWindowController: NSWindowController {
     private let collapsedWidth: CGFloat = 144
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
-    // Defaults to false (collapsed state) to ensure window positioning works correctly
-    // even if display changes occur before the first user interaction
     private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
 
@@ -59,7 +55,6 @@ class NotchWindowController: NSWindowController {
 
         window.orderFrontRegardless()
         
-        // Observe display configuration changes
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(screenConfigurationChanged),
@@ -81,8 +76,6 @@ class NotchWindowController: NSWindowController {
     }
 
     @objc private func screenConfigurationChanged() {
-        // Recalculate window position when display configuration changes
-        // Use the current expansion state to reposition the window
         setExpanded(lastExpandedState)
     }
 
@@ -102,7 +95,6 @@ class NotchWindowController: NSWindowController {
         let xPosition = (screenFrame.width - targetWidth) / 2
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
-        // Avoid recursive layout warnings by resizing outside the current update cycle.
         DispatchQueue.main.async {
             window.setFrame(newFrame, display: true, animate: false)
         }
