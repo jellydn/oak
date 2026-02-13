@@ -216,7 +216,6 @@ internal class FocusSessionViewModel: ObservableObject {
             if completedRounds >= roundsBeforeLongBreak {
                 currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
                 isLongBreak = true
-                completedRounds = 0 // Reset rounds after long break
             } else {
                 currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
                 isLongBreak = false
@@ -270,6 +269,10 @@ internal class FocusSessionViewModel: ObservableObject {
             completedRounds += 1
         } else {
             // Break session complete
+            // Reset rounds after long break completes
+            if isLongBreak {
+                completedRounds = 0
+            }
         }
 
         // Send notification

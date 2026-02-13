@@ -9,7 +9,7 @@ internal final class LongBreakTests: XCTestCase {
     var presetSuiteName: String!
 
     override func setUp() async throws {
-        let suiteName = "OakTests.LongBreak.\(UUID().uuidString)"
+        let suiteName = "LongBreakTests.\(UUID().uuidString)"
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {
             throw NSError(domain: "LongBreakTests", code: 1)
         }
@@ -158,8 +158,49 @@ internal final class LongBreakTests: XCTestCase {
         // Start long break
         viewModel.startNextSession()
 
-        // Rounds should be reset to 0 after starting long break
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break starts")
+        // Rounds should still be 4 while long break is in progress
+        XCTAssertEqual(viewModel.completedRounds, 4, "Rounds should remain at 4 during long break")
+
+        // Complete the long break
+        viewModel.completeSessionForTesting()
+
+        // Rounds should be reset to 0 after long break completes
+        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
+    }
+
+    func testRoundsPreservedIfLongBreakCancelled() {
+        viewModel.selectedPreset = .short
+
+        // Complete 4 work sessions to trigger long break
+        for round in 1...4 {
+            if round == 1 {
+                viewModel.startSession()
+            } else {
+                viewModel.startNextSession()
+            }
+            viewModel.completeSessionForTesting()
+
+            if round < 4 {
+                viewModel.startNextSession()
+                viewModel.completeSessionForTesting()
+            }
+        }
+
+        XCTAssertEqual(viewModel.completedRounds, 4)
+
+        // Start long break but reset before completing
+        viewModel.startNextSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
+
+        // Reset session (cancel long break)
+        viewModel.resetSession()
+
+        // Rounds should be reset to 0 (session reset always resets rounds)
+        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 on session reset")
+
+        // Starting a new session should restart the cycle
+        viewModel.startSession()
+        XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testRoundCounterResetsOnSessionReset() {
