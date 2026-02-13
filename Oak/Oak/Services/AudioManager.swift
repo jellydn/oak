@@ -35,6 +35,10 @@ internal class AudioManager: ObservableObject {
             }
         #endif
 
+        if playBundledTrack(track) {
+            return
+        }
+
         generateAmbientSound(for: track)
     }
 
@@ -61,6 +65,47 @@ internal class AudioManager: ObservableObject {
 
     func setVolume(_ newVolume: Double) {
         volume = max(0, min(1, newVolume))
+    }
+
+    private func playBundledTrack(_ track: AudioTrack) -> Bool {
+        guard let url = bundledAudioURL(for: track) else {
+            logger.debug("No bundled asset for \(track.rawValue, privacy: .public), using generated fallback")
+            return false
+        }
+
+        stop()
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.numberOfLoops = -1
+            player.volume = Float(volume)
+            player.prepareToPlay()
+            player.play()
+
+            audioPlayer = player
+            isPlaying = true
+            selectedTrack = track
+            return true
+        } catch {
+            let trackName = track.rawValue
+            let errorDescription = error.localizedDescription
+            logger.error("Bundled track failed \(trackName, privacy: .public): \(errorDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    private func bundledAudioURL(for track: AudioTrack) -> URL? {
+        guard let baseName = track.bundledFileBaseName else {
+            return nil
+        }
+
+        for fileExtension in AudioTrack.supportedAudioExtensions {
+            if let url = Bundle.main.url(forResource: baseName, withExtension: fileExtension) {
+                return url
+            }
+        }
+
+        return nil
     }
 
     private func generateAmbientSound(for track: AudioTrack) {
