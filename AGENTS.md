@@ -49,6 +49,7 @@ just check-style           # Run lint and format checks
 ### Imports
 
 - **Order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → @testable import Oak
+- **Import grouping**: `testable-bottom` (testable imports go last)
 - No blank lines between imports, one blank line between type declarations
 
 ### Naming
@@ -82,6 +83,24 @@ just check-style           # Run lint and format checks
 - Use `[weak self]` in escaping closures | Always `invalidate()` timers in `cleanup()` or `deinit`
 - Wrap timer callbacks with `Task { @MainActor in self?.tick() }`
 
+### View Update Safety
+
+- **Never publish changes from within view updates**: When binding setters or `.onChange` modifiers modify `@Published` properties, wrap them in `DispatchQueue.main.async`:
+
+```swift
+// ❌ Wrong - causes "Publishing changes from within view updates"
+.onChange(of: value) { newValue in
+    viewModel.update(newValue)
+}
+
+// ✅ Correct - defers to next run loop
+.onChange(of: value) { newValue in
+    DispatchQueue.main.async {
+        viewModel.update(newValue)
+    }
+}
+```
+
 ### Persistence
 
 ```swift
@@ -91,7 +110,7 @@ guard let data = userDefaults.data(forKey: key),
 
 ### Linter (SwiftLint) & Formatter (SwiftFormat)
 
-- **SwiftLint opt-in**: explicit_init, trailing_closure, first_where, toggle_bool, modifier_order, empty_count
+- **SwiftLint opt-in**: explicit_init, trailing_closure, first_where, toggle_bool, modifier_order, empty_count, explicit_top_level_acl
 - **Custom rule**: `no_print_statements` warns against `print()` in production
 - **SwiftFormat**: indent 4, maxwidth 120, wraparguments before-first, stripunusedargs always, self remove
 
