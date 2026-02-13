@@ -9,12 +9,23 @@ internal struct OakApp: App {
 
     var body: some Scene {
         Settings {
-            SettingsMenuView(
-                presetSettings: presetSettings,
-                notificationService: notificationService
-            )
-            .frame(width: 320)
-            .padding(8)
+            if let sparkleUpdater = appDelegate.sparkleUpdater {
+                SettingsMenuView(
+                    presetSettings: presetSettings,
+                    notificationService: notificationService,
+                    sparkleUpdater: sparkleUpdater
+                )
+                .frame(width: 320)
+                .padding(8)
+            } else {
+                SettingsMenuView(
+                    presetSettings: presetSettings,
+                    notificationService: notificationService,
+                    sparkleUpdater: SparkleUpdater.shared
+                )
+                .frame(width: 320)
+                .padding(8)
+            }
         }
     }
 }
@@ -22,7 +33,7 @@ internal struct OakApp: App {
 @MainActor
 internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
-    var updateChecker: UpdateChecking = UpdateChecker()
+    var sparkleUpdater: SparkleUpdater?
     private let notificationService = NotificationService.shared
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
@@ -38,7 +49,9 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
         notchWindowController = NotchWindowController()
         notchWindowController?.window?.orderFrontRegardless()
-        updateChecker.checkForUpdatesOnLaunch()
+
+        // Initialize Sparkle updater to enable automatic update checks on launch
+        sparkleUpdater = SparkleUpdater.shared
 
         // Keep status in sync at launch; permission requests are user-initiated from Settings.
         Task { @MainActor in

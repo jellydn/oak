@@ -28,6 +28,7 @@ A lightweight macOS focus companion designed for deep work.
 - ▶️ **Session controls**: start, pause, resume
 - 🎵 **Ambient sounds**: rain, forest, cafe, brown noise, lo-fi
 - 📊 **Local tracking**: daily focus minutes, completed sessions, 7-day streak
+- 🔄 **Auto-update**: Automatic updates via Sparkle framework
 
 ## 🚀 Getting Started
 
@@ -118,6 +119,17 @@ Sourcing options:
 - Mixkit: https://mixkit.co/license/
 - Pixabay: https://pixabay.com/service/license-summary/
 - Freesound (check CC license/attribution per file): https://freesound.org/help/faq/
+
+### Auto-Update
+
+Oak uses the [Sparkle framework](https://sparkle-project.org/) to provide automatic updates. Updates are checked automatically on launch and can be configured in Settings:
+
+- **Automatic update checks**: Enable/disable automatic update checking (enabled by default)
+- **Automatic downloads**: Enable/disable automatic download of updates (disabled by default for user control)
+- **Manual check**: Check for updates on demand via Settings
+
+The appcast feed is served from `appcast.xml` in the repository root and is automatically updated when new releases are published.
+Oak is configured with Sparkle EdDSA signing (`SUPublicEDKey`) and appcast entries include `sparkle:edSignature`.
 
 ### Code Quality Commands
 

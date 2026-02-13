@@ -1,0 +1,188 @@
+name: Update Sparkle Appcast
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: update-appcast
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  update-appcast:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Resolve Sparkle tools
+        run: |
+          xcodebuild \
+            -resolvePackageDependencies \
+            -project Oak/Oak.xcodeproj \
+            -scheme Oak \
+            -derivedDataPath /tmp/oak-derived
+
+          test -x /tmp/oak-derived/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update
+
+      - name: Get release information
+        id: release
+        run: |
+          # Extract version from tag (remove 'v' prefix)
+          VERSION="${{ github.event.release.tag_name }}"; VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          
+          # Get the DMG download URL
+          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Oak-${VERSION}.dmg"
+          echo "dmg_url=$DMG_URL" >> "$GITHUB_OUTPUT"
+          
+          # Get release date in RFC 2822 format
+          RELEASE_DATE=$(date -R)
+          echo "release_date=$RELEASE_DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Download DMG and get file size
+        id: dmg_info
+        env:
+          DMG_URL: ${{ steps.release.outputs.dmg_url }}
+        run: |
+          # Download the DMG file with retry logic
+          max_attempts=5
+          attempt=1
+          while :; do
+            echo "Attempt ${attempt}/${max_attempts} to download DMG from $DMG_URL"
+            if curl -sfL "$DMG_URL" -o /tmp/Oak.dmg; then
+              break
+            fi
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "Error: Failed to download DMG from $DMG_URL after ${max_attempts} attempts"
+              exit 1
+            fi
+            attempt=$((attempt + 1))
+            echo "DMG not available yet, retrying in 10 seconds..."
+            sleep 10
+          done
+          
+          # Verify the file exists and has content
+          if [[ ! -s /tmp/Oak.dmg ]]; then
+            echo "Error: Downloaded file is empty"
+            exit 1
+          fi
+          
+          # Get file size in bytes
+          FILE_SIZE=$(stat -f%z /tmp/Oak.dmg)
+          echo "file_size=$FILE_SIZE" >> "$GITHUB_OUTPUT"
+          
+      - name: Sign DMG with Sparkle EdDSA key
+        id: sign
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          if [[ -z "${SPARKLE_PRIVATE_KEY:-}" ]]; then
+            echo "Error: Missing SPARKLE_PRIVATE_KEY secret"
+            exit 1
+          fi
+
+          ED_SIGNATURE="$(
+            echo "$SPARKLE_PRIVATE_KEY" | \
+            /tmp/oak-derived/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update \
+              --ed-key-file - \
+              -p \
+              /tmp/Oak.dmg
+          )"
+          echo "ed_signature=$ED_SIGNATURE" >> "$GITHUB_OUTPUT"
+
+      - name: Update appcast.xml
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          TAG: ${{ steps.release.outputs.tag }}
+          DMG_URL: ${{ steps.release.outputs.dmg_url }}
+          FILE_SIZE: ${{ steps.dmg_info.outputs.file_size }}
+          ED_SIGNATURE: ${{ steps.sign.outputs.ed_signature }}
+          RELEASE_DATE: ${{ steps.release.outputs.release_date }}
+          RELEASE_NOTES: ${{ github.event.release.body }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Create a new item entry for the release
+          cat > /tmp/new_item.xml << 'EOF'
+          <item>
+            <title>Version ${VERSION}</title>
+            <link>https://github.com/${REPO}/releases/tag/${TAG}</link>
+            <sparkle:version>${VERSION}</sparkle:version>
+            <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
+            <description><![CDATA[
+              <h2>Oak ${VERSION}</h2>
+              ${RELEASE_NOTES}
+            ]]></description>
+            <pubDate>${RELEASE_DATE}</pubDate>
+            <enclosure url="${DMG_URL}"
+                       sparkle:version="${VERSION}"
+                       sparkle:shortVersionString="${VERSION}"
+                       sparkle:edSignature="${ED_SIGNATURE}"
+                       length="${FILE_SIZE}"
+                       type="application/octet-stream" />
+          </item>
+          EOF
+          
+          # Replace variables in the template
+          sed -i '' "s/\${VERSION}/$VERSION/g" /tmp/new_item.xml
+          sed -i '' "s/\${TAG}/$TAG/g" /tmp/new_item.xml
+          sed -i '' "s/\${REPO}/$REPO/g" /tmp/new_item.xml
+          sed -i '' "s|\${DMG_URL}|$DMG_URL|g" /tmp/new_item.xml
+          sed -i '' "s/\${FILE_SIZE}/$FILE_SIZE/g" /tmp/new_item.xml
+          sed -i '' "s/\${ED_SIGNATURE}/$ED_SIGNATURE/g" /tmp/new_item.xml
+          sed -i '' "s/\${RELEASE_DATE}/$RELEASE_DATE/g" /tmp/new_item.xml
+          
+          # Escape and insert release notes using perl for better handling of special characters
+          export ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+          perl -i -pe 's/\$\{RELEASE_NOTES\}/$ENV{ESCAPED_NOTES}/g' /tmp/new_item.xml
+          
+          # Insert the new item at the beginning of the channel (after the comment)
+          # This ensures the latest release is always first
+          awk '
+            /<!-- Latest release will be added here by CI\/CD -->/ {
+              print
+              system("cat /tmp/new_item.xml")
+              next
+            }
+            { print }
+          ' appcast.xml > /tmp/appcast.xml.new
+          
+          # Retain only the most recent 20 items to prevent unbounded growth
+          awk '
+            BEGIN { max_items = 20; item_count = 0; in_item = 0 }
+            /<item>/ { in_item = 1; item_count++ }
+            in_item == 0 || item_count <= max_items { print }
+            /<\/item>/ { 
+              if (item_count > max_items) { in_item = 0; next }
+              in_item = 0
+            }
+          ' /tmp/appcast.xml.new > /tmp/appcast.xml.trimmed
+          
+          mv /tmp/appcast.xml.trimmed appcast.xml
+          
+          # Show the updated appcast
+          echo "Updated appcast.xml:"
+          cat appcast.xml
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add appcast.xml
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git commit -m "chore: update appcast for v${{ steps.release.outputs.version }} [skip ci]"
+          git push origin main
