@@ -3,7 +3,6 @@ import Combine
 import Foundation
 import os
 
-@MainActor
 internal class AudioManager: ObservableObject {
     @Published var selectedTrack: AudioTrack = .none
     @Published var volume: Double = 0.5 {
@@ -17,6 +16,7 @@ internal class AudioManager: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var audioEngine: AVAudioEngine?
     private var audioNodes: [AVAudioNode] = []
+    private var noiseGenerator = NoiseGenerator()
     private let logger = Logger(subsystem: "com.oak.app", category: "AudioManager")
 
     func play(track: AudioTrack) {
@@ -64,6 +64,7 @@ internal class AudioManager: ObservableObject {
 
     private func generateAmbientSound(for track: AudioTrack) {
         stop()
+        noiseGenerator = NoiseGenerator()
 
         let engine = AVAudioEngine()
         let mainMixer = engine.mainMixerNode
@@ -76,19 +77,19 @@ internal class AudioManager: ObservableObject {
             return
 
         case .brownNoise:
-            sourceNode = createBrownNoiseNode()
+            sourceNode = createBrownNoiseNode(generator: noiseGenerator)
 
         case .rain:
-            sourceNode = createRainNode()
+            sourceNode = createRainNode(generator: noiseGenerator)
 
         case .forest:
-            sourceNode = createForestNode()
+            sourceNode = createForestNode(generator: noiseGenerator)
 
         case .cafe:
-            sourceNode = createCafeNode()
+            sourceNode = createCafeNode(generator: noiseGenerator)
 
         case .lofi:
-            sourceNode = createLofiNode()
+            sourceNode = createLofiNode(generator: noiseGenerator)
         }
 
         if let source = sourceNode {
@@ -109,67 +110,52 @@ internal class AudioManager: ObservableObject {
         }
     }
 
-    private func createBrownNoiseNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
-            guard let self else {
-                return noErr
-            }
-            self.fillOutputBuffer(outputBuffer) {
-                self.generateBrownNoise()
+    private func createBrownNoiseNode(generator: NoiseGenerator) -> AVAudioSourceNode {
+        AVAudioSourceNode { _, _, _, outputBuffer in
+            Self.fillOutputBuffer(outputBuffer) {
+                generator.generateBrownNoise()
             }
             return noErr
         }
     }
 
-    private func createRainNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
-            guard let self else {
-                return noErr
-            }
-            self.fillOutputBuffer(outputBuffer) {
-                self.generateRainNoise()
+    private func createRainNode(generator: NoiseGenerator) -> AVAudioSourceNode {
+        AVAudioSourceNode { _, _, _, outputBuffer in
+            Self.fillOutputBuffer(outputBuffer) {
+                generator.generateRainNoise()
             }
             return noErr
         }
     }
 
-    private func createForestNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
-            guard let self else {
-                return noErr
-            }
-            self.fillOutputBuffer(outputBuffer) {
-                self.generateForestNoise()
+    private func createForestNode(generator: NoiseGenerator) -> AVAudioSourceNode {
+        AVAudioSourceNode { _, _, _, outputBuffer in
+            Self.fillOutputBuffer(outputBuffer) {
+                generator.generateForestNoise()
             }
             return noErr
         }
     }
 
-    private func createCafeNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
-            guard let self else {
-                return noErr
-            }
-            self.fillOutputBuffer(outputBuffer) {
-                self.generateCafeNoise()
+    private func createCafeNode(generator: NoiseGenerator) -> AVAudioSourceNode {
+        AVAudioSourceNode { _, _, _, outputBuffer in
+            Self.fillOutputBuffer(outputBuffer) {
+                generator.generateCafeNoise()
             }
             return noErr
         }
     }
 
-    private func createLofiNode() -> AVAudioSourceNode {
-        return AVAudioSourceNode { [weak self] _, _, _, outputBuffer in
-            guard let self else {
-                return noErr
-            }
-            self.fillOutputBuffer(outputBuffer) {
-                self.generateLofiNoise()
+    private func createLofiNode(generator: NoiseGenerator) -> AVAudioSourceNode {
+        AVAudioSourceNode { _, _, _, outputBuffer in
+            Self.fillOutputBuffer(outputBuffer) {
+                generator.generateLofiNoise()
             }
             return noErr
         }
     }
 
-    private func fillOutputBuffer(_ outputBuffer: UnsafeMutablePointer<AudioBufferList>, sample: () -> Float) {
+    private static func fillOutputBuffer(_ outputBuffer: UnsafeMutablePointer<AudioBufferList>, sample: () -> Float) {
         let bufferList = UnsafeMutableAudioBufferListPointer(outputBuffer)
         for buffer in bufferList {
             guard let mData = buffer.mData else { continue }
@@ -182,8 +168,16 @@ internal class AudioManager: ObservableObject {
         }
     }
 
+    deinit {
+        stop()
+    }
+}
+
+private final class NoiseGenerator {
     private var brownNoiseLast: Float = 0
-    private func generateBrownNoise() -> Float {
+    private var rainSeed: Float = 0
+
+    func generateBrownNoise() -> Float {
         let white = Float.random(in: -1 ... 1)
         brownNoiseLast = (brownNoiseLast + (0.02 * white)) / 1.02
         brownNoiseLast *= 3.5
@@ -191,27 +185,30 @@ internal class AudioManager: ObservableObject {
         return brownNoiseLast * 0.15
     }
 
-    private var rainSeed: Float = 0
-    private func generateRainNoise() -> Float {
+    func generateRainNoise() -> Float {
         rainSeed += 0.01
+        let maxSeed = Float.pi * 2000
+        if rainSeed > maxSeed {
+            rainSeed -= maxSeed
+        }
         let noise = Float.random(in: -0.3 ... 0.3)
         let modulation = sin(rainSeed * 2.0) * 0.5 + 0.5
         return noise * modulation
     }
 
-    private func generateForestNoise() -> Float {
+    func generateForestNoise() -> Float {
         let noise = Float.random(in: -0.4 ... 0.4)
         let modulation = sin(Float.random(in: 0 ... Float.pi * 2)) * 0.3
         return (noise + modulation) * 0.5
     }
 
-    private func generateCafeNoise() -> Float {
+    func generateCafeNoise() -> Float {
         let base = Float.random(in: -0.2 ... 0.2)
         let chatter = sin(Float.random(in: 0 ... Float.pi * 10)) * 0.15
         return base + chatter
     }
 
-    private func generateLofiNoise() -> Float {
+    func generateLofiNoise() -> Float {
         let noise = Float.random(in: -0.25 ... 0.25)
         let vinyl = Float.random(in: -0.05 ... 0.05)
         return noise + vinyl

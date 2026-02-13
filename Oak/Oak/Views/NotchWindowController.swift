@@ -10,6 +10,7 @@ internal class NotchWindowController: NSWindowController {
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool = false
+    private var hasCleanedUp = false
     private let viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
     private var displayTargetCancellable: AnyCancellable?
@@ -35,6 +36,9 @@ internal class NotchWindowController: NSWindowController {
             self?.handleExpansionChange(expanded)
         }
         window.contentView = NSHostingView(rootView: contentView)
+        window.contentMinSize = NSSize(width: collapsedWidth, height: notchHeight)
+        window.contentMaxSize = NSSize(width: expandedWidth, height: notchHeight)
+        setExpanded(false, forceReposition: true, targetOverride: settings.displayTarget)
 
         window.orderFrontRegardless()
 
@@ -63,6 +67,9 @@ internal class NotchWindowController: NSWindowController {
     }
 
     func cleanup() {
+        guard !hasCleanedUp else { return }
+        hasCleanedUp = true
+        displayTargetCancellable?.cancel()
         viewModel.cleanup()
     }
 
@@ -93,9 +100,8 @@ internal class NotchWindowController: NSWindowController {
         let screenFrame = resolvedScreen?.frame ?? .zero
         let yPosition = screenFrame.maxY - notchHeight
         let xPosition = screenFrame.midX - (targetWidth / 2)
-        let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
-
-        window.setFrame(newFrame, display: true, animate: false)
+        let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
+        window.setFrame(frame, display: true, animate: false)
     }
 }
 

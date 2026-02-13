@@ -28,8 +28,6 @@ targets:
     deploymentTarget: "13.0"
     sources:
       - path: Tests/OakTests
-        excludes:
-          - NotchWindowControllerTests.swift
     dependencies:
       - target: Oak
     settings:

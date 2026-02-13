@@ -14,17 +14,18 @@ internal class FocusSessionViewModel: ObservableObject {
     private var sessionStartSeconds: Int = 0
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
-    let progressManager = ProgressManager()
+    let progressManager: ProgressManager
 
-    init(presetSettings: PresetSettingsStore) {
+    init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil) {
         self.presetSettings = presetSettings
+        self.progressManager = progressManager ?? ProgressManager()
         presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
     }
 
     convenience init() {
-        self.init(presetSettings: PresetSettingsStore.shared)
+        self.init(presetSettings: PresetSettingsStore.shared, progressManager: nil)
     }
 
     var canStart: Bool {
@@ -214,7 +215,9 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     deinit {
+        timer?.invalidate()
         presetSettingsCancellable?.cancel()
+        audioManager.stop()
     }
 
     func cleanup() {

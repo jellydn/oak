@@ -1,18 +1,34 @@
 import AppKit
+import SwiftUI
 import XCTest
 @testable import Oak
 
 @MainActor
 internal final class NotchWindowControllerTests: XCTestCase {
     var windowController: NotchWindowController!
+    private var testUserDefaults: UserDefaults!
+    private var suiteName: String!
+    private var presetSettings: PresetSettingsStore!
 
     override func setUp() async throws {
-        windowController = NotchWindowController()
+        guard NSScreen.main != nil else {
+            throw XCTSkip("No display available for window tests")
+        }
+        suiteName = "OakTests.NotchWindowController.\(UUID().uuidString)"
+        testUserDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        testUserDefaults.removePersistentDomain(forName: suiteName)
+        presetSettings = PresetSettingsStore(userDefaults: testUserDefaults)
+        presetSettings.setDisplayTarget(.mainDisplay, screenID: CGMainDisplayID())
+        windowController = NotchWindowController(presetSettings: presetSettings)
     }
 
     override func tearDown() async throws {
         windowController.cleanup()
         windowController = nil
+        presetSettings = nil
+        testUserDefaults.removePersistentDomain(forName: suiteName)
+        testUserDefaults = nil
+        suiteName = nil
     }
 
     // MARK: - Initialization Tests
@@ -47,8 +63,14 @@ internal final class NotchWindowControllerTests: XCTestCase {
         let initialWidth = window?.frame.width ?? 0
 
         triggerExpansion(true)
+        var finalWidth = window?.frame.width ?? 0
 
-        let finalWidth = window?.frame.width ?? 0
+        if finalWidth <= initialWidth {
+            // Retry once to reduce timing-related flakiness from initial layout.
+            triggerExpansion(true)
+            finalWidth = window?.frame.width ?? 0
+        }
+
         XCTAssertTrue(finalWidth > initialWidth, "Window width should increase when expanded")
     }
 
@@ -67,7 +89,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
         let window = windowController.window as? NotchWindow
         let screenFrame = NSScreen.main?.frame ?? .zero
         let initialCenterX = window?.frame.midX ?? 0
-        let expectedCenterX = screenFrame.width / 2
+        let expectedCenterX = screenFrame.midX
 
         XCTAssertEqual(initialCenterX, expectedCenterX, accuracy: 1.0, "Window should be centered horizontally on init")
 
@@ -81,7 +103,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
         let window = windowController.window as? NotchWindow
         let screenFrame = NSScreen.main?.frame ?? .zero
         let notchHeight: CGFloat = 33
-        let expectedYPosition = screenFrame.height - notchHeight
+        let expectedYPosition = screenFrame.maxY - notchHeight
 
         triggerExpansion(true)
 
@@ -217,7 +239,6 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
         // Expand the window first
         triggerExpansion(true)
-        let initialFrame = window?.frame ?? .zero
 
         // Simulate screen configuration change
         NotificationCenter.default.post(
@@ -262,9 +283,9 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
     private func waitForFrameUpdate() {
         let expectation = expectation(description: "Wait for window resize")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
 }

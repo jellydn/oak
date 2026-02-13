@@ -4,10 +4,11 @@ import Foundation
 internal class ProgressManager: ObservableObject {
     @Published var dailyStats = DailyStats(todayFocusMinutes: 0, todayCompletedSessions: 0, streakDays: 0)
 
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
     private let progressKey = "progressHistory"
 
-    init() {
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
         loadProgress()
     }
 
@@ -60,11 +61,12 @@ internal class ProgressManager: ObservableObject {
     }
 
     private func calculateStreak(records: [ProgressData]) -> Int {
+        let sortedRecords = records.sorted { $0.date > $1.date }
         var streak = 0
         var currentDate = Calendar.current.startOfDay(for: Date())
         let calendar = Calendar.current
 
-        for record in records {
+        for record in sortedRecords {
             let recordDate = calendar.startOfDay(for: record.date)
             let daysDifference = calendar.dateComponents([.day], from: recordDate, to: currentDate).day
 
@@ -87,5 +89,9 @@ internal class ProgressManager: ObservableObject {
         }
 
         return streak
+    }
+
+    deinit {
+        // Safety net for future resources held by this manager.
     }
 }
