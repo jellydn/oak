@@ -264,7 +264,11 @@ internal struct NotchCompanionView: View {
 
                         Text(viewModel.displayTime)
                             .font(.system(size: 6, weight: .semibold, design: .monospaced))
-                            .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
+                            .foregroundColor(
+                                viewModel.isPaused
+                                    ? Color.orange.opacity(0.95)
+                                    : Color.white.opacity(0.95)
+                            )
                     }
 
                     Text(viewModel.currentSessionType)

@@ -58,7 +58,8 @@ internal final class PresetSettingsStore: ObservableObject {
         mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
         notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
         playSoundOnSessionCompletion = userDefaults.bool(forKey: Keys.playSoundOnSessionCompletion)
-        let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode) ?? CountdownDisplayMode.number.rawValue
+        let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode)
+            ?? CountdownDisplayMode.number.rawValue
         countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
         ensureDisplayIDsInitialized()
     }
