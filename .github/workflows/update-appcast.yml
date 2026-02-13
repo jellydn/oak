@@ -3,6 +3,11 @@ name: Update Sparkle Appcast
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name to update (e.g., v0.4.3)'
+        required: true
 
 concurrency:
   group: update-appcast
@@ -34,17 +39,32 @@ jobs:
       - name: Get release information
         id: release
         run: |
+          # Determine the tag based on trigger type
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            TAG="${{ github.event.release.tag_name }}"
+            RELEASE_DATE_ISO="${{ github.event.release.published_at }}"
+          else
+            TAG="${{ github.event.inputs.tag }}"
+            RELEASE_DATE_ISO=""
+          fi
+
+          echo "Using tag: $TAG"
+
           # Extract version from tag (remove 'v' prefix)
-          VERSION="${{ github.event.release.tag_name }}"; VERSION="${VERSION#v}"
+          VERSION="${TAG#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           
           # Get the DMG download URL
-          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/Oak-${VERSION}.dmg"
+          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/Oak-${VERSION}.dmg"
           echo "dmg_url=$DMG_URL" >> "$GITHUB_OUTPUT"
           
           # Get release date in RFC 2822 format
-          RELEASE_DATE=$(date -R)
+          if [[ -n "$RELEASE_DATE_ISO" ]]; then
+            RELEASE_DATE=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$RELEASE_DATE_ISO" "+%a, %d %b %Y %H:%M:%S %z")
+          else
+            RELEASE_DATE=$(date -R)
+          fi
           echo "release_date=$RELEASE_DATE" >> "$GITHUB_OUTPUT"
 
       - name: Download DMG and get file size
@@ -52,8 +72,8 @@ jobs:
         env:
           DMG_URL: ${{ steps.release.outputs.dmg_url }}
         run: |
-          # Download the DMG file with retry logic
-          max_attempts=5
+          # Download the DMG file with retry logic to handle release-asset propagation delay
+          max_attempts=30
           attempt=1
           while :; do
             echo "Attempt ${attempt}/${max_attempts} to download DMG from $DMG_URL"
@@ -109,6 +129,10 @@ jobs:
           RELEASE_NOTES: ${{ github.event.release.body }}
           REPO: ${{ github.repository }}
         run: |
+          if [[ -z "${RELEASE_NOTES:-}" ]]; then
+            RELEASE_NOTES="<p>Release ${VERSION}</p>"
+          fi
+
           # Create a new item entry for the release
           cat > /tmp/new_item.xml << 'EOF'
           <item>
@@ -143,6 +167,10 @@ jobs:
           export ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
           perl -i -pe 's/\$\{RELEASE_NOTES\}/$ENV{ESCAPED_NOTES}/g' /tmp/new_item.xml
           
+          # Remove any existing item for the same version so retries stay idempotent
+          perl -0777 -pe "s#\\s*<item>.*?<sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>.*?</item>\\s*##sg" \
+            appcast.xml > /tmp/appcast.without_current.xml
+
           # Insert the new item at the beginning of the channel (after the comment)
           # This ensures the latest release is always first
           awk '
@@ -152,7 +180,7 @@ jobs:
               next
             }
             { print }
-          ' appcast.xml > /tmp/appcast.xml.new
+          ' /tmp/appcast.without_current.xml > /tmp/appcast.xml.new
           
           # Retain only the most recent 20 items to prevent unbounded growth
           awk '

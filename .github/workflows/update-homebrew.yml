@@ -3,9 +3,6 @@ name: Update Homebrew Cask
 on:
   release:
     types: [published]
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
@@ -35,8 +32,6 @@ jobs:
           # Determine the tag based on the trigger type
           if [[ "${{ github.event_name }}" == "release" ]]; then
             TAG="${{ github.event.release.tag_name }}"
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
           else
             TAG="${{ github.event.inputs.tag }}"
           fi
@@ -56,8 +51,8 @@ jobs:
         env:
           DMG_URL: ${{ steps.release.outputs.dmg_url }}
         run: |
-          # Download the DMG file with retry logic to handle asset upload race conditions
-          max_attempts=5
+          # Download the DMG file with retry logic to handle release-asset propagation delay
+          max_attempts=30
           attempt=1
           while :; do
             echo "Attempt ${attempt}/${max_attempts} to download DMG from $DMG_URL"
