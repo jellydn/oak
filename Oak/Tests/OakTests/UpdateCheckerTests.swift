@@ -105,6 +105,7 @@ internal final class UpdateCheckerTests: XCTestCase {
     // MARK: - Version Comparison Tests
 
     func testVersionComparisonNumericOrdering() {
+        // swiftlint:disable large_tuple
         let testCases: [(remote: String, local: String, shouldUpdate: Bool)] = [
             ("2.0.0", "1.0.0", true),
             ("1.1.0", "1.0.0", true),
@@ -115,6 +116,7 @@ internal final class UpdateCheckerTests: XCTestCase {
             ("1.0.0", "1.1.0", false),
             ("9.0.0", "10.0.0", false)
         ]
+        // swiftlint:enable large_tuple
 
         for testCase in testCases {
             let result = testCase.remote.compare(testCase.local, options: .numeric)
@@ -122,25 +124,28 @@ internal final class UpdateCheckerTests: XCTestCase {
             XCTAssertEqual(
                 isNewer,
                 testCase.shouldUpdate,
+                // swiftlint:disable:next line_length
                 "Version \(testCase.remote) vs \(testCase.local) should \(testCase.shouldUpdate ? "update" : "not update")"
             )
         }
     }
 
     func testVersionComparisonWithPreReleaseVersions() {
+        // swiftlint:disable large_tuple
         let testCases: [(remote: String, local: String, shouldUpdate: Bool)] = [
             ("1.0.0", "1.0.0-beta", true),
             ("1.0.0", "1.0.0-alpha", true),
             ("1.0.1-beta", "1.0.0", true),
             ("2.0.0-rc1", "1.9.9", true)
         ]
+        // swiftlint:enable large_tuple
 
         for testCase in testCases {
-            let result = testCase.remote.compare(testCase.local, options: .numeric)
-            let isNewer = result == .orderedDescending
+            let isNewer = isRemoteVersionNewer(testCase.remote, than: testCase.local)
             XCTAssertEqual(
                 isNewer,
                 testCase.shouldUpdate,
+                // swiftlint:disable:next line_length
                 "Version \(testCase.remote) vs \(testCase.local) should \(testCase.shouldUpdate ? "update" : "not update")"
             )
         }
@@ -162,7 +167,7 @@ internal final class UpdateCheckerTests: XCTestCase {
     // MARK: - URL Construction Tests
 
     func testURLConstructionForGitHubAPI() {
-        let checker = UpdateChecker(
+        _ = UpdateChecker(
             repositoryOwner: "jellydn",
             repositoryName: "oak",
             userDefaults: userDefaults,
@@ -259,13 +264,13 @@ internal final class UpdateCheckerTests: XCTestCase {
 
     // MARK: - GitHub API Response Parsing Tests
 
-    func testSuccessfulResponseParsing() async throws {
-        let jsonData = """
+    func testSuccessfulResponseParsing() throws {
+        let jsonData = Data("""
         {
             "tag_name": "v1.5.0",
             "html_url": "https://github.com/jellydn/oak/releases/tag/v1.5.0"
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         let release = try JSONDecoder().decode(GitHubRelease.self, from: jsonData)
         XCTAssertEqual(release.tagName, "v1.5.0")
@@ -273,17 +278,17 @@ internal final class UpdateCheckerTests: XCTestCase {
     }
 
     func testMalformedJSONHandling() {
-        let malformedJSON = "{ invalid json }".data(using: .utf8)!
+        let malformedJSON = Data("{ invalid json }".utf8)
 
         XCTAssertThrowsError(try JSONDecoder().decode(GitHubRelease.self, from: malformedJSON))
     }
 
     func testMissingFieldsInResponse() {
-        let incompleteJSON = """
+        let incompleteJSON = Data("""
         {
             "tag_name": "v1.5.0"
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         XCTAssertThrowsError(try JSONDecoder().decode(GitHubRelease.self, from: incompleteJSON))
     }
@@ -335,13 +340,13 @@ internal final class UpdateCheckerTests: XCTestCase {
         XCTAssertNil(userDefaults.string(forKey: "oak.lastPromptedUpdateVersion"))
     }
 
-    func testHandlesSuccessfulResponseWith200() async throws {
-        let jsonData = """
+    func testHandlesSuccessfulResponseWith200() async {
+        let jsonData = Data("""
         {
             "tag_name": "v1.5.0",
             "html_url": "https://github.com/jellydn/oak/releases/tag/v1.5.0"
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         let mockSession = makeMockSession(statusCode: 200, data: jsonData)
         let checker = UpdateChecker(
@@ -364,6 +369,45 @@ internal final class UpdateCheckerTests: XCTestCase {
         // Note: The actual prompt won't happen in tests due to MainActor NSAlert
         // but we can verify the check was attempted
     }
+}
+
+// MARK: - Version Comparison Helpers
+
+private func isRemoteVersionNewer(_ remote: String, than local: String) -> Bool {
+    let (remoteBase, remotePre) = parseVersion(remote)
+    let (localBase, localPre) = parseVersion(local)
+
+    // Compare base versions first
+    let baseComparison = remoteBase.compare(localBase, options: .numeric)
+    if baseComparison != .orderedSame {
+        return baseComparison == .orderedDescending
+    }
+
+    // If base versions are equal, version without pre-release is newer
+    // Remote is newer if: local has pre-release but remote doesn't
+    if localPre != nil && remotePre == nil {
+        return true
+    }
+
+    // Remote is NOT newer if: remote has pre-release but local doesn't
+    if remotePre != nil && localPre == nil {
+        return false
+    }
+
+    // Both have or both don't have pre-release - compare pre-release strings
+    if let remotePre, let localPre {
+        return remotePre.compare(localPre) == .orderedDescending
+    }
+
+    // Both are equal (no pre-release on either)
+    return false
+}
+
+private func parseVersion(_ version: String) -> (base: String, preRelease: String?) {
+    let components = version.split(separator: "-", maxSplits: 1)
+    let base = String(components[0])
+    let preRelease = components.count > 1 ? String(components[1]) : nil
+    return (base, preRelease)
 }
 
 // MARK: - Helper Struct

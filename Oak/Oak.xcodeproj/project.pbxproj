@@ -25,6 +25,7 @@
 		935A6BD932F4EC629908FE05 /* ambient_lofi.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 63539C12247302E14148BE07 /* ambient_lofi.m4a */; };
 		9756D44804BF478285073F0C /* ambient_rain.wav in Resources */ = {isa = PBXBuildFile; fileRef = 17D6B30DEDC9126B5A3E77DF /* ambient_rain.wav */; };
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
+		9DBE752E8C6A86537F00D6E2 /* FocusSessionTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A84484D614BECBBFFEBF99D /* FocusSessionTimerTests.swift */; };
 		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
 		AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */; };
 		B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3EFAB628759B783D66D3 /* AudioTrack.swift */; };
@@ -42,6 +43,7 @@
 		E24A84D1E69B270F4EEE1C95 /* ambient_forest.wav in Resources */ = {isa = PBXBuildFile; fileRef = 32954184C5B3930CBE019533 /* ambient_forest.wav */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
 		EAFB172B8BA777F1E272F3F7 /* ambient_cafe.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1641B6605BDA11BE28B2440F /* ambient_cafe.wav */; };
+		ED83D72FEA74BD4FB1A307DE /* AudioManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */; };
 		F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732AEE30E8FEC2D900C8224A /* US005Tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -75,7 +77,9 @@
 		3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+DisplayTarget.swift"; sourceTree = "<group>"; };
 		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
+		4A84484D614BECBBFFEBF99D /* FocusSessionTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionTimerTests.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
+		5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManagerTests.swift; sourceTree = "<group>"; };
 		63539C12247302E14148BE07 /* ambient_lofi.m4a */ = {isa = PBXFileReference; path = ambient_lofi.m4a; sourceTree = "<group>"; };
 		6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressManager.swift; sourceTree = "<group>"; };
 		732AEE30E8FEC2D900C8224A /* US005Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US005Tests.swift; sourceTree = "<group>"; };
@@ -159,6 +163,8 @@
 		7A59316AAFB96A57EDCA1D15 /* OakTests */ = {
 			isa = PBXGroup;
 			children = (
+				5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */,
+				4A84484D614BECBBFFEBF99D /* FocusSessionTimerTests.swift */,
 				D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */,
@@ -339,6 +345,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED83D72FEA74BD4FB1A307DE /* AudioManagerTests.swift in Sources */,
+				9DBE752E8C6A86537F00D6E2 /* FocusSessionTimerTests.swift in Sources */,
 				AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */,
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
 				1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */,

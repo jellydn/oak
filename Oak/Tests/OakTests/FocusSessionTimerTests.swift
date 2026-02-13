@@ -52,7 +52,7 @@ internal final class FocusSessionTimerTests: XCTestCase {
         }
 
         // Wait for 2 ticks (2 seconds)
-        try? await Task.sleep(nanoseconds: 2_100_000_000)
+        try? await Task.sleep(nanoseconds: 2100000000)
 
         if case let .running(remainingSeconds, _) = viewModel.sessionState {
             // Should be approximately 2 seconds less
@@ -68,13 +68,13 @@ internal final class FocusSessionTimerTests: XCTestCase {
         XCTAssertEqual(viewModel.displayTime, "25:00")
 
         // Wait for a few ticks
-        try? await Task.sleep(nanoseconds: 2_100_000_000)
+        try? await Task.sleep(nanoseconds: 2100000000)
 
         // Display time should have changed
         XCTAssertNotEqual(viewModel.displayTime, "25:00")
     }
 
-    func testSessionCompletesWhenTimeReachesZero() async {
+    func testSessionCompletesWhenTimeReachesZero() {
         // Start session with very short duration for testing
         viewModel.selectedPreset = .short
         viewModel.startSession()
@@ -121,7 +121,7 @@ internal final class FocusSessionTimerTests: XCTestCase {
         XCTAssertTrue(viewModel.isRunning)
     }
 
-    func testSessionCompleteStateTracking() async {
+    func testSessionCompleteStateTracking() {
         viewModel.startSession()
 
         // Initially should not be complete
@@ -134,7 +134,7 @@ internal final class FocusSessionTimerTests: XCTestCase {
         XCTAssertTrue(viewModel.isRunning)
     }
 
-    func testSessionCompleteStopsAudio() async {
+    func testSessionCompleteStopsAudio() {
         viewModel.audioManager.play(track: .brownNoise)
         XCTAssertTrue(viewModel.audioManager.isPlaying)
 
@@ -149,7 +149,7 @@ internal final class FocusSessionTimerTests: XCTestCase {
 
     // MARK: - Work to Break Transition Tests
 
-    func testWorkSessionIdentification() async {
+    func testWorkSessionIdentification() {
         viewModel.startSession()
         XCTAssertEqual(viewModel.currentSessionType, "Focus")
 
@@ -189,13 +189,13 @@ internal final class FocusSessionTimerTests: XCTestCase {
         XCTAssertTrue(viewModel.isPaused)
 
         // Wait a bit
-        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        try? await Task.sleep(nanoseconds: 2000000000)
 
         // Time should not have changed
         XCTAssertEqual(viewModel.displayTime, displayTimeBefore)
     }
 
-    func testResetInvalidatesTimer() async {
+    func testResetInvalidatesTimer() {
         viewModel.startSession()
         XCTAssertTrue(viewModel.isRunning)
 
@@ -220,7 +220,7 @@ internal final class FocusSessionTimerTests: XCTestCase {
         XCTAssertTrue(viewModel.isRunning)
 
         // Wait for a tick
-        try? await Task.sleep(nanoseconds: 1_100_000_000)
+        try? await Task.sleep(nanoseconds: 1100000000)
 
         // Time should have changed after resume
         if case let .running(remainingSeconds, _) = viewModel.sessionState {
@@ -233,7 +233,7 @@ internal final class FocusSessionTimerTests: XCTestCase {
 
     func testMultipleStartSessionCallsRestartsTimer() async {
         viewModel.startSession()
-        try? await Task.sleep(nanoseconds: 1_100_000_000)
+        try? await Task.sleep(nanoseconds: 1100000000)
 
         let displayTimeAfterFirstStart = viewModel.displayTime
 
