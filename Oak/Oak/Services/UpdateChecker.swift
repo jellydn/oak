@@ -2,10 +2,15 @@ import AppKit
 import Foundation
 import os
 
+/// Legacy manual update checker - Deprecated in favor of Sparkle framework
+/// This service is kept for backward compatibility and testing purposes only.
+/// New installations should use SparkleUpdater for automatic updates.
+@available(*, deprecated, message: "Use SparkleUpdater for automatic updates")
 internal protocol UpdateChecking {
     func checkForUpdatesOnLaunch()
 }
 
+@available(*, deprecated, message: "Use SparkleUpdater for automatic updates")
 internal final class UpdateChecker: UpdateChecking {
     private let repositoryOwner: String
     private let repositoryName: String

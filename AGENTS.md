@@ -147,6 +147,27 @@ Oak/
 
 ---
 
+## Auto-Update System
+
+Oak uses the [Sparkle framework](https://sparkle-project.org/) for automatic updates:
+
+- **Framework**: Sparkle 2.6.4+ via Swift Package Manager
+- **Feed URL**: `https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml`
+- **Update checks**: Automatic on launch (configurable in Settings)
+- **User control**: Users can enable/disable automatic checks and downloads
+
+### Key Components
+
+- `SparkleUpdater.swift`: SwiftUI-friendly wrapper around Sparkle
+- `appcast.xml`: RSS feed listing available versions (auto-updated by CI)
+- Entitlements: `com.apple.security.network.client` for update downloads
+
+### Legacy Update Checker
+
+The `UpdateChecker` service is deprecated in favor of Sparkle. It remains for backward compatibility and testing but should not be used in new code.
+
+---
+
 ## Commit Style
 
 `type(scope): brief description` | **Types**: feat, fix, refactor, test, docs, chore | **Scope**: timer, audio, ui, persistence

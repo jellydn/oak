@@ -1,6 +1,9 @@
 import XCTest
 @testable import Oak
 
+/// Tests for the legacy manual UpdateChecker service (now deprecated).
+/// These tests verify the manual update checking functionality for backward compatibility.
+/// New auto-update functionality is provided by SparkleUpdater.
 internal final class UpdateCheckerTests: XCTestCase {
     var suiteName: String!
     var userDefaults: UserDefaults!
