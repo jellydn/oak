@@ -14,12 +14,12 @@ internal struct NotchCompanionView: View {
     @State private var isExpandedByToggle = false
     @State private var lastReportedExpansion: Bool?
     @State private var presetSelection: Preset = .short
-    private let horizontalPadding: CGFloat = 6
-    private let verticalPadding: CGFloat = 4
-    private let contentSpacing: CGFloat = 8
-    private let controlSize: CGFloat = 18
+    private let horizontalPadding: CGFloat = 8
+    private let verticalPadding: CGFloat = 5
+    private let contentSpacing: CGFloat = 10
+    private let controlSize: CGFloat = 20
     private let compactRingSize: CGFloat = 20
-    private let expandedRingSize: CGFloat = 28
+    private let expandedRingSize: CGFloat = 26
     init(
         viewModel: FocusSessionViewModel,
         onExpansionChanged: @escaping (Bool) -> Void = { _ in }
@@ -48,8 +48,8 @@ internal struct NotchCompanionView: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.black.opacity(0.78),
-                            Color(red: 0.13, green: 0.14, blue: 0.18).opacity(0.9)
+                            Color.black.opacity(0.8),
+                            Color(red: 0.11, green: 0.12, blue: 0.15).opacity(0.86)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -62,7 +62,7 @@ internal struct NotchCompanionView: View {
                             lineWidth: viewModel.isSessionComplete ? 1.4 : 1
                         )
                 )
-                .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
+                .shadow(color: Color.black.opacity(0.28), radius: 10, x: 0, y: 4)
 
             HStack(spacing: contentSpacing) {
                 if isExpanded {
@@ -71,10 +71,14 @@ internal struct NotchCompanionView: View {
                     } else {
                         sessionView
                     }
-
-                    audioButton
-                    progressButton
-                    settingsButton
+                    Rectangle()
+                        .fill(Color.white.opacity(0.15))
+                        .frame(width: 1, height: controlSize)
+                    HStack(spacing: 6) {
+                        audioButton
+                        progressButton
+                        settingsButton
+                    }
                 } else {
                     compactView
                 }
@@ -107,7 +111,6 @@ internal struct NotchCompanionView: View {
                 }
                 if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
                     showConfetti = true
-
                     DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
                         showConfetti = false
                     }
@@ -463,7 +466,6 @@ internal struct NotchCompanionView: View {
 
     private func presetChip(_ preset: Preset) -> some View {
         let isSelected = presetSelection == preset
-
         return Button(
             action: {
                 presetSelection = preset
@@ -489,7 +491,6 @@ internal struct NotchCompanionView: View {
     private func notifyExpansionChanged(_ expanded: Bool) {
         guard lastReportedExpansion != expanded else { return }
         lastReportedExpansion = expanded
-
         DispatchQueue.main.async {
             onExpansionChanged(expanded)
         }

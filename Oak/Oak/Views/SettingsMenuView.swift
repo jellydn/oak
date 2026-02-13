@@ -18,24 +18,34 @@ internal struct SettingsMenuView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             headerRow
 
-            VStack(spacing: 10) {
+            Divider()
+
+            section(title: "Display") {
                 displayTargetPicker
                 countdownDisplayModePicker
+            }
+
+            section(title: "Session Presets") {
                 longBreakCycleEditor
-                presetEditor(title: "Preset A", preset: .short)
-                presetEditor(title: "Preset B", preset: .long)
+                presetEditor(title: presetSettings.displayName(for: .short), preset: .short)
+                presetEditor(title: presetSettings.displayName(for: .long), preset: .long)
+            }
+
+            section(title: "Notifications") {
                 notificationSettings
             }
+
+            Divider()
 
             Text(validRangeDescription)
                 .font(.caption2)
                 .foregroundColor(.secondary)
 
             HStack {
-                Button("Reset defaults") {
+                Button("Reset to defaults") {
                     presetSettings.resetToDefault()
                 }
                 .buttonStyle(.link)
@@ -54,11 +64,11 @@ internal struct SettingsMenuView: View {
     }
 
     private var headerRow: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Settings")
                     .font(.headline)
-                Text("Tune focus presets and notifications.")
+                Text("Focus presets, display, and notifications.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -73,10 +83,19 @@ internal struct SettingsMenuView: View {
         }
     }
 
+    private func section<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.primary)
+            content()
+        }
+    }
+
     private func presetEditor(title: String, preset: Preset) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("\(title) (\(presetSettings.displayName(for: preset)))")
-                .font(.system(size: 11, weight: .semibold))
+            Text(title)
+                .font(.system(size: 11, weight: .medium))
 
             HStack(spacing: 8) {
                 Text("Focus")
@@ -123,91 +142,61 @@ internal struct SettingsMenuView: View {
                 }
             }
         }
-        .padding(8)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var longBreakCycleEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Long Break Cycle")
-                .font(.system(size: 11, weight: .semibold))
-
-            Stepper(
-                value: roundsBeforeLongBreakBinding,
-                in: PresetSettingsStore.minRoundsBeforeLongBreak ... PresetSettingsStore.maxRoundsBeforeLongBreak
-            ) {
-                Text("Every \(presetSettings.roundsBeforeLongBreak) focus sessions")
-                    .font(.caption)
-            }
+        Stepper(
+            value: roundsBeforeLongBreakBinding,
+            in: PresetSettingsStore.minRoundsBeforeLongBreak ... PresetSettingsStore.maxRoundsBeforeLongBreak
+        ) {
+            Text("Long break every \(presetSettings.roundsBeforeLongBreak) focus sessions")
+                .font(.caption)
         }
-        .padding(8)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var displayTargetPicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Display")
-                .font(.system(size: 11, weight: .semibold))
-
-            Picker("Display target", selection: displayTargetBinding) {
-                ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
-                    Text(
-                        NSScreen.displayName(
-                            for: target,
-                            preferredDisplayID: presetSettings.preferredDisplayID(for: target)
-                        )
+        Picker("Display target", selection: displayTargetBinding) {
+            ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
+                Text(
+                    NSScreen.displayName(
+                        for: target,
+                        preferredDisplayID: presetSettings.preferredDisplayID(for: target)
                     )
-                    .tag(target)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .onChange(of: selectedDisplayTarget) { newValue in
-                guard presetSettings.displayTarget != newValue else { return }
-                DispatchQueue.main.async {
-                    presetSettings.setDisplayTarget(newValue)
-                }
-            }
-            .onChange(of: presetSettings.displayTarget) { newValue in
-                guard selectedDisplayTarget != newValue else { return }
-                selectedDisplayTarget = newValue
+                )
+                .tag(target)
             }
         }
-        .padding(8)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .onChange(of: selectedDisplayTarget) { newValue in
+            guard presetSettings.displayTarget != newValue else { return }
+            DispatchQueue.main.async {
+                presetSettings.setDisplayTarget(newValue)
+            }
+        }
+        .onChange(of: presetSettings.displayTarget) { newValue in
+            guard selectedDisplayTarget != newValue else { return }
+            selectedDisplayTarget = newValue
+        }
     }
 
     private var countdownDisplayModePicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Countdown Display")
-                .font(.system(size: 11, weight: .semibold))
-
-            Picker("Countdown display mode", selection: countdownDisplayModeBinding) {
-                ForEach(CountdownDisplayMode.allCases, id: \.rawValue) { mode in
-                    Text(mode.displayName)
-                        .tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .onChange(of: presetSettings.countdownDisplayMode) { newValue in
-                guard selectedCountdownDisplayMode != newValue else { return }
-                selectedCountdownDisplayMode = newValue
+        Picker("Countdown display mode", selection: countdownDisplayModeBinding) {
+            ForEach(CountdownDisplayMode.allCases, id: \.rawValue) { mode in
+                Text(mode.displayName)
+                    .tag(mode)
             }
         }
-        .padding(8)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .onChange(of: presetSettings.countdownDisplayMode) { newValue in
+            guard selectedCountdownDisplayMode != newValue else { return }
+            selectedCountdownDisplayMode = newValue
+        }
     }
 
     private var notificationSettings: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Notifications")
-                .font(.system(size: 11, weight: .semibold))
-
             Text(notificationStatusText)
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -242,9 +231,6 @@ internal struct SettingsMenuView: View {
             }
             .buttonStyle(.link)
         }
-        .padding(8)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private func workMinutesBinding(for preset: Preset) -> Binding<Int> {
