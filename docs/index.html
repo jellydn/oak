@@ -3,532 +3,618 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Oak - A lightweight macOS focus companion designed for deep work with Pomodoro timer and ambient sounds">
-    <meta name="keywords" content="macOS, focus, productivity, Pomodoro, ambient sounds, deep work">
+    <meta name="description" content="Oak is a lightweight macOS focus companion with notch-first Pomodoro sessions, ambient sounds, and local progress tracking.">
+    <meta name="keywords" content="Oak, macOS, focus, productivity, Pomodoro, notch app, ambient sounds">
     <meta name="author" content="Dung Huynh">
-    
-    <!-- Open Graph / Facebook -->
+
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://jellydn.github.io/oak/">
     <meta property="og:title" content="Oak - Focus Companion for macOS">
-    <meta property="og:description" content="A lightweight macOS focus companion designed for deep work with Pomodoro timer and ambient sounds">
+    <meta property="og:description" content="Notch-first focus sessions, ambient sounds, and local progress tracking for deep work.">
     <meta property="og:image" content="https://jellydn.github.io/oak/assets/readme-header.svg">
 
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://jellydn.github.io/oak/">
     <meta property="twitter:title" content="Oak - Focus Companion for macOS">
-    <meta property="twitter:description" content="A lightweight macOS focus companion designed for deep work with Pomodoro timer and ambient sounds">
+    <meta property="twitter:description" content="Notch-first focus sessions, ambient sounds, and local progress tracking for deep work.">
     <meta property="twitter:image" content="https://jellydn.github.io/oak/assets/readme-header.svg">
     <meta property="twitter:creator" content="@jellydn">
 
     <title>Oak - Focus Companion for macOS</title>
-    
+
     <link rel="icon" type="image/svg+xml" href="/oak/assets/app-icon-small.svg">
-    
+
     <style>
+        :root {
+            --bg: #f4f3ee;
+            --paper: #fffdf8;
+            --ink: #151515;
+            --muted: #5a5a55;
+            --line: #ddd9cf;
+            --accent: #2f7a3f;
+            --accent-dark: #245f31;
+            --chip: #ece8db;
+            --terminal: #1d1f22;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
-        :root {
-            --bg-primary: #1C1C1E;
-            --bg-secondary: #2C2C2E;
-            --bg-tertiary: #3A3A3C;
-            --text-primary: #FFFFFF;
-            --text-secondary: #AEAEB2;
-            --accent-green: #34C759;
-            --accent-green-dark: #28A745;
-            --border-color: #48484A;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        header {
-            padding: 60px 0 40px;
-            text-align: center;
-        }
-
-        .logo {
-            max-width: 800px;
-            width: 100%;
-            height: auto;
-            margin-bottom: 30px;
-        }
-
-        .badges {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-
-        .badge {
-            display: inline-block;
-        }
-
-        /* Demo Section */
-        .demo-section {
-            text-align: center;
-            margin: 40px 0;
-            padding: 40px 20px;
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        .demo-section h2 {
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: var(--text-primary);
-        }
-
-        .demo-gif {
-            max-width: 600px;
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Main Content */
-        main {
-            padding: 40px 0;
-        }
-
-        section {
-            margin-bottom: 60px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-dark) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--accent-green);
-        }
-
-        p {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        /* Features Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .feature-card {
-            background: var(--bg-secondary);
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(52, 199, 89, 0.2);
-        }
-
-        .feature-card h3 {
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        /* Installation Section */
-        .install-section {
-            background: var(--bg-secondary);
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        pre {
-            background: var(--bg-tertiary);
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 15px 0;
-            border: 1px solid var(--border-color);
-        }
-
-        code {
-            color: var(--accent-green);
-            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
-            font-size: 0.95rem;
-        }
-
-        /* CTA Buttons */
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-dark) 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(52, 199, 89, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--accent-green);
-            border: 2px solid var(--accent-green);
-        }
-
-        .btn-secondary:hover {
-            background: var(--accent-green);
-            color: white;
-        }
-
-        /* Lists */
-        ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        ul li {
-            padding: 8px 0;
-            padding-left: 30px;
-            position: relative;
-            color: var(--text-secondary);
-        }
-
-        ul li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--accent-green);
-            font-weight: bold;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 60px 20px 40px;
-            border-top: 1px solid var(--border-color);
-            margin-top: 80px;
-        }
-
-        .author-info {
-            margin-bottom: 30px;
-        }
-
-        .author-info h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .social-links a {
-            color: var(--accent-green);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .social-links a:hover {
-            color: var(--accent-green-dark);
-        }
-
-        .support-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        .support-buttons img {
-            height: 40px;
-            width: auto;
-            transition: transform 0.2s;
-        }
-
-        .support-buttons img:hover {
-            transform: scale(1.05);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                text-align: center;
-                max-width: 300px;
-            }
-
-            .install-section {
-                padding: 20px;
-            }
-        }
-
-        /* Smooth scroll */
         html {
             scroll-behavior: smooth;
         }
 
-        /* Links */
+        body {
+            background:
+                radial-gradient(circle at 20% 10%, #ffffff 0%, transparent 40%),
+                radial-gradient(circle at 85% 0%, #ecefe5 0%, transparent 35%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
         a {
-            color: var(--accent-green);
+            color: var(--accent);
             text-decoration: none;
         }
 
         a:hover {
             text-decoration: underline;
         }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .floating-nav {
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            margin: 14px 0 20px;
+        }
+
+        .floating-nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: rgba(255, 253, 248, 0.86);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 14px 28px rgba(40, 44, 33, 0.08);
+        }
+
+        .floating-nav a {
+            display: inline-block;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 999px;
+        }
+
+        .floating-nav a:hover {
+            color: var(--ink);
+            background: var(--chip);
+            text-decoration: none;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 34px;
+            align-items: center;
+            padding: 34px 0 28px;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--chip);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 4.6vw, 3.4rem);
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+
+        .hero h1 .accent {
+            color: var(--accent);
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 58ch;
+            margin-bottom: 18px;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .btn:hover {
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(47, 122, 63, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+        }
+
+        .btn-secondary {
+            background: var(--paper);
+            color: var(--ink);
+            border-color: var(--line);
+        }
+
+        .terminal {
+            background: var(--terminal);
+            color: #e7e9ec;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #2f3237;
+            box-shadow: 0 22px 34px rgba(20, 20, 20, 0.24);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2a2d32;
+            border-bottom: 1px solid #3a3f46;
+            padding: 10px 12px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot.red { background: #ff5f57; }
+        .dot.yellow { background: #febc2e; }
+        .dot.green { background: #28c840; }
+
+        .terminal-title {
+            margin-left: 6px;
+            font-size: 0.78rem;
+            color: #a6acb8;
+        }
+
+        .terminal pre {
+            margin: 0;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .terminal code {
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        }
+
+        section {
+            padding: 42px 0;
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 2.8vw, 2.15rem);
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            color: var(--muted);
+            margin-bottom: 22px;
+            max-width: 72ch;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 6px 20px rgba(40, 44, 33, 0.06);
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 0.96rem;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .panel {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .panel h3 {
+            font-size: 1.02rem;
+            margin-bottom: 8px;
+        }
+
+        .panel p,
+        .panel li {
+            color: var(--muted);
+        }
+
+        .panel ul {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .panel li {
+            position: relative;
+            padding-left: 16px;
+            margin: 6px 0;
+        }
+
+        .panel li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .demo {
+            text-align: center;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .demo img {
+            width: 100%;
+            max-width: 760px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            box-shadow: 0 12px 28px rgba(40, 44, 33, 0.15);
+        }
+
+        .code-block {
+            background: #f8f6ef;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            overflow-x: auto;
+            font-size: 0.88rem;
+        }
+
+        .code-block code {
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+            color: #2f302c;
+        }
+
+        .docs-list,
+        .author-links {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .docs-list a,
+        .author-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--chip);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 12px;
+            color: var(--ink);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .docs-list a:hover,
+        .author-links a:hover {
+            text-decoration: none;
+            border-color: #c8c4b8;
+        }
+
+        .support {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .support img {
+            height: 34px;
+            width: auto;
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            margin-top: 26px;
+            padding: 28px 0 40px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 980px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 720px) {
+            .container {
+                padding: 0 14px;
+            }
+
+            .floating-nav {
+                top: 10px;
+            }
+
+            .floating-nav ul {
+                justify-content: center;
+            }
+
+            .split {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header with Logo -->
-        <header>
-            <img src="https://jellydn.github.io/oak/assets/readme-header.svg" alt="Oak - Focus Companion for macOS" class="logo">
-            
-            <div class="badges">
-                <span class="badge">
-                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
-                </span>
-                <span class="badge">
-                    <img src="https://img.shields.io/badge/macOS-13+-blue.svg" alt="macOS 13+">
-                </span>
-                <span class="badge">
-                    <img src="https://img.shields.io/badge/Swift-5.9+-orange.svg" alt="Swift 5.9+">
-                </span>
-            </div>
+        <nav class="floating-nav" aria-label="Section navigation">
+            <ul>
+                <li><a href="#top">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#install">Install</a></li>
+                <li><a href="#docs">Docs</a></li>
+                <li><a href="#support">Support</a></li>
+            </ul>
+        </nav>
 
-            <p style="font-size: 1.3rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto;">
-                A lightweight macOS focus companion designed for deep work
-            </p>
-
-            <div class="cta-buttons">
-                <a href="https://github.com/jellydn/oak/releases/latest" class="btn btn-primary">Download Latest Release</a>
-                <a href="https://github.com/jellydn/oak" class="btn btn-secondary">View on GitHub</a>
-            </div>
-        </header>
-
-        <!-- Demo Section -->
-        <div class="demo-section">
-            <h2>🎬 Demo</h2>
-            <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak Demo - Focus session in action" class="demo-gif">
-        </div>
-
-        <!-- Main Content -->
-        <main>
-            <!-- Features -->
-            <section id="features">
-                <h2>✨ Features</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <h3>🎯 Notch-first UI</h3>
-                        <p>Beautifully designed focus companion that lives in your MacBook's notch</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>⏱️ Pomodoro Presets</h3>
-                        <p>Fixed presets: 25/5 and 50/10 minutes for optimal focus sessions</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>▶️ Session Controls</h3>
-                        <p>Full control with start, pause, and resume functionality</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>🎵 Ambient Sounds</h3>
-                        <p>Immersive audio: rain, forest, cafe, brown noise, lo-fi</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>📊 Local Tracking</h3>
-                        <p>Track daily focus minutes, completed sessions, and 7-day streaks</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>🔒 Privacy First</h3>
-                        <p>All data stays local on your Mac - no cloud, no tracking</p>
-                    </div>
+        <header class="hero" id="top">
+            <div>
+                <div class="badge-row">
+                    <span class="chip">Notch-first macOS app</span>
+                    <span class="chip">Default presets: 25/5 and 50/10</span>
+                    <span class="chip">Local-only tracking</span>
                 </div>
-            </section>
 
-            <!-- Installation -->
-            <section id="installation">
-                <h2>🚀 Getting Started</h2>
-                
-                <div class="install-section">
-                    <h3>Using Homebrew (Recommended)</h3>
-                    <pre><code># Add the tap
+                <h1>
+                    Deep work in your notch.<br>
+                    <span class="accent">Simple focus sessions.</span>
+                </h1>
+                <p>
+                    Oak is a lightweight macOS focus companion with Pomodoro-style sessions, ambient audio,
+                    and practical daily metrics. It stays out of your way while helping you stay in flow.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="https://github.com/jellydn/oak/releases/latest">Download Latest Release</a>
+                    <a class="btn btn-secondary" href="https://github.com/jellydn/oak">View on GitHub</a>
+                </div>
+            </div>
+
+            <div class="terminal" aria-label="Quick install terminal">
+                <div class="terminal-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span class="terminal-title">quick-install.sh</span>
+                </div>
+<pre><code># Add the tap
 brew tap jellydn/oak https://github.com/jellydn/oak
 
 # Install Oak
 brew install --cask oak</code></pre>
+            </div>
+        </header>
 
-                    <h3 style="margin-top: 30px;">From Source</h3>
-                    <p><strong>Prerequisites:</strong></p>
+        <section aria-labelledby="demo-title">
+            <h2 class="section-title" id="demo-title">Demo</h2>
+            <p class="section-subtitle">Focus sessions in action with Oak's notch companion UI.</p>
+            <div class="demo">
+                <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak demo showing focus session flow">
+            </div>
+        </section>
+
+        <section id="features" aria-labelledby="features-title">
+            <h2 class="section-title" id="features-title">Features</h2>
+            <p class="section-subtitle">Aligned with the latest README feature set.</p>
+            <div class="card-grid">
+                <article class="card">
+                    <h3>Notch-first experience</h3>
+                    <p>A focused companion UI designed around the MacBook notch instead of a full app window.</p>
+                </article>
+                <article class="card">
+                    <h3>Default Pomodoro presets</h3>
+                    <p>Purposeful default session lengths with <code>25/5</code> and <code>50/10</code>.</p>
+                </article>
+                <article class="card">
+                    <h3>Long break rhythm</h3>
+                    <p>Automatic 15/20 minute long breaks after four completed focus rounds.</p>
+                </article>
+                <article class="card">
+                    <h3>Session controls</h3>
+                    <p>Simple controls for start, pause, and resume to keep interaction friction low.</p>
+                </article>
+                <article class="card">
+                    <h3>Ambient sound library</h3>
+                    <p>Rain, forest, cafe, brown noise, and lo-fi tracks are built in.</p>
+                </article>
+                <article class="card">
+                    <h3>Local progress tracking</h3>
+                    <p>Track daily focus minutes, completed sessions, and 7-day streaks entirely on-device.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="install" aria-labelledby="install-title">
+            <h2 class="section-title" id="install-title">Getting Started</h2>
+            <p class="section-subtitle">Install through Homebrew or build from source on macOS 13+.</p>
+
+            <div class="split">
+                <div class="panel">
+                    <h3>Install via Homebrew</h3>
+                    <div class="code-block">
+                        <code>brew tap jellydn/oak https://github.com/jellydn/oak
+brew install --cask oak</code>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3>Build from source</h3>
                     <ul>
                         <li>macOS 13+ (Apple Silicon recommended)</li>
-                        <li>XcodeGen (<code>brew install xcodegen</code>)</li>
-                        <li>SwiftLint (optional: <code>brew install swiftlint</code>)</li>
-                        <li>SwiftFormat (optional: <code>brew install swiftformat</code>)</li>
+                        <li>XcodeGen: <code>brew install xcodegen</code></li>
+                        <li>Optional SwiftLint: <code>brew install swiftlint</code></li>
+                        <li>Optional SwiftFormat: <code>brew install swiftformat</code></li>
                     </ul>
-
-                    <pre><code># Clone the repository
-git clone https://github.com/jellydn/oak.git
+                    <pre class="code-block" style="margin-top: 10px;"><code class="language-sh">git clone https://github.com/jellydn/oak.git
 cd oak
-
-# Generate Xcode project
-cd Oak && xcodegen generate
-
-# Build and run
-open Oak.xcodeproj</code></pre>
+just dev</code></pre>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Project Structure -->
-            <section id="structure">
-                <h2>📁 Project Structure</h2>
-                <pre><code>Oak/
-├── Oak/
-│   ├── Models/              # Data models, enums, protocols
-│   ├── Views/               # SwiftUI Views
-│   ├── ViewModels/          # ObservableObject classes
-│   ├── Services/            # Business logic, audio, persistence
-│   ├── Resources/           # Assets, sounds, config files
-│   └── OakApp.swift        # App entry point
-├── Oak.xcodeproj/           # Generated by XcodeGen
-├── project.yml              # XcodeGen config
-└── Tests/                   # Unit tests</code></pre>
-            </section>
-
-            <!-- Documentation -->
-            <section id="docs">
-                <h2>📝 Documentation</h2>
-                <ul style="font-size: 1.1rem;">
-                    <li><a href="https://github.com/jellydn/oak/blob/main/tasks/prd-macos-focus-companion-app.md">Product Requirements Document</a></li>
-                    <li><a href="https://github.com/jellydn/oak/tree/main/doc/adr">Architecture Decision Records</a></li>
-                    <li><a href="https://github.com/jellydn/oak/blob/main/AGENTS.md">Development Guidelines</a></li>
-                </ul>
-            </section>
-
-            <!-- Contributing -->
-            <section id="contributing">
-                <h2>🤝 Contributing</h2>
-                <p>Contributions are welcome! Please read our contributing guidelines before submitting PRs.</p>
-                <div class="cta-buttons">
-                    <a href="https://github.com/jellydn/oak/issues" class="btn btn-secondary">Report an Issue</a>
-                    <a href="https://github.com/jellydn/oak/pulls" class="btn btn-secondary">Submit a PR</a>
+        <section aria-labelledby="assets-title">
+            <h2 class="section-title" id="assets-title">Ambient Sound Assets</h2>
+            <p class="section-subtitle">Expected files under <code>Oak/Oak/Resources/Sounds</code>.</p>
+            <div class="split">
+                <div class="panel">
+                    <h3>Required base names</h3>
+                    <ul>
+                        <li><code>ambient_rain</code></li>
+                        <li><code>ambient_forest</code></li>
+                        <li><code>ambient_cafe</code></li>
+                        <li><code>ambient_brown_noise</code></li>
+                        <li><code>ambient_lofi</code></li>
+                    </ul>
+                    <p style="margin-top: 8px;">Supported extensions: <code>.m4a</code> (preferred), <code>.wav</code>, <code>.mp3</code>.</p>
                 </div>
-            </section>
-        </main>
+                <div class="panel">
+                    <h3>Sound source references</h3>
+                    <ul>
+                        <li><a href="https://mixkit.co/license/">Mixkit license</a></li>
+                        <li><a href="https://pixabay.com/service/license-summary/">Pixabay license summary</a></li>
+                        <li><a href="https://freesound.org/help/faq/">Freesound licensing FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-        <!-- Footer -->
+        <section id="docs" aria-labelledby="docs-title">
+            <h2 class="section-title" id="docs-title">Documentation</h2>
+            <p class="section-subtitle">Project docs and decision records.</p>
+            <ul class="docs-list">
+                <li><a href="https://github.com/jellydn/oak/blob/main/tasks/prd-macos-focus-companion-app.md">PRD</a></li>
+                <li><a href="https://github.com/jellydn/oak/tree/main/doc/adr">Architecture Decisions</a></li>
+                <li><a href="https://github.com/jellydn/oak/blob/main/AGENTS.md">Agent Guidelines</a></li>
+                <li><a href="https://github.com/jellydn/oak/blob/main/LICENSE">MIT License</a></li>
+            </ul>
+        </section>
+
+        <section id="support" aria-labelledby="support-title">
+            <h2 class="section-title" id="support-title">Author and Support</h2>
+            <p class="section-subtitle">Maintained by Dung Huynh.</p>
+
+            <ul class="author-links">
+                <li><a href="https://productsway.com">Website</a></li>
+                <li><a href="https://twitter.com/jellydn">Twitter</a></li>
+                <li><a href="https://github.com/jellydn">GitHub</a></li>
+            </ul>
+
+            <div class="support">
+                <a href="https://ko-fi.com/dunghd">
+                    <img src="https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&amp;logo=ko-fi&amp;logoColor=white" alt="Support on Ko-fi">
+                </a>
+                <a href="https://paypal.me/dunghd">
+                    <img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&amp;logo=paypal&amp;logoColor=white" alt="Support via PayPal">
+                </a>
+                <a href="https://www.buymeacoffee.com/dunghd">
+                    <img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&amp;logo=buy-me-a-coffee&amp;logoColor=black" alt="Support on Buy Me A Coffee">
+                </a>
+            </div>
+        </section>
+
         <footer>
-            <div class="author-info">
-                <h3>👤 Author</h3>
-                <p><strong>Dung Huynh</strong></p>
-                <div class="social-links">
-                    <a href="https://productsway.com" target="_blank">🌐 Website</a>
-                    <span style="color: var(--border-color);">•</span>
-                    <a href="https://twitter.com/jellydn" target="_blank">🐦 Twitter</a>
-                    <span style="color: var(--border-color);">•</span>
-                    <a href="https://github.com/jellydn" target="_blank">💻 GitHub</a>
-                </div>
-            </div>
-
-            <div>
-                <h3>💖 Support</h3>
-                <div class="support-buttons">
-                    <a href="https://ko-fi.com/dunghd" target="_blank">
-                        <img src="https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Ko-fi">
-                    </a>
-                    <a href="https://paypal.me/dunghd" target="_blank">
-                        <img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal">
-                    </a>
-                    <a href="https://www.buymeacoffee.com/dunghd" target="_blank">
-                        <img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee">
-                    </a>
-                </div>
-            </div>
-
-            <p style="margin-top: 40px; color: var(--text-secondary);">
-                © 2026 Dung Huynh. Licensed under the <a href="https://github.com/jellydn/oak/blob/main/LICENSE">MIT License</a>.
-            </p>
+            <p>© 2026 Dung Huynh. Oak is licensed under MIT.</p>
         </footer>
     </div>
 </body>
