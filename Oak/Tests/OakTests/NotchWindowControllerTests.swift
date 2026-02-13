@@ -249,14 +249,14 @@ internal final class NotchWindowControllerTests: XCTestCase {
             object: NSApp
         )
 
-        _ = waitForFrameWidth(372, timeout: 1.0)
+        _ = waitForFrameWidth(NotchLayout.expandedWidth, timeout: 1.0)
 
         let finalFrame = window?.frame ?? .zero
 
         // The frame should remain valid (width should still match expanded state)
         XCTAssertEqual(
             finalFrame.width,
-            372,
+            NotchLayout.expandedWidth,
             accuracy: 1.0,
             "Window should maintain expanded width after screen change"
         )
@@ -281,7 +281,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
     private func triggerExpansion(_ expanded: Bool) {
         windowController.handleExpansionChange(expanded)
-        let targetWidth: CGFloat = expanded ? 372 : 144
+        let targetWidth: CGFloat = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         if !waitForFrameWidth(targetWidth, timeout: 1.0) {
             // Retry once to reduce occasional timing flakiness in CI/local runs.
             windowController.handleExpansionChange(expanded)
