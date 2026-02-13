@@ -6,9 +6,6 @@ import SwiftUI
 
 @MainActor
 internal class NotchWindowController: NSWindowController {
-    private let collapsedWidth: CGFloat = 144
-    private let expandedWidth: CGFloat = 372
-    private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool = false
     private var hasCleanedUp = false
     private var isApplyingFrameChange = false
@@ -30,8 +27,8 @@ internal class NotchWindowController: NSWindowController {
         viewModel = FocusSessionViewModel(presetSettings: settings)
 
         let window = NotchWindow(
-            width: 144,
-            height: 33,
+            width: NotchLayout.collapsedWidth,
+            height: NotchLayout.height,
             displayTarget: settings.displayTarget,
             preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
         )
@@ -50,8 +47,8 @@ internal class NotchWindowController: NSWindowController {
             hostingView.safeAreaRegions = []
         }
         window.contentView = hostingView
-        window.contentMinSize = NSSize(width: collapsedWidth, height: notchHeight)
-        window.contentMaxSize = NSSize(width: expandedWidth, height: notchHeight)
+        window.contentMinSize = NSSize(width: NotchLayout.collapsedWidth, height: NotchLayout.height)
+        window.contentMaxSize = NSSize(width: NotchLayout.expandedWidth, height: NotchLayout.height)
         setExpanded(false, forceReposition: true, targetOverride: settings.displayTarget)
 
         window.orderFrontRegardless()
@@ -141,7 +138,7 @@ internal class NotchWindowController: NSWindowController {
         guard !isApplyingFrameChange else { return }
         guard forceReposition || lastExpandedState != expanded else { return }
 
-        let targetWidth = expanded ? expandedWidth : collapsedWidth
+        let targetWidth = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         let activeTarget = targetOverride ?? presetSettings.displayTarget
         let preferredDisplayID = presetSettings.preferredDisplayID(for: activeTarget)
         let resolvedScreen = NSScreen.screen(
@@ -149,9 +146,9 @@ internal class NotchWindowController: NSWindowController {
             preferredDisplayID: preferredDisplayID
         )
         let screenFrame = resolvedScreen?.frame ?? .zero
-        let yPosition = screenFrame.maxY - notchHeight
+        let yPosition = screenFrame.maxY - NotchLayout.height
         let xPosition = screenFrame.midX - (targetWidth / 2)
-        let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
+        let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: NotchLayout.height)
 
         guard shouldApplyFrameUpdate(current: window.frame, target: frame, forceReposition: forceReposition) else {
             lastExpandedState = expanded

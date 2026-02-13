@@ -12,7 +12,6 @@ internal struct NotchCompanionView: View {
     @State private var isExpandedByToggle = false
     @State private var lastReportedExpansion: Bool?
     @State private var presetSelection: Preset = .short
-    private let notchHeight: CGFloat = 33
     private let horizontalPadding: CGFloat = 6
     private let verticalPadding: CGFloat = 4
     private let contentSpacing: CGFloat = 8
@@ -84,7 +83,7 @@ internal struct NotchCompanionView: View {
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
-        .frame(height: notchHeight)
+        .frame(height: NotchLayout.height)
         .contentShape(Rectangle())
         .onChange(of: isExpanded) { expanded in
             notifyExpansionChanged(expanded)
