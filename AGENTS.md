@@ -24,6 +24,11 @@ just test-class Tests      # Run specific test class
 just test-method Tests methodName  # Run specific test method
 just check                 # Check compilation errors
 just clean && just open    # Clean and open in Xcode
+just lint                  # Lint Swift code with SwiftLint
+just lint-fix              # Auto-fix linting issues
+just format                # Format Swift code with SwiftFormat
+just format-check          # Check if code is formatted
+just check-style           # Run both lint and format checks
 ```
 
 **Single test command examples:**
@@ -99,6 +104,17 @@ guard let data = userDefaults.data(forKey: key),
       let records = try? JSONDecoder().decode([T].self, from: data) else { return [] }
 ```
 
+### Code Quality & Linting
+
+- Use SwiftLint for style enforcement (`.swiftlint.yml` config)
+- Use SwiftFormat for automatic formatting (`.swiftformat` config)
+- Run `just lint` before committing to check for violations
+- Run `just format` to auto-format code according to project style
+- SwiftLint rules are configured to match project conventions:
+  - Line length: 120 chars (warning), 150 (error)
+  - Use `os.log` instead of `print()` for logging
+  - Follow naming conventions (see Types & Naming section)
+
 ---
 
 ## File Organization
@@ -158,6 +174,7 @@ Oak/
 ## What Agents Should Know
 
 - Always run `just build` after making changes to verify compilation
+- Run `just lint` to check code style and `just format` to auto-format code
 - Run relevant tests before submitting changes: `just test-method ViewModelTests "testName"`
 - Verify changes don't break existing UI constraints (notch-only display)
 - Use `os.log` for logging in production, `print()` for debugging

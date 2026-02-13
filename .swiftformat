@@ -1,0 +1,40 @@
+# SwiftFormat Configuration for Oak
+
+# File options
+--exclude Oak.xcodeproj,.build,.swiftpm,DerivedData,.planning
+
+# Format options
+--indent 4
+--maxwidth 120
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--closingparen balanced
+--commas inline
+--decimalgrouping none
+--elseposition same-line
+--indentcase false
+--trimwhitespace always
+--linebreaks lf
+--semicolons never
+--stripunusedargs always
+--self remove
+--importgrouping testable-bottom
+--header strip
+
+# Rules to enable
+--enable isEmpty
+--enable sortedImports
+--enable blankLinesAtEndOfScope
+--enable blankLinesAtStartOfScope
+--enable blankLinesBetweenScopes
+--enable consecutiveBlankLines
+--enable redundantSelf
+--enable redundantReturn
+--enable trailingCommas
+--enable wrapArguments
+--enable wrapAttributes
+
+# Rules to disable
+--disable andOperator
+--disable redundantType

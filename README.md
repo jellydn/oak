@@ -28,6 +28,8 @@ A lightweight macOS focus companion designed for deep work.
 
 - macOS 13+ (Apple Silicon recommended)
 - XcodeGen (`brew install xcodegen`)
+- SwiftLint (optional, for code linting: `brew install swiftlint`)
+- SwiftFormat (optional, for code formatting: `brew install swiftformat`)
 
 ### Installation
 
@@ -75,6 +77,25 @@ just clean
 
 # Open in Xcode
 just open
+```
+
+### Code Quality Commands
+
+```bash
+# Lint Swift code
+just lint
+
+# Auto-fix linting issues
+just lint-fix
+
+# Format Swift code
+just format
+
+# Check if code is formatted correctly
+just format-check
+
+# Run both lint and format checks
+just check-style
 ```
 
 ## CI/CD and Releases
