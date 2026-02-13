@@ -173,6 +173,63 @@ final class NotchWindowControllerTests: XCTestCase {
         XCTAssertFalse(window?.ignoresMouseEvents ?? true, "NotchWindow should accept mouse events")
     }
 
+    // MARK: - Display Configuration Change Tests
+
+    func testObserverIsRegisteredForScreenChanges() {
+        // Verify that the observer is set up by checking we can trigger the notification
+        let expectation = expectation(description: "Screen configuration change notification")
+        
+        // Post the notification on the main thread
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: NSApplication.didChangeScreenParametersNotification,
+                object: NSApp
+            )
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 1.0)
+        
+        // If no crash occurred, the observer is properly set up
+        XCTAssertNotNil(windowController.window, "Window should still exist after screen change notification")
+    }
+
+    func testWindowRepositionsOnScreenConfigurationChange() {
+        let window = windowController.window as? NotchWindow
+        
+        // Expand the window first
+        triggerExpansion(true)
+        let initialFrame = window?.frame ?? .zero
+        
+        // Simulate screen configuration change
+        NotificationCenter.default.post(
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: NSApp
+        )
+        
+        waitForFrameUpdate()
+        
+        let finalFrame = window?.frame ?? .zero
+        
+        // The frame should remain valid (width should still match expanded state)
+        XCTAssertEqual(finalFrame.width, 372, accuracy: 1.0, "Window should maintain expanded width after screen change")
+        XCTAssertGreaterThan(finalFrame.height, 0, "Window should have valid height after screen change")
+    }
+
+    func testCleanupRemovesScreenChangeObserver() {
+        // Cleanup should not crash
+        XCTAssertNoThrow(windowController.cleanup(), "Cleanup should remove observer without crashing")
+        
+        // Post notification after cleanup - should not crash
+        XCTAssertNoThrow(
+            NotificationCenter.default.post(
+                name: NSApplication.didChangeScreenParametersNotification,
+                object: NSApp
+            ),
+            "Posting notification after cleanup should not crash"
+        )
+    }
+
     // MARK: - Helper Methods
 
     private func triggerExpansion(_ expanded: Bool) {

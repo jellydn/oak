@@ -1,11 +1,40 @@
 import SwiftUI
 import AppKit
 
+// MARK: - Screen Detection Helper
+
+extension NSScreen {
+    static func screenWithNotch() -> NSScreen? {
+        // Prefer main screen if it has a notch (macOS 12+)
+        if let mainScreen = NSScreen.main {
+            if #available(macOS 12.0, *) {
+                if mainScreen.auxiliaryTopLeftArea != nil {
+                    return mainScreen
+                }
+            }
+        }
+        
+        // Check other screens for notch
+        for screen in NSScreen.screens {
+            if #available(macOS 12.0, *) {
+                if screen.auxiliaryTopLeftArea != nil {
+                    return screen
+                }
+            }
+        }
+        
+        return NSScreen.main ?? NSScreen.screens.first
+    }
+}
+
+// MARK: - NotchWindowController
+
+@MainActor
 class NotchWindowController: NSWindowController {
     private let collapsedWidth: CGFloat = 144
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
-    private var lastExpandedState: Bool?
+    private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
 
     convenience init() {
@@ -25,14 +54,29 @@ class NotchWindowController: NSWindowController {
         window.contentView = NSHostingView(rootView: contentView)
 
         window.orderFrontRegardless()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(screenConfigurationChanged),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     func cleanup() {
         viewModel.cleanup()
+    }
+
+    @objc private func screenConfigurationChanged() {
+        setExpanded(lastExpandedState)
     }
 
     func handleExpansionChange(_ expanded: Bool) {
@@ -45,21 +89,24 @@ class NotchWindowController: NSWindowController {
         lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
-        let screenFrame = NSScreen.main?.frame ?? .zero
+        let screen = NSScreen.screenWithNotch()
+        let screenFrame = screen?.frame ?? .zero
         let yPosition = screenFrame.height - notchHeight
         let xPosition = (screenFrame.width - targetWidth) / 2
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
-        // Avoid recursive layout warnings by resizing outside the current update cycle.
         DispatchQueue.main.async {
             window.setFrame(newFrame, display: true, animate: false)
         }
     }
 }
 
+// MARK: - NotchWindow
+
 class NotchWindow: NSPanel {
     init(width: CGFloat, height: CGFloat) {
-        let screenFrame = NSScreen.main?.frame ?? .zero
+        let screen = NSScreen.screenWithNotch()
+        let screenFrame = screen?.frame ?? .zero
         let xPosition = (screenFrame.width - width) / 2
 
         super.init(
