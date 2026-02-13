@@ -5,7 +5,16 @@ import AppKit
 
 extension NSScreen {
     static func screenWithNotch() -> NSScreen? {
-        // Try to find a screen with auxiliaryTopLeftArea (indicates notch)
+        // Prefer main screen if it has a notch
+        if let mainScreen = NSScreen.main {
+            if #available(macOS 12.0, *) {
+                if mainScreen.auxiliaryTopLeftArea != nil {
+                    return mainScreen
+                }
+            }
+        }
+        
+        // Try to find any other screen with auxiliaryTopLeftArea (indicates notch)
         // This property is available on macOS 12+ and returns non-nil for screens with notch
         for screen in NSScreen.screens {
             if #available(macOS 12.0, *) {
@@ -22,10 +31,13 @@ extension NSScreen {
 
 // MARK: - NotchWindowController
 
+@MainActor
 class NotchWindowController: NSWindowController {
     private let collapsedWidth: CGFloat = 144
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
+    // Defaults to false (collapsed state) to ensure window positioning works correctly
+    // even if display changes occur before the first user interaction
     private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
 
@@ -66,7 +78,6 @@ class NotchWindowController: NSWindowController {
 
     func cleanup() {
         viewModel.cleanup()
-        NotificationCenter.default.removeObserver(self)
     }
 
     @objc private func screenConfigurationChanged() {
