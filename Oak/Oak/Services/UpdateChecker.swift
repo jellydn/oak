@@ -51,7 +51,17 @@ final class UpdateChecker: UpdateChecking {
 
         do {
             let (data, response) = try await session.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return
+            }
+            
+            // Handle rate limiting
+            if httpResponse.statusCode == 403 || httpResponse.statusCode == 429 {
+                logger.info("GitHub API rate limited, skipping update check")
+                return
+            }
+            
+            guard httpResponse.statusCode == 200 else {
                 return
             }
 
@@ -107,6 +117,11 @@ final class UpdateChecker: UpdateChecking {
         userDefaults.set(Date(), forKey: lastPromptedAtKey)
 
         if response == .alertFirstButtonReturn {
+            // Validate URL host to prevent MITM attacks
+            guard releaseURL.host?.hasSuffix("github.com") == true else {
+                logger.warning("Rejected non-GitHub release URL: \(releaseURL, privacy: .public)")
+                return
+            }
             NSWorkspace.shared.open(releaseURL)
         }
     }
