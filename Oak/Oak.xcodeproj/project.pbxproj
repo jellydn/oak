@@ -37,6 +37,7 @@
 		C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */; };
 		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
+		3B5E955207F954E0ED209D04 /* NotchLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601F399F3F938E7E9ADFD551 /* NotchLayout.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
 		E0B877DBD09CEEF00019BE07 /* ambient_lofi.wav in Resources */ = {isa = PBXBuildFile; fileRef = DB739C07704B32BF1998761B /* ambient_lofi.wav */; };
 		E24A84D1E69B270F4EEE1C95 /* ambient_forest.wav in Resources */ = {isa = PBXBuildFile; fileRef = 32954184C5B3930CBE019533 /* ambient_forest.wav */; };
@@ -70,6 +71,7 @@
 		23364F4B016E445E5657BF63 /* SettingsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuView.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
+		601F399F3F938E7E9ADFD551 /* NotchLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchLayout.swift; sourceTree = "<group>"; };
 		32954184C5B3930CBE019533 /* ambient_forest.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_forest.wav; sourceTree = "<group>"; };
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
 		3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+DisplayTarget.swift"; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				841F3EFAB628759B783D66D3 /* AudioTrack.swift */,
+				601F399F3F938E7E9ADFD551 /* NotchLayout.swift */,
 				1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */,
 				23F2FC6738FCAE0999D42A11 /* SessionModels.swift */,
 			);
@@ -329,6 +332,7 @@
 				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
 				C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */,
+				3B5E955207F954E0ED209D04 /* NotchLayout.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */,
 				4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */,
