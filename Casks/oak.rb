@@ -15,7 +15,7 @@ cask "oak" do
   app "Oak.app"
 
   zap trash: [
-    "~/Library/Preferences/com.jellydn.Oak.plist",
-    "~/Library/Saved Application State/com.jellydn.Oak.savedState",
+    "~/Library/Preferences/com.oak.app.plist",
+    "~/Library/Saved Application State/com.oak.app.savedState",
   ]
 end
