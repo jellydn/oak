@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 internal struct SettingsMenuView: View {
@@ -16,8 +17,7 @@ internal struct SettingsMenuView: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Settings")
-                .font(.headline)
+            headerRow
 
             VStack(spacing: 10) {
                 displayTargetPicker
@@ -46,6 +46,26 @@ internal struct SettingsMenuView: View {
         .padding(14)
         .task {
             await notificationService.refreshAuthorizationStatus()
+        }
+    }
+
+    private var headerRow: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Settings")
+                    .font(.headline)
+                Text("Tune focus presets and notifications.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Button("Quit Oak") {
+                NSApplication.shared.terminate(nil)
+            }
+            .buttonStyle(.link)
+            .help("Quit Oak")
         }
     }
 
@@ -143,7 +163,7 @@ internal struct SettingsMenuView: View {
                     }
                 }
 
-                Button("Refresh") {
+                Button("Refresh Status") {
                     Task {
                         await notificationService.refreshAuthorizationStatus()
                     }

@@ -28,7 +28,11 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
             _ = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
             await refreshAuthorizationStatus()
         } catch {
-            logger.error("Failed to request notification permission: \(error.localizedDescription)")
+            if let notificationError = error as? UNError, notificationError.code == .notificationsNotAllowed {
+                logger.info("Notification permission is unavailable for this app configuration.")
+            } else {
+                logger.error("Failed to request notification permission: \(error.localizedDescription)")
+            }
             await refreshAuthorizationStatus()
         }
     }

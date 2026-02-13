@@ -40,9 +40,9 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         notchWindowController?.window?.orderFrontRegardless()
         updateChecker.checkForUpdatesOnLaunch()
 
-        // Request notification permissions (not during tests)
+        // Keep status in sync at launch; permission requests are user-initiated from Settings.
         Task { @MainActor in
-            await notificationService.requestAuthorization()
+            await notificationService.refreshAuthorizationStatus()
         }
     }
 
