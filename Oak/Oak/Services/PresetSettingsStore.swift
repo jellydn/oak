@@ -13,6 +13,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var shortBreakMinutes: Int
     @Published private(set) var longWorkMinutes: Int
     @Published private(set) var longBreakMinutes: Int
+    @Published private(set) var displayTarget: DisplayTarget
 
     private let userDefaults: UserDefaults
 
@@ -21,6 +22,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let shortBreakMinutes = "preset.short.breakMinutes"
         static let longWorkMinutes = "preset.long.workMinutes"
         static let longBreakMinutes = "preset.long.breakMinutes"
+        static let displayTarget = "display.target"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -30,7 +32,8 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.shortWorkMinutes: Preset.short.defaultWorkMinutes,
             Keys.shortBreakMinutes: Preset.short.defaultBreakMinutes,
             Keys.longWorkMinutes: Preset.long.defaultWorkMinutes,
-            Keys.longBreakMinutes: Preset.long.defaultBreakMinutes
+            Keys.longBreakMinutes: Preset.long.defaultBreakMinutes,
+            Keys.displayTarget: DisplayTarget.mainDisplay.rawValue
         ]
         userDefaults.register(defaults: defaults)
 
@@ -38,6 +41,8 @@ internal final class PresetSettingsStore: ObservableObject {
         shortBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.shortBreakMinutes))
         longWorkMinutes = Self.validatedWorkMinutes(userDefaults.integer(forKey: Keys.longWorkMinutes))
         longBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.longBreakMinutes))
+        let rawDisplayTarget = userDefaults.string(forKey: Keys.displayTarget) ?? DisplayTarget.mainDisplay.rawValue
+        displayTarget = DisplayTarget(rawValue: rawDisplayTarget) ?? .mainDisplay
     }
 
     func workDuration(for preset: Preset) -> Int {
@@ -97,6 +102,13 @@ internal final class PresetSettingsStore: ObservableObject {
         setBreakMinutes(Preset.short.defaultBreakMinutes, for: .short)
         setWorkMinutes(Preset.long.defaultWorkMinutes, for: .long)
         setBreakMinutes(Preset.long.defaultBreakMinutes, for: .long)
+        setDisplayTarget(.mainDisplay)
+    }
+
+    func setDisplayTarget(_ target: DisplayTarget) {
+        guard displayTarget != target else { return }
+        displayTarget = target
+        userDefaults.set(target.rawValue, forKey: Keys.displayTarget)
     }
 
     private static func validatedWorkMinutes(_ value: Int) -> Int {

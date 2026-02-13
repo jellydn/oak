@@ -1,16 +1,25 @@
 import AppKit
+import Combine
 import SwiftUI
 
 // MARK: - Screen Detection Helper
 
 internal extension NSScreen {
-    static func screenWithNotch() -> NSScreen? {
-        // Default to the current main screen.
+    static func screen(for target: DisplayTarget) -> NSScreen? {
+        if target == .mainDisplay, let mainScreen = NSScreen.main {
+            return mainScreen
+        }
+
+        if target == .notchedDisplay {
+            for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
+                return screen
+            }
+        }
+
         if let mainScreen = NSScreen.main {
             return mainScreen
         }
 
-        // Fallback to any notched screen if main is unavailable.
         for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
             return screen
         }
@@ -28,6 +37,8 @@ internal class NotchWindowController: NSWindowController {
     private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
+    private let presetSettings: PresetSettingsStore
+    private var displayTargetCancellable: AnyCancellable?
 
     convenience init() {
         self.init(presetSettings: nil)
@@ -35,9 +46,10 @@ internal class NotchWindowController: NSWindowController {
 
     init(presetSettings: PresetSettingsStore?) {
         let settings = presetSettings ?? PresetSettingsStore.shared
+        self.presetSettings = settings
         viewModel = FocusSessionViewModel(presetSettings: settings)
 
-        let window = NotchWindow(width: 144, height: 33)
+        let window = NotchWindow(width: 144, height: 33, displayTarget: settings.displayTarget)
         super.init(window: window)
 
         let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
@@ -53,6 +65,12 @@ internal class NotchWindowController: NSWindowController {
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
+
+        displayTargetCancellable = settings.$displayTarget
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.setExpanded(self?.lastExpandedState ?? false, forceReposition: true)
+            }
     }
 
     @available(*, unavailable)
@@ -82,7 +100,7 @@ internal class NotchWindowController: NSWindowController {
         lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
-        let screenFrame = NSScreen.screenWithNotch()?.frame ?? .zero
+        let screenFrame = NSScreen.screen(for: presetSettings.displayTarget)?.frame ?? .zero
         let yPosition = screenFrame.maxY - notchHeight
         let xPosition = screenFrame.midX - (targetWidth / 2)
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
@@ -96,8 +114,8 @@ internal class NotchWindowController: NSWindowController {
 // MARK: - NotchWindow
 
 internal class NotchWindow: NSPanel {
-    init(width: CGFloat, height: CGFloat) {
-        let screenFrame = NSScreen.screenWithNotch()?.frame ?? .zero
+    init(width: CGFloat, height: CGFloat, displayTarget: DisplayTarget) {
+        let screenFrame = NSScreen.screen(for: displayTarget)?.frame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
 
         super.init(
