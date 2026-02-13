@@ -210,7 +210,11 @@ internal final class UpdateCheckerTests: XCTestCase {
         XCTAssertNotNil(lastPromptTime)
 
         // Within cooldown period (24 hours)
-        let shouldPrompt = Date().timeIntervalSince(lastPromptTime!) >= (24 * 60 * 60)
+        guard let lastPromptTime else {
+            XCTFail("lastPromptTime should not be nil")
+            return
+        }
+        let shouldPrompt = Date().timeIntervalSince(lastPromptTime) >= (24 * 60 * 60)
         XCTAssertFalse(shouldPrompt)
     }
 
@@ -229,7 +233,11 @@ internal final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(lastVersion, version)
         XCTAssertNotNil(lastPromptTime)
 
-        let shouldPrompt = Date().timeIntervalSince(lastPromptTime!) >= (24 * 60 * 60)
+        guard let lastPromptTime else {
+            XCTFail("lastPromptTime should not be nil")
+            return
+        }
+        let shouldPrompt = Date().timeIntervalSince(lastPromptTime) >= (24 * 60 * 60)
         XCTAssertTrue(shouldPrompt)
     }
 
