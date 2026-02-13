@@ -31,9 +31,6 @@ extension NSScreen {
 
 @MainActor
 class NotchWindowController: NSWindowController {
-    private let collapsedWidth: CGFloat = 144
-    private let expandedWidth: CGFloat = 372
-    private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
 
@@ -45,7 +42,7 @@ class NotchWindowController: NSWindowController {
         let settings = presetSettings ?? PresetSettingsStore.shared
         self.viewModel = FocusSessionViewModel(presetSettings: settings)
         
-        let window = NotchWindow(width: 144, height: 33)
+        let window = NotchWindow(width: NotchLayout.collapsedWidth, height: NotchLayout.height)
         super.init(window: window)
 
         let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
@@ -88,12 +85,12 @@ class NotchWindowController: NSWindowController {
         guard lastExpandedState != expanded else { return }
         lastExpandedState = expanded
 
-        let targetWidth = expanded ? expandedWidth : collapsedWidth
+        let targetWidth = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         let screen = NSScreen.screenWithNotch()
         let screenFrame = screen?.frame ?? .zero
-        let yPosition = screenFrame.height - notchHeight
+        let yPosition = screenFrame.height - NotchLayout.height
         let xPosition = (screenFrame.width - targetWidth) / 2
-        let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
+        let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: NotchLayout.height)
 
         DispatchQueue.main.async {
             window.setFrame(newFrame, display: true, animate: false)

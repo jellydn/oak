@@ -10,9 +10,6 @@ struct NotchCompanionView: View {
     @State private var animateCompletion: Bool = false
     @State private var isExpandedByToggle = false
     @State private var presetSelection: Preset = .short
-    private let collapsedWidth: CGFloat = 132
-    private let expandedWidth: CGFloat = 360
-    private let notchHeight: CGFloat = 33
     private let horizontalPadding: CGFloat = 6
     private let verticalPadding: CGFloat = 4
     private let contentSpacing: CGFloat = 8
@@ -84,7 +81,7 @@ struct NotchCompanionView: View {
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
-        .frame(width: isExpanded ? expandedWidth : collapsedWidth, height: notchHeight)
+        .frame(width: isExpanded ? NotchLayout.contentExpandedWidth : NotchLayout.contentWidth, height: NotchLayout.height)
         .contentShape(Rectangle())
         .onChange(of: isExpanded) { expanded in
             DispatchQueue.main.async {

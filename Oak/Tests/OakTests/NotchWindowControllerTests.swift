@@ -80,8 +80,7 @@ final class NotchWindowControllerTests: XCTestCase {
     func testWindowStaysAtNotchHeight() {
         let window = windowController.window as? NotchWindow
         let screenFrame = NSScreen.main?.frame ?? .zero
-        let notchHeight: CGFloat = 33
-        let expectedYPosition = screenFrame.height - notchHeight
+        let expectedYPosition = screenFrame.height - NotchLayout.height
 
         triggerExpansion(true)
 
@@ -212,7 +211,7 @@ final class NotchWindowControllerTests: XCTestCase {
         let finalFrame = window?.frame ?? .zero
         
         // The frame should remain valid (width should still match expanded state)
-        XCTAssertEqual(finalFrame.width, 372, accuracy: 1.0, "Window should maintain expanded width after screen change")
+        XCTAssertEqual(finalFrame.width, NotchLayout.expandedWidth, accuracy: 1.0, "Window should maintain expanded width after screen change")
         XCTAssertGreaterThan(finalFrame.height, 0, "Window should have valid height after screen change")
     }
 
