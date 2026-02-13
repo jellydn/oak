@@ -17,6 +17,7 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published var sessionState: SessionState = .idle
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
+    @Published var completedRounds: Int = 0
 
     let presetSettings: PresetSettingsStore
     private var timer: Timer?
@@ -28,6 +29,8 @@ internal class FocusSessionViewModel: ObservableObject {
     let progressManager: ProgressManager
     let notificationService: any SessionCompletionNotifying
     let completionSoundPlayer: any SessionCompletionSoundPlaying
+
+    private let roundsBeforeLongBreak = 4
 
     init(
         presetSettings: PresetSettingsStore,
@@ -89,7 +92,12 @@ internal class FocusSessionViewModel: ObservableObject {
             seconds = remaining % 60
         case let .completed(isWorkSession):
             if isWorkSession {
-                minutes = presetSettings.breakDuration(for: selectedPreset) / 60
+                // Work session completed, show next break duration
+                if completedRounds >= roundsBeforeLongBreak {
+                    minutes = presetSettings.longBreakDuration(for: selectedPreset) / 60
+                } else {
+                    minutes = presetSettings.breakDuration(for: selectedPreset) / 60
+                }
             } else {
                 minutes = presetSettings.workDuration(for: selectedPreset) / 60
             }
@@ -160,6 +168,7 @@ internal class FocusSessionViewModel: ObservableObject {
         currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
         isWorkSession = true
         sessionStartSeconds = currentRemainingSeconds
+        completedRounds = 0
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
     }
@@ -181,9 +190,21 @@ internal class FocusSessionViewModel: ObservableObject {
         }
 
         isWorkSession = !completedWorkSession
-        currentRemainingSeconds = isWorkSession
-            ? presetSettings.workDuration(for: selectedPreset)
-            : presetSettings.breakDuration(for: selectedPreset)
+
+        if isWorkSession {
+            // Starting a new work session
+            currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
+        } else {
+            // Starting a break session
+            // Check if we should use long break
+            if completedRounds >= roundsBeforeLongBreak {
+                currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
+                completedRounds = 0 // Reset rounds after long break
+            } else {
+                currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
+            }
+        }
+
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
@@ -196,6 +217,7 @@ internal class FocusSessionViewModel: ObservableObject {
         isWorkSession = true
         sessionStartSeconds = 0
         isSessionComplete = false
+        completedRounds = 0
         audioManager.stop()
         sessionState = .idle
     }
@@ -221,11 +243,12 @@ internal class FocusSessionViewModel: ObservableObject {
 
     private func completeSession() {
         if isWorkSession {
-            // Work session complete - record progress
+            // Work session complete - record progress and increment rounds
             let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
             if durationMinutes > 0 {
                 progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
             }
+            completedRounds += 1
         } else {
             // Break session complete
         }

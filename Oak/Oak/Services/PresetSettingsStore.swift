@@ -72,6 +72,10 @@ internal final class PresetSettingsStore: ObservableObject {
         breakMinutes(for: preset) * 60
     }
 
+    func longBreakDuration(for preset: Preset) -> Int {
+        preset.defaultLongBreakMinutes * 60
+    }
+
     func displayName(for preset: Preset) -> String {
         "\(workMinutes(for: preset))/\(breakMinutes(for: preset))"
     }

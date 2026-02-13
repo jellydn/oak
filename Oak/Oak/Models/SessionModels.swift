@@ -19,6 +19,10 @@ internal enum Preset: CaseIterable {
         defaultBreakMinutes * 60
     }
 
+    var longBreakDuration: Int {
+        defaultLongBreakMinutes * 60
+    }
+
     var defaultWorkMinutes: Int {
         switch self {
         case .short: return 25
@@ -30,6 +34,13 @@ internal enum Preset: CaseIterable {
         switch self {
         case .short: return 5
         case .long: return 10
+        }
+    }
+
+    var defaultLongBreakMinutes: Int {
+        switch self {
+        case .short: return 15
+        case .long: return 20
         }
     }
 
