@@ -38,3 +38,5 @@
 # Rules to disable
 --disable andOperator
 --disable redundantType
+--disable redundantInternal
+--disable redundantPublic

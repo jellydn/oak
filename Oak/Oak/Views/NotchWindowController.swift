@@ -1,28 +1,22 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 // MARK: - Screen Detection Helper
 
-extension NSScreen {
+internal extension NSScreen {
     static func screenWithNotch() -> NSScreen? {
-        // Prefer main screen if it has a notch (macOS 12+)
+        // Prefer main screen if it has a notch.
         if let mainScreen = NSScreen.main {
-            if #available(macOS 12.0, *) {
-                if mainScreen.auxiliaryTopLeftArea != nil {
-                    return mainScreen
-                }
+            if mainScreen.auxiliaryTopLeftArea != nil {
+                return mainScreen
             }
         }
-        
+
         // Check other screens for notch
-        for screen in NSScreen.screens {
-            if #available(macOS 12.0, *) {
-                if screen.auxiliaryTopLeftArea != nil {
-                    return screen
-                }
-            }
+        for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
+            return screen
         }
-        
+
         return NSScreen.main ?? NSScreen.screens.first
     }
 }
@@ -30,7 +24,7 @@ extension NSScreen {
 // MARK: - NotchWindowController
 
 @MainActor
-class NotchWindowController: NSWindowController {
+internal class NotchWindowController: NSWindowController {
     private let collapsedWidth: CGFloat = 144
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
@@ -43,8 +37,8 @@ class NotchWindowController: NSWindowController {
 
     init(presetSettings: PresetSettingsStore?) {
         let settings = presetSettings ?? PresetSettingsStore.shared
-        self.viewModel = FocusSessionViewModel(presetSettings: settings)
-        
+        viewModel = FocusSessionViewModel(presetSettings: settings)
+
         let window = NotchWindow(width: 144, height: 33)
         super.init(window: window)
 
@@ -54,7 +48,7 @@ class NotchWindowController: NSWindowController {
         window.contentView = NSHostingView(rootView: contentView)
 
         window.orderFrontRegardless()
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(screenConfigurationChanged),
@@ -63,7 +57,8 @@ class NotchWindowController: NSWindowController {
         )
     }
 
-    required init?(coder: NSCoder) {
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -103,7 +98,7 @@ class NotchWindowController: NSWindowController {
 
 // MARK: - NotchWindow
 
-class NotchWindow: NSPanel {
+internal class NotchWindow: NSPanel {
     init(width: CGFloat, height: CGFloat) {
         let screen = NSScreen.screenWithNotch()
         let screenFrame = screen?.frame ?? .zero
@@ -116,15 +111,11 @@ class NotchWindow: NSPanel {
             defer: false
         )
 
-        self.level = .floating
-        self.collectionBehavior = [.canJoinAllSpaces, .stationary]
-        self.backgroundColor = .clear
-        self.isOpaque = false
-        self.hasShadow = false
-        self.ignoresMouseEvents = false
-    }
-
-    override func rightMouseDown(with event: NSEvent) {
-        super.rightMouseDown(with: event)
+        level = .floating
+        collectionBehavior = [.canJoinAllSpaces, .stationary]
+        backgroundColor = .clear
+        isOpaque = false
+        hasShadow = false
+        ignoresMouseEvents = false
     }
 }

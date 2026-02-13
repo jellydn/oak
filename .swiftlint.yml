@@ -21,15 +21,18 @@ opt_in_rules:
   - unneeded_parentheses_in_closure_argument
   - closure_spacing
   - empty_count
-  - explicit_self
   - file_header
   - first_where
   - sorted_first_last
   - modifier_order
   - redundant_type_annotation
   - toggle_bool
-  - unused_import
   - yoda_condition
+
+# Analyzer-only rules
+analyzer_rules:
+  - explicit_self
+  - unused_import
 
 # Rules to disable
 disabled_rules:

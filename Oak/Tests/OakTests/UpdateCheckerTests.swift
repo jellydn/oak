@@ -1,10 +1,10 @@
 import XCTest
 @testable import Oak
 
-final class UpdateCheckerTests: XCTestCase {
+internal final class UpdateCheckerTests: XCTestCase {
     var suiteName: String!
     var userDefaults: UserDefaults!
-    
+
     override func setUp() async throws {
         suiteName = "OakTests.UpdateChecker.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -13,16 +13,16 @@ final class UpdateCheckerTests: XCTestCase {
         defaults.removePersistentDomain(forName: suiteName)
         userDefaults = defaults
     }
-    
+
     override func tearDown() async throws {
         if let suiteName {
             UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
         }
     }
-    
+
     // MARK: - Rate Limit Tests
-    
-    func testHandles403RateLimitResponse() async throws {
+
+    func testHandles403RateLimitResponse() async {
         let mockSession = makeMockSession(statusCode: 403, data: Data())
         let checker = UpdateChecker(
             repositoryOwner: "test",
@@ -30,21 +30,21 @@ final class UpdateCheckerTests: XCTestCase {
             userDefaults: userDefaults,
             session: mockSession
         )
-        
+
         let expectation = self.expectation(description: "Update check completes")
-        
+
         Task {
             checker.checkForUpdatesOnLaunch()
-            try? await Task.sleep(nanoseconds: 100_000_000)
+            try? await Task.sleep(nanoseconds: 100000000)
             expectation.fulfill()
         }
-        
+
         await fulfillment(of: [expectation], timeout: 2.0)
-        
+
         XCTAssertNil(userDefaults.string(forKey: "oak.lastPromptedUpdateVersion"))
     }
-    
-    func testHandles429RateLimitResponse() async throws {
+
+    func testHandles429RateLimitResponse() async {
         let mockSession = makeMockSession(statusCode: 429, data: Data())
         let checker = UpdateChecker(
             repositoryOwner: "test",
@@ -52,52 +52,52 @@ final class UpdateCheckerTests: XCTestCase {
             userDefaults: userDefaults,
             session: mockSession
         )
-        
+
         let expectation = self.expectation(description: "Update check completes")
-        
+
         Task {
             checker.checkForUpdatesOnLaunch()
-            try? await Task.sleep(nanoseconds: 100_000_000)
+            try? await Task.sleep(nanoseconds: 100000000)
             expectation.fulfill()
         }
-        
+
         await fulfillment(of: [expectation], timeout: 2.0)
-        
+
         XCTAssertNil(userDefaults.string(forKey: "oak.lastPromptedUpdateVersion"))
     }
-    
+
     // MARK: - URL Validation Tests
-    
-    func testValidatesGitHubURL() {
-        let validURLs = [
-            URL(string: "https://github.com/jellydn/oak/releases/tag/v1.0.0")!,
-            URL(string: "https://api.github.com/repos/jellydn/oak/releases")!,
-            URL(string: "https://raw.githubusercontent.com/jellydn/oak/main/README.md")!
+
+    func testValidatesGitHubURL() throws {
+        let validURLs = try [
+            XCTUnwrap(URL(string: "https://github.com/jellydn/oak/releases/tag/v1.0.0")),
+            XCTUnwrap(URL(string: "https://api.github.com/repos/jellydn/oak/releases")),
+            XCTUnwrap(URL(string: "https://raw.githubusercontent.com/jellydn/oak/main/README.md"))
         ]
-        
+
         for url in validURLs {
             let host = url.host
             let isValidGitHub = host == "github.com" ||
-                               host == "api.github.com" ||
-                               host == "raw.githubusercontent.com"
+                host == "api.github.com" ||
+                host == "raw.githubusercontent.com"
             XCTAssertTrue(isValidGitHub, "Expected \(url) to be a valid GitHub URL")
         }
     }
-    
-    func testRejectsMaliciousURLs() {
-        let invalidURLs = [
-            URL(string: "https://evil.com/releases")!,
-            URL(string: "https://github.com.evil.com/releases")!,
-            URL(string: "https://notgithub.com/releases")!,
-            URL(string: "https://evilgithub.com/releases")!,
-            URL(string: "https://mygithub.com/releases")!
+
+    func testRejectsMaliciousURLs() throws {
+        let invalidURLs = try [
+            XCTUnwrap(URL(string: "https://evil.com/releases")),
+            XCTUnwrap(URL(string: "https://github.com.evil.com/releases")),
+            XCTUnwrap(URL(string: "https://notgithub.com/releases")),
+            XCTUnwrap(URL(string: "https://evilgithub.com/releases")),
+            XCTUnwrap(URL(string: "https://mygithub.com/releases"))
         ]
-        
+
         for url in invalidURLs {
             let host = url.host
             let isValidGitHub = host == "github.com" ||
-                               host == "api.github.com" ||
-                               host == "raw.githubusercontent.com"
+                host == "api.github.com" ||
+                host == "raw.githubusercontent.com"
             XCTAssertFalse(isValidGitHub, "Expected \(url) to be rejected as non-GitHub URL")
         }
     }
@@ -105,11 +105,11 @@ final class UpdateCheckerTests: XCTestCase {
 
 // MARK: - URLProtocol Mocking
 
-private final class MockURLProtocol: URLProtocol {
+private class MockURLProtocol: URLProtocol {
     static var statusCode = 200
     static var responseData = Data()
 
-    override class func canInit(with request: URLRequest) -> Bool {
+    override class func canInit(with _: URLRequest) -> Bool {
         true
     }
 

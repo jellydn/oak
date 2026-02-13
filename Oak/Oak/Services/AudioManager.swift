@@ -1,16 +1,17 @@
-import Foundation
 import AVFoundation
 import Combine
+import Foundation
 import os
 
 @MainActor
-class AudioManager: ObservableObject {
+internal class AudioManager: ObservableObject {
     @Published var selectedTrack: AudioTrack = .none
     @Published var volume: Double = 0.5 {
         didSet {
             updateAudioEngineVolume()
         }
     }
+
     @Published var isPlaying: Bool = false
 
     private var audioPlayer: AVAudioPlayer?
@@ -175,7 +176,7 @@ class AudioManager: ObservableObject {
             let frameCount = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
             let samples = mData.assumingMemoryBound(to: Float.self)
 
-            for index in 0..<frameCount {
+            for index in 0 ..< frameCount {
                 samples[index] = sample()
             }
         }
@@ -183,7 +184,7 @@ class AudioManager: ObservableObject {
 
     private var brownNoiseLast: Float = 0
     private func generateBrownNoise() -> Float {
-        let white = Float.random(in: -1...1)
+        let white = Float.random(in: -1 ... 1)
         brownNoiseLast = (brownNoiseLast + (0.02 * white)) / 1.02
         brownNoiseLast *= 3.5
         brownNoiseLast = max(-1, min(1, brownNoiseLast))
@@ -193,26 +194,26 @@ class AudioManager: ObservableObject {
     private var rainSeed: Float = 0
     private func generateRainNoise() -> Float {
         rainSeed += 0.01
-        let noise = Float.random(in: -0.3...0.3)
+        let noise = Float.random(in: -0.3 ... 0.3)
         let modulation = sin(rainSeed * 2.0) * 0.5 + 0.5
         return noise * modulation
     }
 
     private func generateForestNoise() -> Float {
-        let noise = Float.random(in: -0.4...0.4)
-        let modulation = sin(Float.random(in: 0...Float.pi * 2)) * 0.3
+        let noise = Float.random(in: -0.4 ... 0.4)
+        let modulation = sin(Float.random(in: 0 ... Float.pi * 2)) * 0.3
         return (noise + modulation) * 0.5
     }
 
     private func generateCafeNoise() -> Float {
-        let base = Float.random(in: -0.2...0.2)
-        let chatter = sin(Float.random(in: 0...Float.pi * 10)) * 0.15
+        let base = Float.random(in: -0.2 ... 0.2)
+        let chatter = sin(Float.random(in: 0 ... Float.pi * 10)) * 0.15
         return base + chatter
     }
 
     private func generateLofiNoise() -> Float {
-        let noise = Float.random(in: -0.25...0.25)
-        let vinyl = Float.random(in: -0.05...0.05)
+        let noise = Float.random(in: -0.25 ... 0.25)
+        let vinyl = Float.random(in: -0.05 ... 0.05)
         return noise + vinyl
     }
 }

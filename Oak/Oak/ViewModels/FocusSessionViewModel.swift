@@ -1,8 +1,8 @@
-import SwiftUI
 import Combine
+import SwiftUI
 
 @MainActor
-class FocusSessionViewModel: ObservableObject {
+internal class FocusSessionViewModel: ObservableObject {
     @Published var sessionState: SessionState = .idle
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
@@ -18,7 +18,7 @@ class FocusSessionViewModel: ObservableObject {
 
     init(presetSettings: PresetSettingsStore) {
         self.presetSettings = presetSettings
-        self.presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
+        presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
     }
@@ -63,10 +63,10 @@ class FocusSessionViewModel: ObservableObject {
         case .idle:
             minutes = presetSettings.workDuration(for: selectedPreset) / 60
             seconds = 0
-        case .running(let remaining, _), .paused(let remaining, _):
+        case let .running(remaining, _), let .paused(remaining, _):
             minutes = remaining / 60
             seconds = remaining % 60
-        case .completed(let isWorkSession):
+        case let .completed(isWorkSession):
             if isWorkSession {
                 minutes = presetSettings.breakDuration(for: selectedPreset) / 60
             } else {
@@ -96,9 +96,9 @@ class FocusSessionViewModel: ObservableObject {
         switch sessionState {
         case .idle:
             return "Ready"
-        case .running(_, let isWork), .paused(_, let isWork):
+        case let .running(_, isWork), let .paused(_, isWork):
             return isWork ? "Focus" : "Break"
-        case .completed(let isWorkSession):
+        case let .completed(isWorkSession):
             return isWorkSession ? "Break" : "Focus"
         }
     }
@@ -143,7 +143,7 @@ class FocusSessionViewModel: ObservableObject {
     }
 
     func startNextSession() {
-        guard case .completed(let completedWorkSession) = sessionState else {
+        guard case let .completed(completedWorkSession) = sessionState else {
             return
         }
 
@@ -208,7 +208,7 @@ class FocusSessionViewModel: ObservableObject {
 
         // Reset animation state after 1.5 seconds
         Task {
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
         }
     }

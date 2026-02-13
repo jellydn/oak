@@ -1,7 +1,7 @@
-import Foundation
 import AppKit
+import Foundation
 
-enum AudioTrack: String, CaseIterable, Identifiable {
+internal enum AudioTrack: String, CaseIterable, Identifiable {
     case none = "None"
     case rain = "Rain"
     case forest = "Forest"
@@ -9,7 +9,9 @@ enum AudioTrack: String, CaseIterable, Identifiable {
     case brownNoise = "Brown Noise"
     case lofi = "Lo-Fi"
 
-    var id: String { rawValue }
+    public var id: String {
+        rawValue
+    }
 
     var systemImageName: String {
         switch self {

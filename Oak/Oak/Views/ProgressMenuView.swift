@@ -1,7 +1,11 @@
 import SwiftUI
 
-struct ProgressMenuView: View {
+internal struct ProgressMenuView: View {
     @ObservedObject var viewModel: FocusSessionViewModel
+    private var completedSessionsText: String {
+        let suffix = viewModel.todayCompletedSessions == 1 ? "" : "s"
+        return "\(viewModel.todayCompletedSessions) session\(suffix)"
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -30,7 +34,7 @@ struct ProgressMenuView: View {
                         .foregroundColor(.green)
                         .frame(width: 24)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(viewModel.todayCompletedSessions) session\(viewModel.todayCompletedSessions == 1 ? "" : "s")")
+                        Text(completedSessionsText)
                             .font(.body)
                             .fontWeight(.semibold)
                         Text("Completed")
@@ -45,9 +49,11 @@ struct ProgressMenuView: View {
                         .foregroundColor(.orange)
                         .frame(width: 24)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(viewModel.streakDays) day\(viewModel.streakDays == 1 ? "" : "s")")
-                            .font(.body)
-                            .fontWeight(.semibold)
+                        Text(
+                            "\(viewModel.streakDays) day\(viewModel.streakDays == 1 ? "" : "s")"
+                        )
+                        .font(.body)
+                        .fontWeight(.semibold)
                         Text("Streak")
                             .font(.caption)
                             .foregroundColor(.secondary)

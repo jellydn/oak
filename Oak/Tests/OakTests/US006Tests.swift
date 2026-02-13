@@ -1,9 +1,9 @@
-import XCTest
 import SwiftUI
+import XCTest
 @testable import Oak
 
 @MainActor
-final class US006Tests: XCTestCase {
+internal final class US006Tests: XCTestCase {
     var progressManager: ProgressManager!
 
     override func setUp() async throws {
@@ -40,7 +40,7 @@ final class US006Tests: XCTestCase {
         let today = calendar.startOfDay(for: Date())
 
         // Simulate 7 days of completed sessions
-        for dayOffset in 0..<7 {
+        for dayOffset in 0 ..< 7 {
             guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) else {
                 XCTFail("Could not create date")
                 return
@@ -126,10 +126,10 @@ final class US006Tests: XCTestCase {
         XCTAssertEqual(manager.dailyStats.streakDays, 0, "Should have 0 streak days with no sessions")
     }
 
-    func testViewModelExposesProgressStats() {
+    func testViewModelExposesProgressStats() throws {
         // Test that ViewModel exposes progress stats
         let suiteName = "OakTests.US006.\(UUID().uuidString)"
-        let userDefaults = UserDefaults(suiteName: suiteName)!
+        let userDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
         let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         let viewModel = FocusSessionViewModel(presetSettings: presetSettings)
@@ -146,10 +146,10 @@ final class US006Tests: XCTestCase {
         viewModel.cleanup()
     }
 
-    func testProgressMenuDisplaysStats() {
+    func testProgressMenuDisplaysStats() throws {
         // Test that ProgressMenuView can be created and displays stats
         let suiteName = "OakTests.US006.\(UUID().uuidString)"
-        let userDefaults = UserDefaults(suiteName: suiteName)!
+        let userDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
         let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         let viewModel = FocusSessionViewModel(presetSettings: presetSettings)

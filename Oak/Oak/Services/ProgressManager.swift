@@ -1,8 +1,8 @@
 import Foundation
 
 @MainActor
-class ProgressManager: ObservableObject {
-    @Published var dailyStats: DailyStats = DailyStats(todayFocusMinutes: 0, todayCompletedSessions: 0, streakDays: 0)
+internal class ProgressManager: ObservableObject {
+    @Published var dailyStats = DailyStats(todayFocusMinutes: 0, todayCompletedSessions: 0, streakDays: 0)
 
     private let userDefaults = UserDefaults.standard
     private let progressKey = "progressHistory"
@@ -30,7 +30,8 @@ class ProgressManager: ObservableObject {
 
     private func loadRecords() -> [ProgressData] {
         guard let data = userDefaults.data(forKey: progressKey),
-              let records = try? JSONDecoder().decode([ProgressData].self, from: data) else {
+              let records = try? JSONDecoder().decode([ProgressData].self, from: data)
+        else {
             return []
         }
         return records
@@ -46,12 +47,16 @@ class ProgressManager: ObservableObject {
         let records = loadRecords()
         let today = Calendar.current.startOfDay(for: Date())
 
-        let todayRecord = records.first(where: { Calendar.current.isDate($0.date, inSameDayAs: today) })
+        let todayRecord = records.first { Calendar.current.isDate($0.date, inSameDayAs: today) }
         let todayFocusMinutes = todayRecord?.focusMinutes ?? 0
         let todayCompletedSessions = todayRecord?.completedSessions ?? 0
         let streakDays = calculateStreak(records: records)
 
-        dailyStats = DailyStats(todayFocusMinutes: todayFocusMinutes, todayCompletedSessions: todayCompletedSessions, streakDays: streakDays)
+        dailyStats = DailyStats(
+            todayFocusMinutes: todayFocusMinutes,
+            todayCompletedSessions: todayCompletedSessions,
+            streakDays: streakDays
+        )
     }
 
     private func calculateStreak(records: [ProgressData]) -> Int {

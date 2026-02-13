@@ -1,13 +1,13 @@
 import SwiftUI
 
 @MainActor
-final class PresetSettingsStore: ObservableObject {
+internal final class PresetSettingsStore: ObservableObject {
     static let shared = PresetSettingsStore()
 
-    public static let minWorkMinutes = 1
-    public static let maxWorkMinutes = 180
-    public static let minBreakMinutes = 1
-    public static let maxBreakMinutes = 90
+    static let minWorkMinutes = 1
+    static let maxWorkMinutes = 180
+    static let minBreakMinutes = 1
+    static let maxBreakMinutes = 90
 
     @Published private(set) var shortWorkMinutes: Int
     @Published private(set) var shortBreakMinutes: Int
@@ -30,7 +30,7 @@ final class PresetSettingsStore: ObservableObject {
             Keys.shortWorkMinutes: Preset.short.defaultWorkMinutes,
             Keys.shortBreakMinutes: Preset.short.defaultBreakMinutes,
             Keys.longWorkMinutes: Preset.long.defaultWorkMinutes,
-            Keys.longBreakMinutes: Preset.long.defaultBreakMinutes,
+            Keys.longBreakMinutes: Preset.long.defaultBreakMinutes
         ]
         userDefaults.register(defaults: defaults)
 
@@ -100,10 +100,10 @@ final class PresetSettingsStore: ObservableObject {
     }
 
     private static func validatedWorkMinutes(_ value: Int) -> Int {
-        max(Self.minWorkMinutes, min(Self.maxWorkMinutes, value))
+        max(minWorkMinutes, min(maxWorkMinutes, value))
     }
 
     private static func validatedBreakMinutes(_ value: Int) -> Int {
-        max(Self.minBreakMinutes, min(Self.maxBreakMinutes, value))
+        max(minBreakMinutes, min(maxBreakMinutes, value))
     }
 }

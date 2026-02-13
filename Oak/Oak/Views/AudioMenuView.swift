@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AudioMenuView: View {
+internal struct AudioMenuView: View {
     @ObservedObject var audioManager: AudioManager
 
     var body: some View {
@@ -11,30 +11,33 @@ struct AudioMenuView: View {
 
             VStack(spacing: 8) {
                 ForEach(AudioTrack.allCases) { track in
-                    Button(action: {
-                        if audioManager.selectedTrack == track {
-                            audioManager.stop()
-                        } else {
-                            audioManager.play(track: track)
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: track.systemImageName)
-                                .frame(width: 24)
-                            Text(track.rawValue)
-                                .font(.body)
-                            Spacer()
-                            if audioManager.selectedTrack == track && audioManager.isPlaying {
-                                Image(systemName: "speaker.wave.2.fill")
-                                    .foregroundColor(.blue)
+                    Button(
+                        action: {
+                            if audioManager.selectedTrack == track {
+                                audioManager.stop()
+                            } else {
+                                audioManager.play(track: track)
                             }
+                        },
+                        label: {
+                            HStack {
+                                Image(systemName: track.systemImageName)
+                                    .frame(width: 24)
+                                Text(track.rawValue)
+                                    .font(.body)
+                                Spacer()
+                                if audioManager.selectedTrack == track && audioManager.isPlaying {
+                                    Image(systemName: "speaker.wave.2.fill")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(audioManager.selectedTrack == track ? Color.blue.opacity(0.1) : Color.clear)
+                            .cornerRadius(8)
                         }
-                        .foregroundColor(.primary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
-                        .background(audioManager.selectedTrack == track ? Color.blue.opacity(0.1) : Color.clear)
-                        .cornerRadius(8)
-                    }
+                    )
                     .buttonStyle(.plain)
                 }
             }
@@ -44,7 +47,7 @@ struct AudioMenuView: View {
                     Image(systemName: "speaker.fill")
                         .foregroundColor(.secondary)
                         .font(.system(size: 12))
-                    Slider(value: $audioManager.volume, in: 0...1)
+                    Slider(value: $audioManager.volume, in: 0 ... 1)
                         .frame(height: 20)
                     Image(systemName: "speaker.wave.3.fill")
                         .foregroundColor(.secondary)

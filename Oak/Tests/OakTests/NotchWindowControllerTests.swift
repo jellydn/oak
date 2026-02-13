@@ -1,9 +1,9 @@
-import XCTest
 import AppKit
+import XCTest
 @testable import Oak
 
 @MainActor
-final class NotchWindowControllerTests: XCTestCase {
+internal final class NotchWindowControllerTests: XCTestCase {
     var windowController: NotchWindowController!
 
     override func setUp() async throws {
@@ -99,7 +99,12 @@ final class NotchWindowControllerTests: XCTestCase {
         triggerExpansion(true)
 
         let secondWidth = window?.frame.width ?? 0
-        XCTAssertEqual(secondWidth, firstWidth, accuracy: 0.1, "Duplicate expansion request should not change window size")
+        XCTAssertEqual(
+            secondWidth,
+            firstWidth,
+            accuracy: 0.1,
+            "Duplicate expansion request should not change window size"
+        )
     }
 
     func testDuplicateCollapseRequestsAreIgnored() {
@@ -109,7 +114,12 @@ final class NotchWindowControllerTests: XCTestCase {
         triggerExpansion(false)
 
         let finalWidth = window?.frame.width ?? 0
-        XCTAssertEqual(finalWidth, initialWidth, accuracy: 0.1, "Duplicate collapse request should not change window size")
+        XCTAssertEqual(
+            finalWidth,
+            initialWidth,
+            accuracy: 0.1,
+            "Duplicate collapse request should not change window size"
+        )
     }
 
     func testToggleExpansionThenCollapseChangesSize() {
@@ -143,7 +153,11 @@ final class NotchWindowControllerTests: XCTestCase {
         let window = windowController.window as? NotchWindow
 
         let expectedStyleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
-        XCTAssertEqual(window?.styleMask, expectedStyleMask, "NotchWindow should have borderless and non-activating style")
+        XCTAssertEqual(
+            window?.styleMask,
+            expectedStyleMask,
+            "NotchWindow should have borderless and non-activating style"
+        )
     }
 
     func testNotchWindowIsFloating() {
@@ -156,7 +170,11 @@ final class NotchWindowControllerTests: XCTestCase {
         let window = windowController.window as? NotchWindow
 
         let expectedBehavior: NSWindow.CollectionBehavior = [.canJoinAllSpaces, .stationary]
-        XCTAssertEqual(window?.collectionBehavior, expectedBehavior, "NotchWindow should join all spaces and remain stationary")
+        XCTAssertEqual(
+            window?.collectionBehavior,
+            expectedBehavior,
+            "NotchWindow should join all spaces and remain stationary"
+        )
     }
 
     func testNotchWindowHasTransparentBackground() {
@@ -178,7 +196,7 @@ final class NotchWindowControllerTests: XCTestCase {
     func testObserverIsRegisteredForScreenChanges() {
         // Verify that the observer is set up by checking we can trigger the notification
         let expectation = expectation(description: "Screen configuration change notification")
-        
+
         // Post the notification on the main thread
         DispatchQueue.main.async {
             NotificationCenter.default.post(
@@ -187,39 +205,44 @@ final class NotchWindowControllerTests: XCTestCase {
             )
             expectation.fulfill()
         }
-        
+
         wait(for: [expectation], timeout: 1.0)
-        
+
         // If no crash occurred, the observer is properly set up
         XCTAssertNotNil(windowController.window, "Window should still exist after screen change notification")
     }
 
     func testWindowRepositionsOnScreenConfigurationChange() {
         let window = windowController.window as? NotchWindow
-        
+
         // Expand the window first
         triggerExpansion(true)
         let initialFrame = window?.frame ?? .zero
-        
+
         // Simulate screen configuration change
         NotificationCenter.default.post(
             name: NSApplication.didChangeScreenParametersNotification,
             object: NSApp
         )
-        
+
         waitForFrameUpdate()
-        
+
         let finalFrame = window?.frame ?? .zero
-        
+
         // The frame should remain valid (width should still match expanded state)
-        XCTAssertEqual(finalFrame.width, 372, accuracy: 1.0, "Window should maintain expanded width after screen change")
+        XCTAssertEqual(
+            finalFrame.width,
+            372,
+            accuracy: 1.0,
+            "Window should maintain expanded width after screen change"
+        )
         XCTAssertGreaterThan(finalFrame.height, 0, "Window should have valid height after screen change")
     }
 
     func testCleanupRemovesScreenChangeObserver() {
         // Cleanup should not crash
         XCTAssertNoThrow(windowController.cleanup(), "Cleanup should remove observer without crashing")
-        
+
         // Post notification after cleanup - should not crash
         XCTAssertNoThrow(
             NotificationCenter.default.post(

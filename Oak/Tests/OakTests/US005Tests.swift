@@ -1,9 +1,9 @@
-import XCTest
 import SwiftUI
+import XCTest
 @testable import Oak
 
 @MainActor
-final class US005Tests: XCTestCase {
+internal final class US005Tests: XCTestCase {
     var viewModel: FocusSessionViewModel!
     var view: NotchCompanionView!
     var presetSettings: PresetSettingsStore!
@@ -50,7 +50,7 @@ final class US005Tests: XCTestCase {
         // When work completes, next state should be "Break"
         // Can't easily simulate timer completion, but we can verify computed property
         // The currentSessionType computed property returns correct next state
-        if case .completed(let isWorkSession) = SessionState.completed(isWorkSession: true) {
+        if case let .completed(isWorkSession) = SessionState.completed(isWorkSession: true) {
             let nextType = isWorkSession ? "Break" : "Focus"
             XCTAssertEqual(nextType, "Break", "After work session, next state should be Break")
         }
@@ -63,14 +63,14 @@ final class US005Tests: XCTestCase {
         if case .running = viewModel.sessionState {
             // Can't easily complete timer, but we verify the logic
             let completedState = SessionState.completed(isWorkSession: true)
-            if case .completed(let isWorkSession) = completedState {
+            if case let .completed(isWorkSession) = completedState {
                 let nextType = isWorkSession ? "Break" : "Focus"
                 XCTAssertEqual(nextType, "Break", "After work, next state should be Break")
             }
 
             // After break, next state should be "Focus"
             let breakCompletedState = SessionState.completed(isWorkSession: false)
-            if case .completed(let isWorkSession2) = breakCompletedState {
+            if case let .completed(isWorkSession2) = breakCompletedState {
                 let nextType2 = isWorkSession2 ? "Break" : "Focus"
                 XCTAssertEqual(nextType2, "Focus", "After break, next state should be Focus")
             }

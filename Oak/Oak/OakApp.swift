@@ -1,8 +1,8 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 
 @main
-struct OakApp: App {
+internal struct OakApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var presetSettings = PresetSettingsStore.shared
 
@@ -15,7 +15,7 @@ struct OakApp: App {
     }
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
     var updateChecker: UpdateChecking = UpdateChecker()
     private var isRunningTests: Bool {
@@ -23,7 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil
     }
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         if isRunningTests {
             return
         }
@@ -35,7 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updateChecker.checkForUpdatesOnLaunch()
     }
 
-    func applicationWillTerminate(_ notification: Notification) {
+    func applicationWillTerminate(_: Notification) {
         notchWindowController?.cleanup()
     }
 }

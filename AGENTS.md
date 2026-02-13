@@ -6,13 +6,13 @@ Oak is a lightweight macOS focus companion app with notch-based Pomodoro-style f
 
 **Stack**: Swift 5.9+, SwiftUI, AVFoundation | **Platform**: macOS 13+ (Apple Silicon)
 **Architecture**: MVVM with `@MainActor` for UI layer
-**Project Configuration**: XcodeGen (`project.yml`) - The Xcode project is generated from `project.yml`, not Swift Package Manager
+**Config**: XcodeGen (`project.yml`) - not SPM
 
 ---
 
 ## Build/Test Commands
 
-Use `just` for common tasks (requires [just](https://github.com/casey/just)):
+Use `just` (requires [just](https://github.com/casey/just)):
 
 ```bash
 just                        # Show available commands
@@ -23,19 +23,17 @@ just test-verbose          # Run tests with verbose output
 just test-class Tests      # Run specific test class
 just test-method Tests methodName  # Run specific test method
 just check                 # Check compilation errors
-just clean && just open    # Clean and open in Xcode
-just lint                  # Lint Swift code with SwiftLint
+just lint                  # Run SwiftLint
 just lint-fix              # Auto-fix linting issues
-just format                # Format Swift code with SwiftFormat
-just format-check          # Check if code is formatted
-just check-style           # Run both lint and format checks
+just format                # Format with SwiftFormat
+just format-check          # Check formatting
+just check-style           # Run lint and format checks
 ```
 
-**Single test command examples:**
+**Single test examples:**
 
 ```bash
 just test-method FocusSessionViewModelTests "testStartSession"
-just test-method FocusSessionViewModelTests "testPauseSession"
 just test-method AudioServiceTests "testPlayAndStop"
 ```
 
@@ -60,7 +58,7 @@ cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=m
 
 - Group: Foundation → SwiftUI/AppKit → Apple frameworks → project imports
 - No blank lines between imports, one blank line between type declarations
-- 4 spaces indentation (no tabs), 120 char line limit (soft)
+- 4 spaces indentation, 120 char line limit (soft)
 - Trailing newline at end of files
 
 ### Types & Naming
@@ -104,17 +102,6 @@ guard let data = userDefaults.data(forKey: key),
       let records = try? JSONDecoder().decode([T].self, from: data) else { return [] }
 ```
 
-### Code Quality & Linting
-
-- Use SwiftLint for style enforcement (`.swiftlint.yml` config)
-- Use SwiftFormat for automatic formatting (`.swiftformat` config)
-- Run `just lint` before committing to check for violations
-- Run `just format` to auto-format code according to project style
-- SwiftLint rules are configured to match project conventions:
-  - Line length: 120 chars (warning), 150 (error)
-  - Use `os.log` instead of `print()` for logging
-  - Follow naming conventions (see Types & Naming section)
-
 ---
 
 ## File Organization
@@ -126,8 +113,8 @@ Oak/
 │   ├── Views/               # SwiftUI Views
 │   ├── ViewModels/          # ObservableObject classes
 │   ├── Services/            # Business logic, audio, persistence
-│   ├── Resources/            # Assets, sounds, config files
-│   └── OakApp.swift         # App entry point
+│   ├── Resources/           # Assets, sounds, config files
+│   └── OakApp.swift        # App entry point
 ├── Oak.xcodeproj/
 ├── project.yml              # XcodeGen config
 └── Tests/                   # Unit tests
@@ -155,13 +142,6 @@ Oak/
 
 ---
 
-## Performance Requirements
-
-- Launch time < 1 second, idle CPU < 3% in release
-- Timer accuracy under backgrounding and sleep/wake
-
----
-
 ## Commit Message Style
 
 `type(scope): brief description`
@@ -175,15 +155,8 @@ Oak/
 
 - Always run `just build` after making changes to verify compilation
 - Run `just lint` to check code style and `just format` to auto-format code
-- Run relevant tests before submitting changes: `just test-method ViewModelTests "testName"`
-- Verify changes don't break existing UI constraints (notch-only display)
+- Run relevant tests before submitting: `just test-method ViewModelTests "testName"`
+- Verify changes don't break notch-only display constraints
 - Use `os.log` for logging in production, `print()` for debugging
-- When in doubt, check the PRD at `tasks/prd-macos-focus-companion-app.md`
-
----
-
-## References
-
-- PRD: `tasks/prd-macos-focus-companion-app.md`
-- ADRs: `doc/adr/`
 - Use `///` for public API documentation
+- Check PRD at `tasks/prd-macos-focus-companion-app.md` and ADRs in `doc/adr/` when in doubt

@@ -1,12 +1,12 @@
-import Foundation
 import AppKit
+import Foundation
 import os
 
-protocol UpdateChecking {
+internal protocol UpdateChecking {
     func checkForUpdatesOnLaunch()
 }
 
-final class UpdateChecker: UpdateChecking {
+internal final class UpdateChecker: UpdateChecking {
     private let repositoryOwner: String
     private let repositoryName: String
     private let lastPromptedVersionKey = "oak.lastPromptedUpdateVersion"
@@ -54,12 +54,12 @@ final class UpdateChecker: UpdateChecking {
             guard let httpResponse = response as? HTTPURLResponse else {
                 return
             }
-            
+
             if httpResponse.statusCode == 403 || httpResponse.statusCode == 429 {
                 logger.info("GitHub API rate limited, skipping update check")
                 return
             }
-            
+
             guard httpResponse.statusCode == 200 else {
                 return
             }
@@ -119,7 +119,8 @@ final class UpdateChecker: UpdateChecking {
             guard let host = releaseURL.host,
                   host == "github.com" ||
                   host == "api.github.com" ||
-                  host == "raw.githubusercontent.com" else {
+                  host == "raw.githubusercontent.com"
+            else {
                 logger.warning("Rejected non-GitHub release URL: \(releaseURL, privacy: .public)")
                 return
             }

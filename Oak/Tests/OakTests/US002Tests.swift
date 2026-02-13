@@ -1,9 +1,9 @@
-import XCTest
 import SwiftUI
+import XCTest
 @testable import Oak
 
 @MainActor
-final class US002Tests: XCTestCase {
+internal final class US002Tests: XCTestCase {
     var viewModel: FocusSessionViewModel!
     var presetSettings: PresetSettingsStore!
     var presetSuiteName: String!
