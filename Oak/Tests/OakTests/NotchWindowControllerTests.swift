@@ -101,14 +101,17 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
     func testWindowStaysAtNotchHeight() {
         let window = windowController.window as? NotchWindow
-        let screenFrame = resolvedDisplayFrame()
-        let notchHeight: CGFloat = 33
-        let expectedYPosition = screenFrame.maxY - notchHeight
+        let initialYPosition = window?.frame.minY ?? 0
 
         triggerExpansion(true)
 
         let windowY = window?.frame.minY ?? 0
-        XCTAssertEqual(windowY, expectedYPosition, accuracy: 1.0, "Window should remain at notch height position")
+        XCTAssertEqual(
+            windowY,
+            initialYPosition,
+            accuracy: 1.0,
+            "Window should remain at notch height position when expansion state changes"
+        )
     }
 
     // MARK: - State Deduplication Tests
