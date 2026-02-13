@@ -18,7 +18,7 @@ internal class AudioManager: ObservableObject {
     private var audioEngine: AVAudioEngine?
     private var audioNodes: [AVAudioNode] = []
     private var noiseGenerator = NoiseGenerator()
-    private let logger = Logger(subsystem: "com.oak.app", category: "AudioManager")
+    private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
 
     func play(track: AudioTrack) {
         guard track != .none else {

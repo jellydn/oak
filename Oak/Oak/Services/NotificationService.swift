@@ -15,7 +15,7 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
     @Published private(set) var isAuthorized: Bool = false
     @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
 
-    private let logger = Logger(subsystem: "com.oak.app", category: "NotificationService")
+    private let logger = Logger(subsystem: "com.productsway.oak.app", category: "NotificationService")
 
     private init() {
         Task {
@@ -44,7 +44,7 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
     }
 
     func openNotificationSettings() {
-        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.oak.app"
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.productsway.oak.app"
         let candidateURLs = [
             "x-apple.systempreferences:com.apple.Notifications-Settings.extension?\(bundleIdentifier)",
             "x-apple.systempreferences:com.apple.Notifications-Settings.extension",

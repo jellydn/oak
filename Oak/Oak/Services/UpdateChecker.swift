@@ -12,7 +12,7 @@ internal final class UpdateChecker: UpdateChecking {
     private let lastPromptedVersionKey = "oak.lastPromptedUpdateVersion"
     private let lastPromptedAtKey = "oak.lastPromptedUpdateAt"
     private let promptCooldown: TimeInterval = 24 * 60 * 60
-    private let logger = Logger(subsystem: "com.oak.app", category: "UpdateChecker")
+    private let logger = Logger(subsystem: "com.productsway.oak.app", category: "UpdateChecker")
     private let userDefaults: UserDefaults
     private let session: URLSession
 

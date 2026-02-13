@@ -257,7 +257,7 @@ internal struct SettingsMenuView: View {
         }
 
         let appBundle = Bundle.main
-        let fallbackBundle = Bundle(identifier: "com.oak.app") ?? Bundle(for: FocusSessionViewModel.self)
+        let fallbackBundle = Bundle(identifier: "com.productsway.oak.app") ?? Bundle(for: FocusSessionViewModel.self)
 
         if let (shortVersion, buildVersion) = getVersion(from: appBundle) {
             return "v\(shortVersion) (\(buildVersion))"
