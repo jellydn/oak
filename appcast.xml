@@ -6,6 +6,23 @@
     <description>Oak - Lightweight macOS focus companion</description>
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
+<item>
+  <title>Version 0.4.5</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.4.5</link>
+  <sparkle:version>0.4.5</sparkle:version>
+  <sparkle:shortVersionString>0.4.5</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.4.5</h2>
+    &lt;p&gt;Release 0.4.5&lt;/p&gt;
+  ]]></description>
+  <pubDate>Fri, 13 Feb 2026 23:02:57 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.5/Oak-0.4.5.dmg"
+             sparkle:version="0.4.5"
+             sparkle:shortVersionString="0.4.5"
+             sparkle:edSignature="oZ9cq1ckkN3HaEjr7AC0dWZK8H7StrZ5a44dzSSQ8mQGhuwvd80oIlKqtrAa4urDWUGFLxDzwG+sokBs2fDDCw=="
+             length="86166260"
+             type="application/octet-stream" />
+</item>
     <item>
       <title>Version 0.4.1</title>
       <link>https://github.com/jellydn/oak/releases/tag/v0.4.1</link>
