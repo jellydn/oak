@@ -17,7 +17,7 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published var sessionState: SessionState = .idle
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
-    @Published var completedRounds: Int = 0
+    @Published private(set) var completedRounds: Int = 0
 
     let presetSettings: PresetSettingsStore
     private var timer: Timer?
