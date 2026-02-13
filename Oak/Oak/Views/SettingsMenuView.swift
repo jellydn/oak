@@ -157,6 +157,10 @@ internal struct SettingsMenuView: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .onChange(of: presetSettings.countdownDisplayMode) { newValue in
+                guard selectedCountdownDisplayMode != newValue else { return }
+                selectedCountdownDisplayMode = newValue
+            }
         }
         .padding(8)
         .background(Color.primary.opacity(0.04))
