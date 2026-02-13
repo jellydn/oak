@@ -73,9 +73,9 @@ internal final class SparkleUpdaterTests: XCTestCase {
     }
 
     func testCheckForUpdatesDoesNotCrash() {
-        // This test verifies that checkForUpdates can be called without crashing
-        // The actual update check is managed by Sparkle and would require network access
-        updater.checkForUpdates()
-        // If we get here without crashing, the test passes
+        XCTAssertNoThrow(
+            updater.checkForUpdates(),
+            "checkForUpdates should be callable without throwing"
+        )
     }
 }

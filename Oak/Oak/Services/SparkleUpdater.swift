@@ -43,16 +43,14 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
     }
 
     func setAutomaticallyChecksForUpdates(_ enabled: Bool) {
-        guard let updaterController else { return }
-        updaterController.updater.automaticallyChecksForUpdates = enabled
         automaticallyChecksForUpdates = enabled
+        updaterController?.updater.automaticallyChecksForUpdates = enabled
         logger.info("Automatic update checks: \(enabled ? "enabled" : "disabled")")
     }
 
     func setAutomaticallyDownloadsUpdates(_ enabled: Bool) {
-        guard let updaterController else { return }
-        updaterController.updater.automaticallyDownloadsUpdates = enabled
         automaticallyDownloadsUpdates = enabled
+        updaterController?.updater.automaticallyDownloadsUpdates = enabled
         logger.info("Automatic downloads: \(enabled ? "enabled" : "disabled")")
     }
 
