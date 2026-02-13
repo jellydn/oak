@@ -8,7 +8,7 @@ class FocusSessionViewModel: ObservableObject {
     @Published var isSessionComplete: Bool = false
 
     let presetSettings: PresetSettingsStore
-    private var timer: Timer?
+    nonisolated(unsafe) private var timer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
     private var sessionStartSeconds: Int = 0

@@ -12,9 +12,9 @@ class AudioManager: ObservableObject {
     }
     @Published var isPlaying: Bool = false
 
-    private var audioPlayer: AVAudioPlayer?
-    private var audioEngine: AVAudioEngine?
-    private var audioNodes: [AVAudioNode] = []
+    nonisolated(unsafe) private var audioPlayer: AVAudioPlayer?
+    nonisolated(unsafe) private var audioEngine: AVAudioEngine?
+    nonisolated(unsafe) private var audioNodes: [AVAudioNode] = []
 
     func play(track: AudioTrack) {
         guard track != .none else {
@@ -200,9 +200,7 @@ class AudioManager: ObservableObject {
     }
 
     nonisolated deinit {
-        Task { @MainActor in
-            audioEngine?.stop()
-            audioPlayer?.stop()
-        }
+        audioEngine?.stop()
+        audioPlayer?.stop()
     }
 }

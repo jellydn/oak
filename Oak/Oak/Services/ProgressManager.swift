@@ -83,8 +83,4 @@ class ProgressManager: ObservableObject {
 
         return streak
     }
-
-    deinit {
-        // No resources to clean up, but included for consistency
-    }
 }
