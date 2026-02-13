@@ -18,10 +18,8 @@ internal struct NotchCompanionView: View {
     private let verticalPadding: CGFloat = 4
     private let contentSpacing: CGFloat = 8
     private let controlSize: CGFloat = 18
-    private let ringTextSizeMultiplier: CGFloat = 0.4
     private let compactRingSize: CGFloat = 20
     private let expandedRingSize: CGFloat = 28
-    private let expandedRingTextSize: CGFloat = 6
 
     init(
         viewModel: FocusSessionViewModel,
@@ -165,7 +163,6 @@ internal struct NotchCompanionView: View {
                 Text(presetLabel(for: presetSelection))
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.white.opacity(0.62))
-
                 Button(
                     action: {
                         viewModel.startSession(using: presetSelection)
@@ -188,7 +185,6 @@ internal struct NotchCompanionView: View {
                     size: compactRingSize,
                     fontSize: 13
                 )
-
                 Button(
                     action: {
                         viewModel.startNextSession()
@@ -223,29 +219,13 @@ internal struct NotchCompanionView: View {
     ) -> some View {
         Group {
             if mode == .circleRing {
-                ZStack {
-                    CircularProgressRing(
-                        progress: viewModel.progressPercentage,
-                        lineWidth: 2.5,
-                        ringColor: viewModel.isPaused ? .orange : .white,
-                        backgroundColor: .white.opacity(0.2)
-                    )
-                    .frame(width: size, height: size)
-
-                    Text(viewModel.displayTime)
-                        .font(
-                            .system(
-                                size: fontSize * ringTextSizeMultiplier,
-                                weight: .semibold,
-                                design: .monospaced
-                            )
-                        )
-                        .foregroundColor(
-                            viewModel.isPaused
-                                ? Color.orange.opacity(0.95)
-                                : Color.white.opacity(0.95)
-                        )
-                }
+                CircularProgressRing(
+                    progress: viewModel.progressPercentage,
+                    lineWidth: 2.5,
+                    ringColor: viewModel.isPaused ? .orange : .white,
+                    backgroundColor: .white.opacity(0.2)
+                )
+                .frame(width: size, height: size)
             } else {
                 Text(viewModel.displayTime)
                     .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
@@ -261,7 +241,6 @@ internal struct NotchCompanionView: View {
     private var startView: some View {
         HStack(spacing: 6) {
             presetSelector
-
             Button(
                 action: {
                     viewModel.startSession(using: presetSelection)
@@ -282,36 +261,21 @@ internal struct NotchCompanionView: View {
     private var sessionView: some View {
         HStack(spacing: 6) {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
-
             if displayMode == .circleRing {
-                VStack(alignment: .leading, spacing: 2) {
-                    ZStack {
-                        CircularProgressRing(
-                            progress: viewModel.progressPercentage,
-                            lineWidth: 2.5,
-                            ringColor: viewModel.isPaused ? .orange : .white,
-                            backgroundColor: .white.opacity(0.2)
-                        )
-                        .frame(width: expandedRingSize, height: expandedRingSize)
-
-                        Text(viewModel.displayTime)
-                            .font(
-                                .system(
-                                    size: expandedRingTextSize,
-                                    weight: .semibold,
-                                    design: .monospaced
-                                )
-                            )
-                            .foregroundColor(
-                                viewModel.isPaused
-                                    ? Color.orange.opacity(0.95)
-                                    : Color.white.opacity(0.95)
-                            )
-                    }
-
+                ZStack {
+                    CircularProgressRing(
+                        progress: viewModel.progressPercentage,
+                        lineWidth: 2.5,
+                        ringColor: viewModel.isPaused ? .orange : .white,
+                        backgroundColor: .white.opacity(0.2)
+                    )
+                    .frame(width: expandedRingSize, height: expandedRingSize)
                     Text(viewModel.currentSessionType)
-                        .font(.system(size: 8, weight: .medium))
-                        .foregroundColor(.white.opacity(0.52))
+                        .font(.system(size: 7, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.9))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .frame(width: expandedRingSize - 6)
                 }
             } else {
                 VStack(alignment: .leading, spacing: 2) {
@@ -322,13 +286,11 @@ internal struct NotchCompanionView: View {
                                 ? Color.orange.opacity(0.95)
                                 : Color.white.opacity(0.95)
                         )
-
                     Text(viewModel.currentSessionType)
                         .font(.system(size: 8, weight: .medium))
                         .foregroundColor(.white.opacity(0.52))
                 }
             }
-
             if viewModel.canPause {
                 Button(
                     action: {
@@ -466,7 +428,6 @@ internal struct NotchCompanionView: View {
             action: {
                 let shouldExpand = !isExpandedByToggle
                 isExpandedByToggle = shouldExpand
-
                 if !shouldExpand {
                     showAudioMenu = false
                     showProgressMenu = false
