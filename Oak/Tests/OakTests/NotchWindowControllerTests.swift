@@ -87,7 +87,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
     func testWindowRemainsCenteredHorizontally() {
         let window = windowController.window as? NotchWindow
-        let screenFrame = NSScreen.main?.frame ?? .zero
+        let screenFrame = resolvedDisplayFrame()
         let initialCenterX = window?.frame.midX ?? 0
         let expectedCenterX = screenFrame.midX
 
@@ -101,7 +101,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
     func testWindowStaysAtNotchHeight() {
         let window = windowController.window as? NotchWindow
-        let screenFrame = NSScreen.main?.frame ?? .zero
+        let screenFrame = resolvedDisplayFrame()
         let notchHeight: CGFloat = 33
         let expectedYPosition = screenFrame.maxY - notchHeight
 
@@ -291,14 +291,21 @@ internal final class NotchWindowControllerTests: XCTestCase {
         let endTime = Date().addingTimeInterval(timeout)
 
         while Date() < endTime {
-            if let window = windowController.window as? NotchWindow,
-               abs(window.frame.width - width) <= 1.0 {
-                return true
+            if let window = windowController.window as? NotchWindow {
+                if abs(window.frame.width - width) <= 1.0 {
+                    return true
+                }
             }
 
             RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
 
         return false
+    }
+
+    private func resolvedDisplayFrame() -> NSRect {
+        let target = presetSettings.displayTarget
+        let preferredDisplayID = presetSettings.preferredDisplayID(for: target)
+        return NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
     }
 }
