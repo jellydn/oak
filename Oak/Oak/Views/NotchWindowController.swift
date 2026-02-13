@@ -1,11 +1,32 @@
 import SwiftUI
 import AppKit
 
+// MARK: - Screen Detection Helper
+
+extension NSScreen {
+    static func screenWithNotch() -> NSScreen? {
+        // Try to find a screen with auxiliaryTopLeftArea (indicates notch)
+        // This property is available on macOS 12+ and returns non-nil for screens with notch
+        for screen in NSScreen.screens {
+            if #available(macOS 12.0, *) {
+                if screen.auxiliaryTopLeftArea != nil {
+                    return screen
+                }
+            }
+        }
+        
+        // Fallback: return main screen or first screen
+        return NSScreen.main ?? NSScreen.screens.first
+    }
+}
+
+// MARK: - NotchWindowController
+
 class NotchWindowController: NSWindowController {
     private let collapsedWidth: CGFloat = 144
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
-    private var lastExpandedState: Bool?
+    private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
 
     convenience init() {
@@ -50,30 +71,8 @@ class NotchWindowController: NSWindowController {
 
     @objc private func screenConfigurationChanged() {
         // Recalculate window position when display configuration changes
-        guard let currentExpanded = lastExpandedState else { return }
-        setExpanded(currentExpanded)
-    }
-
-    private func findScreenWithNotch() -> NSScreen? {
-        // Try to find a screen with auxiliaryTopLeftArea (indicates notch)
-        // This property is available on macOS 12+ and returns non-nil for screens with notch
-        for screen in NSScreen.screens {
-            if #available(macOS 12.0, *) {
-                if screen.auxiliaryTopLeftArea != nil {
-                    return screen
-                }
-            }
-        }
-        
-        // Fallback: look for built-in display by checking if it's the main screen
-        // The built-in display is typically the one with the highest pixel density
-        // and is usually the main screen when it's the only display
-        if let mainScreen = NSScreen.main {
-            return mainScreen
-        }
-        
-        // Last resort: return the first screen
-        return NSScreen.screens.first
+        // Use the current expansion state to reposition the window
+        setExpanded(lastExpandedState)
     }
 
     func handleExpansionChange(_ expanded: Bool) {
@@ -86,7 +85,7 @@ class NotchWindowController: NSWindowController {
         lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
-        let screen = findScreenWithNotch()
+        let screen = NSScreen.screenWithNotch()
         let screenFrame = screen?.frame ?? .zero
         let yPosition = screenFrame.height - notchHeight
         let xPosition = (screenFrame.width - targetWidth) / 2
@@ -99,9 +98,11 @@ class NotchWindowController: NSWindowController {
     }
 }
 
+// MARK: - NotchWindow
+
 class NotchWindow: NSPanel {
     init(width: CGFloat, height: CGFloat) {
-        let screen = NotchWindow.findScreenWithNotch()
+        let screen = NSScreen.screenWithNotch()
         let screenFrame = screen?.frame ?? .zero
         let xPosition = (screenFrame.width - width) / 2
 
@@ -118,20 +119,6 @@ class NotchWindow: NSPanel {
         self.isOpaque = false
         self.hasShadow = false
         self.ignoresMouseEvents = false
-    }
-
-    private static func findScreenWithNotch() -> NSScreen? {
-        // Try to find a screen with auxiliaryTopLeftArea (indicates notch)
-        for screen in NSScreen.screens {
-            if #available(macOS 12.0, *) {
-                if screen.auxiliaryTopLeftArea != nil {
-                    return screen
-                }
-            }
-        }
-        
-        // Fallback: return main screen or first screen
-        return NSScreen.main ?? NSScreen.screens.first
     }
 
     override func rightMouseDown(with event: NSEvent) {
