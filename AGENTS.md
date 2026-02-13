@@ -140,7 +140,7 @@ Oak/
 
 ## MVP Constraints (Do Not Violate)
 
-- Fixed presets only: `25/5` and `50/10` (no custom durations)
+- Default presets: `25/5` and `50/10` (configurable in settings)
 - Notch-only UI (no menu bar fallback yet) | No global keyboard shortcuts
 - Auto-start next interval defaults to OFF | Built-in audio tracks only
 - Local persistence only (no cloud sync)

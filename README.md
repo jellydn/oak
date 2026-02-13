@@ -23,7 +23,7 @@ A lightweight macOS focus companion designed for deep work.
 ## ✨ Features
 
 - 🎯 **Notch-first** focus companion UI
-- ⏱️ **Fixed Pomodoro** presets: `25/5` and `50/10`
+- ⏱️ **Default Pomodoro** presets: `25/5` and `50/10` (configurable in settings)
 - 🔄 **Long breaks**: Automatic 15/20 min breaks after 4 focus rounds
 - ▶️ **Session controls**: start, pause, resume
 - 🎵 **Ambient sounds**: rain, forest, cafe, brown noise, lo-fi
