@@ -92,7 +92,6 @@ internal class FocusSessionViewModel: ObservableObject {
             seconds = remaining % 60
         case let .completed(isWorkSession):
             if isWorkSession {
-                // Work session completed, show next break duration
                 if completedRounds >= roundsBeforeLongBreak {
                     minutes = presetSettings.longBreakDuration(for: selectedPreset) / 60
                 } else {
@@ -146,7 +145,6 @@ internal class FocusSessionViewModel: ObservableObject {
             }
         case let .completed(isWorkSession):
             if isWorkSession {
-                // Work session completed, show what's next
                 if completedRounds >= roundsBeforeLongBreak {
                     return "Long Break"
                 } else {
@@ -208,12 +206,9 @@ internal class FocusSessionViewModel: ObservableObject {
         isWorkSession = !completedWorkSession
 
         if isWorkSession {
-            // Starting a new work session
             currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
             isLongBreak = false
         } else {
-            // Starting a break session
-            // Check if we should use long break
             if completedRounds >= roundsBeforeLongBreak {
                 currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
                 isLongBreak = true
@@ -262,15 +257,12 @@ internal class FocusSessionViewModel: ObservableObject {
 
     private func completeSession() {
         if isWorkSession {
-            // Work session complete - record progress and increment rounds
             let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
             if durationMinutes > 0 {
                 progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
             }
             completedRounds += 1
         } else {
-            // Break session complete
-            // Reset rounds after long break completes
             if isLongBreak {
                 completedRounds = 0
             }
