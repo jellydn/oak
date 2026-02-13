@@ -12,6 +12,7 @@
 		1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74BB88C04B3824E97E3C561 /* US001Tests.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155853CBF9374645092FE699 /* UpdateChecker.swift */; };
+		4F06BC587A1F786E52BEECF6 /* ProgressMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCF243F05E35D1D4F5150A98 /* ProgressMenuView.swift */; };
 		8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFE863ED8125FD3D3029341 /* US004Tests.swift */; };
 		8C831319B8AF05D32A0F8608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08E0A4A56EADCDB21276DE81 /* Assets.xcassets */; };
 		8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */; };
@@ -25,6 +26,7 @@
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
+		EF8A05B094735BFC535509D2 /* AudioMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C467D435C7DB52DC7013BE5 /* AudioMenuView.swift */; };
 		F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732AEE30E8FEC2D900C8224A /* US005Tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +62,8 @@
 		B93F85CD94F4CCB44AC7296C /* OakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C348F7E99471145836A04408 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		DBFE863ED8125FD3D3029341 /* US004Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US004Tests.swift; sourceTree = "<group>"; };
+		6C467D435C7DB52DC7013BE5 /* AudioMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMenuView.swift; sourceTree = "<group>"; };
+		FCF243F05E35D1D4F5150A98 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -130,8 +134,10 @@
 		9B4DD5BBE504192643738A6D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6C467D435C7DB52DC7013BE5 /* AudioMenuView.swift */,
 				0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */,
 				3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */,
+				FCF243F05E35D1D4F5150A98 /* ProgressMenuView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -240,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */,
+				EF8A05B094735BFC535509D2 /* AudioMenuView.swift in Sources */,
 				B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */,
 				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
 				8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */,
@@ -248,6 +255,7 @@
 				1941B67DA3C25D4A42BB7D6D /* PresetSettingsStore.swift in Sources */,
 				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
+				4F06BC587A1F786E52BEECF6 /* ProgressMenuView.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */,
 			);
