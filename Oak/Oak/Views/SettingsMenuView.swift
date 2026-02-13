@@ -150,6 +150,15 @@ internal struct SettingsMenuView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
+            Toggle(
+                "Play completion sound",
+                isOn: Binding(
+                    get: { presetSettings.playSoundOnSessionCompletion },
+                    set: { presetSettings.setPlaySoundOnSessionCompletion($0) }
+                )
+            )
+            .font(.caption)
+
             HStack(spacing: 8) {
                 if notificationService.authorizationStatus == .notDetermined {
                     Button("Allow Notifications") {

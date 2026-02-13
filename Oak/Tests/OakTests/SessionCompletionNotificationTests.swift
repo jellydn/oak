@@ -12,10 +12,20 @@ private final class MockNotificationService: SessionCompletionNotifying {
 }
 
 @MainActor
+private final class MockSessionCompletionSoundPlayer: SessionCompletionSoundPlaying {
+    private(set) var playCallCount = 0
+
+    func playCompletionSound() {
+        playCallCount += 1
+    }
+}
+
+@MainActor
 internal final class SessionCompletionNotificationTests: XCTestCase {
     var viewModel: FocusSessionViewModel!
     var presetSettings: PresetSettingsStore!
     private var notificationService: MockNotificationService!
+    private var completionSoundPlayer: MockSessionCompletionSoundPlayer!
     var presetSuiteName: String!
 
     override func setUp() async throws {
@@ -27,15 +37,18 @@ internal final class SessionCompletionNotificationTests: XCTestCase {
         presetSuiteName = suiteName
         presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         notificationService = MockNotificationService()
+        completionSoundPlayer = MockSessionCompletionSoundPlayer()
         viewModel = FocusSessionViewModel(
             presetSettings: presetSettings,
-            notificationService: notificationService
+            notificationService: notificationService,
+            completionSoundPlayer: completionSoundPlayer
         )
     }
 
     override func tearDown() async throws {
         viewModel.cleanup()
         notificationService = nil
+        completionSoundPlayer = nil
         if let presetSuiteName {
             UserDefaults(suiteName: presetSuiteName)?.removePersistentDomain(forName: presetSuiteName)
         }
@@ -56,6 +69,32 @@ internal final class SessionCompletionNotificationTests: XCTestCase {
             notificationService.sentNotifications,
             [true],
             "Work session completion should send notification"
+        )
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Completion sound should play by default")
+    }
+
+    func testCompletionSoundSettingDefaultsToEnabled() {
+        XCTAssertTrue(
+            presetSettings.playSoundOnSessionCompletion,
+            "Completion sound should be enabled by default"
+        )
+    }
+
+    func testSessionCompletionDoesNotPlaySoundWhenOptedOut() {
+        presetSettings.setPlaySoundOnSessionCompletion(false)
+        viewModel.startSession()
+
+        viewModel.completeSessionForTesting()
+
+        XCTAssertEqual(
+            notificationService.sentNotifications,
+            [true],
+            "Notification should still be sent when opted out"
+        )
+        XCTAssertEqual(
+            completionSoundPlayer.playCallCount,
+            0,
+            "Completion sound should not play when opted out"
         )
     }
 }

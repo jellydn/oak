@@ -1,5 +1,16 @@
+import AppKit
 import Combine
 import SwiftUI
+
+internal protocol SessionCompletionSoundPlaying {
+    func playCompletionSound()
+}
+
+internal struct SystemSessionCompletionSoundPlayer: SessionCompletionSoundPlaying {
+    func playCompletionSound() {
+        NSSound.beep()
+    }
+}
 
 @MainActor
 internal class FocusSessionViewModel: ObservableObject {
@@ -16,15 +27,18 @@ internal class FocusSessionViewModel: ObservableObject {
     let audioManager = AudioManager()
     let progressManager: ProgressManager
     let notificationService: any SessionCompletionNotifying
+    let completionSoundPlayer: any SessionCompletionSoundPlaying
 
     init(
         presetSettings: PresetSettingsStore,
         progressManager: ProgressManager? = nil,
-        notificationService: (any SessionCompletionNotifying)? = nil
+        notificationService: (any SessionCompletionNotifying)? = nil,
+        completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil
     ) {
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
         self.notificationService = notificationService ?? NotificationService.shared
+        self.completionSoundPlayer = completionSoundPlayer ?? SystemSessionCompletionSoundPlayer()
         presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
@@ -209,6 +223,10 @@ internal class FocusSessionViewModel: ObservableObject {
 
         // Stop audio when any session ends
         audioManager.stop()
+
+        if presetSettings.playSoundOnSessionCompletion {
+            completionSoundPlayer.playCompletionSound()
+        }
 
         timer?.invalidate()
         timer = nil
