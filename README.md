@@ -10,6 +10,12 @@
 
 </div>
 
+## 🎬 Demo
+
+<div align="center">
+  <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak Demo - Focus session in action" width="600"/>
+</div>
+
 # Oak
 
 A lightweight macOS focus companion designed for deep work.
