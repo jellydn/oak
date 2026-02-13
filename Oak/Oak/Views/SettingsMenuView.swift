@@ -2,10 +2,15 @@ import SwiftUI
 
 internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
+    @ObservedObject var notificationService: NotificationService
     @State private var selectedDisplayTarget: DisplayTarget
 
-    init(presetSettings: PresetSettingsStore) {
+    init(
+        presetSettings: PresetSettingsStore,
+        notificationService: NotificationService
+    ) {
         self.presetSettings = presetSettings
+        self.notificationService = notificationService
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
     }
 
@@ -18,6 +23,7 @@ internal struct SettingsMenuView: View {
                 displayTargetPicker
                 presetEditor(title: "Preset A", preset: .short)
                 presetEditor(title: "Preset B", preset: .long)
+                notificationSettings
             }
 
             Text(validRangeDescription)
@@ -38,6 +44,9 @@ internal struct SettingsMenuView: View {
             }
         }
         .padding(14)
+        .task {
+            await notificationService.refreshAuthorizationStatus()
+        }
     }
 
     private func presetEditor(title: String, preset: Preset) -> some View {
@@ -112,6 +121,41 @@ internal struct SettingsMenuView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
+    private var notificationSettings: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Notifications")
+                .font(.system(size: 11, weight: .semibold))
+
+            Text(notificationStatusText)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 8) {
+                if notificationService.authorizationStatus == .notDetermined {
+                    Button("Allow Notifications") {
+                        Task {
+                            await notificationService.requestAuthorization()
+                        }
+                    }
+                } else if !notificationService.isAuthorized {
+                    Button("Open System Settings") {
+                        notificationService.openNotificationSettings()
+                    }
+                }
+
+                Button("Refresh") {
+                    Task {
+                        await notificationService.refreshAuthorizationStatus()
+                    }
+                }
+            }
+            .buttonStyle(.link)
+        }
+        .padding(8)
+        .background(Color.primary.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
     private func workMinutesBinding(for preset: Preset) -> Binding<Int> {
         Binding(
             get: { presetSettings.workMinutes(for: preset) },
@@ -159,5 +203,18 @@ internal struct SettingsMenuView: View {
         let focusRange = "\(PresetSettingsStore.minWorkMinutes)-\(PresetSettingsStore.maxWorkMinutes)"
         let breakRange = "\(PresetSettingsStore.minBreakMinutes)-\(PresetSettingsStore.maxBreakMinutes)"
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min"
+    }
+
+    private var notificationStatusText: String {
+        switch notificationService.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return "Notifications are enabled."
+        case .notDetermined:
+            return "Notifications have not been requested yet."
+        case .denied:
+            return "Notifications are disabled. Enable them in System Settings."
+        @unknown default:
+            return "Notification status is unknown."
+        }
     }
 }

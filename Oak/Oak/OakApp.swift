@@ -5,12 +5,16 @@ import SwiftUI
 internal struct OakApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var presetSettings = PresetSettingsStore.shared
+    @StateObject private var notificationService = NotificationService.shared
 
     var body: some Scene {
         Settings {
-            SettingsMenuView(presetSettings: presetSettings)
-                .frame(width: 320)
-                .padding(8)
+            SettingsMenuView(
+                presetSettings: presetSettings,
+                notificationService: notificationService
+            )
+            .frame(width: 320)
+            .padding(8)
         }
     }
 }
@@ -44,6 +48,12 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_: Notification) {
         notchWindowController?.cleanup()
+    }
+
+    func applicationDidBecomeActive(_: Notification) {
+        Task { @MainActor in
+            await notificationService.refreshAuthorizationStatus()
+        }
     }
 
     deinit {
