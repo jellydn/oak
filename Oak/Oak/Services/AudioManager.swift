@@ -198,4 +198,11 @@ class AudioManager: ObservableObject {
         let vinyl = Float.random(in: -0.05...0.05)
         return noise + vinyl
     }
+
+    nonisolated deinit {
+        Task { @MainActor in
+            audioEngine?.stop()
+            audioPlayer?.stop()
+        }
+    }
 }

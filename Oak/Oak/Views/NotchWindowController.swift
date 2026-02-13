@@ -35,6 +35,12 @@ class NotchWindowController: NSWindowController {
         viewModel.cleanup()
     }
 
+    nonisolated deinit {
+        Task { @MainActor in
+            viewModel.cleanup()
+        }
+    }
+
     func handleExpansionChange(_ expanded: Bool) {
         setExpanded(expanded)
     }

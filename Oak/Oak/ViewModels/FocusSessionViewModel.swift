@@ -214,6 +214,7 @@ class FocusSessionViewModel: ObservableObject {
     }
 
     deinit {
+        timer?.invalidate()
         presetSettingsCancellable?.cancel()
     }
 
