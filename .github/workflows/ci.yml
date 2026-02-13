@@ -9,6 +9,8 @@ on:
 jobs:
   lint:
     runs-on: macos-15
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
