@@ -13,7 +13,6 @@
 --commas inline
 --decimalgrouping none
 --elseposition same-line
---indent 4
 --indentcase false
 --trimwhitespace always
 --linebreaks lf
