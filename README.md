@@ -129,6 +129,7 @@ Oak uses the [Sparkle framework](https://sparkle-project.org/) to provide automa
 - **Manual check**: Check for updates on demand via Settings
 
 The appcast feed is served from `appcast.xml` in the repository root and is automatically updated when new releases are published.
+Oak is configured with Sparkle EdDSA signing (`SUPublicEDKey`) and appcast entries include `sparkle:edSignature`.
 
 ### Code Quality Commands
 

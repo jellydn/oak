@@ -242,6 +242,12 @@ internal struct SettingsMenuView: View {
 
     private var updateSettings: some View {
         VStack(alignment: .leading, spacing: 8) {
+            if !sparkleUpdater.isConfigured {
+                Text("Update signing is not configured (missing SUPublicEDKey).")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
             Toggle(
                 "Automatically check for updates",
                 isOn: Binding(
@@ -250,6 +256,7 @@ internal struct SettingsMenuView: View {
                 )
             )
             .font(.caption)
+            .disabled(!sparkleUpdater.isConfigured)
 
             Toggle(
                 "Automatically download updates",
@@ -259,45 +266,47 @@ internal struct SettingsMenuView: View {
                 )
             )
             .font(.caption)
-            .disabled(!sparkleUpdater.automaticallyChecksForUpdates)
+            .disabled(!sparkleUpdater.isConfigured || !sparkleUpdater.automaticallyChecksForUpdates)
 
             Button("Check for Updates Now") {
                 sparkleUpdater.checkForUpdates()
             }
             .buttonStyle(.link)
-            .disabled(!sparkleUpdater.canCheckForUpdates)
+            .disabled(!sparkleUpdater.isConfigured || !sparkleUpdater.canCheckForUpdates)
         }
     }
+}
 
-    private func workMinutesBinding(for preset: Preset) -> Binding<Int> {
+private extension SettingsMenuView {
+    func workMinutesBinding(for preset: Preset) -> Binding<Int> {
         Binding(
             get: { presetSettings.workMinutes(for: preset) },
             set: { presetSettings.setWorkMinutes($0, for: preset) }
         )
     }
 
-    private func breakMinutesBinding(for preset: Preset) -> Binding<Int> {
+    func breakMinutesBinding(for preset: Preset) -> Binding<Int> {
         Binding(
             get: { presetSettings.breakMinutes(for: preset) },
             set: { presetSettings.setBreakMinutes($0, for: preset) }
         )
     }
 
-    private func longBreakMinutesBinding(for preset: Preset) -> Binding<Int> {
+    func longBreakMinutesBinding(for preset: Preset) -> Binding<Int> {
         Binding(
             get: { presetSettings.longBreakMinutes(for: preset) },
             set: { presetSettings.setLongBreakMinutes($0, for: preset) }
         )
     }
 
-    private var displayTargetBinding: Binding<DisplayTarget> {
+    var displayTargetBinding: Binding<DisplayTarget> {
         Binding(
             get: { selectedDisplayTarget },
             set: { selectedDisplayTarget = $0 }
         )
     }
 
-    private var countdownDisplayModeBinding: Binding<CountdownDisplayMode> {
+    var countdownDisplayModeBinding: Binding<CountdownDisplayMode> {
         Binding(
             get: { selectedCountdownDisplayMode },
             set: { newValue in
@@ -309,14 +318,14 @@ internal struct SettingsMenuView: View {
         )
     }
 
-    private var roundsBeforeLongBreakBinding: Binding<Int> {
+    var roundsBeforeLongBreakBinding: Binding<Int> {
         Binding(
             get: { presetSettings.roundsBeforeLongBreak },
             set: { presetSettings.setRoundsBeforeLongBreak($0) }
         )
     }
 
-    private var currentVersion: String {
+    var currentVersion: String {
         func getVersion(from bundle: Bundle) -> (String, String)? {
             guard let shortVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String,
                   let buildVersion = bundle.infoDictionary?["CFBundleVersion"] as? String
@@ -338,7 +347,7 @@ internal struct SettingsMenuView: View {
         return "v0.0.0 (0)"
     }
 
-    private var validRangeDescription: String {
+    var validRangeDescription: String {
         let focusRange = "\(PresetSettingsStore.minWorkMinutes)-\(PresetSettingsStore.maxWorkMinutes)"
         let breakRange = "\(PresetSettingsStore.minBreakMinutes)-\(PresetSettingsStore.maxBreakMinutes)"
         let cycleRange = "\(PresetSettingsStore.minRoundsBeforeLongBreak)"
@@ -346,7 +355,7 @@ internal struct SettingsMenuView: View {
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min, Long cycle \(cycleRange) sessions"
     }
 
-    private var notificationStatusText: String {
+    var notificationStatusText: String {
         switch notificationService.authorizationStatus {
         case .authorized, .provisional, .ephemeral:
             return "Notifications are enabled."

@@ -31,6 +31,8 @@ targets:
       INFOPLIST_KEY_SUFeedURL: https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml
       INFOPLIST_KEY_SUEnableAutomaticChecks: true
       INFOPLIST_KEY_SUScheduledCheckInterval: 86400
+      SPARKLE_PUBLIC_ED_KEY: IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=
+      INFOPLIST_KEY_SUPublicEDKey: $(SPARKLE_PUBLIC_ED_KEY)
     scheme:
       testTargets:
         - OakTests

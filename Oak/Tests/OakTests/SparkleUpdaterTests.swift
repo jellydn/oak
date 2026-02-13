@@ -13,26 +13,26 @@ internal final class SparkleUpdaterTests: XCTestCase {
         updater = nil
     }
 
-    func testUpdaterInitialization() async throws {
+    func testUpdaterInitialization() {
         XCTAssertNotNil(updater, "SparkleUpdater should initialize successfully")
     }
 
-    func testCanCheckForUpdatesProperty() async throws {
+    func testCanCheckForUpdatesProperty() {
         // canCheckForUpdates should be accessible
         _ = updater.canCheckForUpdates
     }
 
-    func testAutomaticallyChecksForUpdatesProperty() async throws {
+    func testAutomaticallyChecksForUpdatesProperty() {
         // automaticallyChecksForUpdates should be accessible
         _ = updater.automaticallyChecksForUpdates
     }
 
-    func testAutomaticallyDownloadsUpdatesProperty() async throws {
+    func testAutomaticallyDownloadsUpdatesProperty() {
         // automaticallyDownloadsUpdates should be accessible
         _ = updater.automaticallyDownloadsUpdates
     }
 
-    func testSetAutomaticallyChecksForUpdates() async throws {
+    func testSetAutomaticallyChecksForUpdates() {
         let initialValue = updater.automaticallyChecksForUpdates
 
         updater.setAutomaticallyChecksForUpdates(!initialValue)
@@ -52,7 +52,7 @@ internal final class SparkleUpdaterTests: XCTestCase {
         )
     }
 
-    func testSetAutomaticallyDownloadsUpdates() async throws {
+    func testSetAutomaticallyDownloadsUpdates() {
         let initialValue = updater.automaticallyDownloadsUpdates
 
         updater.setAutomaticallyDownloadsUpdates(!initialValue)
@@ -72,7 +72,7 @@ internal final class SparkleUpdaterTests: XCTestCase {
         )
     }
 
-    func testCheckForUpdatesDoesNotCrash() async throws {
+    func testCheckForUpdatesDoesNotCrash() {
         // This test verifies that checkForUpdates can be called without crashing
         // The actual update check is managed by Sparkle and would require network access
         updater.checkForUpdates()

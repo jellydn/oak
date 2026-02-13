@@ -3,9 +3,9 @@ import SwiftUI
 // swiftlint:disable type_body_length
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
-
     @StateObject private var viewModel: FocusSessionViewModel
     @StateObject private var notificationService = NotificationService.shared
+    @StateObject private var sparkleUpdater = SparkleUpdater.shared
     @State private var showAudioMenu = false
     @State private var showProgressMenu = false
     @State private var showSettingsMenu = false
@@ -134,7 +134,8 @@ internal struct NotchCompanionView: View {
         .popover(isPresented: $showSettingsMenu) {
             SettingsMenuView(
                 presetSettings: viewModel.presetSettings,
-                notificationService: notificationService
+                notificationService: notificationService,
+                sparkleUpdater: sparkleUpdater
             )
             .frame(width: 280)
         }
@@ -339,7 +340,6 @@ internal struct NotchCompanionView: View {
                 )
                 .buttonStyle(.plain)
             }
-
             Button(
                 action: {
                     viewModel.resetSession()

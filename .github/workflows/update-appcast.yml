@@ -21,6 +21,16 @@ jobs:
         with:
           ref: main
 
+      - name: Resolve Sparkle tools
+        run: |
+          xcodebuild \
+            -resolvePackageDependencies \
+            -project Oak/Oak.xcodeproj \
+            -scheme Oak \
+            -derivedDataPath /tmp/oak-derived
+
+          test -x /tmp/oak-derived/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update
+
       - name: Get release information
         id: release
         run: |
@@ -69,15 +79,24 @@ jobs:
           FILE_SIZE=$(stat -f%z /tmp/Oak.dmg)
           echo "file_size=$FILE_SIZE" >> "$GITHUB_OUTPUT"
           
-          # Calculate SHA256 for verification
-          # Note: SHA256 is calculated for download verification but not currently used in appcast.
-          # Sparkle supports EdDSA signatures (sparkle:edSignature) for cryptographic verification,
-          # which requires code signing. For unsigned builds, file size and HTTPS are used for basic integrity.
-          SHA256=$(shasum -a 256 /tmp/Oak.dmg | awk '{print $1}')
-          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
-          
-          # Clean up
-          rm /tmp/Oak.dmg
+      - name: Sign DMG with Sparkle EdDSA key
+        id: sign
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          if [[ -z "${SPARKLE_PRIVATE_KEY:-}" ]]; then
+            echo "Error: Missing SPARKLE_PRIVATE_KEY secret"
+            exit 1
+          fi
+
+          ED_SIGNATURE="$(
+            echo "$SPARKLE_PRIVATE_KEY" | \
+            /tmp/oak-derived/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update \
+              --ed-key-file - \
+              -p \
+              /tmp/Oak.dmg
+          )"
+          echo "ed_signature=$ED_SIGNATURE" >> "$GITHUB_OUTPUT"
 
       - name: Update appcast.xml
         env:
@@ -85,7 +104,7 @@ jobs:
           TAG: ${{ steps.release.outputs.tag }}
           DMG_URL: ${{ steps.release.outputs.dmg_url }}
           FILE_SIZE: ${{ steps.dmg_info.outputs.file_size }}
-          SHA256: ${{ steps.dmg_info.outputs.sha256 }}
+          ED_SIGNATURE: ${{ steps.sign.outputs.ed_signature }}
           RELEASE_DATE: ${{ steps.release.outputs.release_date }}
           RELEASE_NOTES: ${{ github.event.release.body }}
           REPO: ${{ github.repository }}
@@ -105,6 +124,7 @@ jobs:
             <enclosure url="${DMG_URL}"
                        sparkle:version="${VERSION}"
                        sparkle:shortVersionString="${VERSION}"
+                       sparkle:edSignature="${ED_SIGNATURE}"
                        length="${FILE_SIZE}"
                        type="application/octet-stream" />
           </item>
@@ -116,6 +136,7 @@ jobs:
           sed -i '' "s/\${REPO}/$REPO/g" /tmp/new_item.xml
           sed -i '' "s|\${DMG_URL}|$DMG_URL|g" /tmp/new_item.xml
           sed -i '' "s/\${FILE_SIZE}/$FILE_SIZE/g" /tmp/new_item.xml
+          sed -i '' "s/\${ED_SIGNATURE}/$ED_SIGNATURE/g" /tmp/new_item.xml
           sed -i '' "s/\${RELEASE_DATE}/$RELEASE_DATE/g" /tmp/new_item.xml
           
           # Escape and insert release notes using perl for better handling of special characters

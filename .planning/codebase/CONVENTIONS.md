@@ -3,91 +3,211 @@
 **Analysis Date:** 2026-02-13
 
 ## Naming Patterns
+
 **Files:**
-- PascalCase for all Swift source files (`FocusSessionViewModel.swift`, `NotchCompanionView.swift`)
-- Models: singular nouns (`AudioTrack.swift`, `ProgressData.swift`, `SessionModels.swift`)
-- ViewModels: suffixed with `ViewModel` (`FocusSessionViewModel.swift`)
-- Views: descriptive noun phrases (`NotchCompanionView.swift`, `NotchWindowController.swift`)
-- Services: suffixed with `Manager` or descriptive role (`AudioManager.swift`, `ProgressManager.swift`, `UpdateChecker.swift`)
+- PascalCase for types matching the type name (`FocusSessionViewModel.swift` → `FocusSessionViewModel`)
+- `Tests` suffix for test files matching source structure (`OakTests/`)
+- Descriptive names that reflect contents (`PresetSettingsStore.swift`, `AudioManager.swift`)
 
 **Functions:**
-- camelCase verbs for actions: `startSession()`, `pauseSession()`, `resumeSession()`, `resetSession()`
-- `can`/`is`/`has` prefixes for boolean computed properties: `canStart`, `canPause`, `isRunning`, `isPaused`
-- Private helpers prefixed with verbs: `startTimer()`, `tick()`, `completeSession()`
-- Factory-style private methods: `createBrownNoiseNode()`, `createRainNode()`
+- camelCase for all functions (`startSession()`, `setWorkMinutes()`)
+- Verb-first names for actions (`play()`, `stop()`, `requestAuthorization()`)
+- Computed properties use camelCase (`displayTime`, `canStart`, `isRunning`)
+- Bool properties prefixed with `is`, `has`, `should`, `can` (`isRunning`, `canPause`, `hasSoundPermission`)
 
 **Variables:**
-- camelCase throughout
-- Boolean properties use `is`/`has`/`can`/`should` prefixes: `isWorkSession`, `isPlaying`, `isSessionComplete`, `isExpandedByToggle`
-- Constants as `private let` with camelCase: `collapsedWidth`, `expandedWidth`, `notchHeight`
-- UserDefaults keys as inline strings: `"progressHistory"`, `"oak.lastPromptedUpdateVersion"`
+- camelCase for local variables and parameters (`remainingSeconds`, `isWorkSession`)
+- Descriptive names over abbreviations (`preferredDisplayID` not `dispID`)
+- `_` prefix for @StateObject wrappers in views when external binding is needed
 
 **Types:**
-- PascalCase for all types: `SessionState`, `Preset`, `AudioTrack`, `ProgressData`, `DailyStats`
-- Enums: PascalCase type with lowerCamelCase cases (`SessionState.idle`, `Preset.short`, `AudioTrack.brownNoise`)
-- Protocols: suffixed with `-ing` or `-Checking` (`UpdateChecking`)
-- Private nested types: PascalCase (`GitHubRelease`)
+- PascalCase for all types (`SessionState`, `AudioTrack`, `Preset`)
+- Enums use PascalCase with lowerCamelCase cases (`DisplayTarget.mainDisplay`, `SessionState.idle`)
+- Protocols use -ing suffix for capabilities (`SessionCompletionNotifying`, `UpdateChecking`)
+- `internal` access control by default, explicit `public` for exposed APIs
 
 ## Code Style
+
 **Formatting:**
-- No explicit formatter tool (SwiftFormat/SwiftLint not configured)
-- 4-space indentation consistently
-- No trailing whitespace observed
-- Trailing newline at end of files
-- Single blank line between type declarations and method groups
-- No blank lines between imports
+- **Tool:** SwiftFormat + SwiftLint
+- **Indentation:** 4 spaces
+- **Line length:** 120 chars (warning), 150 chars (error)
+- **Trailing newline:** Required
+- **Single-line statements:** Single `if`/`guard` without braces allowed for early returns
 
 **Linting:**
-- No SwiftLint or other linter configured
-- Code style enforced by convention (documented in AGENTS.md)
-- Soft 120-character line limit
+- **Tool:** SwiftLint
+- **Key rules:**
+  - `explicit_init` - Require explicit `self.init()` calls
+  - `explicit_top_level_acl` - Require explicit access control at top level
+  - `trailing_closure` - Prefer trailing closure syntax
+  - `empty_count` - Use `.isEmpty` instead of `.count == 0`
+  - `first_where` - Use `.first(where:)` instead of `.filter{}.first`
+  - `toggle_bool` - Use `toggle()` for bools
+  - `modifier_order` - Enforce SwiftUI modifier order
+  - `custom: no_print_statements` - Warn against `print()` in production
 
 ## Import Organization
-**Order:**
-1. Foundation (always first when used)
-2. SwiftUI / AppKit (UI frameworks)
-3. Apple frameworks (AVFoundation, Combine, os)
-4. No third-party dependencies
 
-**Path Aliases:**
-- None; the project uses no external packages (zero dependencies in Package.swift)
-- `@testable import Oak` used in tests
+**Order:**
+1. AppKit/Foundation (system frameworks)
+2. Combine/SwiftUI (Apple frameworks)
+3. Third-party (if any)
+4. `@testable import Oak` (test imports last)
+
+**Examples:**
+```swift
+import AppKit
+import Combine
+import Foundation
+import os
+import SwiftUI
+@testable import Oak
+```
+
+**No blank lines** between import groups of same level, one blank line between type declarations.
+
+**Path Aliases:** None used - direct module imports only.
 
 ## Error Handling
+
 **Patterns:**
-- `guard` with early return for preconditions: `guard canStart else { return }`, `guard let window else { return }`
-- `do/catch` with `print()` for non-critical failures (AudioManager): `print("Failed to start audio engine: \(error)")`
-- `try?` with optional binding for persistence decode/encode (ProgressManager): `try? JSONDecoder().decode(...)`
-- `os.Logger` with `.error` level for production-facing errors (UpdateChecker): `logger.error("Update check failed: \(error.localizedDescription, privacy: .public)")`
-- No custom error types; errors are handled inline
+- `Result` type for async operations where failure is expected
+- `try?` for optional failure handling (seen in persistence)
+- `guard let` for early returns on unavailable data
+- Early returns with `guard` statements over nested conditions
+- `XCTSkip` for tests that should not run in CI (notification permission tests)
+
+**UserDefaults persistence:**
+```swift
+guard let data = userDefaults.data(forKey: key),
+      let records = try? JSONDecoder().decode([T].self, from: data) else { return [] }
+```
+
+**Optional error logging:**
+```swift
+if let error {
+    Task { @MainActor in
+        self.logger.error("Failed: \(error.localizedDescription)")
+    }
+}
+```
 
 ## Logging
-**Framework:** `os.Logger` for production code (UpdateChecker); `print()` for dev/debug (AudioManager)
+
+**Framework:** `os.log` (Logger) for production, `print()` acceptable in dev/debug tests
+
 **Patterns:**
-- Logger initialized with subsystem and category: `Logger(subsystem: "com.oak.app", category: "UpdateChecker")`
-- Privacy-aware logging: `\(error.localizedDescription, privacy: .public)`
-- `print()` used sparingly for audio engine failures during development
+- `Logger(subsystem: "com.productsway.oak.app", category: "ClassName")`
+- Use `privacy: .public` for non-sensitive log data
+- Error logging uses `logger.error()`, debug uses `logger.debug()`
+- Custom SwiftLint rule warns against `print()` in production code
+
+**Example:**
+```swift
+private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
+logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")
+```
 
 ## Comments
-**When to Comment:**
-- Inline comments for non-obvious logic: `// Work session complete - record progress`
-- State transition explanations: `// Reset animation state after 1.5 seconds`
-- Comments used to explain "why" not "what"
-- `// MARK: -` used in test files to group related test sections
 
-**JSDoc/TSDoc:**
-- No `///` documentation comments used anywhere in the codebase
-- No formal API documentation; code is self-documenting through naming
+**When to Comment:**
+- `///` for public API documentation
+- `// MARK: -` for code organization (section dividers)
+- Inline comments for non-obvious logic (noise generation algorithms)
+- Property comments for shared constants (`NotchLayout.swift`)
+
+**Documentation:**
+- Triple-slash `///` for public types and properties
+- Explanation of "why" not "what"
+- Parameter descriptions where intent isn't obvious
+
+**Example:**
+```swift
+/// Shared layout constants for notch companion UI.
+/// These values define window dimensions and ensure consistency
+/// between NotchCompanionView and NotchWindowController.
+internal enum NotchLayout { ... }
+```
 
 ## Function Design
-**Size:** Functions are small, typically 5-15 lines. Largest is `generateAmbientSound(for:)` at ~35 lines
-**Parameters:** Minimal parameters (0-2); optional parameters use default values: `startSession(using preset: Preset? = nil)`
-**Return Values:** Computed properties preferred for derived state (`displayTime`, `canStart`, `currentSessionType`); void functions for mutations
+
+**Size:**
+- Target under 50 lines (warning at 50, error at 100 per SwiftLint)
+- Extract complex view modifiers to `private var someView: some View`
+- Extract logic to private helper methods
+
+**Parameters:**
+- Prefer parameter labels that read naturally at call site
+- Default values for optional parameters (`preset: Preset? = nil`)
+- Closure parameters use trailing closure syntax
+
+**Return Values:**
+- Computed properties for derived state
+- `-> Bool` for validation/predicates
+- `-> some View` for SwiftUI view builders
+- `async throws` for operations that can fail
 
 ## Module Design
-**Exports:** All types are `internal` (default access); `private` used extensively for implementation details; `private(set)` not observed but `@Published` properties are public-facing
-**Barrel Files:** Not used; each file contains one primary type (except `SessionModels.swift` which groups `SessionState`, `Preset`)
-**Protocols:** Used for testability (`UpdateChecking` protocol for dependency injection in `AppDelegate`)
+
+**Exports:** All types use `internal` by default, `public` where needed
+
+**Barrel Files:** Not used - direct imports
+
+**Access Control:**
+- Explicit `internal` on top-level declarations (SwiftLint rule)
+- `private` for implementation details
+- `private(set)` for read-only published properties
+- `fileprivate` avoided, prefer `private`
+
+**Shared Instances:**
+- Singleton pattern with `static let shared = ClassName()` for services
+- Shared instances: `PresetSettingsStore.shared`, `NotificationService.shared`
+
+**Dependency Injection:**
+- Constructor injection for testability
+```swift
+init(presetSettings: PresetSettingsStore,
+     progressManager: ProgressManager? = nil,
+     notificationService: (any SessionCompletionNotifying)? = nil)
+```
+
+## SwiftUI Conventions
+
+**State Management:**
+- `@MainActor` on all ViewModels and UI-related classes
+- `@Published` for observable properties
+- `@StateObject` for view-owned ViewModel instances
+- `@ObservedObject` for passed-in dependencies
+- `private(set)` for externally read-only published properties
+
+**View Organization:**
+- Extract reusable views as `private var someView: some View`
+- Use `#available` checks for version-specific APIs
+- Defer view updates to next run loop to prevent "Publishing changes from within view updates"
+- `onChange` handlers wrap state updates in `DispatchQueue.main.async`
+
+**Protocols for Testing:**
+- Protocol-based dependencies for mockable services
+- `any SessionCompletionNotifying` protocol for notification abstraction
+- `any SessionCompletionSoundPlaying` for sound abstraction
+
+## Memory & Concurrency
+
+**Patterns:**
+- `[weak self]` in escaping closures to prevent retain cycles
+- Timer callbacks wrapped in `Task { @MainActor in self?.tick() }`
+- Always `invalidate()` timers in `cleanup()` or `deinit`
+- `@MainActor` for UI-related classes
+- `deinit` cleanup with `Task { @MainActor in ... }` for async cleanup
+
+**Example:**
+```swift
+timer?.invalidate()
+timer = nil
+presetSettingsCancellable?.cancel()
+```
 
 ---
+
 *Convention analysis: 2026-02-13*
