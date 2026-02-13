@@ -45,8 +45,16 @@ internal final class LongBreakTests: XCTestCase {
 
     func testLongBreakDurationsAreConfigured() {
         // Verify long break durations are defined
-        XCTAssertEqual(Preset.short.longBreakDuration, 15 * 60, "Short preset long break should be 15 minutes")
-        XCTAssertEqual(Preset.long.longBreakDuration, 20 * 60, "Long preset long break should be 20 minutes")
+        XCTAssertEqual(
+            presetSettings.longBreakDuration(for: .short),
+            15 * 60,
+            "Short preset long break should be 15 minutes"
+        )
+        XCTAssertEqual(
+            presetSettings.longBreakDuration(for: .long),
+            20 * 60,
+            "Long preset long break should be 20 minutes"
+        )
     }
 
     func testRoundCounterStartsAtZero() {
@@ -259,5 +267,44 @@ internal final class LongBreakTests: XCTestCase {
         // Resume and verify label
         viewModel.resumeSession()
         XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' after resume")
+    }
+
+    func testLongBreakTriggerUsesConfiguredRoundInterval() {
+        presetSettings.setRoundsBeforeLongBreak(3)
+        viewModel.selectedPreset = .short
+
+        // Round 1
+        viewModel.startSession()
+        viewModel.completeSessionForTesting()
+        viewModel.startNextSession()
+        viewModel.completeSessionForTesting()
+
+        // Round 2
+        viewModel.startNextSession()
+        viewModel.completeSessionForTesting()
+        XCTAssertEqual(viewModel.currentSessionType, "Break", "Should still be short break before configured interval")
+        viewModel.startNextSession()
+        viewModel.completeSessionForTesting()
+
+        // Round 3 should trigger long break
+        viewModel.startNextSession()
+        viewModel.completeSessionForTesting()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should trigger long break at configured interval")
+    }
+
+    func testLongBreakUsesConfiguredDuration() {
+        presetSettings.setLongBreakMinutes(30, for: .short)
+        viewModel.selectedPreset = .short
+
+        completeFourWorkSessions()
+
+        viewModel.startNextSession()
+
+        if case let .running(remaining, isWork) = viewModel.sessionState {
+            XCTAssertFalse(isWork, "Should be a break session")
+            XCTAssertEqual(remaining, 30 * 60, "Should use configured long break duration")
+        } else {
+            XCTFail("Should be in running state")
+        }
     }
 }
