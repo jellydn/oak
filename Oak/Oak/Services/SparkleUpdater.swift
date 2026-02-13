@@ -74,14 +74,18 @@ internal enum AppcastVersionParser {
             return nil
         }
 
-        guard let match = regex.firstMatch(in: xml, range: NSRange(xml.startIndex ..< xml.endIndex, in: xml)),
-              let versionRange = Range(match.range(at: 1), in: xml)
-        else {
-            return nil
+        let matches = regex.matches(in: xml, range: NSRange(xml.startIndex ..< xml.endIndex, in: xml))
+        let versions = matches.compactMap { match -> String? in
+            guard let versionRange = Range(match.range(at: 1), in: xml) else {
+                return nil
+            }
+            let version = xml[versionRange].trimmingCharacters(in: .whitespacesAndNewlines)
+            return version.isEmpty ? nil : version
         }
 
-        let version = xml[versionRange].trimmingCharacters(in: .whitespacesAndNewlines)
-        return version.isEmpty ? nil : version
+        return versions.max { lhs, rhs in
+            lhs.compare(rhs, options: .numeric) == .orderedAscending
+        }
     }
 }
 
@@ -143,7 +147,10 @@ private extension SparkleUpdater {
         }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: feedURL)
+            var request = URLRequest(url: feedURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
+            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+            request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+            let (data, _) = try await URLSession.shared.data(for: request)
             guard let xml = String(data: data, encoding: .utf8) else {
                 return nil
             }

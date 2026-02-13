@@ -2,12 +2,15 @@ import XCTest
 @testable import Oak
 
 internal final class AppcastVersionParserTests: XCTestCase {
-    func testParsesFirstShortVersionStringAsLatest() {
+    func testParsesHighestShortVersionStringAsLatest() {
         let appcast = """
         <rss>
           <channel>
             <item>
               <sparkle:shortVersionString>0.4.3</sparkle:shortVersionString>
+            </item>
+            <item>
+              <sparkle:shortVersionString>0.4.10</sparkle:shortVersionString>
             </item>
             <item>
               <sparkle:shortVersionString>0.4.1</sparkle:shortVersionString>
@@ -18,7 +21,7 @@ internal final class AppcastVersionParserTests: XCTestCase {
 
         let version = AppcastVersionParser.latestShortVersion(in: appcast)
 
-        XCTAssertEqual(version, "0.4.3")
+        XCTAssertEqual(version, "0.4.10")
     }
 
     func testReturnsNilWhenVersionIsMissing() {
