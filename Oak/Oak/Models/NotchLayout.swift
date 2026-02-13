@@ -8,8 +8,8 @@ internal enum NotchLayout {
     static let height: CGFloat = 33
 
     /// Width of the collapsed notch window
-    static let collapsedWidth: CGFloat = 144
+    static let collapsedWidth: CGFloat = 100
 
     /// Width of the expanded notch window
-    static let expandedWidth: CGFloat = 372
+    static let expandedWidth: CGFloat = 320
 }

@@ -19,6 +19,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var mainDisplayID: UInt32?
     @Published private(set) var notchedDisplayID: UInt32?
     @Published private(set) var playSoundOnSessionCompletion: Bool
+    @Published private(set) var countdownDisplayMode: CountdownDisplayMode
 
     private let userDefaults: UserDefaults
 
@@ -31,6 +32,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let mainDisplayID = "display.main.id"
         static let notchedDisplayID = "display.notched.id"
         static let playSoundOnSessionCompletion = "session.completion.playSound"
+        static let countdownDisplayMode = "countdown.displayMode"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -42,7 +44,8 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.longWorkMinutes: Preset.long.defaultWorkMinutes,
             Keys.longBreakMinutes: Preset.long.defaultBreakMinutes,
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
-            Keys.playSoundOnSessionCompletion: true
+            Keys.playSoundOnSessionCompletion: true,
+            Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue
         ]
         userDefaults.register(defaults: defaults)
 
@@ -55,6 +58,9 @@ internal final class PresetSettingsStore: ObservableObject {
         mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
         notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
         playSoundOnSessionCompletion = userDefaults.bool(forKey: Keys.playSoundOnSessionCompletion)
+        let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode)
+            ?? CountdownDisplayMode.number.rawValue
+        countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
         ensureDisplayIDsInitialized()
     }
 
@@ -117,12 +123,19 @@ internal final class PresetSettingsStore: ObservableObject {
         setBreakMinutes(Preset.long.defaultBreakMinutes, for: .long)
         setDisplayTarget(.mainDisplay, screenID: nil)
         setPlaySoundOnSessionCompletion(true)
+        setCountdownDisplayMode(.number)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {
         guard playSoundOnSessionCompletion != value else { return }
         playSoundOnSessionCompletion = value
         userDefaults.set(value, forKey: Keys.playSoundOnSessionCompletion)
+    }
+
+    func setCountdownDisplayMode(_ mode: CountdownDisplayMode) {
+        guard countdownDisplayMode != mode else { return }
+        countdownDisplayMode = mode
+        userDefaults.set(mode.rawValue, forKey: Keys.countdownDisplayMode)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {

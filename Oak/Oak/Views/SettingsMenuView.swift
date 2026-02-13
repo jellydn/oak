@@ -5,6 +5,7 @@ internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
     @ObservedObject var notificationService: NotificationService
     @State private var selectedDisplayTarget: DisplayTarget
+    @State private var selectedCountdownDisplayMode: CountdownDisplayMode
 
     init(
         presetSettings: PresetSettingsStore,
@@ -13,6 +14,7 @@ internal struct SettingsMenuView: View {
         self.presetSettings = presetSettings
         self.notificationService = notificationService
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
+        _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
     }
 
     public var body: some View {
@@ -21,6 +23,7 @@ internal struct SettingsMenuView: View {
 
             VStack(spacing: 10) {
                 displayTargetPicker
+                countdownDisplayModePicker
                 presetEditor(title: "Preset A", preset: .short)
                 presetEditor(title: "Preset B", preset: .long)
                 notificationSettings
@@ -129,11 +132,36 @@ internal struct SettingsMenuView: View {
             .labelsHidden()
             .onChange(of: selectedDisplayTarget) { newValue in
                 guard presetSettings.displayTarget != newValue else { return }
-                presetSettings.setDisplayTarget(newValue)
+                DispatchQueue.main.async {
+                    presetSettings.setDisplayTarget(newValue)
+                }
             }
             .onChange(of: presetSettings.displayTarget) { newValue in
                 guard selectedDisplayTarget != newValue else { return }
                 selectedDisplayTarget = newValue
+            }
+        }
+        .padding(8)
+        .background(Color.primary.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var countdownDisplayModePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Countdown Display")
+                .font(.system(size: 11, weight: .semibold))
+
+            Picker("Countdown display mode", selection: countdownDisplayModeBinding) {
+                ForEach(CountdownDisplayMode.allCases, id: \.rawValue) { mode in
+                    Text(mode.displayName)
+                        .tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .onChange(of: presetSettings.countdownDisplayMode) { newValue in
+                guard selectedCountdownDisplayMode != newValue else { return }
+                selectedCountdownDisplayMode = newValue
             }
         }
         .padding(8)
@@ -203,6 +231,18 @@ internal struct SettingsMenuView: View {
         Binding(
             get: { selectedDisplayTarget },
             set: { selectedDisplayTarget = $0 }
+        )
+    }
+
+    private var countdownDisplayModeBinding: Binding<CountdownDisplayMode> {
+        Binding(
+            get: { selectedCountdownDisplayMode },
+            set: { newValue in
+                selectedCountdownDisplayMode = newValue
+                DispatchQueue.main.async {
+                    presetSettings.setCountdownDisplayMode(newValue)
+                }
+            }
         )
     }
 
