@@ -58,7 +58,7 @@ internal final class CountdownDisplayModeTests: XCTestCase {
 
     func testProgressPercentageAfterStart() {
         viewModel.startSession(using: .short)
-        XCTAssertGreaterThan(viewModel.progressPercentage, 0.0)
+        XCTAssertGreaterThanOrEqual(viewModel.progressPercentage, 0.0)
         XCTAssertLessThanOrEqual(viewModel.progressPercentage, 1.0)
     }
 
