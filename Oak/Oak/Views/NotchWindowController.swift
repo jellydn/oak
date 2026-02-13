@@ -5,19 +5,17 @@ import SwiftUI
 
 internal extension NSScreen {
     static func screenWithNotch() -> NSScreen? {
-        // Prefer main screen if it has a notch.
+        // Default to the current main screen.
         if let mainScreen = NSScreen.main {
-            if mainScreen.auxiliaryTopLeftArea != nil {
-                return mainScreen
-            }
+            return mainScreen
         }
 
-        // Check other screens for notch
+        // Fallback to any notched screen if main is unavailable.
         for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
             return screen
         }
 
-        return NSScreen.main ?? NSScreen.screens.first
+        return NSScreen.screens.first
     }
 }
 
@@ -71,23 +69,22 @@ internal class NotchWindowController: NSWindowController {
     }
 
     @objc private func screenConfigurationChanged() {
-        setExpanded(lastExpandedState)
+        setExpanded(lastExpandedState, forceReposition: true)
     }
 
     func handleExpansionChange(_ expanded: Bool) {
         setExpanded(expanded)
     }
 
-    private func setExpanded(_ expanded: Bool) {
+    private func setExpanded(_ expanded: Bool, forceReposition: Bool = false) {
         guard let window else { return }
-        guard lastExpandedState != expanded else { return }
+        guard forceReposition || lastExpandedState != expanded else { return }
         lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
-        let screen = NSScreen.screenWithNotch()
-        let screenFrame = screen?.frame ?? .zero
-        let yPosition = screenFrame.height - notchHeight
-        let xPosition = (screenFrame.width - targetWidth) / 2
+        let screenFrame = NSScreen.screenWithNotch()?.frame ?? .zero
+        let yPosition = screenFrame.maxY - notchHeight
+        let xPosition = screenFrame.midX - (targetWidth / 2)
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
         DispatchQueue.main.async {
@@ -100,12 +97,11 @@ internal class NotchWindowController: NSWindowController {
 
 internal class NotchWindow: NSPanel {
     init(width: CGFloat, height: CGFloat) {
-        let screen = NSScreen.screenWithNotch()
-        let screenFrame = screen?.frame ?? .zero
-        let xPosition = (screenFrame.width - width) / 2
+        let screenFrame = NSScreen.screenWithNotch()?.frame ?? .zero
+        let xPosition = screenFrame.midX - (width / 2)
 
         super.init(
-            contentRect: NSRect(x: xPosition, y: screenFrame.height - height, width: width, height: height),
+            contentRect: NSRect(x: xPosition, y: screenFrame.maxY - height, width: width, height: height),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
