@@ -107,7 +107,7 @@ internal class FocusSessionViewModel: ObservableObject {
             guard sessionStartSeconds > 0 else { return 0.0 }
             return Double(sessionStartSeconds - remaining) / Double(sessionStartSeconds)
         case .completed:
-            return 1.0
+            return 0.0
         }
     }
 
