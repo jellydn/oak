@@ -26,6 +26,23 @@ internal final class LongBreakTests: XCTestCase {
         }
     }
 
+    // MARK: - Helper Methods
+
+    private func completeFourWorkSessions() {
+        for round in 1 ... 4 {
+            if round == 1 {
+                viewModel.startSession()
+            } else {
+                viewModel.startNextSession()
+            }
+            viewModel.completeSessionForTesting()
+            if round < 4 {
+                viewModel.startNextSession()
+                viewModel.completeSessionForTesting()
+            }
+        }
+    }
+
     func testLongBreakDurationsAreConfigured() {
         // Verify long break durations are defined
         XCTAssertEqual(Preset.short.longBreakDuration, 15 * 60, "Short preset long break should be 15 minutes")
@@ -66,7 +83,7 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 3 work sessions and verify short breaks
-        for round in 1...3 {
+        for round in 1 ... 3 {
             // Start work session
             if round == 1 {
                 viewModel.startSession()
@@ -98,22 +115,7 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions
-        for round in 1...4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-            XCTAssertEqual(viewModel.completedRounds, round)
-
-            // Complete break if not the 4th round
-            if round < 4 {
-                viewModel.startNextSession()
-                XCTAssertEqual(viewModel.currentSessionType, "Break", "Should show 'Break' for short breaks")
-                viewModel.completeSessionForTesting()
-            }
-        }
+        completeFourWorkSessions()
 
         // After 4th work session, verify UI shows "Long Break"
         XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' label after 4th round")
@@ -138,20 +140,7 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions
-        for round in 1...4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-
-            // Complete break after rounds 1-3
-            if round < 4 {
-                viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
-            }
-        }
+        completeFourWorkSessions()
 
         XCTAssertEqual(viewModel.completedRounds, 4, "Should have 4 completed rounds")
 
@@ -168,23 +157,11 @@ internal final class LongBreakTests: XCTestCase {
         XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
     }
 
-    func testRoundsPreservedIfLongBreakCancelled() {
+    func testRoundsResetWhenLongBreakCancelled() {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions to trigger long break
-        for round in 1...4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-
-            if round < 4 {
-                viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
-            }
-        }
+        completeFourWorkSessions()
 
         XCTAssertEqual(viewModel.completedRounds, 4)
 
@@ -230,20 +207,7 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions
-        for round in 1...4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-
-            // Complete break after rounds 1-3
-            if round < 4 {
-                viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
-            }
-        }
+        completeFourWorkSessions()
 
         // After 4th work session completion, display time should show long break duration
         XCTAssertEqual(viewModel.displayTime, "15:00", "Should display 15 minute long break time")
@@ -253,19 +217,7 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .long
 
         // Complete 4 work sessions
-        for round in 1...4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-
-            if round < 4 {
-                viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
-            }
-        }
+        completeFourWorkSessions()
 
         // After 4th work session, next break should be long (20 minutes for long preset)
         XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' label")
@@ -291,20 +243,7 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.selectedPreset = .short
 
         // Complete 4 work sessions to reach long break
-        for round in 1...4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-
-            // Complete break after rounds 1-3
-            if round < 4 {
-                viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
-            }
-        }
+        completeFourWorkSessions()
 
         // Verify label shows "Long Break" in completed state
         XCTAssertEqual(viewModel.currentSessionType, "Long Break")
