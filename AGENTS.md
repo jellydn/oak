@@ -6,6 +6,7 @@ Oak is a lightweight macOS focus companion app with notch-based Pomodoro-style f
 
 **Stack**: Swift 5.9+, SwiftUI, AVFoundation | **Platform**: macOS 13+ (Apple Silicon)
 **Architecture**: MVVM with `@MainActor` for UI layer
+**Project Configuration**: XcodeGen (`project.yml`) - The Xcode project is generated from `project.yml`, not Swift Package Manager
 
 ---
 
