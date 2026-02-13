@@ -101,4 +101,40 @@ internal final class US004Tests: XCTestCase {
         viewModel.cleanup()
         XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should stop after cleanup")
     }
+
+    func testDisplayTargetDefaultsToMainDisplay() {
+        XCTAssertEqual(presetSettings.displayTarget, .mainDisplay)
+    }
+
+    func testDisplayTargetIsPersisted() {
+        presetSettings.setDisplayTarget(.notchedDisplay)
+
+        guard let reloadedDefaults = UserDefaults(suiteName: presetSuiteName) else {
+            XCTFail("Failed to create UserDefaults with suite name")
+            return
+        }
+        let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults)
+        XCTAssertEqual(reloadedStore.displayTarget, .notchedDisplay)
+    }
+
+    func testResetToDefaultRestoresMainDisplayTarget() {
+        presetSettings.setDisplayTarget(.notchedDisplay)
+
+        presetSettings.resetToDefault()
+
+        XCTAssertEqual(presetSettings.displayTarget, .mainDisplay)
+    }
+
+    func testSwitchingTargetWithoutScreenIDPreservesStoredDisplayIDs() {
+        let initialMainID = presetSettings.mainDisplayID
+        let initialNotchedID = presetSettings.notchedDisplayID
+
+        presetSettings.setDisplayTarget(.notchedDisplay)
+        XCTAssertEqual(presetSettings.mainDisplayID, initialMainID)
+        XCTAssertEqual(presetSettings.notchedDisplayID, initialNotchedID)
+
+        presetSettings.setDisplayTarget(.mainDisplay)
+        XCTAssertEqual(presetSettings.mainDisplayID, initialMainID)
+        XCTAssertEqual(presetSettings.notchedDisplayID, initialNotchedID)
+    }
 }

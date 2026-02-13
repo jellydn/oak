@@ -40,3 +40,17 @@ internal enum Preset: CaseIterable {
         }
     }
 }
+
+internal enum DisplayTarget: String, CaseIterable, Identifiable {
+    case mainDisplay
+    case notchedDisplay
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .mainDisplay: return "Main display"
+        case .notchedDisplay: return "Notched display"
+        }
+    }
+}

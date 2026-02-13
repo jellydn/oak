@@ -2,6 +2,12 @@ import SwiftUI
 
 internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
+    @State private var selectedDisplayTarget: DisplayTarget
+
+    init(presetSettings: PresetSettingsStore) {
+        self.presetSettings = presetSettings
+        _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
+    }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -9,6 +15,7 @@ internal struct SettingsMenuView: View {
                 .font(.headline)
 
             VStack(spacing: 10) {
+                displayTargetPicker
                 presetEditor(title: "Preset A", preset: .short)
                 presetEditor(title: "Preset B", preset: .long)
             }
@@ -73,6 +80,38 @@ internal struct SettingsMenuView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
+    private var displayTargetPicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Display")
+                .font(.system(size: 11, weight: .semibold))
+
+            Picker("Display target", selection: displayTargetBinding) {
+                ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
+                    Text(
+                        NSScreen.displayName(
+                            for: target,
+                            preferredDisplayID: presetSettings.preferredDisplayID(for: target)
+                        )
+                    )
+                        .tag(target)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .onChange(of: selectedDisplayTarget) { newValue in
+                guard presetSettings.displayTarget != newValue else { return }
+                presetSettings.setDisplayTarget(newValue)
+            }
+            .onChange(of: presetSettings.displayTarget) { newValue in
+                guard selectedDisplayTarget != newValue else { return }
+                selectedDisplayTarget = newValue
+            }
+        }
+        .padding(8)
+        .background(Color.primary.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
     private func workMinutesBinding(for preset: Preset) -> Binding<Int> {
         Binding(
             get: { presetSettings.workMinutes(for: preset) },
@@ -84,6 +123,13 @@ internal struct SettingsMenuView: View {
         Binding(
             get: { presetSettings.breakMinutes(for: preset) },
             set: { presetSettings.setBreakMinutes($0, for: preset) }
+        )
+    }
+
+    private var displayTargetBinding: Binding<DisplayTarget> {
+        Binding(
+            get: { selectedDisplayTarget },
+            set: { selectedDisplayTarget = $0 }
         )
     }
 

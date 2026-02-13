@@ -1,23 +1,6 @@
 import AppKit
+import Combine
 import SwiftUI
-
-// MARK: - Screen Detection Helper
-
-internal extension NSScreen {
-    static func screenWithNotch() -> NSScreen? {
-        // Default to the current main screen.
-        if let mainScreen = NSScreen.main {
-            return mainScreen
-        }
-
-        // Fallback to any notched screen if main is unavailable.
-        for screen in NSScreen.screens where screen.auxiliaryTopLeftArea != nil {
-            return screen
-        }
-
-        return NSScreen.screens.first
-    }
-}
 
 // MARK: - NotchWindowController
 
@@ -28,6 +11,8 @@ internal class NotchWindowController: NSWindowController {
     private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool = false
     private let viewModel: FocusSessionViewModel
+    private let presetSettings: PresetSettingsStore
+    private var displayTargetCancellable: AnyCancellable?
 
     convenience init() {
         self.init(presetSettings: nil)
@@ -35,9 +20,15 @@ internal class NotchWindowController: NSWindowController {
 
     init(presetSettings: PresetSettingsStore?) {
         let settings = presetSettings ?? PresetSettingsStore.shared
+        self.presetSettings = settings
         viewModel = FocusSessionViewModel(presetSettings: settings)
 
-        let window = NotchWindow(width: 144, height: 33)
+        let window = NotchWindow(
+            width: 144,
+            height: 33,
+            displayTarget: settings.displayTarget,
+            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
+        )
         super.init(window: window)
 
         let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
@@ -53,6 +44,12 @@ internal class NotchWindowController: NSWindowController {
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
+
+        displayTargetCancellable = settings.$displayTarget
+            .sink { [weak self] nextTarget in
+                guard let self else { return }
+                self.setExpanded(lastExpandedState, forceReposition: true, targetOverride: nextTarget)
+            }
     }
 
     @available(*, unavailable)
@@ -62,6 +59,7 @@ internal class NotchWindowController: NSWindowController {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        displayTargetCancellable?.cancel()
     }
 
     func cleanup() {
@@ -76,28 +74,36 @@ internal class NotchWindowController: NSWindowController {
         setExpanded(expanded)
     }
 
-    private func setExpanded(_ expanded: Bool, forceReposition: Bool = false) {
+    private func setExpanded(
+        _ expanded: Bool,
+        forceReposition: Bool = false,
+        targetOverride: DisplayTarget? = nil
+    ) {
         guard let window else { return }
         guard forceReposition || lastExpandedState != expanded else { return }
         lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
-        let screenFrame = NSScreen.screenWithNotch()?.frame ?? .zero
+        let activeTarget = targetOverride ?? presetSettings.displayTarget
+        let preferredDisplayID = presetSettings.preferredDisplayID(for: activeTarget)
+        let resolvedScreen = NSScreen.screen(
+            for: activeTarget,
+            preferredDisplayID: preferredDisplayID
+        )
+        let screenFrame = resolvedScreen?.frame ?? .zero
         let yPosition = screenFrame.maxY - notchHeight
         let xPosition = screenFrame.midX - (targetWidth / 2)
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
-        DispatchQueue.main.async {
-            window.setFrame(newFrame, display: true, animate: false)
-        }
+        window.setFrame(newFrame, display: true, animate: false)
     }
 }
 
 // MARK: - NotchWindow
 
 internal class NotchWindow: NSPanel {
-    init(width: CGFloat, height: CGFloat) {
-        let screenFrame = NSScreen.screenWithNotch()?.frame ?? .zero
+    init(width: CGFloat, height: CGFloat, displayTarget: DisplayTarget, preferredDisplayID: CGDirectDisplayID?) {
+        let screenFrame = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
 
         super.init(
