@@ -23,7 +23,6 @@ final class UpdateCheckerTests: XCTestCase {
     // MARK: - Rate Limit Tests
     
     func testHandles403RateLimitResponse() async throws {
-        // Create mock session that returns 403
         let mockSession = MockURLSession(statusCode: 403, data: Data())
         let checker = UpdateChecker(
             repositoryOwner: "test",
@@ -32,24 +31,20 @@ final class UpdateCheckerTests: XCTestCase {
             session: mockSession
         )
         
-        // Create expectation for async call
         let expectation = self.expectation(description: "Update check completes")
         
         Task {
             checker.checkForUpdatesOnLaunch()
-            // Give it time to complete
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            try? await Task.sleep(nanoseconds: 100_000_000)
             expectation.fulfill()
         }
         
         await fulfillment(of: [expectation], timeout: 2.0)
         
-        // Verify no prompt was shown (no userDefaults were set)
         XCTAssertNil(userDefaults.string(forKey: "oak.lastPromptedUpdateVersion"))
     }
     
     func testHandles429RateLimitResponse() async throws {
-        // Create mock session that returns 429
         let mockSession = MockURLSession(statusCode: 429, data: Data())
         let checker = UpdateChecker(
             repositoryOwner: "test",
@@ -58,28 +53,22 @@ final class UpdateCheckerTests: XCTestCase {
             session: mockSession
         )
         
-        // Create expectation for async call
         let expectation = self.expectation(description: "Update check completes")
         
         Task {
             checker.checkForUpdatesOnLaunch()
-            // Give it time to complete
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            try? await Task.sleep(nanoseconds: 100_000_000)
             expectation.fulfill()
         }
         
         await fulfillment(of: [expectation], timeout: 2.0)
         
-        // Verify no prompt was shown (no userDefaults were set)
         XCTAssertNil(userDefaults.string(forKey: "oak.lastPromptedUpdateVersion"))
     }
     
     // MARK: - URL Validation Tests
-    // Note: These tests verify host validation only. Scheme (http vs https) is not validated
-    // as GitHub API responses always use HTTPS URLs.
     
     func testValidatesGitHubURL() {
-        // Valid github.com URLs with exact hostname matching
         let validURLs = [
             URL(string: "https://github.com/jellydn/oak/releases/tag/v1.0.0")!,
             URL(string: "https://api.github.com/repos/jellydn/oak/releases")!,
@@ -96,13 +85,12 @@ final class UpdateCheckerTests: XCTestCase {
     }
     
     func testRejectsMaliciousURLs() {
-        // Invalid URLs that should be rejected (non-GitHub hosts)
         let invalidURLs = [
             URL(string: "https://evil.com/releases")!,
             URL(string: "https://github.com.evil.com/releases")!,
             URL(string: "https://notgithub.com/releases")!,
-            URL(string: "https://evilgithub.com/releases")!,  // Subdomain spoofing attempt
-            URL(string: "https://mygithub.com/releases")!     // Domain ending in github.com
+            URL(string: "https://evilgithub.com/releases")!,
+            URL(string: "https://mygithub.com/releases")!
         ]
         
         for url in invalidURLs {

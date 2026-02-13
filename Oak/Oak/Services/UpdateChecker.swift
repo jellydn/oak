@@ -55,7 +55,6 @@ final class UpdateChecker: UpdateChecking {
                 return
             }
             
-            // Handle rate limiting
             if httpResponse.statusCode == 403 || httpResponse.statusCode == 429 {
                 logger.info("GitHub API rate limited, skipping update check")
                 return
@@ -117,7 +116,6 @@ final class UpdateChecker: UpdateChecking {
         userDefaults.set(Date(), forKey: lastPromptedAtKey)
 
         if response == .alertFirstButtonReturn {
-            // Validate URL host to prevent MITM attacks
             guard let host = releaseURL.host,
                   host == "github.com" ||
                   host == "api.github.com" ||
