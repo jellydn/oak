@@ -132,7 +132,9 @@ internal struct SettingsMenuView: View {
             .labelsHidden()
             .onChange(of: selectedDisplayTarget) { newValue in
                 guard presetSettings.displayTarget != newValue else { return }
-                presetSettings.setDisplayTarget(newValue)
+                DispatchQueue.main.async {
+                    presetSettings.setDisplayTarget(newValue)
+                }
             }
             .onChange(of: presetSettings.displayTarget) { newValue in
                 guard selectedDisplayTarget != newValue else { return }
@@ -237,7 +239,9 @@ internal struct SettingsMenuView: View {
             get: { selectedCountdownDisplayMode },
             set: { newValue in
                 selectedCountdownDisplayMode = newValue
-                presetSettings.setCountdownDisplayMode(newValue)
+                DispatchQueue.main.async {
+                    presetSettings.setCountdownDisplayMode(newValue)
+                }
             }
         )
     }
