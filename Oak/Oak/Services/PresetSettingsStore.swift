@@ -1,4 +1,6 @@
 import SwiftUI
+import CoreGraphics
+import AppKit
 
 @MainActor
 internal final class PresetSettingsStore: ObservableObject {
@@ -14,6 +16,8 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var longWorkMinutes: Int
     @Published private(set) var longBreakMinutes: Int
     @Published private(set) var displayTarget: DisplayTarget
+    @Published private(set) var mainDisplayID: UInt32?
+    @Published private(set) var notchedDisplayID: UInt32?
 
     private let userDefaults: UserDefaults
 
@@ -23,6 +27,8 @@ internal final class PresetSettingsStore: ObservableObject {
         static let longWorkMinutes = "preset.long.workMinutes"
         static let longBreakMinutes = "preset.long.breakMinutes"
         static let displayTarget = "display.target"
+        static let mainDisplayID = "display.main.id"
+        static let notchedDisplayID = "display.notched.id"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -43,6 +49,9 @@ internal final class PresetSettingsStore: ObservableObject {
         longBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.longBreakMinutes))
         let rawDisplayTarget = userDefaults.string(forKey: Keys.displayTarget) ?? DisplayTarget.mainDisplay.rawValue
         displayTarget = DisplayTarget(rawValue: rawDisplayTarget) ?? .mainDisplay
+        mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
+        notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
+        ensureDisplayIDsInitialized()
     }
 
     func workDuration(for preset: Preset) -> Int {
@@ -102,13 +111,75 @@ internal final class PresetSettingsStore: ObservableObject {
         setBreakMinutes(Preset.short.defaultBreakMinutes, for: .short)
         setWorkMinutes(Preset.long.defaultWorkMinutes, for: .long)
         setBreakMinutes(Preset.long.defaultBreakMinutes, for: .long)
-        setDisplayTarget(.mainDisplay)
+        setDisplayTarget(.mainDisplay, screenID: nil)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {
-        guard displayTarget != target else { return }
-        displayTarget = target
-        userDefaults.set(target.rawValue, forKey: Keys.displayTarget)
+        setDisplayTarget(target, screenID: nil)
+    }
+
+    func setDisplayTarget(_ target: DisplayTarget, screenID: CGDirectDisplayID?) {
+        ensureDisplayIDsInitialized()
+        let normalizedID = screenID.map { UInt32($0) }
+        var didChangeStoredID = false
+
+        switch target {
+        case .mainDisplay:
+            if let normalizedID, mainDisplayID != normalizedID {
+                mainDisplayID = normalizedID
+                didChangeStoredID = true
+                userDefaults.set(normalizedID, forKey: Keys.mainDisplayID)
+            }
+        case .notchedDisplay:
+            if let normalizedID, notchedDisplayID != normalizedID {
+                notchedDisplayID = normalizedID
+                didChangeStoredID = true
+                userDefaults.set(normalizedID, forKey: Keys.notchedDisplayID)
+            }
+        }
+
+        if displayTarget != target {
+            displayTarget = target
+            userDefaults.set(target.rawValue, forKey: Keys.displayTarget)
+            return
+        }
+
+        if didChangeStoredID {
+            // Re-emit to notify subscribers that target screen mapping changed.
+            displayTarget = target
+        }
+    }
+
+    func preferredDisplayID(for target: DisplayTarget) -> CGDirectDisplayID? {
+        ensureDisplayIDsInitialized()
+        switch target {
+        case .mainDisplay:
+            return mainDisplayID.map { CGDirectDisplayID($0) }
+        case .notchedDisplay:
+            return notchedDisplayID.map { CGDirectDisplayID($0) }
+        }
+    }
+
+    private func ensureDisplayIDsInitialized() {
+        let allDisplayIDs = NSScreen.screens.compactMap { NSScreen.displayID(for: $0) }
+        guard !allDisplayIDs.isEmpty else { return }
+
+        let primaryID = CGMainDisplayID()
+        let resolvedPrimaryID = allDisplayIDs.first { $0 == primaryID } ?? allDisplayIDs[0]
+
+        if mainDisplayID == nil {
+            let value = UInt32(resolvedPrimaryID)
+            mainDisplayID = value
+            userDefaults.set(value, forKey: Keys.mainDisplayID)
+        }
+
+        if notchedDisplayID == nil {
+            let secondaryID = allDisplayIDs.first { $0 != resolvedPrimaryID } ?? resolvedPrimaryID
+            let value = UInt32(secondaryID)
+            notchedDisplayID = value
+            userDefaults.set(value, forKey: Keys.notchedDisplayID)
+        }
+
     }
 
     private static func validatedWorkMinutes(_ value: Int) -> Int {

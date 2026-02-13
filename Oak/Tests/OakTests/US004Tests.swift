@@ -124,4 +124,17 @@ internal final class US004Tests: XCTestCase {
 
         XCTAssertEqual(presetSettings.displayTarget, .mainDisplay)
     }
+
+    func testSwitchingTargetWithoutScreenIDPreservesStoredDisplayIDs() {
+        let initialMainID = presetSettings.mainDisplayID
+        let initialNotchedID = presetSettings.notchedDisplayID
+
+        presetSettings.setDisplayTarget(.notchedDisplay)
+        XCTAssertEqual(presetSettings.mainDisplayID, initialMainID)
+        XCTAssertEqual(presetSettings.notchedDisplayID, initialNotchedID)
+
+        presetSettings.setDisplayTarget(.mainDisplay)
+        XCTAssertEqual(presetSettings.mainDisplayID, initialMainID)
+        XCTAssertEqual(presetSettings.notchedDisplayID, initialNotchedID)
+    }
 }

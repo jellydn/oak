@@ -23,7 +23,12 @@ internal class NotchWindowController: NSWindowController {
         self.presetSettings = settings
         viewModel = FocusSessionViewModel(presetSettings: settings)
 
-        let window = NotchWindow(width: 144, height: 33, displayTarget: settings.displayTarget)
+        let window = NotchWindow(
+            width: 144,
+            height: 33,
+            displayTarget: settings.displayTarget,
+            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
+        )
         super.init(window: window)
 
         let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
@@ -41,9 +46,9 @@ internal class NotchWindowController: NSWindowController {
         )
 
         displayTargetCancellable = settings.$displayTarget
-            .removeDuplicates()
-            .sink { [weak self] _ in
-                self?.setExpanded(self?.lastExpandedState ?? false, forceReposition: true)
+            .sink { [weak self] nextTarget in
+                guard let self else { return }
+                self.setExpanded(lastExpandedState, forceReposition: true, targetOverride: nextTarget)
             }
     }
 
@@ -69,28 +74,36 @@ internal class NotchWindowController: NSWindowController {
         setExpanded(expanded)
     }
 
-    private func setExpanded(_ expanded: Bool, forceReposition: Bool = false) {
+    private func setExpanded(
+        _ expanded: Bool,
+        forceReposition: Bool = false,
+        targetOverride: DisplayTarget? = nil
+    ) {
         guard let window else { return }
         guard forceReposition || lastExpandedState != expanded else { return }
         lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
-        let screenFrame = NSScreen.screen(for: presetSettings.displayTarget)?.frame ?? .zero
+        let activeTarget = targetOverride ?? presetSettings.displayTarget
+        let preferredDisplayID = presetSettings.preferredDisplayID(for: activeTarget)
+        let resolvedScreen = NSScreen.screen(
+            for: activeTarget,
+            preferredDisplayID: preferredDisplayID
+        )
+        let screenFrame = resolvedScreen?.frame ?? .zero
         let yPosition = screenFrame.maxY - notchHeight
         let xPosition = screenFrame.midX - (targetWidth / 2)
         let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
-        DispatchQueue.main.async {
-            window.setFrame(newFrame, display: true, animate: false)
-        }
+        window.setFrame(newFrame, display: true, animate: false)
     }
 }
 
 // MARK: - NotchWindow
 
 internal class NotchWindow: NSPanel {
-    init(width: CGFloat, height: CGFloat, displayTarget: DisplayTarget) {
-        let screenFrame = NSScreen.screen(for: displayTarget)?.frame ?? .zero
+    init(width: CGFloat, height: CGFloat, displayTarget: DisplayTarget, preferredDisplayID: CGDirectDisplayID?) {
+        let screenFrame = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
 
         super.init(

@@ -2,6 +2,12 @@ import SwiftUI
 
 internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
+    @State private var selectedDisplayTarget: DisplayTarget
+
+    init(presetSettings: PresetSettingsStore) {
+        self.presetSettings = presetSettings
+        _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
+    }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -81,11 +87,25 @@ internal struct SettingsMenuView: View {
 
             Picker("Display target", selection: displayTargetBinding) {
                 ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
-                    Text(target.displayName).tag(target)
+                    Text(
+                        NSScreen.displayName(
+                            for: target,
+                            preferredDisplayID: presetSettings.preferredDisplayID(for: target)
+                        )
+                    )
+                        .tag(target)
                 }
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .onChange(of: selectedDisplayTarget) { newValue in
+                guard presetSettings.displayTarget != newValue else { return }
+                presetSettings.setDisplayTarget(newValue)
+            }
+            .onChange(of: presetSettings.displayTarget) { newValue in
+                guard selectedDisplayTarget != newValue else { return }
+                selectedDisplayTarget = newValue
+            }
         }
         .padding(8)
         .background(Color.primary.opacity(0.04))
@@ -108,8 +128,8 @@ internal struct SettingsMenuView: View {
 
     private var displayTargetBinding: Binding<DisplayTarget> {
         Binding(
-            get: { presetSettings.displayTarget },
-            set: { presetSettings.setDisplayTarget($0) }
+            get: { selectedDisplayTarget },
+            set: { selectedDisplayTarget = $0 }
         )
     }
 
