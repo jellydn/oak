@@ -110,12 +110,18 @@ internal final class LongBreakTests: XCTestCase {
             // Complete break if not the 4th round
             if round < 4 {
                 viewModel.startNextSession()
+                XCTAssertEqual(viewModel.currentSessionType, "Break", "Should show 'Break' for short breaks")
                 viewModel.completeSessionForTesting()
             }
         }
 
-        // After 4th work session, next break should be long
+        // After 4th work session, verify UI shows "Long Break"
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' label after 4th round")
+
+        // Next break should be long
         viewModel.startNextSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' during long break session")
+
         if case let .running(remaining, isWork) = viewModel.sessionState {
             XCTAssertFalse(isWork, "Should be a break session")
             XCTAssertEqual(
@@ -215,7 +221,11 @@ internal final class LongBreakTests: XCTestCase {
         }
 
         // After 4th work session, next break should be long (20 minutes for long preset)
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' label")
+
         viewModel.startNextSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' during long break")
+
         if case let .running(remaining, isWork) = viewModel.sessionState {
             XCTAssertFalse(isWork, "Should be a break session")
             XCTAssertEqual(
@@ -228,5 +238,30 @@ internal final class LongBreakTests: XCTestCase {
         }
 
         XCTAssertEqual(viewModel.displayTime, "20:00", "Should display 20 minute long break time for long preset")
+    }
+
+    func testCurrentSessionTypeDuringLongBreak() {
+        viewModel.selectedPreset = .short
+
+        // Complete 4 work sessions to reach long break
+        for _ in 1...4 {
+            viewModel.startSession()
+            viewModel.completeSessionForTesting()
+        }
+
+        // Verify label shows "Long Break" in completed state
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
+
+        // Start the long break and verify label during running state
+        viewModel.startNextSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' while running")
+
+        // Pause and verify label during paused state
+        viewModel.pauseSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' while paused")
+
+        // Resume and verify label
+        viewModel.resumeSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' after resume")
     }
 }

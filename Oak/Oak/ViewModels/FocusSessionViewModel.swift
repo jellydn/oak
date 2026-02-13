@@ -138,9 +138,27 @@ internal class FocusSessionViewModel: ObservableObject {
         case .idle:
             return "Ready"
         case let .running(_, isWork), let .paused(_, isWork):
-            return isWork ? "Focus" : "Break"
+            if isWork {
+                return "Focus"
+            } else {
+                // Check if this is a long break by looking at the duration
+                if currentRemainingSeconds > presetSettings.breakDuration(for: selectedPreset) {
+                    return "Long Break"
+                } else {
+                    return "Break"
+                }
+            }
         case let .completed(isWorkSession):
-            return isWorkSession ? "Break" : "Focus"
+            if isWorkSession {
+                // Work session completed, show what's next
+                if completedRounds >= roundsBeforeLongBreak {
+                    return "Long Break"
+                } else {
+                    return "Break"
+                }
+            } else {
+                return "Focus"
+            }
         }
     }
 
