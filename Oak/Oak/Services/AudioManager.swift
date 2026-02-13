@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import os
 
 @MainActor
 class AudioManager: ObservableObject {
@@ -15,6 +16,7 @@ class AudioManager: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var audioEngine: AVAudioEngine?
     private var audioNodes: [AVAudioNode] = []
+    private let logger = Logger(subsystem: "com.oak.app", category: "AudioManager")
 
     func play(track: AudioTrack) {
         guard track != .none else {
@@ -27,7 +29,7 @@ class AudioManager: ObservableObject {
                 try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
                 try AVAudioSession.sharedInstance().setActive(true)
             } catch {
-                print("Failed to set up audio session: \(error)")
+                logger.error("Failed to set up audio session: \(error.localizedDescription, privacy: .public)")
             }
         #endif
 
@@ -102,7 +104,7 @@ class AudioManager: ObservableObject {
             isPlaying = true
             selectedTrack = track
         } catch {
-            print("Failed to start audio engine: \(error)")
+            logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")
         }
     }
 
