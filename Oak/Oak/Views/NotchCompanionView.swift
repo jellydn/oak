@@ -9,6 +9,7 @@ internal struct NotchCompanionView: View {
     @State private var showProgressMenu = false
     @State private var showSettingsMenu = false
     @State private var animateCompletion: Bool = false
+    @State private var showConfetti: Bool = false
     @State private var isExpandedByToggle = false
     @State private var lastReportedExpansion: Bool?
     @State private var presetSelection: Preset = .short
@@ -83,6 +84,11 @@ internal struct NotchCompanionView: View {
             .padding(.vertical, verticalPadding)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
+            
+            if showConfetti {
+                ConfettiView()
+                    .allowsHitTesting(false)
+            }
         }
         .frame(height: notchHeight)
         .contentShape(Rectangle())
@@ -97,6 +103,15 @@ internal struct NotchCompanionView: View {
             if isComplete {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     animateCompletion = true
+                }
+
+                // Show confetti only for completed work sessions
+                if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
+                    showConfetti = true
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        showConfetti = false
+                    }
                 }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
