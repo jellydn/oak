@@ -4,15 +4,18 @@ import SwiftUI
 internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
     @ObservedObject var notificationService: NotificationService
+    @ObservedObject var sparkleUpdater: SparkleUpdater
     @State private var selectedDisplayTarget: DisplayTarget
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
 
     init(
         presetSettings: PresetSettingsStore,
-        notificationService: NotificationService
+        notificationService: NotificationService,
+        sparkleUpdater: SparkleUpdater
     ) {
         self.presetSettings = presetSettings
         self.notificationService = notificationService
+        self.sparkleUpdater = sparkleUpdater
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
         _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
     }
@@ -36,6 +39,10 @@ internal struct SettingsMenuView: View {
 
             section(title: "Notifications") {
                 notificationSettings
+            }
+
+            section(title: "Updates") {
+                updateSettings
             }
 
             Divider()
@@ -230,6 +237,35 @@ internal struct SettingsMenuView: View {
                 }
             }
             .buttonStyle(.link)
+        }
+    }
+
+    private var updateSettings: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle(
+                "Automatically check for updates",
+                isOn: Binding(
+                    get: { sparkleUpdater.automaticallyChecksForUpdates },
+                    set: { sparkleUpdater.setAutomaticallyChecksForUpdates($0) }
+                )
+            )
+            .font(.caption)
+
+            Toggle(
+                "Automatically download updates",
+                isOn: Binding(
+                    get: { sparkleUpdater.automaticallyDownloadsUpdates },
+                    set: { sparkleUpdater.setAutomaticallyDownloadsUpdates($0) }
+                )
+            )
+            .font(.caption)
+            .disabled(!sparkleUpdater.automaticallyChecksForUpdates)
+
+            Button("Check for Updates Now") {
+                sparkleUpdater.checkForUpdates()
+            }
+            .buttonStyle(.link)
+            .disabled(!sparkleUpdater.canCheckForUpdates)
         }
     }
 

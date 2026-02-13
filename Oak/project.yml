@@ -3,6 +3,10 @@ options:
   xcodeVersion: "17.0"
 attributes:
   LastSwiftUpdateCheck: 1700
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.6.4
 targets:
   Oak:
     type: application
@@ -12,6 +16,9 @@ targets:
       - path: Oak
         excludes:
           - "**/*.entitlements"
+    dependencies:
+      - package: Sparkle
+        product: Sparkle
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.productsway.oak.app
       MARKETING_VERSION: 0.0.0
@@ -21,6 +28,9 @@ targets:
       INFOPLIST_KEY_CFBundleVersion: $(CURRENT_PROJECT_VERSION)
       INFOPLIST_KEY_LSUIElement: true
       GENERATE_INFOPLIST_FILE: true
+      INFOPLIST_KEY_SUFeedURL: https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml
+      INFOPLIST_KEY_SUEnableAutomaticChecks: true
+      INFOPLIST_KEY_SUScheduledCheckInterval: 86400
     scheme:
       testTargets:
         - OakTests
