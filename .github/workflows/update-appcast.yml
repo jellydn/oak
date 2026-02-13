@@ -82,14 +82,16 @@ jobs:
           TAG: ${{ steps.release.outputs.tag }}
           DMG_URL: ${{ steps.release.outputs.dmg_url }}
           FILE_SIZE: ${{ steps.dmg_info.outputs.file_size }}
+          SHA256: ${{ steps.dmg_info.outputs.sha256 }}
           RELEASE_DATE: ${{ steps.release.outputs.release_date }}
           RELEASE_NOTES: ${{ github.event.release.body }}
+          REPO: ${{ github.repository }}
         run: |
           # Create a new item entry for the release
           cat > /tmp/new_item.xml << 'EOF'
           <item>
             <title>Version ${VERSION}</title>
-            <link>https://github.com/${{ github.repository }}/releases/tag/${TAG}</link>
+            <link>https://github.com/${REPO}/releases/tag/${TAG}</link>
             <sparkle:version>${VERSION}</sparkle:version>
             <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
             <description><![CDATA[
@@ -108,13 +110,14 @@ jobs:
           # Replace variables in the template
           sed -i '' "s/\${VERSION}/$VERSION/g" /tmp/new_item.xml
           sed -i '' "s/\${TAG}/$TAG/g" /tmp/new_item.xml
+          sed -i '' "s/\${REPO}/$REPO/g" /tmp/new_item.xml
           sed -i '' "s|\${DMG_URL}|$DMG_URL|g" /tmp/new_item.xml
           sed -i '' "s/\${FILE_SIZE}/$FILE_SIZE/g" /tmp/new_item.xml
           sed -i '' "s/\${RELEASE_DATE}/$RELEASE_DATE/g" /tmp/new_item.xml
           
-          # Escape release notes for XML
-          ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
-          sed -i '' "s/\${RELEASE_NOTES}/$ESCAPED_NOTES/g" /tmp/new_item.xml
+          # Escape and insert release notes using perl for better handling of special characters
+          export ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+          perl -i -pe 's/\$\{RELEASE_NOTES\}/$ENV{ESCAPED_NOTES}/g' /tmp/new_item.xml
           
           # Insert the new item at the beginning of the channel (after the comment)
           # This ensures the latest release is always first
@@ -127,7 +130,18 @@ jobs:
             { print }
           ' appcast.xml > /tmp/appcast.xml.new
           
-          mv /tmp/appcast.xml.new appcast.xml
+          # Retain only the most recent 20 items to prevent unbounded growth
+          awk '
+            BEGIN { max_items = 20; item_count = 0; in_item = 0 }
+            /<item>/ { in_item = 1; item_count++ }
+            in_item == 0 || item_count <= max_items { print }
+            /<\/item>/ { 
+              if (item_count > max_items) { in_item = 0; next }
+              in_item = 0
+            }
+          ' /tmp/appcast.xml.new > /tmp/appcast.xml.trimmed
+          
+          mv /tmp/appcast.xml.trimmed appcast.xml
           
           # Show the updated appcast
           echo "Updated appcast.xml:"

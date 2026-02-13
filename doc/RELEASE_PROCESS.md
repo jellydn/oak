@@ -57,11 +57,11 @@ The feed is served from the `main` branch at:
 
 ## How Updates Work for Users
 
-1. **Launch Check**: Oak automatically checks for updates on launch (if enabled)
-2. **Periodic Checks**: Sparkle checks for updates every 24 hours by default
+1. **Launch Check**: Oak initializes Sparkle on launch to enable automatic update checks
+2. **Periodic Checks**: Sparkle checks for updates every 24 hours by default (if enabled in Settings)
 3. **Update Notification**: If a newer version is found, the user is notified
 4. **Download**: User can choose to download the update immediately or later
-5. **Installation**: Sparkle handles the update installation automatically
+5. **Installation**: Sparkle handles the update installation automatically (may require user approval for unsigned builds)
 
 ## User Settings
 
@@ -114,16 +114,28 @@ To test the update mechanism in development:
 
 ## Security Considerations
 
+**Current Limitations:**
+- The app is currently built unsigned (`CODE_SIGNING_ALLOWED=NO`) as documented in the main README
+- Without code signing and notarization, users will need to bypass Gatekeeper on first launch (Right-click app → Open)
+- Auto-updates will work but users may see security warnings on macOS
+
+**Security Measures:**
 - The appcast feed is served over HTTPS from GitHub
 - DMG files are downloaded from GitHub Releases (HTTPS)
 - Sparkle verifies file integrity using SHA256 checksums
 - Network access is required and granted via entitlements
 
+**For Production:**
+To fully enable secure auto-updates for public distribution, the following are required (not optional):
+- Sign the app with a Developer ID application certificate
+- Notarize both the DMG and the app bundle with Apple
+- Add `sparkle:edSignature` to appcast entries for cryptographic verification
+
 ## Future Enhancements
 
 Potential improvements to the update system:
 
-- Code signing for notarized updates
+- Implement code signing and notarization for production distributions (required for secure updates)
 - Delta updates for smaller download sizes
 - More granular update channels (stable, beta, nightly)
 - Release notes rendering in the update prompt
