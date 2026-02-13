@@ -1,4 +1,8 @@
 name: Oak
+options:
+  xcodeVersion: "17.0"
+attributes:
+  LastSwiftUpdateCheck: 1700
 targets:
   Oak:
     type: application

@@ -283,7 +283,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastSwiftUpdateCheck = 1700;
+				LastUpgradeCheck = 1700;
 			};
 			buildConfigurationList = 532456882F461C1352BFE531 /* Build configuration list for PBXProject "Oak" */;
 			compatibilityVersion = "Xcode 14.0";
