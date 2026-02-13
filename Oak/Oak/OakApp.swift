@@ -18,6 +18,7 @@ internal struct OakApp: App {
 internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
     var updateChecker: UpdateChecking = UpdateChecker()
+    private let notificationService = NotificationService.shared
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
         return environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil
@@ -33,6 +34,11 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         notchWindowController = NotchWindowController()
         notchWindowController?.window?.orderFrontRegardless()
         updateChecker.checkForUpdatesOnLaunch()
+        
+        // Request notification permissions
+        Task { @MainActor in
+            await notificationService.requestAuthorization()
+        }
     }
 
     func applicationWillTerminate(_: Notification) {

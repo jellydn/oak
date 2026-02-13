@@ -1,5 +1,6 @@
 import Combine
 import SwiftUI
+import UserNotifications
 
 @MainActor
 internal class FocusSessionViewModel: ObservableObject {
@@ -15,6 +16,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager: ProgressManager
+    let notificationService = NotificationService.shared
 
     init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil) {
         self.presetSettings = presetSettings
@@ -199,6 +201,9 @@ internal class FocusSessionViewModel: ObservableObject {
         } else {
             // Break session complete
         }
+
+        // Send notification
+        notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
 
         // Stop audio when any session ends
         audioManager.stop()
