@@ -66,6 +66,41 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
 }
 
 internal enum AppcastVersionParser {
+    private struct SemanticVersion: Comparable {
+        let major: Int
+        let minor: Int
+        let patch: Int
+
+        init?(_ value: String) {
+            let parts = value.split(separator: ".")
+            guard parts.count == 3,
+                  let major = Int(parts[0]),
+                  let minor = Int(parts[1]),
+                  let patch = Int(parts[2])
+            else {
+                return nil
+            }
+
+            self.major = major
+            self.minor = minor
+            self.patch = patch
+        }
+
+        var stringValue: String {
+            "\(major).\(minor).\(patch)"
+        }
+
+        static func < (lhs: SemanticVersion, rhs: SemanticVersion) -> Bool {
+            if lhs.major != rhs.major {
+                return lhs.major < rhs.major
+            }
+            if lhs.minor != rhs.minor {
+                return lhs.minor < rhs.minor
+            }
+            return lhs.patch < rhs.patch
+        }
+    }
+
     static func latestShortVersion(in xml: String) -> String? {
         guard let regex = try? NSRegularExpression(
             pattern: "<sparkle:shortVersionString>\\s*([^<\\s]+)\\s*</sparkle:shortVersionString>",
@@ -75,17 +110,15 @@ internal enum AppcastVersionParser {
         }
 
         let matches = regex.matches(in: xml, range: NSRange(xml.startIndex ..< xml.endIndex, in: xml))
-        let versions = matches.compactMap { match -> String? in
+        let semanticVersions = matches.compactMap { match -> SemanticVersion? in
             guard let versionRange = Range(match.range(at: 1), in: xml) else {
                 return nil
             }
             let version = xml[versionRange].trimmingCharacters(in: .whitespacesAndNewlines)
-            return version.isEmpty ? nil : version
+            return SemanticVersion(version)
         }
 
-        return versions.max { lhs, rhs in
-            lhs.compare(rhs, options: .numeric) == .orderedAscending
-        }
+        return semanticVersions.max()?.stringValue
     }
 }
 
@@ -112,24 +145,21 @@ private extension SparkleUpdater {
         let feedVersion = await fetchLatestFeedVersion()
 
         if let currentVersion, let feedVersion {
-            let isFeedOlderThanInstalled =
-                feedVersion.compare(currentVersion, options: .numeric) == .orderedAscending
-
-            guard isFeedOlderThanInstalled else {
-                updaterController.checkForUpdates(nil)
-                logger.info("Manual update check triggered")
-                return
-            }
-
-            logger.warning(
+            logger.info(
                 """
-                Update feed is behind current app version. \
-                Feed: \(feedVersion, privacy: .public), \
-                current: \(currentVersion, privacy: .public)
+                Remote appcast latest semver: \(feedVersion, privacy: .public), \
+                installed: \(currentVersion, privacy: .public)
                 """
             )
-            showFeedBehindAlert(currentVersion: currentVersion, feedVersion: feedVersion)
-            return
+
+            if feedVersion.compare(currentVersion, options: .numeric) == .orderedAscending {
+                logger.info(
+                    """
+                    Installed build is newer than remote appcast. \
+                    Proceeding with normal Sparkle check.
+                    """
+                )
+            }
         }
 
         updaterController.checkForUpdates(nil)
@@ -147,7 +177,16 @@ private extension SparkleUpdater {
         }
 
         do {
-            var request = URLRequest(url: feedURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
+            let requestURL: URL
+            if var components = URLComponents(url: feedURL, resolvingAgainstBaseURL: false) {
+                let timestamp = String(Int(Date().timeIntervalSince1970))
+                components.queryItems = (components.queryItems ?? []) + [URLQueryItem(name: "ts", value: timestamp)]
+                requestURL = components.url ?? feedURL
+            } else {
+                requestURL = feedURL
+            }
+
+            var request = URLRequest(url: requestURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
             request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
             request.setValue("no-cache", forHTTPHeaderField: "Pragma")
             let (data, _) = try await URLSession.shared.data(for: request)
@@ -159,15 +198,6 @@ private extension SparkleUpdater {
             logger.warning("Failed to preflight appcast version: \(error.localizedDescription, privacy: .public)")
             return nil
         }
-    }
-
-    func showFeedBehindAlert(currentVersion: String, feedVersion: String) {
-        let alert = NSAlert()
-        alert.alertStyle = .informational
-        alert.messageText = "No New Update Available"
-        alert.informativeText = "Installed version \(currentVersion) is newer than appcast version \(feedVersion)."
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
     }
 
     static var hasValidPublicEDKey: Bool {
