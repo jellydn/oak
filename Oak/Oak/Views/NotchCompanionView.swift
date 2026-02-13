@@ -5,10 +5,12 @@ internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
 
     @StateObject private var viewModel: FocusSessionViewModel
+    @StateObject private var notificationService = NotificationService.shared
     @State private var showAudioMenu = false
     @State private var showProgressMenu = false
     @State private var showSettingsMenu = false
     @State private var animateCompletion: Bool = false
+    @State private var showConfetti: Bool = false
     @State private var isExpandedByToggle = false
     @State private var lastReportedExpansion: Bool?
     @State private var presetSelection: Preset = .short
@@ -82,6 +84,11 @@ internal struct NotchCompanionView: View {
             .padding(.vertical, verticalPadding)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
+
+            if showConfetti {
+                ConfettiView()
+                    .allowsHitTesting(false)
+            }
         }
         .frame(height: NotchLayout.height)
         .contentShape(Rectangle())
@@ -96,6 +103,15 @@ internal struct NotchCompanionView: View {
             if isComplete {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     animateCompletion = true
+                }
+
+                // Show confetti only for completed work sessions
+                if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
+                    showConfetti = true
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
+                        showConfetti = false
+                    }
                 }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -114,8 +130,11 @@ internal struct NotchCompanionView: View {
                 .frame(width: 200)
         }
         .popover(isPresented: $showSettingsMenu) {
-            SettingsMenuView(presetSettings: viewModel.presetSettings)
-                .frame(width: 280)
+            SettingsMenuView(
+                presetSettings: viewModel.presetSettings,
+                notificationService: notificationService
+            )
+            .frame(width: 280)
         }
         .contextMenu {
             if #available(macOS 14.0, *) {
@@ -159,6 +178,28 @@ internal struct NotchCompanionView: View {
                     }
                 )
                 .buttonStyle(.plain)
+            } else if viewModel.canStartNext {
+                Text(viewModel.displayTime)
+                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.95))
+
+                Button(
+                    action: {
+                        viewModel.startNextSession()
+                    },
+                    label: {
+                        Image(systemName: "forward.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 9, weight: .bold))
+                            .frame(width: 16, height: 16)
+                            .background(
+                                Circle()
+                                    .fill(Color.blue.opacity(0.88))
+                            )
+                    }
+                )
+                .buttonStyle(.plain)
+                .help("Start \(viewModel.currentSessionType)")
             } else {
                 Text(viewModel.displayTime)
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))

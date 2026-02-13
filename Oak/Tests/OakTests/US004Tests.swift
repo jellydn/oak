@@ -106,6 +106,10 @@ internal final class US004Tests: XCTestCase {
         XCTAssertEqual(presetSettings.displayTarget, .mainDisplay)
     }
 
+    func testCompletionSoundDefaultsToEnabled() {
+        XCTAssertTrue(presetSettings.playSoundOnSessionCompletion)
+    }
+
     func testDisplayTargetIsPersisted() {
         presetSettings.setDisplayTarget(.notchedDisplay)
 
@@ -119,10 +123,12 @@ internal final class US004Tests: XCTestCase {
 
     func testResetToDefaultRestoresMainDisplayTarget() {
         presetSettings.setDisplayTarget(.notchedDisplay)
+        presetSettings.setPlaySoundOnSessionCompletion(false)
 
         presetSettings.resetToDefault()
 
         XCTAssertEqual(presetSettings.displayTarget, .mainDisplay)
+        XCTAssertTrue(presetSettings.playSoundOnSessionCompletion)
     }
 
     func testSwitchingTargetWithoutScreenIDPreservesStoredDisplayIDs() {
@@ -136,5 +142,16 @@ internal final class US004Tests: XCTestCase {
         presetSettings.setDisplayTarget(.mainDisplay)
         XCTAssertEqual(presetSettings.mainDisplayID, initialMainID)
         XCTAssertEqual(presetSettings.notchedDisplayID, initialNotchedID)
+    }
+
+    func testCompletionSoundPreferenceIsPersisted() {
+        presetSettings.setPlaySoundOnSessionCompletion(false)
+
+        guard let reloadedDefaults = UserDefaults(suiteName: presetSuiteName) else {
+            XCTFail("Failed to create UserDefaults with suite name")
+            return
+        }
+        let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults)
+        XCTAssertFalse(reloadedStore.playSoundOnSessionCompletion)
     }
 }

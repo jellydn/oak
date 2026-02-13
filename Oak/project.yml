@@ -1,4 +1,8 @@
 name: Oak
+options:
+  xcodeVersion: "17.0"
+attributes:
+  LastSwiftUpdateCheck: 1700
 targets:
   Oak:
     type: application
@@ -16,7 +20,6 @@ targets:
       INFOPLIST_KEY_CFBundleShortVersionString: $(MARKETING_VERSION)
       INFOPLIST_KEY_CFBundleVersion: $(CURRENT_PROJECT_VERSION)
       INFOPLIST_KEY_LSUIElement: true
-      INFOPLIST_KEY_LSBackgroundOnly: true
       GENERATE_INFOPLIST_FILE: true
     scheme:
       testTargets:

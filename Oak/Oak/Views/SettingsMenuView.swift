@@ -1,23 +1,29 @@
+import AppKit
 import SwiftUI
 
 internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
+    @ObservedObject var notificationService: NotificationService
     @State private var selectedDisplayTarget: DisplayTarget
 
-    init(presetSettings: PresetSettingsStore) {
+    init(
+        presetSettings: PresetSettingsStore,
+        notificationService: NotificationService
+    ) {
         self.presetSettings = presetSettings
+        self.notificationService = notificationService
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Settings")
-                .font(.headline)
+            headerRow
 
             VStack(spacing: 10) {
                 displayTargetPicker
                 presetEditor(title: "Preset A", preset: .short)
                 presetEditor(title: "Preset B", preset: .long)
+                notificationSettings
             }
 
             Text(validRangeDescription)
@@ -38,6 +44,29 @@ internal struct SettingsMenuView: View {
             }
         }
         .padding(14)
+        .task {
+            await notificationService.refreshAuthorizationStatus()
+        }
+    }
+
+    private var headerRow: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Settings")
+                    .font(.headline)
+                Text("Tune focus presets and notifications.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Button("Quit Oak") {
+                NSApplication.shared.terminate(nil)
+            }
+            .buttonStyle(.link)
+            .help("Quit Oak")
+        }
     }
 
     private func presetEditor(title: String, preset: Preset) -> some View {
@@ -112,6 +141,50 @@ internal struct SettingsMenuView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
+    private var notificationSettings: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Notifications")
+                .font(.system(size: 11, weight: .semibold))
+
+            Text(notificationStatusText)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Toggle(
+                "Play completion sound",
+                isOn: Binding(
+                    get: { presetSettings.playSoundOnSessionCompletion },
+                    set: { presetSettings.setPlaySoundOnSessionCompletion($0) }
+                )
+            )
+            .font(.caption)
+
+            HStack(spacing: 8) {
+                if notificationService.authorizationStatus == .notDetermined {
+                    Button("Allow Notifications") {
+                        Task {
+                            await notificationService.requestAuthorization()
+                        }
+                    }
+                } else if !notificationService.isAuthorized {
+                    Button("Open System Settings") {
+                        notificationService.openNotificationSettings()
+                    }
+                }
+
+                Button("Refresh Status") {
+                    Task {
+                        await notificationService.refreshAuthorizationStatus()
+                    }
+                }
+            }
+            .buttonStyle(.link)
+        }
+        .padding(8)
+        .background(Color.primary.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
     private func workMinutesBinding(for preset: Preset) -> Binding<Int> {
         Binding(
             get: { presetSettings.workMinutes(for: preset) },
@@ -159,5 +232,18 @@ internal struct SettingsMenuView: View {
         let focusRange = "\(PresetSettingsStore.minWorkMinutes)-\(PresetSettingsStore.maxWorkMinutes)"
         let breakRange = "\(PresetSettingsStore.minBreakMinutes)-\(PresetSettingsStore.maxBreakMinutes)"
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min"
+    }
+
+    private var notificationStatusText: String {
+        switch notificationService.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return "Notifications are enabled."
+        case .notDetermined:
+            return "Notifications have not been requested yet."
+        case .denied:
+            return "Notifications are disabled. Enable them in System Settings."
+        @unknown default:
+            return "Notification status is unknown."
+        }
     }
 }

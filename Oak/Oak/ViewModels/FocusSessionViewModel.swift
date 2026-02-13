@@ -1,5 +1,16 @@
+import AppKit
 import Combine
 import SwiftUI
+
+internal protocol SessionCompletionSoundPlaying {
+    func playCompletionSound()
+}
+
+internal struct SystemSessionCompletionSoundPlayer: SessionCompletionSoundPlaying {
+    func playCompletionSound() {
+        NSSound.beep()
+    }
+}
 
 @MainActor
 internal class FocusSessionViewModel: ObservableObject {
@@ -15,10 +26,19 @@ internal class FocusSessionViewModel: ObservableObject {
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager: ProgressManager
+    let notificationService: any SessionCompletionNotifying
+    let completionSoundPlayer: any SessionCompletionSoundPlaying
 
-    init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil) {
+    init(
+        presetSettings: PresetSettingsStore,
+        progressManager: ProgressManager? = nil,
+        notificationService: (any SessionCompletionNotifying)? = nil,
+        completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil
+    ) {
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
+        self.notificationService = notificationService ?? NotificationService.shared
+        self.completionSoundPlayer = completionSoundPlayer ?? SystemSessionCompletionSoundPlayer()
         presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
@@ -188,8 +208,6 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     private func completeSession() {
-        isSessionComplete = true
-
         if isWorkSession {
             // Work session complete - record progress
             let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
@@ -200,18 +218,32 @@ internal class FocusSessionViewModel: ObservableObject {
             // Break session complete
         }
 
+        // Send notification
+        notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
+
         // Stop audio when any session ends
         audioManager.stop()
+
+        if presetSettings.playSoundOnSessionCompletion {
+            completionSoundPlayer.playCompletionSound()
+        }
 
         timer?.invalidate()
         timer = nil
         sessionState = .completed(isWorkSession: isWorkSession)
+
+        // Trigger UI animations after state is updated
+        isSessionComplete = true
 
         // Reset animation state after 1.5 seconds
         Task {
             try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
         }
+    }
+
+    func completeSessionForTesting() {
+        completeSession()
     }
 
     deinit {

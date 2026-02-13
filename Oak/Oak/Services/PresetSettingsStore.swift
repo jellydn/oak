@@ -18,6 +18,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var displayTarget: DisplayTarget
     @Published private(set) var mainDisplayID: UInt32?
     @Published private(set) var notchedDisplayID: UInt32?
+    @Published private(set) var playSoundOnSessionCompletion: Bool
 
     private let userDefaults: UserDefaults
 
@@ -29,6 +30,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let displayTarget = "display.target"
         static let mainDisplayID = "display.main.id"
         static let notchedDisplayID = "display.notched.id"
+        static let playSoundOnSessionCompletion = "session.completion.playSound"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -39,7 +41,8 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.shortBreakMinutes: Preset.short.defaultBreakMinutes,
             Keys.longWorkMinutes: Preset.long.defaultWorkMinutes,
             Keys.longBreakMinutes: Preset.long.defaultBreakMinutes,
-            Keys.displayTarget: DisplayTarget.mainDisplay.rawValue
+            Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
+            Keys.playSoundOnSessionCompletion: true
         ]
         userDefaults.register(defaults: defaults)
 
@@ -51,6 +54,7 @@ internal final class PresetSettingsStore: ObservableObject {
         displayTarget = DisplayTarget(rawValue: rawDisplayTarget) ?? .mainDisplay
         mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
         notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
+        playSoundOnSessionCompletion = userDefaults.bool(forKey: Keys.playSoundOnSessionCompletion)
         ensureDisplayIDsInitialized()
     }
 
@@ -112,6 +116,13 @@ internal final class PresetSettingsStore: ObservableObject {
         setWorkMinutes(Preset.long.defaultWorkMinutes, for: .long)
         setBreakMinutes(Preset.long.defaultBreakMinutes, for: .long)
         setDisplayTarget(.mainDisplay, screenID: nil)
+        setPlaySoundOnSessionCompletion(true)
+    }
+
+    func setPlaySoundOnSessionCompletion(_ value: Bool) {
+        guard playSoundOnSessionCompletion != value else { return }
+        playSoundOnSessionCompletion = value
+        userDefaults.set(value, forKey: Keys.playSoundOnSessionCompletion)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {

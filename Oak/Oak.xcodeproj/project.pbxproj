@@ -10,6 +10,7 @@
 		16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */; };
 		1941B67DA3C25D4A42BB7D6D /* PresetSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */; };
 		1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74BB88C04B3824E97E3C561 /* US001Tests.swift */; };
+		25BAA3E90290CE446B9F7BFC /* NotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3912FED25041D62DE77347EA /* NotificationTests.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		3ED5BDC623247CE16B62E99B /* ambient_rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */; };
 		4404053F80F1F1F3265EF06E /* ambient_cafe.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */; };
@@ -27,6 +28,7 @@
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
 		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
 		AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */; };
+		ADE41CB716798207A29851E9 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F287A617D7BF92425C7BD22A /* ConfettiView.swift */; };
 		B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3EFAB628759B783D66D3 /* AudioTrack.swift */; };
 		B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C93F37E0AC4AA71C304FDD /* US003Tests.swift */; };
 		B5C9AD5FC22FACC36FAA5620 /* AudioMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */; };
@@ -39,10 +41,13 @@
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
 		3B5E955207F954E0ED209D04 /* NotchLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601F399F3F938E7E9ADFD551 /* NotchLayout.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
+		DF1ECF04DC3D712A1F7B0C30 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D555E4182E199E8EC8D0B3 /* NotificationService.swift */; };
 		E0B877DBD09CEEF00019BE07 /* ambient_lofi.wav in Resources */ = {isa = PBXBuildFile; fileRef = DB739C07704B32BF1998761B /* ambient_lofi.wav */; };
 		E24A84D1E69B270F4EEE1C95 /* ambient_forest.wav in Resources */ = {isa = PBXBuildFile; fileRef = 32954184C5B3930CBE019533 /* ambient_forest.wav */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
 		EAFB172B8BA777F1E272F3F7 /* ambient_cafe.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1641B6605BDA11BE28B2440F /* ambient_cafe.wav */; };
+		EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */; };
+		F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */; };
 		F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732AEE30E8FEC2D900C8224A /* US005Tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,7 +66,9 @@
 		0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchCompanionView.swift; sourceTree = "<group>"; };
 		08E0A4A56EADCDB21276DE81 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompletionNotificationTests.swift; sourceTree = "<group>"; };
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
+		14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiViewTests.swift; sourceTree = "<group>"; };
 		155853CBF9374645092FE699 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		1641B6605BDA11BE28B2440F /* ambient_cafe.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_cafe.wav; sourceTree = "<group>"; };
 		17D6B30DEDC9126B5A3E77DF /* ambient_rain.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_rain.wav; sourceTree = "<group>"; };
@@ -74,6 +81,7 @@
 		601F399F3F938E7E9ADFD551 /* NotchLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchLayout.swift; sourceTree = "<group>"; };
 		32954184C5B3930CBE019533 /* ambient_forest.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_forest.wav; sourceTree = "<group>"; };
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
+		3912FED25041D62DE77347EA /* NotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTests.swift; sourceTree = "<group>"; };
 		3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+DisplayTarget.swift"; sourceTree = "<group>"; };
 		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
@@ -85,6 +93,7 @@
 		7D93E5502BBC8DD90FD136BB /* ambient_forest.m4a */ = {isa = PBXFileReference; path = ambient_forest.m4a; sourceTree = "<group>"; };
 		841F3EFAB628759B783D66D3 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
 		85C93F37E0AC4AA71C304FDD /* US003Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US003Tests.swift; sourceTree = "<group>"; };
+		98D555E4182E199E8EC8D0B3 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		B1EB99EC9EF014772EA562EF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B74BB88C04B3824E97E3C561 /* US001Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US001Tests.swift; sourceTree = "<group>"; };
 		B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */ = {isa = PBXFileReference; path = ambient_rain.m4a; sourceTree = "<group>"; };
@@ -94,6 +103,7 @@
 		D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
 		DB739C07704B32BF1998761B /* ambient_lofi.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_lofi.wav; sourceTree = "<group>"; };
 		DBFE863ED8125FD3D3029341 /* US004Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US004Tests.swift; sourceTree = "<group>"; };
+		F287A617D7BF92425C7BD22A /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMenuView.swift; sourceTree = "<group>"; };
 		F8EC066ED6CCF07ED7D7309E /* ambient_brown_noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_brown_noise.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -162,7 +172,10 @@
 		7A59316AAFB96A57EDCA1D15 /* OakTests */ = {
 			isa = PBXGroup;
 			children = (
+				14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */,
 				D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */,
+				3912FED25041D62DE77347EA /* NotificationTests.swift */,
+				131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */,
 				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
@@ -180,6 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */,
+				F287A617D7BF92425C7BD22A /* ConfettiView.swift */,
 				0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */,
 				3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */,
 				D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */,
@@ -200,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				C348F7E99471145836A04408 /* AudioManager.swift */,
+				98D555E4182E199E8EC8D0B3 /* NotificationService.swift */,
 				1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */,
 				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
 				155853CBF9374645092FE699 /* UpdateChecker.swift */,
@@ -271,7 +286,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastSwiftUpdateCheck = 1700;
+				LastUpgradeCheck = 1700;
 			};
 			buildConfigurationList = 532456882F461C1352BFE531 /* Build configuration list for PBXProject "Oak" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -323,10 +339,12 @@
 				D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */,
 				B5C9AD5FC22FACC36FAA5620 /* AudioMenuView.swift in Sources */,
 				B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */,
+				ADE41CB716798207A29851E9 /* ConfettiView.swift in Sources */,
 				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
 				5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */,
 				8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */,
 				B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */,
+				DF1ECF04DC3D712A1F7B0C30 /* NotificationService.swift in Sources */,
 				BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */,
 				1941B67DA3C25D4A42BB7D6D /* PresetSettingsStore.swift in Sources */,
 				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
@@ -343,7 +361,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */,
 				AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */,
+				25BAA3E90290CE446B9F7BFC /* NotificationTests.swift in Sources */,
+				F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */,
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
 				1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */,
 				DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */,
@@ -509,7 +530,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleShortVersionString = "$(MARKETING_VERSION)";
 				INFOPLIST_KEY_CFBundleVersion = "$(CURRENT_PROJECT_VERSION)";
-				INFOPLIST_KEY_LSBackgroundOnly = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -548,7 +568,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleShortVersionString = "$(MARKETING_VERSION)";
 				INFOPLIST_KEY_CFBundleVersion = "$(CURRENT_PROJECT_VERSION)";
-				INFOPLIST_KEY_LSBackgroundOnly = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
