@@ -115,6 +115,7 @@
 		D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
 		DB739C07704B32BF1998761B /* ambient_lofi.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_lofi.wav; sourceTree = "<group>"; };
 		DBFE863ED8125FD3D3029341 /* US004Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US004Tests.swift; sourceTree = "<group>"; };
+		E43285E82910BB45D9CF9000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F287A617D7BF92425C7BD22A /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownDisplayModeTests.swift; sourceTree = "<group>"; };
 		F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMenuView.swift; sourceTree = "<group>"; };
@@ -174,6 +175,7 @@
 		64E95FFCFED6BE5E5E74A2EC /* Oak */ = {
 			isa = PBXGroup;
 			children = (
+				E43285E82910BB45D9CF9000 /* Info.plist */,
 				451C36F9BC7A6103BF32362C /* OakApp.swift */,
 				24245D90328E2484C7585C5A /* Extensions */,
 				01D9F58885F69FCDA63E90F6 /* Models */,
@@ -568,14 +570,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleShortVersionString = "$(MARKETING_VERSION)";
-				INFOPLIST_KEY_CFBundleVersion = "$(CURRENT_PROJECT_VERSION)";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "$(SPARKLE_PUBLIC_ED_KEY)";
-				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
+				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -611,14 +606,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleShortVersionString = "$(MARKETING_VERSION)";
-				INFOPLIST_KEY_CFBundleVersion = "$(CURRENT_PROJECT_VERSION)";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "$(SPARKLE_PUBLIC_ED_KEY)";
-				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
+				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

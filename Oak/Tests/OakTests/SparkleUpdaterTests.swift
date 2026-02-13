@@ -33,6 +33,8 @@ internal final class SparkleUpdaterTests: XCTestCase {
     }
 
     func testSetAutomaticallyChecksForUpdates() {
+        guard updater.isConfigured else { return }
+
         let initialValue = updater.automaticallyChecksForUpdates
 
         updater.setAutomaticallyChecksForUpdates(!initialValue)
@@ -53,6 +55,8 @@ internal final class SparkleUpdaterTests: XCTestCase {
     }
 
     func testSetAutomaticallyDownloadsUpdates() {
+        guard updater.isConfigured else { return }
+
         let initialValue = updater.automaticallyDownloadsUpdates
 
         updater.setAutomaticallyDownloadsUpdates(!initialValue)

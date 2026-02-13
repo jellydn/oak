@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import os
 import Sparkle
@@ -25,7 +26,7 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
         let controller = SPUStandardUpdaterController(
             startingUpdater: true,
             updaterDelegate: self,
-            userDriverDelegate: nil
+            userDriverDelegate: self
         )
         updaterController = controller
         isConfigured = true
@@ -43,19 +44,38 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
     }
 
     func setAutomaticallyChecksForUpdates(_ enabled: Bool) {
+        guard let updaterController else { return }
+        updaterController.updater.automaticallyChecksForUpdates = enabled
         automaticallyChecksForUpdates = enabled
-        updaterController?.updater.automaticallyChecksForUpdates = enabled
         logger.info("Automatic update checks: \(enabled ? "enabled" : "disabled")")
     }
 
     func setAutomaticallyDownloadsUpdates(_ enabled: Bool) {
+        guard let updaterController else { return }
+        updaterController.updater.automaticallyDownloadsUpdates = enabled
         automaticallyDownloadsUpdates = enabled
-        updaterController?.updater.automaticallyDownloadsUpdates = enabled
         logger.info("Automatic downloads: \(enabled ? "enabled" : "disabled")")
     }
 
     nonisolated func feedURLString(for _: SPUUpdater) -> String? {
         "https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml"
+    }
+}
+
+@MainActor
+extension SparkleUpdater: @preconcurrency SPUStandardUserDriverDelegate {
+    var supportsGentleScheduledUpdateReminders: Bool {
+        true
+    }
+
+    func standardUserDriverWillHandleShowingUpdate(
+        _: Bool,
+        forUpdate _: SUAppcastItem,
+        state: SPUUserUpdateState
+    ) {
+        // Background-only apps should request user attention when a scheduled update is presented.
+        guard !state.userInitiated else { return }
+        NSApp.requestUserAttention(.informationalRequest)
     }
 }
 

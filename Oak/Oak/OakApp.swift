@@ -21,7 +21,7 @@ internal struct OakApp: App {
                 SettingsMenuView(
                     presetSettings: presetSettings,
                     notificationService: notificationService,
-                    sparkleUpdater: SparkleUpdater()
+                    sparkleUpdater: SparkleUpdater.shared
                 )
                 .frame(width: 320)
                 .padding(8)
@@ -51,7 +51,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         notchWindowController?.window?.orderFrontRegardless()
 
         // Initialize Sparkle updater to enable automatic update checks on launch
-        sparkleUpdater = SparkleUpdater()
+        sparkleUpdater = SparkleUpdater.shared
 
         // Keep status in sync at launch; permission requests are user-initiated from Settings.
         Task { @MainActor in
