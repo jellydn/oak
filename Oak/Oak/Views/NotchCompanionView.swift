@@ -215,17 +215,28 @@ internal struct NotchCompanionView: View {
     private func countdownDisplay(
         mode: CountdownDisplayMode,
         size: CGFloat,
-        fontSize: CGFloat
+        fontSize: CGFloat,
+        showSessionType: Bool = false
     ) -> some View {
         Group {
             if mode == .circleRing {
-                CircularProgressRing(
-                    progress: viewModel.progressPercentage,
-                    lineWidth: 2.5,
-                    ringColor: viewModel.isPaused ? .orange : .white,
-                    backgroundColor: .white.opacity(0.2)
-                )
-                .frame(width: size, height: size)
+                ZStack {
+                    CircularProgressRing(
+                        progress: viewModel.progressPercentage,
+                        lineWidth: 2.5,
+                        ringColor: viewModel.isPaused ? .orange : .white,
+                        backgroundColor: .white.opacity(0.2)
+                    )
+                    .frame(width: size, height: size)
+                    if showSessionType {
+                        Text(viewModel.currentSessionType)
+                            .font(.system(size: fontSize * 0.55, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.9))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                            .frame(width: size - 6)
+                    }
+                }
             } else {
                 Text(viewModel.displayTime)
                     .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
@@ -262,30 +273,19 @@ internal struct NotchCompanionView: View {
         HStack(spacing: 6) {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
             if displayMode == .circleRing {
-                ZStack {
-                    CircularProgressRing(
-                        progress: viewModel.progressPercentage,
-                        lineWidth: 2.5,
-                        ringColor: viewModel.isPaused ? .orange : .white,
-                        backgroundColor: .white.opacity(0.2)
-                    )
-                    .frame(width: expandedRingSize, height: expandedRingSize)
-                    Text(viewModel.currentSessionType)
-                        .font(.system(size: 7, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.9))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
-                        .frame(width: expandedRingSize - 6)
-                }
+                countdownDisplay(
+                    mode: displayMode,
+                    size: expandedRingSize,
+                    fontSize: 14,
+                    showSessionType: true
+                )
             } else {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(viewModel.displayTime)
-                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                        .foregroundColor(
-                            viewModel.isPaused
-                                ? Color.orange.opacity(0.95)
-                                : Color.white.opacity(0.95)
-                        )
+                    countdownDisplay(
+                        mode: displayMode,
+                        size: expandedRingSize,
+                        fontSize: 14
+                    )
                     Text(viewModel.currentSessionType)
                         .font(.system(size: 8, weight: .medium))
                         .foregroundColor(.white.opacity(0.52))
