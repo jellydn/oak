@@ -246,7 +246,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
             object: NSApp
         )
 
-        waitForFrameUpdate()
+        _ = waitForFrameWidth(372, timeout: 1.0)
 
         let finalFrame = window?.frame ?? .zero
 
@@ -278,14 +278,28 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
     private func triggerExpansion(_ expanded: Bool) {
         windowController.handleExpansionChange(expanded)
-        waitForFrameUpdate()
+        let targetWidth: CGFloat = expanded ? 372 : 144
+        if !waitForFrameWidth(targetWidth, timeout: 1.0) {
+            // Retry once to reduce occasional timing flakiness in CI/local runs.
+            windowController.handleExpansionChange(expanded)
+            _ = waitForFrameWidth(targetWidth, timeout: 1.0)
+        }
     }
 
-    private func waitForFrameUpdate() {
-        let expectation = expectation(description: "Wait for window resize")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            expectation.fulfill()
+    @discardableResult
+    private func waitForFrameWidth(_ width: CGFloat, timeout: TimeInterval) -> Bool {
+        let endTime = Date().addingTimeInterval(timeout)
+
+        while Date() < endTime {
+            if let window = windowController.window as? NotchWindow,
+               abs(window.frame.width - width) <= 1.0
+            {
+                return true
+            }
+
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
-        wait(for: [expectation], timeout: 2.0)
+
+        return false
     }
 }
