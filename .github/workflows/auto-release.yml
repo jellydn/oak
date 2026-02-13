@@ -41,8 +41,6 @@ jobs:
         if: steps.check_tag.outputs.skip != 'true'
         id: version
         run: |
-          git fetch --force --tags
-          
           # Get the latest tag that matches v*
           latest_tag="$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || echo 'v0.0.0')"
           echo "Latest tag: $latest_tag"
