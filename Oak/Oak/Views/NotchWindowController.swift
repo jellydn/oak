@@ -10,6 +10,12 @@ internal class NotchWindowController: NSWindowController {
     private let expandedWidth: CGFloat = 372
     private let notchHeight: CGFloat = 33
     private var lastExpandedState: Bool = false
+    private var hasCleanedUp = false
+    private var isApplyingFrameChange = false
+    private var isFrameUpdateScheduled = false
+    private var pendingExpandedState: Bool?
+    private var pendingForceReposition = false
+    private var pendingTargetOverride: DisplayTarget?
     private let viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
     private var displayTargetCancellable: AnyCancellable?
@@ -34,7 +40,19 @@ internal class NotchWindowController: NSWindowController {
         let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
             self?.handleExpansionChange(expanded)
         }
-        window.contentView = NSHostingView(rootView: contentView)
+        let hostingView = NSHostingView(rootView: contentView)
+        if #available(macOS 13.0, *) {
+            // Notch width/position is controlled by the window controller, not by NSHostingView sizing.
+            hostingView.sizingOptions = []
+        }
+        if #available(macOS 13.3, *) {
+            // Borderless notch UI should not react to safe-area changes from AppKit window layout.
+            hostingView.safeAreaRegions = []
+        }
+        window.contentView = hostingView
+        window.contentMinSize = NSSize(width: collapsedWidth, height: notchHeight)
+        window.contentMaxSize = NSSize(width: expandedWidth, height: notchHeight)
+        setExpanded(false, forceReposition: true, targetOverride: settings.displayTarget)
 
         window.orderFrontRegardless()
 
@@ -48,7 +66,7 @@ internal class NotchWindowController: NSWindowController {
         displayTargetCancellable = settings.$displayTarget
             .sink { [weak self] nextTarget in
                 guard let self else { return }
-                self.setExpanded(lastExpandedState, forceReposition: true, targetOverride: nextTarget)
+                self.requestFrameUpdate(for: lastExpandedState, forceReposition: true, targetOverride: nextTarget)
             }
     }
 
@@ -58,20 +76,60 @@ internal class NotchWindowController: NSWindowController {
     }
 
     deinit {
+        let vm = viewModel
+        Task { @MainActor in
+            vm.cleanup()
+        }
         NotificationCenter.default.removeObserver(self)
         displayTargetCancellable?.cancel()
     }
 
     func cleanup() {
+        guard !hasCleanedUp else { return }
+        hasCleanedUp = true
+        displayTargetCancellable?.cancel()
         viewModel.cleanup()
     }
 
     @objc private func screenConfigurationChanged() {
-        setExpanded(lastExpandedState, forceReposition: true)
+        requestFrameUpdate(for: lastExpandedState, forceReposition: true)
     }
 
     func handleExpansionChange(_ expanded: Bool) {
-        setExpanded(expanded)
+        requestFrameUpdate(for: expanded)
+    }
+
+    private func requestFrameUpdate(
+        for expanded: Bool,
+        forceReposition: Bool = false,
+        targetOverride: DisplayTarget? = nil
+    ) {
+        pendingExpandedState = expanded
+        pendingForceReposition = pendingForceReposition || forceReposition
+        if let targetOverride {
+            pendingTargetOverride = targetOverride
+        }
+
+        guard !isFrameUpdateScheduled else { return }
+        isFrameUpdateScheduled = true
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.isFrameUpdateScheduled = false
+            guard let expandedState = self.pendingExpandedState else { return }
+            let shouldForceReposition = self.pendingForceReposition
+            let target = self.pendingTargetOverride
+
+            self.pendingExpandedState = nil
+            self.pendingForceReposition = false
+            self.pendingTargetOverride = nil
+
+            self.setExpanded(
+                expandedState,
+                forceReposition: shouldForceReposition,
+                targetOverride: target
+            )
+        }
     }
 
     private func setExpanded(
@@ -80,8 +138,8 @@ internal class NotchWindowController: NSWindowController {
         targetOverride: DisplayTarget? = nil
     ) {
         guard let window else { return }
+        guard !isApplyingFrameChange else { return }
         guard forceReposition || lastExpandedState != expanded else { return }
-        lastExpandedState = expanded
 
         let targetWidth = expanded ? expandedWidth : collapsedWidth
         let activeTarget = targetOverride ?? presetSettings.displayTarget
@@ -93,9 +151,28 @@ internal class NotchWindowController: NSWindowController {
         let screenFrame = resolvedScreen?.frame ?? .zero
         let yPosition = screenFrame.maxY - notchHeight
         let xPosition = screenFrame.midX - (targetWidth / 2)
-        let newFrame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
+        let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: notchHeight)
 
-        window.setFrame(newFrame, display: true, animate: false)
+        guard shouldApplyFrameUpdate(current: window.frame, target: frame, forceReposition: forceReposition) else {
+            lastExpandedState = expanded
+            return
+        }
+
+        lastExpandedState = expanded
+        isApplyingFrameChange = true
+        defer { isApplyingFrameChange = false }
+        window.setFrame(frame, display: false, animate: false)
+    }
+
+    private func shouldApplyFrameUpdate(current: NSRect, target: NSRect, forceReposition: Bool) -> Bool {
+        if forceReposition {
+            return true
+        }
+
+        return abs(current.minX - target.minX) > 0.5 ||
+            abs(current.minY - target.minY) > 0.5 ||
+            abs(current.width - target.width) > 0.5 ||
+            abs(current.height - target.height) > 0.5
     }
 }
 

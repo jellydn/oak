@@ -93,7 +93,7 @@ internal struct SettingsMenuView: View {
                             preferredDisplayID: presetSettings.preferredDisplayID(for: target)
                         )
                     )
-                        .tag(target)
+                    .tag(target)
                 }
             }
             .pickerStyle(.segmented)

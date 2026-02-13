@@ -10,9 +10,8 @@ internal struct NotchCompanionView: View {
     @State private var showSettingsMenu = false
     @State private var animateCompletion: Bool = false
     @State private var isExpandedByToggle = false
+    @State private var lastReportedExpansion: Bool?
     @State private var presetSelection: Preset = .short
-    private let collapsedWidth: CGFloat = 132
-    private let expandedWidth: CGFloat = 360
     private let notchHeight: CGFloat = 33
     private let horizontalPadding: CGFloat = 6
     private let verticalPadding: CGFloat = 4
@@ -85,17 +84,13 @@ internal struct NotchCompanionView: View {
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
         }
-        .frame(width: isExpanded ? expandedWidth : collapsedWidth, height: notchHeight)
+        .frame(height: notchHeight)
         .contentShape(Rectangle())
         .onChange(of: isExpanded) { expanded in
-            DispatchQueue.main.async {
-                onExpansionChanged(expanded)
-            }
+            notifyExpansionChanged(expanded)
         }
         .onAppear {
-            DispatchQueue.main.async {
-                onExpansionChanged(isExpanded)
-            }
+            notifyExpansionChanged(isExpanded)
             presetSelection = viewModel.selectedPreset
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
@@ -341,15 +336,13 @@ internal struct NotchCompanionView: View {
     private var expandToggleButton: some View {
         Button(
             action: {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    let shouldExpand = !isExpandedByToggle
-                    isExpandedByToggle = shouldExpand
+                let shouldExpand = !isExpandedByToggle
+                isExpandedByToggle = shouldExpand
 
-                    if !shouldExpand {
-                        showAudioMenu = false
-                        showProgressMenu = false
-                        showSettingsMenu = false
-                    }
+                if !shouldExpand {
+                    showAudioMenu = false
+                    showProgressMenu = false
+                    showSettingsMenu = false
                 }
             },
             label: {
@@ -403,6 +396,15 @@ internal struct NotchCompanionView: View {
 
     private func presetLabel(for preset: Preset) -> String {
         viewModel.presetSettings.displayName(for: preset)
+    }
+
+    private func notifyExpansionChanged(_ expanded: Bool) {
+        guard lastReportedExpansion != expanded else { return }
+        lastReportedExpansion = expanded
+
+        DispatchQueue.main.async {
+            onExpansionChanged(expanded)
+        }
     }
 }
 

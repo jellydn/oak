@@ -5,15 +5,25 @@ import XCTest
 @MainActor
 internal final class US006Tests: XCTestCase {
     var progressManager: ProgressManager!
+    private var testUserDefaults: UserDefaults?
+    private var suiteName: String?
 
     override func setUp() async throws {
-        // Clear UserDefaults for clean test
-        UserDefaults.standard.removeObject(forKey: "progressHistory")
-        progressManager = ProgressManager()
+        let suite = "OakTests.US006.Progress.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defaults.removePersistentDomain(forName: suite)
+        suiteName = suite
+        testUserDefaults = defaults
+        progressManager = ProgressManager(userDefaults: defaults)
     }
 
     override func tearDown() async throws {
-        UserDefaults.standard.removeObject(forKey: "progressHistory")
+        if let suiteName {
+            UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
+        }
+        progressManager = nil
+        testUserDefaults = nil
+        suiteName = nil
     }
 
     func testAppStoresDailyFocusMinutes() {
@@ -34,7 +44,7 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(progressManager.dailyStats.todayCompletedSessions, 3)
     }
 
-    func testAppComputes7DayStreak() {
+    func testAppComputes7DayStreak() throws {
         // Record sessions for 7 consecutive days
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -47,7 +57,7 @@ internal final class US006Tests: XCTestCase {
             }
 
             // Create a new ProgressManager for each day to simulate daily records
-            let dailyManager = ProgressManager()
+            let dailyManager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
             dailyManager.recordSessionCompletion(durationMinutes: 25)
         }
 
@@ -56,7 +66,7 @@ internal final class US006Tests: XCTestCase {
         // Instead, we'll test the streak calculation logic directly
 
         // Create fresh manager
-        let testManager = ProgressManager()
+        let testManager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         // Record 3 sessions today
         testManager.recordSessionCompletion(durationMinutes: 25)
@@ -67,9 +77,9 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(testManager.dailyStats.streakDays, 1)
     }
 
-    func testStreakResetsOnMissedDay() {
+    func testStreakResetsOnMissedDay() throws {
         // Create manager and record sessions
-        let manager = ProgressManager()
+        let manager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
         manager.recordSessionCompletion(durationMinutes: 25)
 
         XCTAssertEqual(manager.dailyStats.streakDays, 1)
@@ -83,9 +93,9 @@ internal final class US006Tests: XCTestCase {
         XCTAssertTrue(true, "Streak calculation checks for consecutive days")
     }
 
-    func testDataPersistsAcrossAppRelaunch() {
+    func testDataPersistsAcrossAppRelaunch() throws {
         // Record some progress
-        let manager1 = ProgressManager()
+        let manager1 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
         manager1.recordSessionCompletion(durationMinutes: 25)
         manager1.recordSessionCompletion(durationMinutes: 25)
 
@@ -94,7 +104,7 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(statsBefore.todayCompletedSessions, 2)
 
         // Create a new manager (simulates app relaunch)
-        let manager2 = ProgressManager()
+        let manager2 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         // Verify data persisted
         let statsAfter = manager2.dailyStats
@@ -103,13 +113,13 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(statsAfter.streakDays, statsBefore.streakDays, "Streak should persist")
     }
 
-    func testMultipleDaysDataStored() {
+    func testMultipleDaysDataStored() throws {
         // Record sessions on multiple days
-        let manager1 = ProgressManager()
+        let manager1 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
         manager1.recordSessionCompletion(durationMinutes: 25)
 
         // Create a new manager instance to verify persistence
-        let manager2 = ProgressManager()
+        let manager2 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         // Verify data is still there
         XCTAssertEqual(manager2.dailyStats.todayFocusMinutes, 25)
@@ -117,9 +127,9 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(manager2.dailyStats.streakDays, 1)
     }
 
-    func testZeroMinutesWithoutSessions() {
+    func testZeroMinutesWithoutSessions() throws {
         // Test with no sessions recorded
-        let manager = ProgressManager()
+        let manager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
 
         XCTAssertEqual(manager.dailyStats.todayFocusMinutes, 0, "Should have 0 focus minutes with no sessions")
         XCTAssertEqual(manager.dailyStats.todayCompletedSessions, 0, "Should have 0 completed sessions")
@@ -132,8 +142,8 @@ internal final class US006Tests: XCTestCase {
         let userDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
         let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
-        let viewModel = FocusSessionViewModel(presetSettings: presetSettings)
-        let manager = viewModel.progressManager
+        let manager = ProgressManager(userDefaults: userDefaults)
+        let viewModel = FocusSessionViewModel(presetSettings: presetSettings, progressManager: manager)
 
         // Record a session
         manager.recordSessionCompletion(durationMinutes: 25)
@@ -152,7 +162,8 @@ internal final class US006Tests: XCTestCase {
         let userDefaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
         let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
-        let viewModel = FocusSessionViewModel(presetSettings: presetSettings)
+        let manager = ProgressManager(userDefaults: userDefaults)
+        let viewModel = FocusSessionViewModel(presetSettings: presetSettings, progressManager: manager)
 
         // Record some progress
         viewModel.progressManager.recordSessionCompletion(durationMinutes: 25)

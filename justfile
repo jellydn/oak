@@ -33,6 +33,12 @@ open:
 build-release:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} -configuration Release build
 
+# Regenerate project, build, and run app
+dev:
+    cd Oak && xcodegen generate
+    cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} build
+    open {{derived-data}}/Build/Products/Debug/Oak.app
+
 # Run tests with verbose output
 test-verbose:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} test -verbose
@@ -67,3 +73,7 @@ check-style:
     just lint
     @echo "Running SwiftFormat check..."
     just format-check
+
+# Validate required bundled ambient sounds are present
+check-sounds:
+    ./scripts/check-ambient-sounds.sh

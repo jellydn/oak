@@ -1,6 +1,6 @@
-import SwiftUI
-import CoreGraphics
 import AppKit
+import CoreGraphics
+import SwiftUI
 
 @MainActor
 internal final class PresetSettingsStore: ObservableObject {
@@ -179,7 +179,6 @@ internal final class PresetSettingsStore: ObservableObject {
             notchedDisplayID = value
             userDefaults.set(value, forKey: Keys.notchedDisplayID)
         }
-
     }
 
     private static func validatedWorkMinutes(_ value: Int) -> Int {

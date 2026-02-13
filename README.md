@@ -10,6 +10,12 @@
 
 </div>
 
+## 🎬 Demo
+
+<div align="center">
+  <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak Demo - Focus session in action" width="600"/>
+</div>
+
 # Oak
 
 A lightweight macOS focus companion designed for deep work.
@@ -77,7 +83,28 @@ just clean
 
 # Open in Xcode
 just open
+
+# Validate bundled ambient sound files
+just check-sounds
 ```
+
+### Ambient Sound Assets
+
+Oak expects bundled ambient files under `Oak/Oak/Resources/Sounds` with these base names:
+
+- `ambient_rain`
+- `ambient_forest`
+- `ambient_cafe`
+- `ambient_brown_noise`
+- `ambient_lofi`
+
+Supported extensions: `.m4a` (preferred), `.wav`, `.mp3`.
+
+Sourcing options:
+
+- Mixkit: https://mixkit.co/license/
+- Pixabay: https://pixabay.com/service/license-summary/
+- Freesound (check CC license/attribution per file): https://freesound.org/help/faq/
 
 ### Code Quality Commands
 

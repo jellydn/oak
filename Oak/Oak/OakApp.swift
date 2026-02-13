@@ -38,4 +38,11 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_: Notification) {
         notchWindowController?.cleanup()
     }
+
+    deinit {
+        let windowController = notchWindowController
+        Task { @MainActor in
+            windowController?.cleanup()
+        }
+    }
 }
