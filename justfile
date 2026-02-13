@@ -37,6 +37,6 @@ build-release:
 test-verbose:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} test -verbose
 
-# Check for compilation errors without building
+# Check for compilation errors (incremental build)
 check:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} build
