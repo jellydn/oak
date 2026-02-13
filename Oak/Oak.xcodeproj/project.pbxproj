@@ -19,8 +19,11 @@
 		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
 		B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3EFAB628759B783D66D3 /* AudioTrack.swift */; };
 		B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C93F37E0AC4AA71C304FDD /* US003Tests.swift */; };
+		B5C9AD5FC22FACC36FAA5620 /* AudioMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */; };
 		B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */; };
+		BF73E986CFE97F74C3BFF877 /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */; };
 		BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451C36F9BC7A6103BF32362C /* OakApp.swift */; };
+		C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */; };
 		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
@@ -46,6 +49,7 @@
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
 		155853CBF9374645092FE699 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
+		1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
@@ -59,7 +63,9 @@
 		B74BB88C04B3824E97E3C561 /* US001Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US001Tests.swift; sourceTree = "<group>"; };
 		B93F85CD94F4CCB44AC7296C /* OakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C348F7E99471145836A04408 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
+		D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
 		DBFE863ED8125FD3D3029341 /* US004Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US004Tests.swift; sourceTree = "<group>"; };
+		F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMenuView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -116,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
+				1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */,
 				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
 				26934C0C6B7C8A90F9D57916 /* US002Tests.swift */,
 				85C93F37E0AC4AA71C304FDD /* US003Tests.swift */,
@@ -130,8 +137,10 @@
 		9B4DD5BBE504192643738A6D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */,
 				0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */,
 				3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */,
+				D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -240,6 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */,
+				B5C9AD5FC22FACC36FAA5620 /* AudioMenuView.swift in Sources */,
 				B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */,
 				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
 				8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */,
@@ -248,6 +258,7 @@
 				1941B67DA3C25D4A42BB7D6D /* PresetSettingsStore.swift in Sources */,
 				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
+				C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */,
 			);
@@ -264,6 +275,7 @@
 				8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */,
 				F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */,
 				AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */,
+				BF73E986CFE97F74C3BFF877 /* UpdateCheckerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
