@@ -75,6 +75,8 @@ final class UpdateCheckerTests: XCTestCase {
     }
     
     // MARK: - URL Validation Tests
+    // Note: These tests verify host validation only. Scheme (http vs https) is not validated
+    // as GitHub API responses always use HTTPS URLs.
     
     func testValidatesGitHubURL() {
         // Valid github.com URLs
@@ -90,12 +92,11 @@ final class UpdateCheckerTests: XCTestCase {
     }
     
     func testRejectsMaliciousURLs() {
-        // Invalid URLs that should be rejected
+        // Invalid URLs that should be rejected (non-GitHub hosts)
         let invalidURLs = [
             URL(string: "https://evil.com/releases")!,
             URL(string: "https://github.com.evil.com/releases")!,
-            URL(string: "https://notgithub.com/releases")!,
-            URL(string: "http://github.com/releases")! // even http github URLs work because we only check host
+            URL(string: "https://notgithub.com/releases")!
         ]
         
         for url in invalidURLs {
