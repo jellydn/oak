@@ -30,14 +30,25 @@ A lightweight macOS focus companion designed for deep work.
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Installation
 
+#### Using Homebrew (Recommended)
+
+```bash
+# Add the tap
+brew tap jellydn/oak https://github.com/jellydn/oak
+
+# Install Oak
+brew install --cask oak
+```
+
+#### From Source
+
+**Prerequisites:**
 - macOS 13+ (Apple Silicon recommended)
 - XcodeGen (`brew install xcodegen`)
 - SwiftLint (optional, for code linting: `brew install swiftlint`)
 - SwiftFormat (optional, for code formatting: `brew install swiftformat`)
-
-### Installation
 
 ```bash
 # Clone the repository
