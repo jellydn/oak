@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import os
 import UserNotifications
@@ -11,21 +12,49 @@ internal protocol SessionCompletionNotifying {
 internal class NotificationService: ObservableObject, SessionCompletionNotifying {
     static let shared = NotificationService()
 
-    @Published var isAuthorized: Bool = false
+    @Published private(set) var isAuthorized: Bool = false
+    @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
 
     private let logger = Logger(subsystem: "com.oak.app", category: "NotificationService")
 
     private init() {
-        checkAuthorizationStatus()
+        Task {
+            await refreshAuthorizationStatus()
+        }
     }
 
     func requestAuthorization() async {
         do {
-            let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
-            isAuthorized = granted
+            _ = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
+            await refreshAuthorizationStatus()
         } catch {
-            isAuthorized = false
+            logger.error("Failed to request notification permission: \(error.localizedDescription)")
+            await refreshAuthorizationStatus()
         }
+    }
+
+    func refreshAuthorizationStatus() async {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        authorizationStatus = settings.authorizationStatus
+        isAuthorized = isGrantedStatus(settings.authorizationStatus)
+    }
+
+    func openNotificationSettings() {
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.oak.app"
+        let candidateURLs = [
+            "x-apple.systempreferences:com.apple.Notifications-Settings.extension?\(bundleIdentifier)",
+            "x-apple.systempreferences:com.apple.Notifications-Settings.extension",
+            "x-apple.systempreferences:com.apple.preference.notifications"
+        ]
+
+        for candidate in candidateURLs {
+            guard let url = URL(string: candidate) else { continue }
+            if NSWorkspace.shared.open(url) {
+                return
+            }
+        }
+
+        logger.error("Failed to open Notification settings")
     }
 
     func sendSessionCompletionNotification(isWorkSession: Bool) {
@@ -57,10 +86,14 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
         }
     }
 
-    private func checkAuthorizationStatus() {
-        Task {
-            let settings = await UNUserNotificationCenter.current().notificationSettings()
-            isAuthorized = settings.authorizationStatus == .authorized
+    private func isGrantedStatus(_ status: UNAuthorizationStatus) -> Bool {
+        switch status {
+        case .authorized, .provisional, .ephemeral:
+            return true
+        case .denied, .notDetermined:
+            return false
+        @unknown default:
+            return false
         }
     }
 }
