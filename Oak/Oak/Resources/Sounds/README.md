@@ -37,18 +37,19 @@ Example:
 - Export as AAC (`.m4a`) at 44.1 kHz or 48 kHz.
 - Trim to seamless loop boundaries (no clicks at loop point).
 - Normalize to consistent loudness across all tracks.
-- Keep each track long enough (for example 2-10 minutes) to avoid obvious repetition.
+- Keep each track long enough (for example 2-3 minutes) to avoid obvious repetition.
+- Prefer ~3 minute source files to keep raw `.wav` assets under GitHub's 50 MB recommended limit.
 
 ## Useful commands
 
-Generate 10-minute placeholder sources for all required tracks:
+Generate 3-minute placeholder sources for all required tracks:
 
 ```bash
-ffmpeg -f lavfi -i "anoisesrc=color=white:amplitude=0.12" -af "highpass=f=400,lowpass=f=7000" -t 600 ambient_rain.wav
-ffmpeg -f lavfi -i "anoisesrc=color=pink:amplitude=0.10" -af "highpass=f=200,lowpass=f=5000" -t 600 ambient_forest.wav
-ffmpeg -f lavfi -i "anoisesrc=color=pink:amplitude=0.08" -af "highpass=f=120,lowpass=f=3200" -t 600 ambient_cafe.wav
-ffmpeg -f lavfi -i "anoisesrc=color=brown:amplitude=0.18" -t 600 ambient_brown_noise.wav
-ffmpeg -f lavfi -i "anoisesrc=color=violet:amplitude=0.05" -af "lowpass=f=2800" -t 600 ambient_lofi.wav
+ffmpeg -f lavfi -i "anoisesrc=color=white:amplitude=0.12" -af "highpass=f=400,lowpass=f=7000" -t 180 ambient_rain.wav
+ffmpeg -f lavfi -i "anoisesrc=color=pink:amplitude=0.10" -af "highpass=f=200,lowpass=f=5000" -t 180 ambient_forest.wav
+ffmpeg -f lavfi -i "anoisesrc=color=pink:amplitude=0.08" -af "highpass=f=120,lowpass=f=3200" -t 180 ambient_cafe.wav
+ffmpeg -f lavfi -i "anoisesrc=color=brown:amplitude=0.18" -t 180 ambient_brown_noise.wav
+ffmpeg -f lavfi -i "anoisesrc=color=violet:amplitude=0.05" -af "lowpass=f=2800" -t 180 ambient_lofi.wav
 ```
 
 Convert generated WAV files to ready-to-bundle `.m4a` assets:
