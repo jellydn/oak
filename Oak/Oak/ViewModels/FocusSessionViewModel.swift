@@ -217,7 +217,10 @@ internal class FocusSessionViewModel: ObservableObject {
     deinit {
         timer?.invalidate()
         presetSettingsCancellable?.cancel()
-        audioManager.stop()
+        let manager = audioManager
+        Task { @MainActor in
+            manager.stop()
+        }
     }
 
     func cleanup() {

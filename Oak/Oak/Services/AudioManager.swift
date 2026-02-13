@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import os
 
+@MainActor
 internal class AudioManager: ObservableObject {
     @Published var selectedTrack: AudioTrack = .none
     @Published var volume: Double = 0.5 {
@@ -169,7 +170,13 @@ internal class AudioManager: ObservableObject {
     }
 
     deinit {
-        stop()
+        let engine = audioEngine
+        let nodes = audioNodes
+        let player = audioPlayer
+
+        engine?.stop()
+        nodes.forEach { $0.removeTap(onBus: 0) }
+        player?.stop()
     }
 }
 
