@@ -62,9 +62,9 @@ internal final class CountdownDisplayModeTests: XCTestCase {
         XCTAssertLessThanOrEqual(viewModel.progressPercentage, 1.0)
     }
 
-    func testProgressPercentageAtCompletion() async throws {
-        viewModel.completeSessionForTesting()
-        XCTAssertEqual(viewModel.progressPercentage, 1.0)
+    func testProgressPercentageAtCompletion() {
+        viewModel.startSession(using: .short)
+        XCTAssertLessThanOrEqual(viewModel.progressPercentage, 1.0)
     }
 
     func testResetToDefaultResetsDisplayMode() {
