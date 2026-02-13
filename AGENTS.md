@@ -5,8 +5,7 @@
 Oak is a lightweight macOS focus companion app with notch-based Pomodoro-style focus sessions and ambient audio.
 
 **Stack**: Swift 5.9+, SwiftUI, AVFoundation | **Platform**: macOS 13+ (Apple Silicon)
-**Architecture**: MVVM with `@MainActor` for UI layer
-**Config**: XcodeGen (`project.yml`) - not SPM
+**Architecture**: MVVM with `@MainActor` for UI layer | **Config**: XcodeGen (`project.yml`)
 
 ---
 
@@ -18,11 +17,14 @@ Use `just` (requires [just](https://github.com/casey/just)):
 just                        # Show available commands
 just build                  # Build the project
 just build-release         # Build release version
+just dev                   # Regenerate project, build, and run app
+just open                  # Open project in Xcode
 just test                   # Run all tests
 just test-verbose          # Run tests with verbose output
 just test-class Tests      # Run specific test class
 just test-method Tests methodName  # Run specific test method
 just check                 # Check compilation errors
+just check-sounds          # Validate bundled ambient sound files
 just clean                 # Clean build artifacts
 just lint                  # Run SwiftLint
 just lint-fix              # Auto-fix linting issues
@@ -31,68 +33,52 @@ just format-check          # Check formatting
 just check-style           # Run lint and format checks
 ```
 
-**Single test examples:**
-
-```bash
-just test-method FocusSessionViewModelTests "testStartSession"
-just test-method AudioServiceTests "testPlayAndStop"
-```
-
-**Manual xcodebuild:**
-
-```bash
-cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build
-cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' \
-  -only-testing:OakTests/FocusSessionViewModelTests/testStartSession test
-```
-
-**Regenerate Xcode project:** `cd Oak && xcodegen generate`
+**Single test**: `just test-method FocusSessionViewModelTests "testStartSession"`
+**Manual build**: `cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build`
+**Regenerate project**: `cd Oak && xcodegen generate`
 
 ---
 
-## Code Style Guidelines
+## Code Style
 
-### Imports & Formatting
+### Formatting
+
+- **Indent**: 4 spaces | **Line length**: 120 chars (warning), 150 chars (error)
+- **Trailing newline**: Required | **Documentation**: Use `///` for public APIs
+
+### Imports
 
 - **Order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → @testable import Oak
 - No blank lines between imports, one blank line between type declarations
-- 4 spaces indentation, 120 char line limit (soft)
-- Trailing newline at end of files
-- Use `///` for documentation comments
 
-### Types & Naming
+### Naming
 
-- **Types**: PascalCase (`FocusSessionViewModel`, `SessionState`)
-- **Functions/Variables**: camelCase (`startSession`, `remainingSeconds`)
-- **Constants**: lowerCamelCase (instance), PascalCase (static)
-- **Enums**: PascalCase type with lowerCamelCase cases
+- **Types**: PascalCase (`FocusSessionViewModel`) | **Functions/Variables**: camelCase
+- **Constants**: lowerCamelCase (instance), PascalCase (static) | **Enums**: PascalCase with lowerCamelCase cases
 - **Booleans**: Start with is/has/should (`isWorkSession`, `canStart`)
-- **Access control**: Explicit `internal` keyword (e.g., `internal class`, `internal enum`)
+- **Access control**: Explicit `internal` keyword
 
 ### SwiftUI Conventions
 
-- Use `@MainActor` on all ViewModels and UI-related classes
+- `@MainActor` on all ViewModels and UI-related classes
 - ViewModels: `@MainActor class X: ObservableObject` with `@Published`
 - Prefer `private` for internal state, `private(set)` for read-only published
-- Use computed properties for derived state (`displayTime`, `canPause`, `isRunning`)
 - Extract views as `private var some View` computed properties
 
 ### State Management
 
 - Use enums with associated values for finite state machines
-- Use pattern matching with `if case` for state checks
-- Keep state transitions explicit and side-effect-free
+- Use `if case` for state checks, keep transitions explicit
+- Use computed properties for derived state (`displayTime`, `canPause`)
 
 ### Error Handling
 
-- Use Swift's `Result` type for async operations that can fail
-- Prefer early returns/guard clauses over nested if-else
-- **Logging**: Use `os.log` in production; `print()` acceptable in dev/debug
+- Use `Result` type for async operations | Prefer early returns/guard clauses
+- **Logging**: `os.log` in production, `print()` acceptable in dev/debug
 
 ### Memory & Concurrency
 
-- Use `[weak self]` in escaping closures (timers, async callbacks)
-- Always `invalidate()` timers in `cleanup()` or `deinit`
+- Use `[weak self]` in escaping closures | Always `invalidate()` timers in `cleanup()` or `deinit`
 - Wrap timer callbacks with `Task { @MainActor in self?.tick() }`
 
 ### Persistence
@@ -101,6 +87,12 @@ cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=m
 guard let data = userDefaults.data(forKey: key),
       let records = try? JSONDecoder().decode([T].self, from: data) else { return [] }
 ```
+
+### Linter (SwiftLint) & Formatter (SwiftFormat)
+
+- **SwiftLint opt-in**: explicit_init, trailing_closure, first_where, toggle_bool, modifier_order, empty_count
+- **Custom rule**: `no_print_statements` warns against `print()` in production
+- **SwiftFormat**: indent 4, maxwidth 120, wraparguments before-first, stripunusedargs always, self remove
 
 ---
 
@@ -124,65 +116,33 @@ Oak/
 
 ## Testing Guidelines
 
-- Test files mirror source structure with `Tests` suffix
-- Use XCTest framework with `@MainActor` on test classes
-- Test methods are `async throws`
-- Use `setUp()` and `tearDown()` for fixtures
-- Isolate UserDefaults with unique suite names per test:
-
-```swift
-@MainActor
-internal final class FeatureTests: XCTestCase {
-    var viewModel: ViewModel!
-    var suiteName: String!
-
-    override func setUp() async throws {
-        suiteName = "OakTests.Feature.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else { throw ... }
-        defaults.removePersistentDomain(forName: suiteName)
-        viewModel = ViewModel(userDefaults: defaults)
-    }
-
-    override func tearDown() async throws {
-        viewModel.cleanup()
-        if let suiteName {
-            UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
-        }
-    }
-}
-```
-
-- Test state transitions: idle → running → paused → idle
-- Test computed properties and edge cases (0 values, boundaries)
+- Test files: `Tests` suffix, mirror source structure | Use XCTest with `@MainActor` on test classes
+- Test methods: `async throws` | Use `setUp()` and `tearDown()` for fixtures
+- **Isolate UserDefaults** with unique suite names per test class
+- Test state transitions: idle → running → paused → idle | Test computed properties and edge cases
 
 ---
 
 ## MVP Constraints (Do Not Violate)
 
 - Fixed presets only: `25/5` and `50/10` (no custom durations)
-- Notch-only UI (no menu bar fallback yet)
-- No global keyboard shortcuts
-- Auto-start next interval defaults to OFF
-- Built-in audio tracks only (no user imports)
+- Notch-only UI (no menu bar fallback yet) | No global keyboard shortcuts
+- Auto-start next interval defaults to OFF | Built-in audio tracks only
 - Local persistence only (no cloud sync)
 
 ---
 
-## Commit Message Style
+## Commit Style
 
-`type(scope): brief description`
-
-- **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
-- **Scope**: `timer`, `audio`, `ui`, `persistence`, etc.
+`type(scope): brief description` | **Types**: feat, fix, refactor, test, docs, chore | **Scope**: timer, audio, ui, persistence
 
 ---
 
 ## What Agents Should Know
 
-- Always run `just build` after making changes to verify compilation
-- Run `just lint` to check code style and `just format` to auto-format code
-- Run relevant tests before submitting: `just test-method ViewModelTests "testName"`
+- Run `just build` after changes to verify compilation
+- Run `just check-style` before submitting
+- Run relevant tests: `just test-method ViewModelTests "testName"`
 - Verify changes don't break notch-only display constraints
-- Use `os.log` for logging in production, `print()` for debugging
-- Use `///` for public API documentation
-- Check PRD at `tasks/prd-macos-focus-companion-app.md` and ADRs in `doc/adr/` when in doubt
+- Use `os.log` for production logging, `print()` for debugging
+- Check PRD at `tasks/prd-macos-focus-companion-app.md` and ADRs in `doc/adr/`
