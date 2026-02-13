@@ -78,5 +78,5 @@ jobs:
             exit 0
           fi
           
-          git commit -m "chore: update Homebrew cask to v${{ steps.release.outputs.version }}"
+          git commit -m "chore: update Homebrew cask to v${{ steps.release.outputs.version }} [skip ci]"
           git push origin main
