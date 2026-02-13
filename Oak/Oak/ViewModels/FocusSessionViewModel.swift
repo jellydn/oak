@@ -17,7 +17,11 @@ internal class FocusSessionViewModel: ObservableObject {
     let progressManager: ProgressManager
     let notificationService: NotificationService
 
-    init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil, notificationService: NotificationService? = nil) {
+    init(
+        presetSettings: PresetSettingsStore,
+        progressManager: ProgressManager? = nil,
+        notificationService: NotificationService? = nil
+    ) {
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
         self.notificationService = notificationService ?? NotificationService.shared
