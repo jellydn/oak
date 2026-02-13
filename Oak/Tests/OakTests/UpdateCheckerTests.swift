@@ -79,7 +79,7 @@ final class UpdateCheckerTests: XCTestCase {
     // as GitHub API responses always use HTTPS URLs.
     
     func testValidatesGitHubURL() {
-        // Valid github.com URLs
+        // Valid github.com URLs with exact hostname matching
         let validURLs = [
             URL(string: "https://github.com/jellydn/oak/releases/tag/v1.0.0")!,
             URL(string: "https://api.github.com/repos/jellydn/oak/releases")!,
@@ -87,7 +87,11 @@ final class UpdateCheckerTests: XCTestCase {
         ]
         
         for url in validURLs {
-            XCTAssertTrue(url.host?.hasSuffix("github.com") == true, "Expected \(url) to be a valid GitHub URL")
+            let host = url.host
+            let isValidGitHub = host == "github.com" ||
+                               host == "api.github.com" ||
+                               host == "raw.githubusercontent.com"
+            XCTAssertTrue(isValidGitHub, "Expected \(url) to be a valid GitHub URL")
         }
     }
     
@@ -96,12 +100,17 @@ final class UpdateCheckerTests: XCTestCase {
         let invalidURLs = [
             URL(string: "https://evil.com/releases")!,
             URL(string: "https://github.com.evil.com/releases")!,
-            URL(string: "https://notgithub.com/releases")!
+            URL(string: "https://notgithub.com/releases")!,
+            URL(string: "https://evilgithub.com/releases")!,  // Subdomain spoofing attempt
+            URL(string: "https://mygithub.com/releases")!     // Domain ending in github.com
         ]
         
         for url in invalidURLs {
-            let isGitHub = url.host?.hasSuffix("github.com") == true
-            XCTAssertFalse(isGitHub, "Expected \(url) to be rejected as non-GitHub URL")
+            let host = url.host
+            let isValidGitHub = host == "github.com" ||
+                               host == "api.github.com" ||
+                               host == "raw.githubusercontent.com"
+            XCTAssertFalse(isValidGitHub, "Expected \(url) to be rejected as non-GitHub URL")
         }
     }
 }

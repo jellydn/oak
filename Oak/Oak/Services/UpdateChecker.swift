@@ -118,7 +118,10 @@ final class UpdateChecker: UpdateChecking {
 
         if response == .alertFirstButtonReturn {
             // Validate URL host to prevent MITM attacks
-            guard releaseURL.host?.hasSuffix("github.com") == true else {
+            guard let host = releaseURL.host,
+                  host == "github.com" ||
+                  host == "api.github.com" ||
+                  host == "raw.githubusercontent.com" else {
                 logger.warning("Rejected non-GitHub release URL: \(releaseURL, privacy: .public)")
                 return
             }
