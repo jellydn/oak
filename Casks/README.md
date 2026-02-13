@@ -33,7 +33,7 @@ If you need to manually update the cask:
 To submit Oak to the official Homebrew Cask repository:
 
 1. Ensure the cask formula follows [Homebrew Cask guidelines](https://docs.brew.sh/Cask-Cookbook)
-2. Test the cask: `brew install --cask Casks/oak.rb`
+2. Test the cask: `brew install --cask ./Casks/oak.rb`
 3. Submit a PR to [homebrew-cask](https://github.com/Homebrew/homebrew-cask)
 
 For now, users can tap this repository directly to install Oak.
