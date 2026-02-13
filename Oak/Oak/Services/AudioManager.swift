@@ -70,6 +70,14 @@ internal class AudioManager: ObservableObject {
         let engine = AVAudioEngine()
         let mainMixer = engine.mainMixerNode
         mainMixer.outputVolume = Float(volume)
+        let outputFormat = engine.outputNode.outputFormat(forBus: 0)
+
+        guard outputFormat.channelCount > 0, outputFormat.sampleRate > 0 else {
+            logger.error("Audio output format unavailable; skipping playback start")
+            isPlaying = false
+            selectedTrack = .none
+            return
+        }
 
         var sourceNode: AVAudioNode?
 
@@ -95,7 +103,8 @@ internal class AudioManager: ObservableObject {
 
         if let source = sourceNode {
             engine.attach(source)
-            engine.connect(source, to: mainMixer, format: source.outputFormat(forBus: 0))
+            // Let AVAudioEngine negotiate the best internal format for the current hardware route.
+            engine.connect(source, to: mainMixer, format: nil)
             audioNodes.append(source)
         }
 

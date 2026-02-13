@@ -86,10 +86,10 @@ internal struct NotchCompanionView: View {
         .frame(maxWidth: .infinity, minHeight: notchHeight, maxHeight: notchHeight)
         .contentShape(Rectangle())
         .onChange(of: isExpanded) { expanded in
-            onExpansionChanged(expanded)
+            notifyExpansionChanged(expanded)
         }
         .onAppear {
-            onExpansionChanged(isExpanded)
+            notifyExpansionChanged(isExpanded)
             presetSelection = viewModel.selectedPreset
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
@@ -397,6 +397,13 @@ internal struct NotchCompanionView: View {
 
     private func presetLabel(for preset: Preset) -> String {
         viewModel.presetSettings.displayName(for: preset)
+    }
+
+    private func notifyExpansionChanged(_ expanded: Bool) {
+        Task { @MainActor in
+            await Task.yield()
+            onExpansionChanged(expanded)
+        }
     }
 }
 

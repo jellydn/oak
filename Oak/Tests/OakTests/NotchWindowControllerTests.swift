@@ -292,8 +292,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
         while Date() < endTime {
             if let window = windowController.window as? NotchWindow,
-               abs(window.frame.width - width) <= 1.0
-            {
+               abs(window.frame.width - width) <= 1.0 {
                 return true
             }
 
