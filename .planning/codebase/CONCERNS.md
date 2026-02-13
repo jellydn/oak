@@ -122,9 +122,9 @@
 - Scaling path: Migrate to SQLite (via SwiftData/CoreData) or a simple JSON file for historical records. Keep only recent data in UserDefaults.
 
 **Single-display assumption:**
-- Current capacity: Works correctly on the primary display.
-- Limit: `NSScreen.main` is used for window positioning. On multi-monitor setups, the notch window always appears on the primary display, which may not have a notch (external monitors).
-- Scaling path: Detect the built-in display with notch using `NSScreen.auxiliaryTopLeftArea` or screen name matching.
+- ~~Current capacity: Works correctly on the primary display.~~ **RESOLVED**: Now detects and uses the built-in display with notch.
+- ~~Limit: `NSScreen.main` is used for window positioning. On multi-monitor setups, the notch window always appears on the primary display, which may not have a notch (external monitors).~~ **RESOLVED**: Uses `NSScreen.auxiliaryTopLeftArea` to detect notch on macOS 12+.
+- Implementation: The window controller now observes `NSApplication.didChangeScreenParametersNotification` and automatically repositions the window when display configuration changes.
 
 ## Dependencies at Risk
 
@@ -140,9 +140,10 @@
 
 ## Missing Critical Features
 
-**No graceful handling of display changes:**
-- Problem: If the user connects/disconnects an external display, or if `NSScreen.main` changes, the notch window position is not recalculated.
-- Blocks: Proper multi-monitor support; window may become invisible or mispositioned after display configuration changes.
+~~**No graceful handling of display changes:**~~ **RESOLVED**
+- ~~Problem: If the user connects/disconnects an external display, or if `NSScreen.main` changes, the notch window position is not recalculated.~~
+- ~~Blocks: Proper multi-monitor support; window may become invisible or mispositioned after display configuration changes.~~
+- Solution: Implemented `NSApplication.didChangeScreenParametersNotification` observer that automatically recalculates window position when displays are connected/disconnected. The window now detects the built-in display with notch using `NSScreen.auxiliaryTopLeftArea`.
 
 **No app quit mechanism beyond right-click context menu:**
 - Problem: The only way to quit is via the right-click context menu on the notch window or Force Quit. There's no menu bar icon, no Dock icon (`LSUIElement: true`), and no keyboard shortcut.
