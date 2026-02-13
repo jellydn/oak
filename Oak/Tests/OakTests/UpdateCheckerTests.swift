@@ -23,7 +23,7 @@ final class UpdateCheckerTests: XCTestCase {
     // MARK: - Rate Limit Tests
     
     func testHandles403RateLimitResponse() async throws {
-        let mockSession = MockURLSession(statusCode: 403, data: Data())
+        let mockSession = makeMockSession(statusCode: 403, data: Data())
         let checker = UpdateChecker(
             repositoryOwner: "test",
             repositoryName: "test",
@@ -45,7 +45,7 @@ final class UpdateCheckerTests: XCTestCase {
     }
     
     func testHandles429RateLimitResponse() async throws {
-        let mockSession = MockURLSession(statusCode: 429, data: Data())
+        let mockSession = makeMockSession(statusCode: 429, data: Data())
         let checker = UpdateChecker(
             repositoryOwner: "test",
             repositoryName: "test",
@@ -103,29 +103,46 @@ final class UpdateCheckerTests: XCTestCase {
     }
 }
 
-// MARK: - Mock URLSession
+// MARK: - URLProtocol Mocking
 
-private class MockURLSession: URLSession {
-    let statusCode: Int
-    let mockData: Data
-    
-    init(statusCode: Int, data: Data) {
-        self.statusCode = statusCode
-        self.mockData = data
+private final class MockURLProtocol: URLProtocol {
+    static var statusCode = 200
+    static var responseData = Data()
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        true
     }
-    
-    override func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
         guard let url = request.url else {
-            throw URLError(.badURL)
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
         }
-        
+
         let response = HTTPURLResponse(
             url: url,
-            statusCode: statusCode,
+            statusCode: Self.statusCode,
             httpVersion: "HTTP/1.1",
             headerFields: nil
         )!
-        
-        return (mockData, response)
+
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Self.responseData)
+        client?.urlProtocolDidFinishLoading(self)
     }
+
+    override func stopLoading() {}
+}
+
+private func makeMockSession(statusCode: Int, data: Data) -> URLSession {
+    MockURLProtocol.statusCode = statusCode
+    MockURLProtocol.responseData = data
+
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.protocolClasses = [MockURLProtocol.self]
+    return URLSession(configuration: configuration)
 }
