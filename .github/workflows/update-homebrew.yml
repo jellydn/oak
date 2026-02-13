@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: update-homebrew-cask
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
