@@ -3,17 +3,22 @@ import os
 import UserNotifications
 
 @MainActor
-internal class NotificationService: ObservableObject {
+internal protocol SessionCompletionNotifying {
+    func sendSessionCompletionNotification(isWorkSession: Bool)
+}
+
+@MainActor
+internal class NotificationService: ObservableObject, SessionCompletionNotifying {
     static let shared = NotificationService()
-    
+
     @Published var isAuthorized: Bool = false
-    
+
     private let logger = Logger(subsystem: "com.oak.app", category: "NotificationService")
-    
+
     private init() {
         checkAuthorizationStatus()
     }
-    
+
     func requestAuthorization() async {
         do {
             let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
@@ -22,10 +27,10 @@ internal class NotificationService: ObservableObject {
             isAuthorized = false
         }
     }
-    
+
     func sendSessionCompletionNotification(isWorkSession: Bool) {
         guard isAuthorized else { return }
-        
+
         let content = UNMutableNotificationContent()
         if isWorkSession {
             content.title = "Focus Session Complete!"
@@ -36,13 +41,13 @@ internal class NotificationService: ObservableObject {
             content.body = "Ready to focus again?"
             content.sound = .default
         }
-        
+
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
             content: content,
             trigger: nil
         )
-        
+
         UNUserNotificationCenter.current().add(request) { error in
             if let error {
                 Task { @MainActor in
@@ -51,7 +56,7 @@ internal class NotificationService: ObservableObject {
             }
         }
     }
-    
+
     private func checkAuthorizationStatus() {
         Task {
             let settings = await UNUserNotificationCenter.current().notificationSettings()

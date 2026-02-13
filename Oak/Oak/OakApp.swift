@@ -15,6 +15,7 @@ internal struct OakApp: App {
     }
 }
 
+@MainActor
 internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
     var updateChecker: UpdateChecking = UpdateChecker()
@@ -34,7 +35,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         notchWindowController = NotchWindowController()
         notchWindowController?.window?.orderFrontRegardless()
         updateChecker.checkForUpdatesOnLaunch()
-        
+
         // Request notification permissions (not during tests)
         Task { @MainActor in
             await notificationService.requestAuthorization()

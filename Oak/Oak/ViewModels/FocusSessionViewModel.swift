@@ -15,12 +15,12 @@ internal class FocusSessionViewModel: ObservableObject {
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager: ProgressManager
-    let notificationService: NotificationService
+    let notificationService: any SessionCompletionNotifying
 
     init(
         presetSettings: PresetSettingsStore,
         progressManager: ProgressManager? = nil,
-        notificationService: NotificationService? = nil
+        notificationService: (any SessionCompletionNotifying)? = nil
     ) {
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
@@ -213,7 +213,7 @@ internal class FocusSessionViewModel: ObservableObject {
         timer?.invalidate()
         timer = nil
         sessionState = .completed(isWorkSession: isWorkSession)
-        
+
         // Trigger UI animations after state is updated
         isSessionComplete = true
 
@@ -222,6 +222,10 @@ internal class FocusSessionViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
         }
+    }
+
+    func completeSessionForTesting() {
+        completeSession()
     }
 
     deinit {

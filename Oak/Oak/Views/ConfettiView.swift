@@ -2,15 +2,15 @@ import SwiftUI
 
 internal struct ConfettiView: View {
     static let animationDuration: Double = 1.2
-    
+
     let count: Int
     @State private var animating = false
     @State private var particles: [ConfettiParticle] = []
-    
+
     init(count: Int = 30) {
         self.count = count
     }
-    
+
     var body: some View {
         ZStack {
             ForEach(particles) { particle in
@@ -25,16 +25,16 @@ internal struct ConfettiView: View {
             }
         }
         .onAppear {
-            particles = (0..<count).map { index in
+            particles = (0 ..< count).map { index in
                 ConfettiParticle(
                     id: index,
-                    targetX: CGFloat.random(in: -150...150),
-                    targetY: CGFloat.random(in: -100...200),
-                    rotation: Double.random(in: 0...360),
+                    targetX: CGFloat.random(in: -150 ... 150),
+                    targetY: CGFloat.random(in: -100 ... 200),
+                    rotation: Double.random(in: 0 ... 360),
                     color: ConfettiPiece.colors[index % ConfettiPiece.colors.count]
                 )
             }
-            
+
             withAnimation(.easeOut(duration: ConfettiView.animationDuration)) {
                 animating = true
             }
@@ -54,9 +54,9 @@ private struct ConfettiPiece: View {
     static let colors: [Color] = [
         .green, .blue, .orange, .pink, .purple, .yellow, .red
     ]
-    
+
     let color: Color
-    
+
     var body: some View {
         Circle()
             .fill(color)

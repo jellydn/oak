@@ -8,7 +8,7 @@ internal final class ConfettiViewTests: XCTestCase {
         let confettiView = ConfettiView()
         XCTAssertNotNil(confettiView, "ConfettiView should be initialized")
     }
-    
+
     func testConfettiViewWithCustomCount() {
         let confettiView = ConfettiView(count: 50)
         XCTAssertNotNil(confettiView, "ConfettiView with custom count should be initialized")

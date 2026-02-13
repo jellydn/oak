@@ -84,7 +84,7 @@ internal struct NotchCompanionView: View {
             .padding(.vertical, verticalPadding)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
-            
+
             if showConfetti {
                 ConfettiView()
                     .allowsHitTesting(false)
@@ -108,7 +108,7 @@ internal struct NotchCompanionView: View {
                 // Show confetti only for completed work sessions
                 if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
                     showConfetti = true
-                    
+
                     DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
                         showConfetti = false
                     }
