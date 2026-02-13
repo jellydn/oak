@@ -35,7 +35,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         notchWindowController?.window?.orderFrontRegardless()
         updateChecker.checkForUpdatesOnLaunch()
         
-        // Request notification permissions
+        // Request notification permissions (not during tests)
         Task { @MainActor in
             await notificationService.requestAuthorization()
         }

@@ -42,7 +42,9 @@ internal class NotificationService: ObservableObject {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error {
-                print("Error sending notification: \(error.localizedDescription)")
+                Task { @MainActor in
+                    print("Error sending notification: \(error.localizedDescription)")
+                }
             }
         }
     }

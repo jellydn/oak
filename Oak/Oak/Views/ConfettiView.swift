@@ -1,6 +1,8 @@
 import SwiftUI
 
 internal struct ConfettiView: View {
+    static let animationDuration: Double = 1.2
+    
     let count: Int
     @State private var animating = false
     
@@ -22,7 +24,7 @@ internal struct ConfettiView: View {
             }
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 1.2)) {
+            withAnimation(.easeOut(duration: ConfettiView.animationDuration)) {
                 animating = true
             }
         }

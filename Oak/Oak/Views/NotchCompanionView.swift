@@ -109,7 +109,7 @@ internal struct NotchCompanionView: View {
                 if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
                     showConfetti = true
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
                         showConfetti = false
                     }
                 }
