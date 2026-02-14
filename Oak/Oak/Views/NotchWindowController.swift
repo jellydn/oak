@@ -212,21 +212,23 @@ internal class NotchWindow: NSPanel {
     ) {
         let screen = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)
         let screenFrame = screen?.frame ?? .zero
-        let visibleFrame = screen?.visibleFrame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
         
-        // Position for notch-first UI: align with actual notch on built-in displays
-        let yPosition: CGFloat
-        if screen?.hasNotch == true {
-            // On notched displays, position at top of screen to overlay the notch
-            yPosition = screenFrame.maxY - height
-        } else if alwaysOnTop {
-            // On non-notched displays with always-on-top, position below menu bar
-            yPosition = visibleFrame.maxY - height
-        } else {
-            // On non-notched displays without always-on-top, position at top
-            yPosition = screenFrame.maxY - height
-        }
+        // Use the same positioning logic as notchYPosition method for consistency
+        let yPosition: CGFloat = {
+            guard let screen = screen else { return 0 }
+            
+            // For notch-first UI: position at top of screen if display has a notch
+            if screen.hasNotch {
+                return screen.frame.maxY - height
+            }
+            
+            // For non-notched displays: position below menu bar if alwaysOnTop, otherwise at top of screen
+            if alwaysOnTop {
+                return screen.visibleFrame.maxY - height
+            }
+            return screen.frame.maxY - height
+        }()
 
         super.init(
             contentRect: NSRect(x: xPosition, y: yPosition, width: width, height: height),
