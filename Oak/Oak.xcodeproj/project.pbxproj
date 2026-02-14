@@ -21,7 +21,6 @@
 		5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */; };
 		610C05D4C9C49C70A78B7D69 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = B1EB99EC9EF014772EA562EF /* README.md */; };
 		61F4A962C9C52E757FAE25FE /* ambient_brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7663A82B3FFE2837587C2B2F /* ambient_brown_noise.m4a */; };
-		664291E753CDB8DA0B79C9D3 /* ambient_brown_noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = F8EC066ED6CCF07ED7D7309E /* ambient_brown_noise.wav */; };
 		6BF9354EE28ABB4B59A9E051 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B28E445B82B7BC8D6C4D0984 /* Sparkle */; };
 		716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23364F4B016E445E5657BF63 /* SettingsMenuView.swift */; };
 		82C6E45CC0A2D94BBBB83623 /* CountdownDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53A901D48495497B38B2A1E /* CountdownDisplayMode.swift */; };
@@ -29,7 +28,6 @@
 		8C831319B8AF05D32A0F8608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08E0A4A56EADCDB21276DE81 /* Assets.xcassets */; };
 		8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */; };
 		935A6BD932F4EC629908FE05 /* ambient_lofi.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 63539C12247302E14148BE07 /* ambient_lofi.m4a */; };
-		9756D44804BF478285073F0C /* ambient_rain.wav in Resources */ = {isa = PBXBuildFile; fileRef = 17D6B30DEDC9126B5A3E77DF /* ambient_rain.wav */; };
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
 		A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */; };
 		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
@@ -49,10 +47,7 @@
 		D9BC1320EE869D9AD7FE40AE /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770CCC886CF6A5E903159704 /* SparkleUpdater.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
 		DF1ECF04DC3D712A1F7B0C30 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D555E4182E199E8EC8D0B3 /* NotificationService.swift */; };
-		E0B877DBD09CEEF00019BE07 /* ambient_lofi.wav in Resources */ = {isa = PBXBuildFile; fileRef = DB739C07704B32BF1998761B /* ambient_lofi.wav */; };
-		E24A84D1E69B270F4EEE1C95 /* ambient_forest.wav in Resources */ = {isa = PBXBuildFile; fileRef = 32954184C5B3930CBE019533 /* ambient_forest.wav */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
-		EAFB172B8BA777F1E272F3F7 /* ambient_cafe.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1641B6605BDA11BE28B2440F /* ambient_cafe.wav */; };
 		EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */; };
 		EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */; };
 		F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */; };
@@ -78,9 +73,7 @@
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
 		14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiViewTests.swift; sourceTree = "<group>"; };
 		155853CBF9374645092FE699 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
-		1641B6605BDA11BE28B2440F /* ambient_cafe.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_cafe.wav; sourceTree = "<group>"; };
 		164FAFB05B901C05BD1479BF /* NotchLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchLayout.swift; sourceTree = "<group>"; };
-		17D6B30DEDC9126B5A3E77DF /* ambient_rain.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_rain.wav; sourceTree = "<group>"; };
 		1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */ = {isa = PBXFileReference; path = ambient_cafe.m4a; sourceTree = "<group>"; };
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
 		1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
@@ -88,7 +81,6 @@
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
 		309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppcastVersionParserTests.swift; sourceTree = "<group>"; };
-		32954184C5B3930CBE019533 /* ambient_forest.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_forest.wav; sourceTree = "<group>"; };
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
 		3912FED25041D62DE77347EA /* NotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTests.swift; sourceTree = "<group>"; };
 		3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+DisplayTarget.swift"; sourceTree = "<group>"; };
@@ -115,13 +107,11 @@
 		D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowControllerTests.swift; sourceTree = "<group>"; };
 		D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressRing.swift; sourceTree = "<group>"; };
 		D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
-		DB739C07704B32BF1998761B /* ambient_lofi.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_lofi.wav; sourceTree = "<group>"; };
 		DBFE863ED8125FD3D3029341 /* US004Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US004Tests.swift; sourceTree = "<group>"; };
 		E43285E82910BB45D9CF9000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F287A617D7BF92425C7BD22A /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownDisplayModeTests.swift; sourceTree = "<group>"; };
 		F3D8E840983307E12ADC1FCF /* AudioMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMenuView.swift; sourceTree = "<group>"; };
-		F8EC066ED6CCF07ED7D7309E /* ambient_brown_noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ambient_brown_noise.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -261,15 +251,10 @@
 			isa = PBXGroup;
 			children = (
 				7663A82B3FFE2837587C2B2F /* ambient_brown_noise.m4a */,
-				F8EC066ED6CCF07ED7D7309E /* ambient_brown_noise.wav */,
 				1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */,
-				1641B6605BDA11BE28B2440F /* ambient_cafe.wav */,
 				7D93E5502BBC8DD90FD136BB /* ambient_forest.m4a */,
-				32954184C5B3930CBE019533 /* ambient_forest.wav */,
 				63539C12247302E14148BE07 /* ambient_lofi.m4a */,
-				DB739C07704B32BF1998761B /* ambient_lofi.wav */,
 				B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */,
-				17D6B30DEDC9126B5A3E77DF /* ambient_rain.wav */,
 				B1EB99EC9EF014772EA562EF /* README.md */,
 			);
 			path = Sounds;
@@ -357,15 +342,10 @@
 				8C831319B8AF05D32A0F8608 /* Assets.xcassets in Resources */,
 				610C05D4C9C49C70A78B7D69 /* README.md in Resources */,
 				61F4A962C9C52E757FAE25FE /* ambient_brown_noise.m4a in Resources */,
-				664291E753CDB8DA0B79C9D3 /* ambient_brown_noise.wav in Resources */,
 				4404053F80F1F1F3265EF06E /* ambient_cafe.m4a in Resources */,
-				EAFB172B8BA777F1E272F3F7 /* ambient_cafe.wav in Resources */,
 				BC0152F64748D50B856DA0C1 /* ambient_forest.m4a in Resources */,
-				E24A84D1E69B270F4EEE1C95 /* ambient_forest.wav in Resources */,
 				935A6BD932F4EC629908FE05 /* ambient_lofi.m4a in Resources */,
-				E0B877DBD09CEEF00019BE07 /* ambient_lofi.wav in Resources */,
 				3ED5BDC623247CE16B62E99B /* ambient_rain.m4a in Resources */,
-				9756D44804BF478285073F0C /* ambient_rain.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
