@@ -8,10 +8,13 @@ internal extension NSScreen {
             return nil
         }
         let displayID = CGDirectDisplayID(number.uint32Value)
+        // CGDisplayCreateUUIDFromDisplayID follows Core Foundation "Create" naming convention,
+        // returning a +1 retained reference that we must take ownership of
         guard let uuid = CGDisplayCreateUUIDFromDisplayID(displayID)?.takeRetainedValue() else {
             return nil
         }
-        // CFUUIDCreateString returns a retained CFString; Swift's bridging releases it properly
+        // CFUUIDCreateString also returns a +1 retained reference; Swift's automatic
+        // bridging to String properly releases the CFString for us
         let uuidString = CFUUIDCreateString(nil, uuid) as String
         return uuidString
     }
