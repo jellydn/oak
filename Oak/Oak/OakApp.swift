@@ -15,7 +15,7 @@ internal struct OakApp: App {
                     notificationService: notificationService,
                     sparkleUpdater: sparkleUpdater
                 )
-                .frame(width: 320)
+                .frame(width: 420)
                 .padding(8)
             } else {
                 SettingsMenuView(
@@ -23,7 +23,7 @@ internal struct OakApp: App {
                     notificationService: notificationService,
                     sparkleUpdater: SparkleUpdater.shared
                 )
-                .frame(width: 320)
+                .frame(width: 420)
                 .padding(8)
             }
         }
