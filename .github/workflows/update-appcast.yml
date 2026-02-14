@@ -187,10 +187,17 @@ jobs:
           perl -i -pe 's/\$\{ED_SIGNATURE\}/$ENV{ED_SIGNATURE}/g' /tmp/new_item.xml
           sed -i '' "s/\${RELEASE_DATE}/$RELEASE_DATE/g" /tmp/new_item.xml
 
-          # Inject HTML release notes from GitHub release body_html into CDATA
-          awk -v notes="$RELEASE_NOTES_HTML" '
+          # Inject HTML release notes from GitHub release body_html into CDATA.
+          # Avoid `awk -v` for multiline HTML because apostrophes/newlines can break parsing.
+          printf '%s\n' "$RELEASE_NOTES_HTML" > /tmp/release_notes.html
+          awk '
             { print }
-            /<h2>Oak .*<\/h2>/ { print "              " notes }
+            /<h2>Oak .*<\/h2>/ {
+              while ((getline line < "/tmp/release_notes.html") > 0) {
+                print "              " line
+              }
+              close("/tmp/release_notes.html")
+            }
           ' /tmp/new_item.xml > /tmp/new_item.with_notes.xml
           mv /tmp/new_item.with_notes.xml /tmp/new_item.xml
           
