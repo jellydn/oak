@@ -362,6 +362,88 @@ internal final class NotchWindowControllerTests: XCTestCase {
         )
     }
 
+    // MARK: - Notch-First UI Tests
+
+    func testWindowPositionsAtTopOfScreenOnNotchedDisplay() {
+        // Skip if no notched display available
+        guard let notchedScreen = NSScreen.screens.first(where: { $0.hasNotch }) else {
+            XCTSkip("No notched display available for testing")
+        }
+
+        // Create a window controller targeting the notched display
+        let notchedPresetSettings = PresetSettingsStore(userDefaults: testUserDefaults)
+        let notchedScreenID = NSScreen.displayID(for: notchedScreen)
+        notchedPresetSettings.setDisplayTarget(.notchedDisplay, screenID: notchedScreenID)
+        notchedPresetSettings.setAlwaysOnTop(false)
+
+        let notchedController = NotchWindowController(presetSettings: notchedPresetSettings)
+        defer { notchedController.cleanup() }
+
+        let window = notchedController.window as? NotchWindow
+
+        // On a notched display, the window should be positioned at frame.maxY (top of screen)
+        let expectedY = notchedScreen.frame.maxY - NotchLayout.height
+        let actualY = window?.frame.minY ?? 0
+
+        XCTAssertEqual(
+            actualY,
+            expectedY,
+            accuracy: 1.0,
+            "Window should be positioned at top of screen (frame.maxY) on notched display"
+        )
+    }
+
+    func testWindowPositionsBelowMenuBarOnNonNotchedDisplayWithAlwaysOnTop() {
+        // Create a non-notched display scenario by disabling alwaysOnTop first
+        presetSettings.setAlwaysOnTop(true)
+
+        let window = windowController.window as? NotchWindow
+        let target = presetSettings.displayTarget
+        let preferredDisplayID = presetSettings.preferredDisplayID(for: target)
+        let resolvedScreen = NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)
+
+        // Wait for window to reposition
+        var positionUpdated = false
+        let endTime = Date().addingTimeInterval(1.0)
+
+        while Date() < endTime {
+            if let screen = resolvedScreen {
+                // If screen has notch, position should be at frame.maxY
+                // If screen has no notch with alwaysOnTop, position should be at visibleFrame.maxY
+                let expectedY: CGFloat
+                if screen.hasNotch {
+                    expectedY = screen.frame.maxY - NotchLayout.height
+                } else {
+                    expectedY = screen.visibleFrame.maxY - NotchLayout.height
+                }
+
+                if abs((window?.frame.minY ?? 0) - expectedY) <= 1.0 {
+                    positionUpdated = true
+                    break
+                }
+            }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        }
+
+        XCTAssertTrue(positionUpdated, "Window should reposition based on notch detection and alwaysOnTop setting")
+    }
+
+    func testNotchedDisplayTargetFindsNotchedScreen() {
+        guard NSScreen.screens.contains(where: { $0.hasNotch }) else {
+            XCTSkip("No notched display available for testing")
+        }
+
+        let notchedScreen = NSScreen.screens.first { $0.hasNotch }
+        let targetScreen = NSScreen.screen(for: .notchedDisplay)
+
+        XCTAssertNotNil(targetScreen, "Should resolve a screen for notchedDisplay target")
+        XCTAssertEqual(
+            targetScreen,
+            notchedScreen,
+            "notchedDisplay target should prefer screen with actual notch"
+        )
+    }
+
     // MARK: - Helper Methods
 
     private func triggerExpansion(_ expanded: Bool) {
