@@ -188,7 +188,42 @@ internal final class NotchWindowControllerTests: XCTestCase {
     func testNotchWindowIsFloating() {
         let window = windowController.window as? NotchWindow
 
-        XCTAssertEqual(window?.level, .floating, "NotchWindow should have floating level")
+        XCTAssertEqual(window?.level, .floating, "NotchWindow should have floating level by default")
+    }
+
+    func testNotchWindowIsStatusBarWhenAlwaysOnTopEnabled() {
+        presetSettings.setAlwaysOnTop(true)
+
+        // Wait for the subscription to update the window level
+        let expectation = expectation(description: "Window level updated")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        let window = windowController.window as? NotchWindow
+        XCTAssertEqual(window?.level, .statusBar, "NotchWindow should have statusBar level when alwaysOnTop is enabled")
+    }
+
+    func testNotchWindowReturnsToFloatingWhenAlwaysOnTopDisabled() {
+        // First enable
+        presetSettings.setAlwaysOnTop(true)
+        let enableExpectation = expectation(description: "Window level set to statusBar")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            enableExpectation.fulfill()
+        }
+        wait(for: [enableExpectation], timeout: 1.0)
+
+        // Then disable
+        presetSettings.setAlwaysOnTop(false)
+        let disableExpectation = expectation(description: "Window level returned to floating")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            disableExpectation.fulfill()
+        }
+        wait(for: [disableExpectation], timeout: 1.0)
+
+        let window = windowController.window as? NotchWindow
+        XCTAssertEqual(window?.level, .floating, "NotchWindow should return to floating level when alwaysOnTop is disabled")
     }
 
     func testNotchWindowJoinsAllSpaces() {
