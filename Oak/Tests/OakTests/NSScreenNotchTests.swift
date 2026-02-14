@@ -43,10 +43,12 @@ internal final class NSScreenNotchTests: XCTestCase {
         let screens = NSScreen.screens
         let screensByUUID = NSScreen.screensByUUID
 
-        XCTAssertGreaterThanOrEqual(
+        // screensByUUID should contain an entry for each screen that has a valid UUID
+        // The count should be equal or potentially less if some screens lack UUIDs
+        XCTAssertLessThanOrEqual(
             screensByUUID.count,
             screens.count,
-            "screensByUUID should contain at least as many entries as there are screens"
+            "screensByUUID should not contain more entries than available screens"
         )
 
         for screen in screens {

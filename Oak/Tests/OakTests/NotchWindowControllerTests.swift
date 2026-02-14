@@ -394,7 +394,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
     }
 
     func testWindowPositionsBelowMenuBarOnNonNotchedDisplayWithAlwaysOnTop() {
-        // Create a non-notched display scenario by disabling alwaysOnTop first
+        // Enable alwaysOnTop to test positioning below menu bar
         presetSettings.setAlwaysOnTop(true)
 
         let window = windowController.window as? NotchWindow
