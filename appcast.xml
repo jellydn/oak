@@ -30,9 +30,9 @@
   <sparkle:shortVersionString>0.4.12</sparkle:shortVersionString>
   <description><![CDATA[
     <h2>Oak 0.4.12</h2>
-    &lt;p&gt;Release 0.4.12&lt;/p&gt;
+    <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.4.11...v0.4.12"><tt>v0.4.11...v0.4.12</tt></a></p>
   ]]></description>
-  <pubDate>Sat, 14 Feb 2026 04:43:01 +0000</pubDate>
+  <pubDate>Sat, 14 Feb 2026 04:42:36 +0000</pubDate>
   <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.12/Oak-0.4.12.dmg"
              sparkle:version="4012"
              sparkle:shortVersionString="0.4.12"
@@ -47,9 +47,9 @@
   <sparkle:shortVersionString>0.4.11</sparkle:shortVersionString>
   <description><![CDATA[
     <h2>Oak 0.4.11</h2>
-    &lt;p&gt;Release 0.4.11&lt;/p&gt;
+    <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.4.10...v0.4.11"><tt>v0.4.10...v0.4.11</tt></a></p>
   ]]></description>
-  <pubDate>Sat, 14 Feb 2026 04:04:51 +0000</pubDate>
+  <pubDate>Sat, 14 Feb 2026 04:04:17 +0000</pubDate>
   <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.11/Oak-0.4.11.dmg"
              sparkle:version="4011"
              sparkle:shortVersionString="0.4.11"
@@ -64,9 +64,9 @@
   <sparkle:shortVersionString>0.4.10</sparkle:shortVersionString>
   <description><![CDATA[
     <h2>Oak 0.4.10</h2>
-    &lt;p&gt;Release 0.4.10&lt;/p&gt;
+    <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.4.9...v0.4.10"><tt>v0.4.9...v0.4.10</tt></a></p>
   ]]></description>
-  <pubDate>Sat, 14 Feb 2026 03:59:45 +0000</pubDate>
+  <pubDate>Fri, 13 Feb 2026 23:49:28 +0000</pubDate>
   <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.10/Oak-0.4.10.dmg"
              sparkle:version="4010"
              sparkle:shortVersionString="0.4.10"
@@ -74,56 +74,5 @@
              length="86162662"
              type="application/octet-stream" />
 </item>
-<item>
-  <title>Version 0.4.7</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.4.7</link>
-  <sparkle:version>4007</sparkle:version>
-  <sparkle:shortVersionString>0.4.7</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.4.7</h2>
-    &lt;p&gt;Release 0.4.7&lt;/p&gt;
-  ]]></description>
-  <pubDate>Fri, 13 Feb 2026 23:33:07 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.7/Oak-0.4.7.dmg"
-             sparkle:version="4007"
-             sparkle:shortVersionString="0.4.7"
-             sparkle:edSignature="x8k0iegTYZl6tQURyOnmadP1bPCUEcR/1Gi+gWb3O1HW9kSYST5+Qh2xuodcNKAyFL+zjqmilA9OL6HysSQIBQ=="
-             length="86415231"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.4.5</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.4.5</link>
-  <sparkle:version>0.4.5</sparkle:version>
-  <sparkle:shortVersionString>0.4.5</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.4.5</h2>
-    &lt;p&gt;Release 0.4.5&lt;/p&gt;
-  ]]></description>
-  <pubDate>Fri, 13 Feb 2026 23:02:57 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.5/Oak-0.4.5.dmg"
-             sparkle:version="0.4.5"
-             sparkle:shortVersionString="0.4.5"
-             sparkle:edSignature="oZ9cq1ckkN3HaEjr7AC0dWZK8H7StrZ5a44dzSSQ8mQGhuwvd80oIlKqtrAa4urDWUGFLxDzwG+sokBs2fDDCw=="
-             length="86166260"
-             type="application/octet-stream" />
-</item>
-    <item>
-      <title>Version 0.4.1</title>
-      <link>https://github.com/jellydn/oak/releases/tag/v0.4.1</link>
-      <sparkle:version>0.4.1</sparkle:version>
-      <sparkle:shortVersionString>0.4.1</sparkle:shortVersionString>
-      <description><![CDATA[
-        <h2>Oak 0.4.1</h2>
-        <p>Latest release of Oak focus companion app.</p>
-      ]]></description>
-      <pubDate>Thu, 13 Feb 2026 13:56:00 +0000</pubDate>
-      <enclosure url="https://github.com/jellydn/oak/releases/download/v0.4.1/Oak-0.4.1.dmg"
-                 sparkle:version="0.4.1"
-                 sparkle:shortVersionString="0.4.1"
-                 sparkle:edSignature="DZkE/UudqYM6NTaR7UoCbdct2F3ll9ePHdsTYMKusHlfRyv4i/+VYnF204ogQpQNIZN8ehmX3QZNI44yjKpxAA=="
-                 length="85259810"
-                 type="application/octet-stream" />
-    </item>
   </channel>
 </rss>

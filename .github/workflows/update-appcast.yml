@@ -42,10 +42,8 @@ jobs:
           # Determine the tag based on trigger type
           if [[ "${{ github.event_name }}" == "release" ]]; then
             TAG="${{ github.event.release.tag_name }}"
-            RELEASE_DATE_ISO="${{ github.event.release.published_at }}"
           else
             TAG="${{ github.event.inputs.tag }}"
-            RELEASE_DATE_ISO=""
           fi
 
           echo "Using tag: $TAG"
@@ -63,17 +61,30 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "sparkle_version=$SPARKLE_VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+          # Load authoritative release metadata by tag (works for both release event and workflow_dispatch)
+          RELEASE_JSON="$(gh api "repos/${{ github.repository }}/releases/tags/${TAG}" \
+            -H "Accept: application/vnd.github.html+json")"
+          RELEASE_DATE_ISO="$(echo "$RELEASE_JSON" | jq -r '.published_at // empty')"
+          RELEASE_NOTES_HTML="$(echo "$RELEASE_JSON" | jq -r '.body_html // empty')"
+          if [[ -z "$RELEASE_NOTES_HTML" ]]; then
+            RELEASE_NOTES_HTML="<p>Release ${VERSION}</p>"
+          fi
+          {
+            echo "release_notes_html<<EOF"
+            echo "$RELEASE_NOTES_HTML"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
           
           # Get the DMG download URL
           DMG_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/Oak-${VERSION}.dmg"
           echo "dmg_url=$DMG_URL" >> "$GITHUB_OUTPUT"
           
           # Get release date in RFC 2822 format
-          if [[ -n "$RELEASE_DATE_ISO" ]]; then
-            RELEASE_DATE=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$RELEASE_DATE_ISO" "+%a, %d %b %Y %H:%M:%S %z")
-          else
-            RELEASE_DATE=$(date -R)
+          if [[ -z "$RELEASE_DATE_ISO" ]]; then
+            RELEASE_DATE_ISO="$(date -u "+%Y-%m-%dT%H:%M:%SZ")"
           fi
+          RELEASE_DATE=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$RELEASE_DATE_ISO" "+%a, %d %b %Y %H:%M:%S %z")
           echo "release_date=$RELEASE_DATE" >> "$GITHUB_OUTPUT"
 
       - name: Download DMG and get file size
@@ -140,13 +151,9 @@ jobs:
           FILE_SIZE: ${{ steps.dmg_info.outputs.file_size }}
           ED_SIGNATURE: ${{ steps.sign.outputs.ed_signature }}
           RELEASE_DATE: ${{ steps.release.outputs.release_date }}
-          RELEASE_NOTES: ${{ github.event.release.body }}
+          RELEASE_NOTES_HTML: ${{ steps.release.outputs.release_notes_html }}
           REPO: ${{ github.repository }}
         run: |
-          if [[ -z "${RELEASE_NOTES:-}" ]]; then
-            RELEASE_NOTES="<p>Release ${VERSION}</p>"
-          fi
-
           # Create a new item entry for the release
           cat > /tmp/new_item.xml << 'EOF'
           <item>
@@ -156,7 +163,6 @@ jobs:
             <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
             <description><![CDATA[
               <h2>Oak ${VERSION}</h2>
-              ${RELEASE_NOTES}
             ]]></description>
             <pubDate>${RELEASE_DATE}</pubDate>
             <enclosure url="${DMG_URL}"
@@ -178,10 +184,13 @@ jobs:
           # Use perl for signature replacement because EdDSA output can include sed-sensitive characters.
           perl -i -pe 's/\$\{ED_SIGNATURE\}/$ENV{ED_SIGNATURE}/g' /tmp/new_item.xml
           sed -i '' "s/\${RELEASE_DATE}/$RELEASE_DATE/g" /tmp/new_item.xml
-          
-          # Escape and insert release notes using perl for better handling of special characters
-          export ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
-          perl -i -pe 's/\$\{RELEASE_NOTES\}/$ENV{ESCAPED_NOTES}/g' /tmp/new_item.xml
+
+          # Inject HTML release notes from GitHub release body_html into CDATA
+          awk -v notes="$RELEASE_NOTES_HTML" '
+            { print }
+            /<h2>Oak .*<\/h2>/ { print "              " notes }
+          ' /tmp/new_item.xml > /tmp/new_item.with_notes.xml
+          mv /tmp/new_item.with_notes.xml /tmp/new_item.xml
           
           # Remove any existing item for the same version so retries stay idempotent
           perl -0777 -pe "s#\\s*<item>.*?<sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>.*?</item>\\s*##sg" \
@@ -198,9 +207,9 @@ jobs:
             { print }
           ' /tmp/appcast.without_current.xml > /tmp/appcast.xml.new
           
-          # Retain only the most recent 20 items to prevent unbounded growth
+          # Retain only the most recent 3 items
           awk '
-            BEGIN { max_items = 20; item_count = 0; in_item = 0 }
+            BEGIN { max_items = 3; item_count = 0; in_item = 0 }
             /<item>/ { in_item = 1; item_count++ }
             in_item == 0 || item_count <= max_items { print }
             /<\/item>/ { 
