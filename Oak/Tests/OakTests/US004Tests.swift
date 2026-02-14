@@ -110,6 +110,10 @@ internal final class US004Tests: XCTestCase {
         XCTAssertTrue(presetSettings.playSoundOnSessionCompletion)
     }
 
+    func testNotchPositionModeDefaultsToInsideNotch() {
+        XCTAssertEqual(presetSettings.notchPositionMode, .insideNotch)
+    }
+
     func testDisplayTargetIsPersisted() {
         presetSettings.setDisplayTarget(.notchedDisplay)
 
@@ -123,11 +127,13 @@ internal final class US004Tests: XCTestCase {
 
     func testResetToDefaultRestoresMainDisplayTarget() {
         presetSettings.setDisplayTarget(.notchedDisplay)
+        presetSettings.setNotchPositionMode(.belowNotch)
         presetSettings.setPlaySoundOnSessionCompletion(false)
 
         presetSettings.resetToDefault()
 
         XCTAssertEqual(presetSettings.displayTarget, .mainDisplay)
+        XCTAssertEqual(presetSettings.notchPositionMode, .insideNotch)
         XCTAssertTrue(presetSettings.playSoundOnSessionCompletion)
     }
 
@@ -153,6 +159,17 @@ internal final class US004Tests: XCTestCase {
         }
         let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults)
         XCTAssertFalse(reloadedStore.playSoundOnSessionCompletion)
+    }
+
+    func testNotchPositionModePreferenceIsPersisted() {
+        presetSettings.setNotchPositionMode(.belowNotch)
+
+        guard let reloadedDefaults = UserDefaults(suiteName: presetSuiteName) else {
+            XCTFail("Failed to create UserDefaults with suite name")
+            return
+        }
+        let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults)
+        XCTAssertEqual(reloadedStore.notchPositionMode, .belowNotch)
     }
 
     func testLongBreakSettingsPersisted() {

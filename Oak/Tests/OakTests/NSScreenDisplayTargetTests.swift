@@ -27,8 +27,8 @@ internal final class NSScreenDisplayTargetTests: XCTestCase {
         XCTAssertNotNil(result, "Notched display target should resolve to a screen")
 
         // If there's a notched screen available, it should be selected
-        if let notchedScreen = NSScreen.screens.first(where: { $0.auxiliaryTopLeftArea != nil }),
-           let resolvedScreen = result {
+        let notchedScreen = NSScreen.screens.first { $0.auxiliaryTopLeftArea != nil }
+        if let notchedScreen, let resolvedScreen = result {
             XCTAssertEqual(
                 NSScreen.displayID(for: resolvedScreen),
                 NSScreen.displayID(for: notchedScreen),
@@ -52,15 +52,15 @@ internal final class NSScreenDisplayTargetTests: XCTestCase {
         if !hasNotchedScreen && NSScreen.screens.count > 1 {
             // Should select secondary screen when available
             XCTAssertNotNil(result, "Should fall back to secondary screen when no notch exists")
-        } else if !hasNotchedScreen && NSScreen.screens.count == 1,
-                  let resolvedScreen = result,
-                  let mainScreen = NSScreen.main {
-            // Should fall back to primary screen
-            XCTAssertEqual(
-                NSScreen.displayID(for: resolvedScreen),
-                NSScreen.displayID(for: mainScreen),
-                "Should fall back to primary screen when only one screen exists"
-            )
+        } else if !hasNotchedScreen && NSScreen.screens.count == 1 {
+            if let resolvedScreen = result, let mainScreen = NSScreen.main {
+                // Should fall back to primary screen
+                XCTAssertEqual(
+                    NSScreen.displayID(for: resolvedScreen),
+                    NSScreen.displayID(for: mainScreen),
+                    "Should fall back to primary screen when only one screen exists"
+                )
+            }
         }
     }
 

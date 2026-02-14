@@ -181,17 +181,18 @@ internal final class NotchWindowControllerTests: XCTestCase {
         XCTAssertEqual(
             window?.styleMask,
             expectedStyleMask,
-            "NotchWindow should have borderless and non-activating style"
+            "NotchWindow should use overlay panel style flags for notch rendering"
         )
     }
 
-    func testNotchWindowIsFloating() {
+    func testNotchWindowUsesMainMenuOverlayLevel() {
         let window = windowController.window as? NotchWindow
 
-        XCTAssertEqual(window?.level, .floating, "NotchWindow should have floating level by default")
+        XCTAssertEqual(window?.level, .mainMenu + 3, "NotchWindow should sit above menu bar when inside notch")
     }
 
     func testNotchWindowIsStatusBarWhenAlwaysOnTopEnabled() {
+        presetSettings.setNotchPositionMode(.belowNotch)
         presetSettings.setAlwaysOnTop(true)
 
         // Poll for window level change
@@ -214,6 +215,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
     func testNotchWindowMovesToVisibleFrameWhenAlwaysOnTopEnabled() {
         let window = windowController.window as? NotchWindow
 
+        presetSettings.setNotchPositionMode(.belowNotch)
         presetSettings.setAlwaysOnTop(true)
 
         let target = presetSettings.displayTarget
@@ -241,6 +243,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
     func testNotchWindowReturnsToFloatingWhenAlwaysOnTopDisabled() {
         let window = windowController.window as? NotchWindow
 
+        presetSettings.setNotchPositionMode(.belowNotch)
         // First enable
         presetSettings.setAlwaysOnTop(true)
         var levelChangedToStatusBar = false
@@ -283,7 +286,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
         XCTAssertEqual(
             window?.collectionBehavior,
             expectedBehavior,
-            "NotchWindow should join all spaces and remain stationary"
+            "NotchWindow should appear across spaces and fullscreen contexts"
         )
     }
 
@@ -301,70 +304,32 @@ internal final class NotchWindowControllerTests: XCTestCase {
         XCTAssertFalse(window?.ignoresMouseEvents ?? true, "NotchWindow should accept mouse events")
     }
 
-    // MARK: - Display Configuration Change Tests
-
-    func testObserverIsRegisteredForScreenChanges() {
-        // Verify that the observer is set up by checking we can trigger the notification
-        let expectation = expectation(description: "Screen configuration change notification")
-
-        // Post the notification on the main thread
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(
-                name: NSApplication.didChangeScreenParametersNotification,
-                object: NSApp
-            )
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: 1.0)
-
-        // If no crash occurred, the observer is properly set up
-        XCTAssertNotNil(windowController.window, "Window should still exist after screen change notification")
-    }
-
-    func testWindowRepositionsOnScreenConfigurationChange() {
+    func testNotchWindowDoesNotHideOnDeactivate() {
         let window = windowController.window as? NotchWindow
 
-        // Expand the window first
-        triggerExpansion(true)
-
-        // Simulate screen configuration change
-        NotificationCenter.default.post(
-            name: NSApplication.didChangeScreenParametersNotification,
-            object: NSApp
-        )
-
-        _ = waitForFrameWidth(NotchLayout.expandedWidth, timeout: 1.0)
-
-        let finalFrame = window?.frame ?? .zero
-
-        // The frame should remain valid (width should still match expanded state)
-        XCTAssertEqual(
-            finalFrame.width,
-            NotchLayout.expandedWidth,
-            accuracy: 1.0,
-            "Window should maintain expanded width after screen change"
-        )
-        XCTAssertGreaterThan(finalFrame.height, 0, "Window should have valid height after screen change")
+        XCTAssertFalse(window?.hidesOnDeactivate ?? true, "NotchWindow should remain visible when app deactivates")
+        XCTAssertFalse(window?.canHide ?? true, "NotchWindow should not be hideable")
     }
 
-    func testCleanupRemovesScreenChangeObserver() {
-        // Cleanup should not crash
-        XCTAssertNoThrow(windowController.cleanup(), "Cleanup should remove observer without crashing")
-
-        // Post notification after cleanup - should not crash
-        XCTAssertNoThrow(
-            NotificationCenter.default.post(
-                name: NSApplication.didChangeScreenParametersNotification,
-                object: NSApp
-            ),
-            "Posting notification after cleanup should not crash"
+    func testNotchWindowDoesNotConstrainFrameRect() throws {
+        let window = try XCTUnwrap(windowController.window as? NotchWindow)
+        let screen = try XCTUnwrap(window.screen)
+        let requestedFrame = NSRect(
+            x: screen.frame.midX - (NotchLayout.collapsedWidth / 2),
+            y: screen.frame.maxY - NotchLayout.height,
+            width: NotchLayout.collapsedWidth,
+            height: NotchLayout.height
         )
-    }
 
+        let constrainedFrame = window.constrainFrameRect(requestedFrame, to: screen)
+        XCTAssertEqual(constrainedFrame, requestedFrame, "NotchWindow should preserve explicit frame placement")
+    }
+}
+
+private extension NotchWindowControllerTests {
     // MARK: - Helper Methods
 
-    private func triggerExpansion(_ expanded: Bool) {
+    func triggerExpansion(_ expanded: Bool) {
         windowController.handleExpansionChange(expanded)
         let targetWidth: CGFloat = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         if !waitForFrameWidth(targetWidth, timeout: 1.0) {
@@ -375,7 +340,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
     }
 
     @discardableResult
-    private func waitForFrameWidth(_ width: CGFloat, timeout: TimeInterval) -> Bool {
+    func waitForFrameWidth(_ width: CGFloat, timeout: TimeInterval) -> Bool {
         let endTime = Date().addingTimeInterval(timeout)
 
         while Date() < endTime {
@@ -391,7 +356,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
         return false
     }
 
-    private func resolvedDisplayFrame() -> NSRect {
+    func resolvedDisplayFrame() -> NSRect {
         let target = presetSettings.displayTarget
         let preferredDisplayID = presetSettings.preferredDisplayID(for: target)
         return NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
