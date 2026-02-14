@@ -29,8 +29,14 @@ internal extension NSScreen {
 
     private static func notchedScreen() -> NSScreen? {
         // Prefer screens with actual notch (safeAreaInsets.top > 0) over just auxiliary areas
-        NSScreen.screens.first { $0.hasNotch }
-            ?? NSScreen.screens.first { $0.auxiliaryTopLeftArea != nil }
+        // Single pass through screens checking both conditions for efficiency
+        for screen in NSScreen.screens {
+            if screen.hasNotch {
+                return screen
+            }
+        }
+        // Fall back to screens with auxiliary areas if no actual notch found
+        return NSScreen.screens.first { $0.auxiliaryTopLeftArea != nil }
     }
 
     private static func screen(forDisplayID id: CGDirectDisplayID?) -> NSScreen? {

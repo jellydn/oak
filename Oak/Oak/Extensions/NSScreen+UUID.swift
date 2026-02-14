@@ -33,6 +33,12 @@ internal extension NSScreen {
     }
 
     /// Check if this screen has a notch by examining safe area insets
+    /// 
+    /// This property detects displays with actual notch hardware (like MacBook Pro 14"/16" with notch)
+    /// by checking if the top safe area inset is greater than zero. The safe area inset represents
+    /// the area occupied by the notch where regular window content cannot be displayed.
+    ///
+    /// - Returns: `true` if the display has a notch, `false` otherwise
     var hasNotch: Bool {
         return safeAreaInsets.top > 0
     }
