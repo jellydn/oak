@@ -226,3 +226,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [![ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd)
 [![paypal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/dunghd)
 [![buymeacoffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dunghd)
+
+## 🎵 Sound Attribution
+
+The ambient sounds included in Oak are sourced from [Pixabay](https://pixabay.com/) under the [Pixabay Content License](https://pixabay.com/service/license-summary/):
+
+- **Rain Sound**: [Real Rain Sound](https://pixabay.com/sound-effects/real-rain-sound-379215/) by feedthestraycats
+- **Forest Sound**: [Ambient Spring Forest](https://pixabay.com/sound-effects/ambient-spring-forest-323801/) by soundreality
+- **Cafe Sound**: [Cafe Noise](https://pixabay.com/sound-effects/cafe-noise-32940/) by freesound_community
+- **Brown Noise**: [Brown Noise](https://pixabay.com/sound-effects/brown-noise-by-digitalspa-170337/) by digitalspa
+- **Lo-fi Sound**: [Lofi Guitar](https://pixabay.com/sound-effects/lofi-guitar-105361/) by freesound_community
+
+We are grateful to these creators for making their work available for projects like Oak.
