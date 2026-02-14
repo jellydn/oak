@@ -47,7 +47,7 @@ internal extension NSScreen {
         case .mainDisplay:
             return primaryScreen()
         case .notchedDisplay:
-            // Prioritize notched display first (built-in display with notch)
+            // Prioritize display with actual notch hardware
             if let notched = notchedScreen() {
                 return notched
             }

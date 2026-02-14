@@ -372,8 +372,6 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
         // Create a window controller targeting the notched display
         let notchedPresetSettings = PresetSettingsStore(userDefaults: testUserDefaults)
-        // Note: Using legacy displayID here because PresetSettingsStore.setDisplayTarget
-        // still uses CGDirectDisplayID for backward compatibility with saved preferences
         let notchedScreenID = NSScreen.displayID(for: notchedScreen)
         notchedPresetSettings.setDisplayTarget(.notchedDisplay, screenID: notchedScreenID)
         notchedPresetSettings.setAlwaysOnTop(false)
