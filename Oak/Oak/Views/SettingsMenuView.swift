@@ -27,7 +27,9 @@ internal struct SettingsMenuView: View {
             Divider()
 
             section(title: "Display") {
-                displayTargetPicker
+                if NSScreen.screens.count > 1 {
+                    displayTargetPicker
+                }
                 countdownDisplayModePicker
             }
 
