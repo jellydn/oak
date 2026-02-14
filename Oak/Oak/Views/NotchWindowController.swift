@@ -16,6 +16,7 @@ internal class NotchWindowController: NSWindowController {
     private let viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
     private var displayTargetCancellable: AnyCancellable?
+    private var alwaysOnTopCancellable: AnyCancellable?
 
     convenience init() {
         self.init(presetSettings: nil)
@@ -30,7 +31,8 @@ internal class NotchWindowController: NSWindowController {
             width: NotchLayout.collapsedWidth,
             height: NotchLayout.height,
             displayTarget: settings.displayTarget,
-            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
+            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget),
+            alwaysOnTop: settings.alwaysOnTop
         )
         super.init(window: window)
 
@@ -65,6 +67,12 @@ internal class NotchWindowController: NSWindowController {
                 guard let self else { return }
                 self.requestFrameUpdate(for: lastExpandedState, forceReposition: true, targetOverride: nextTarget)
             }
+
+        alwaysOnTopCancellable = settings.$alwaysOnTop
+            .sink { [weak self] isAlwaysOnTop in
+                guard let self, let window = self.window as? NotchWindow else { return }
+                window.level = isAlwaysOnTop ? .statusBar : .floating
+            }
     }
 
     @available(*, unavailable)
@@ -79,12 +87,14 @@ internal class NotchWindowController: NSWindowController {
         }
         NotificationCenter.default.removeObserver(self)
         displayTargetCancellable?.cancel()
+        alwaysOnTopCancellable?.cancel()
     }
 
     func cleanup() {
         guard !hasCleanedUp else { return }
         hasCleanedUp = true
         displayTargetCancellable?.cancel()
+        alwaysOnTopCancellable?.cancel()
         viewModel.cleanup()
     }
 
@@ -176,7 +186,13 @@ internal class NotchWindowController: NSWindowController {
 // MARK: - NotchWindow
 
 internal class NotchWindow: NSPanel {
-    init(width: CGFloat, height: CGFloat, displayTarget: DisplayTarget, preferredDisplayID: CGDirectDisplayID?) {
+    init(
+        width: CGFloat,
+        height: CGFloat,
+        displayTarget: DisplayTarget,
+        preferredDisplayID: CGDirectDisplayID?,
+        alwaysOnTop: Bool = false
+    ) {
         let screenFrame = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
 
@@ -187,7 +203,7 @@ internal class NotchWindow: NSPanel {
             defer: false
         )
 
-        level = .floating
+        level = alwaysOnTop ? .statusBar : .floating
         collectionBehavior = [.canJoinAllSpaces, .stationary]
         backgroundColor = .clear
         isOpaque = false

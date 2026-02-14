@@ -25,6 +25,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var notchedDisplayID: UInt32?
     @Published private(set) var playSoundOnSessionCompletion: Bool
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
+    @Published private(set) var alwaysOnTop: Bool
 
     private let userDefaults: UserDefaults
 
@@ -41,6 +42,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let notchedDisplayID = "display.notched.id"
         static let playSoundOnSessionCompletion = "session.completion.playSound"
         static let countdownDisplayMode = "countdown.displayMode"
+        static let alwaysOnTop = "window.alwaysOnTop"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -56,7 +58,8 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.roundsBeforeLongBreak: 4,
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
             Keys.playSoundOnSessionCompletion: true,
-            Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue
+            Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
+            Keys.alwaysOnTop: false
         ]
         userDefaults.register(defaults: defaults)
 
@@ -77,6 +80,7 @@ internal final class PresetSettingsStore: ObservableObject {
         let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode)
             ?? CountdownDisplayMode.number.rawValue
         countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
+        alwaysOnTop = userDefaults.bool(forKey: Keys.alwaysOnTop)
         ensureDisplayIDsInitialized()
     }
 
@@ -174,6 +178,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setDisplayTarget(.mainDisplay, screenID: nil)
         setPlaySoundOnSessionCompletion(true)
         setCountdownDisplayMode(.number)
+        setAlwaysOnTop(false)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {
@@ -186,6 +191,12 @@ internal final class PresetSettingsStore: ObservableObject {
         guard countdownDisplayMode != mode else { return }
         countdownDisplayMode = mode
         userDefaults.set(mode.rawValue, forKey: Keys.countdownDisplayMode)
+    }
+
+    func setAlwaysOnTop(_ value: Bool) {
+        guard alwaysOnTop != value else { return }
+        alwaysOnTop = value
+        userDefaults.set(value, forKey: Keys.alwaysOnTop)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {
