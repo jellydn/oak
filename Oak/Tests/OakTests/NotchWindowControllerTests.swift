@@ -410,6 +410,7 @@ internal final class NotchWindowControllerTests: XCTestCase {
             if let screen = resolvedScreen {
                 // If screen has notch, position should be at frame.maxY
                 // If screen has no notch with alwaysOnTop, position should be at visibleFrame.maxY
+                // If screen has no notch without alwaysOnTop, position should be at frame.maxY
                 let expectedY: CGFloat
                 if screen.hasNotch {
                     expectedY = screen.frame.maxY - NotchLayout.height

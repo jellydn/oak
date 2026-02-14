@@ -192,7 +192,7 @@ internal class NotchWindowController: NSWindowController {
             return screen.frame.maxY - NotchLayout.height
         }
         
-        // For non-notched displays: respect menu bar and always-on-top setting
+        // For non-notched displays: position below menu bar if alwaysOnTop, otherwise at top of screen
         if alwaysOnTop {
             return screen.visibleFrame.maxY - NotchLayout.height
         }

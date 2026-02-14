@@ -8,12 +8,11 @@ internal extension NSScreen {
             return nil
         }
         let displayID = CGDirectDisplayID(number.uint32Value)
-        guard let uuid = CGDisplayCreateUUIDFromDisplayID(displayID) else {
+        guard let uuid = CGDisplayCreateUUIDFromDisplayID(displayID)?.takeRetainedValue() else {
             return nil
         }
-        // takeUnretainedValue() is correct here because CFUUIDCreateString creates a new retained object
-        // and Swift's automatic bridging handles the memory management
-        let uuidString = CFUUIDCreateString(nil, uuid.takeUnretainedValue()) as String
+        // CFUUIDCreateString returns a retained CFString; Swift's bridging releases it properly
+        let uuidString = CFUUIDCreateString(nil, uuid) as String
         return uuidString
     }
 
