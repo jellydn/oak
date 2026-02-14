@@ -5,17 +5,20 @@ internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
     @ObservedObject var notificationService: NotificationService
     @ObservedObject var sparkleUpdater: SparkleUpdater
+    @ObservedObject var launchAtLoginService: LaunchAtLoginService
     @State private var selectedDisplayTarget: DisplayTarget
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
 
     init(
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
-        sparkleUpdater: SparkleUpdater
+        sparkleUpdater: SparkleUpdater,
+        launchAtLoginService: LaunchAtLoginService = .shared
     ) {
         self.presetSettings = presetSettings
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
+        self.launchAtLoginService = launchAtLoginService
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
         _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
     }
@@ -25,6 +28,10 @@ internal struct SettingsMenuView: View {
             headerRow
 
             Divider()
+
+            section(title: "General") {
+                generalSettings
+            }
 
             section(title: "Display") {
                 displayTargetPicker
@@ -199,6 +206,26 @@ internal struct SettingsMenuView: View {
         .onChange(of: presetSettings.countdownDisplayMode) { newValue in
             guard selectedCountdownDisplayMode != newValue else { return }
             selectedCountdownDisplayMode = newValue
+        }
+    }
+
+    private var generalSettings: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle(
+                "Launch at Login",
+                isOn: Binding(
+                    get: { launchAtLoginService.isEnabled },
+                    set: { newValue in
+                        launchAtLoginService.setEnabled(newValue)
+                        presetSettings.setLaunchAtLogin(newValue)
+                    }
+                )
+            )
+            .font(.caption)
+
+            Text("Automatically start Oak when you log in to your Mac.")
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
     }
 
