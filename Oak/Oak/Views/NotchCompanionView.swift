@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable file_length type_body_length
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
     let onAuxiliaryMenuPresentationChanged: (Bool) -> Void
@@ -43,50 +42,7 @@ internal struct NotchCompanionView: View {
     }
 
     private var isExpanded: Bool {
-        return isExpandedByToggle
-    }
-
-    private var containerShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 15, style: .continuous)
-    }
-
-    private var collapsedShape: NotchCapShape {
-        NotchCapShape(cornerRadius: 14)
-    }
-
-    private var expandedShape: NotchCapShape {
-        NotchCapShape(cornerRadius: 15)
-    }
-
-    private var backgroundFill: some View {
-        Group {
-            if isExpanded {
-                expandedShape
-                    .fill(Color.black.opacity(0.97))
-                    .overlay {
-                        if viewModel.isSessionComplete {
-                            expandedShape
-                                .stroke(Color.green.opacity(0.45), lineWidth: 1.4)
-                        }
-                    }
-            } else {
-                collapsedShape
-                    .fill(Color.black.opacity(0.98))
-                    .overlay {
-                        if viewModel.isSessionComplete {
-                            collapsedShape
-                                .stroke(Color.green.opacity(0.45), lineWidth: 1.2)
-                        }
-                    }
-            }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            guard !isExpandedByToggle else { return }
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.82)) {
-                isExpandedByToggle = true
-            }
-        }
+        isExpandedByToggle
     }
 
     private var currentTopPadding: CGFloat {
@@ -95,33 +51,17 @@ internal struct NotchCompanionView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            backgroundFill
-            HStack(spacing: contentSpacing) {
-                if isExpanded {
-                    if viewModel.canStart {
-                        startView
-                    } else {
-                        sessionView
-                    }
-                    Rectangle()
-                        .fill(Color.white.opacity(0.15))
-                        .frame(width: 1, height: controlSize)
-                    HStack(spacing: 6) {
-                        audioButton
-                        progressButton
-                        settingsButton
-                    }
-                } else {
-                    compactView
-                }
-
-                expandToggleButton
-            }
-            .frame(maxHeight: .infinity, alignment: .top)
-            .padding(.horizontal, horizontalPadding)
-            .padding(.top, currentTopPadding)
-            .scaleEffect(animateCompletion ? 1.05 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
+            NotchBackgroundView(
+                isExpanded: isExpanded,
+                isSessionComplete: viewModel.isSessionComplete,
+                onTap: handleBackgroundTap
+            )
+            mainContent
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(.horizontal, horizontalPadding)
+                .padding(.top, currentTopPadding)
+                .scaleEffect(animateCompletion ? 1.05 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
 
             if showConfetti {
                 ConfettiView()
@@ -147,23 +87,7 @@ internal struct NotchCompanionView: View {
             notifyAuxiliaryPresentationChanged()
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
-            if isComplete {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    animateCompletion = true
-                }
-                if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
-                    showConfetti = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
-                        showConfetti = false
-                    }
-                }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        animateCompletion = false
-                    }
-                }
-            }
+            handleSessionComplete(isComplete)
         }
         .popover(isPresented: $showAudioMenu) {
             AudioMenuView(audioManager: viewModel.audioManager)
@@ -183,271 +107,66 @@ internal struct NotchCompanionView: View {
         }
     }
 
-    private var compactView: some View {
+    private var mainContent: some View {
         HStack(spacing: contentSpacing) {
-            if viewModel.canStart {
-                Text(presetLabel(for: presetSelection))
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.62))
-                Button(
-                    action: {
-                        viewModel.startSession(using: presetSelection)
+            if isExpanded {
+                NotchSessionControlsView(
+                    viewModel: viewModel,
+                    presetSelection: presetSelection,
+                    controlSize: controlSize,
+                    expandedRingSize: expandedRingSize,
+                    onPresetChange: { preset in
+                        presetSelection = preset
                     },
-                    label: {
-                        Image(systemName: "play.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 9, weight: .bold))
-                            .frame(width: 16, height: 16)
-                            .background(
-                                Circle()
-                                    .fill(Color.green.opacity(0.85))
-                            )
-                    }
-                )
-                .buttonStyle(.plain)
-            } else if viewModel.canStartNext {
-                countdownDisplay(
-                    mode: viewModel.presetSettings.countdownDisplayMode,
-                    size: compactRingSize,
-                    fontSize: 13
-                )
-                Button(
-                    action: {
-                        viewModel.startNextSession()
+                    onStart: { preset in
+                        viewModel.startSession(using: preset)
                     },
-                    label: {
-                        Image(systemName: "forward.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 9, weight: .bold))
-                            .frame(width: 16, height: 16)
-                            .background(
-                                Circle()
-                                    .fill(Color.blue.opacity(0.88))
-                            )
-                    }
-                )
-                .buttonStyle(.plain)
-                .help("Start \(viewModel.currentSessionType)")
-            } else {
-                countdownDisplay(
-                    mode: viewModel.presetSettings.countdownDisplayMode,
-                    size: compactRingSize,
-                    fontSize: 13
-                )
-            }
-        }
-    }
-
-    private func countdownDisplay(
-        mode: CountdownDisplayMode,
-        size: CGFloat,
-        fontSize: CGFloat,
-        showSessionType: Bool = false
-    ) -> some View {
-        Group {
-            if mode == .circleRing {
-                ZStack {
-                    CircularProgressRing(
-                        progress: viewModel.progressPercentage,
-                        lineWidth: 2.5,
-                        ringColor: viewModel.isPaused ? .orange : .white,
-                        backgroundColor: .white.opacity(0.2)
-                    )
-                    .frame(width: size, height: size)
-                    if showSessionType {
-                        let sessionType = viewModel.currentSessionType
-                        Text(sessionType == "Long Break" ? "Long\nBreak" : sessionType)
-                            .font(.system(size: fontSize * 0.5, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.9))
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.65)
-                            .multilineTextAlignment(.center)
-                            .frame(width: size - 4)
-                    }
-                }
-            } else {
-                Text(viewModel.displayTime)
-                    .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
-                    .foregroundColor(
-                        viewModel.isPaused
-                            ? Color.orange.opacity(0.95)
-                            : Color.white.opacity(0.95)
-                    )
-            }
-        }
-    }
-
-    private var startView: some View {
-        HStack(spacing: 6) {
-            presetSelector
-            Button(
-                action: {
-                    viewModel.startSession(using: presetSelection)
-                },
-                label: {
-                    Image(systemName: "play.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 10, weight: .bold))
-                        .frame(width: controlSize, height: controlSize)
-                        .background(Color.green.opacity(0.88))
-                        .clipShape(Circle())
-                }
-            )
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var sessionView: some View {
-        HStack(spacing: 6) {
-            let displayMode = viewModel.presetSettings.countdownDisplayMode
-            if displayMode == .circleRing {
-                countdownDisplay(
-                    mode: displayMode,
-                    size: expandedRingSize,
-                    fontSize: 14,
-                    showSessionType: true
-                )
-            } else {
-                VStack(alignment: .leading, spacing: 2) {
-                    countdownDisplay(
-                        mode: displayMode,
-                        size: expandedRingSize,
-                        fontSize: 14
-                    )
-                    Text(viewModel.currentSessionType)
-                        .font(.system(size: 8, weight: .medium))
-                        .foregroundColor(.white.opacity(0.52))
-                }
-            }
-            if viewModel.canPause {
-                Button(
-                    action: {
+                    onPause: {
                         viewModel.pauseSession()
                     },
-                    label: {
-                        Image(systemName: "pause.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 9, weight: .bold))
-                            .frame(width: controlSize, height: controlSize)
-                            .background(Color.orange.opacity(0.88))
-                            .clipShape(Circle())
-                    }
-                )
-                .buttonStyle(.plain)
-            } else if viewModel.canResume {
-                Button(
-                    action: {
+                    onResume: {
                         viewModel.resumeSession()
                     },
-                    label: {
-                        Image(systemName: "play.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 9, weight: .bold))
-                            .frame(width: controlSize, height: controlSize)
-                            .background(Color.green.opacity(0.88))
-                            .clipShape(Circle())
-                    }
-                )
-                .buttonStyle(.plain)
-            } else if viewModel.canStartNext {
-                Button(
-                    action: {
+                    onStartNext: {
                         viewModel.startNextSession()
                     },
-                    label: {
-                        Image(systemName: "forward.fill")
-                            .foregroundColor(.white)
-                            .font(.system(size: 9, weight: .bold))
-                            .frame(width: controlSize, height: controlSize)
-                            .background(Color.blue.opacity(0.88))
-                            .clipShape(Circle())
+                    onReset: {
+                        viewModel.resetSession()
                     }
                 )
-                .buttonStyle(.plain)
-            }
-            Button(
-                action: {
-                    viewModel.resetSession()
-                },
-                label: {
-                    Image(systemName: "stop.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 9, weight: .bold))
-                        .frame(width: 18, height: 18)
-                        .background(Color.red.opacity(0.88))
-                        .clipShape(Circle())
-                }
-            )
-            .buttonStyle(.plain)
-            .help("Stop and reset")
-        }
-    }
-
-    private var audioButton: some View {
-        Button(
-            action: {
-                showAudioMenu.toggle()
-            },
-            label: {
-                ZStack {
-                    Circle()
-                        .fill(viewModel.audioManager.isPlaying ? Color.blue.opacity(0.25) : Color.white.opacity(0.08))
-                        .frame(width: controlSize, height: controlSize)
-
-                    Image(systemName: viewModel.audioManager.selectedTrack.systemImageName)
-                        .foregroundColor(viewModel.audioManager.isPlaying ? .blue : .white.opacity(0.7))
-                        .font(.system(size: 9))
-                }
-            }
-        )
-        .buttonStyle(.plain)
-    }
-
-    private var progressButton: some View {
-        Button(
-            action: {
-                showProgressMenu.toggle()
-            },
-            label: {
-                ZStack {
-                    Circle()
-                        .fill(viewModel.streakDays > 0 ? Color.orange.opacity(0.24) : Color.white.opacity(0.08))
-                        .frame(width: controlSize, height: controlSize)
-
-                    if viewModel.streakDays > 0 {
-                        Text("\(viewModel.streakDays)")
-                            .font(.system(size: 8, weight: .semibold))
-                            .foregroundColor(.orange)
-                    } else {
-                        Image(systemName: "chart.bar.fill")
-                            .foregroundColor(.white.opacity(0.7))
-                            .font(.system(size: 9))
+                Rectangle()
+                    .fill(Color.white.opacity(0.15))
+                    .frame(width: 1, height: controlSize)
+                NotchButtonRowView(
+                    viewModel: viewModel,
+                    controlSize: controlSize,
+                    onAudioToggle: {
+                        showAudioMenu.toggle()
+                    },
+                    onProgressToggle: {
+                        showProgressMenu.toggle()
+                    },
+                    onSettingsToggle: {
+                        showSettingsMenu.toggle()
                     }
-                }
+                )
+            } else {
+                NotchCompactView(
+                    viewModel: viewModel,
+                    presetSelection: presetSelection,
+                    contentSpacing: contentSpacing,
+                    compactRingSize: compactRingSize,
+                    onStart: {
+                        viewModel.startSession(using: presetSelection)
+                    },
+                    onStartNext: {
+                        viewModel.startNextSession()
+                    }
+                )
             }
-        )
-        .buttonStyle(.plain)
-    }
 
-    private var settingsButton: some View {
-        Button(
-            action: {
-                showSettingsMenu.toggle()
-            },
-            label: {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(width: controlSize, height: controlSize)
-
-                    Image(systemName: "gearshape.fill")
-                        .foregroundColor(.white.opacity(0.7))
-                        .font(.system(size: 9))
-                }
-            }
-        )
-        .buttonStyle(.plain)
-        .help("Settings")
+            expandToggleButton
+        }
     }
 
     private var expandToggleButton: some View {
@@ -456,9 +175,7 @@ internal struct NotchCompanionView: View {
                 let shouldExpand = !isExpandedByToggle
                 isExpandedByToggle = shouldExpand
                 if !shouldExpand {
-                    showAudioMenu = false
-                    showProgressMenu = false
-                    showSettingsMenu = false
+                    closeAllMenus()
                 }
             },
             label: {
@@ -477,40 +194,36 @@ internal struct NotchCompanionView: View {
         .help(isExpanded ? "Collapse" : "Expand")
     }
 
-    private var presetSelector: some View {
-        HStack(spacing: 2) {
-            presetChip(.short)
-            presetChip(.long)
+    private func handleBackgroundTap() {
+        guard !isExpandedByToggle else { return }
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.82)) {
+            isExpandedByToggle = true
         }
-        .padding(2)
-        .background(
-            Capsule(style: .continuous)
-                .fill(Color.white.opacity(0.08))
-        )
     }
 
-    private func presetChip(_ preset: Preset) -> some View {
-        let isSelected = presetSelection == preset
-        return Button(
-            action: {
-                presetSelection = preset
-            },
-            label: {
-                Text(presetLabel(for: preset))
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(isSelected ? .white : .white.opacity(0.62))
-                    .frame(minWidth: 54, minHeight: 18)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(isSelected ? Color.white.opacity(0.16) : Color.clear)
-                    )
+    private func closeAllMenus() {
+        showAudioMenu = false
+        showProgressMenu = false
+        showSettingsMenu = false
+    }
+
+    private func handleSessionComplete(_ isComplete: Bool) {
+        guard isComplete else { return }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            animateCompletion = true
+        }
+        if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
+            showConfetti = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
+                showConfetti = false
             }
-        )
-        .buttonStyle(.plain)
-    }
+        }
 
-    private func presetLabel(for preset: Preset) -> String {
-        viewModel.presetSettings.displayName(for: preset)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                animateCompletion = false
+            }
+        }
     }
 
     private func notifyExpansionChanged(_ expanded: Bool) {
@@ -528,5 +241,3 @@ internal struct NotchCompanionView: View {
         }
     }
 }
-
-// swiftlint:enable type_body_length

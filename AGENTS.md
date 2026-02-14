@@ -34,6 +34,7 @@ just check-style           # Run lint and format checks
 ```
 
 **Single test**: `just test-method FocusSessionViewModelTests "testStartSession"`
+**Test scheme**: Tests run via `OakTests` scheme (see justfile line 20 for path format)
 **Manual build**: `xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' build`
 **Regenerate project**: `cd Oak && xcodegen generate`
 
@@ -135,6 +136,13 @@ Oak/
 - Test methods: `async throws` | Use `setUp()` and `tearDown()` for fixtures
 - **Isolate UserDefaults** with unique suite names per test class
 - Test state transitions: idle → running → paused → idle | Test computed properties and edge cases
+- Test scheme: `OakTests` | Test paths use format `OakTests/ClassName/methodName`
+
+---
+
+## Scripts
+
+- `scripts/check-ambient-sounds.sh` - Validates bundled ambient sound files are present
 
 ---
 
