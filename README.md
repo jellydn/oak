@@ -1,6 +1,14 @@
-<div align="center">
-  <img src="assets/readme-header.svg" alt="Oak - Focus Companion for macOS" width="800"/>
-</div>
+<h1 align="center">Welcome to Oak 👋</h1>
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
+[![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
+
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+<p align="center">
+  <strong>Oak</strong> is a lightweight macOS focus companion designed for deep work with notch-first UI and ambient sounds.
+</p>
 
 <div align="center">
 
@@ -10,31 +18,40 @@
 
 </div>
 
+<div align="center">
+  <img src="assets/readme-header.svg" alt="Oak - Focus Companion for macOS" width="800"/>
+</div>
+
 ## 🎬 Demo
 
 <div align="center">
   <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak Demo - Focus session in action" width="600"/>
 </div>
 
-# Oak
+## Prerequisites
 
-A lightweight macOS focus companion designed for deep work.
+- macOS 13+ (Apple Silicon recommended)
+- XcodeGen (`brew install xcodegen`) - for building from source
+- SwiftLint (optional, for code linting: `brew install swiftlint`)
+- SwiftFormat (optional, for code formatting: `brew install swiftformat`)
 
-## ✨ Features
+## Motivation
 
-- 🎯 **Notch-first** focus companion UI
-- ⏱️ **Default Pomodoro** presets: `25/5` and `50/10` (configurable in settings)
-- 🔄 **Long breaks**: Automatic 15/20 min breaks after 4 focus rounds
-- ▶️ **Session controls**: start, pause, resume
-- 🎵 **Ambient sounds**: rain, forest, cafe, brown noise, lo-fi
-- 📊 **Local tracking**: daily focus minutes, completed sessions, 7-day streak
-- 🔄 **Auto-update**: Automatic updates via Sparkle framework
+In today's world of constant distractions, deep work has become increasingly rare and valuable. Oak was created to help you reclaim your focus and establish productive work sessions without cluttering your screen. By leveraging the MacBook's notch area, Oak provides a subtle, always-visible timer that keeps you accountable without being intrusive.
 
-## 🚀 Getting Started
+## Features
 
-### Installation
+- 🎯 **Notch-first UI**: Elegant focus companion that lives in your MacBook's notch
+- ⏱️ **Pomodoro presets**: Default `25/5` and `50/10` sessions (fully configurable)
+- 🔄 **Smart breaks**: Automatic 15/20 min long breaks after 4 focus rounds
+- ▶️ **Session controls**: Start, pause, and resume your focus sessions
+- 🎵 **Ambient sounds**: Rain, forest, cafe, brown noise, and lo-fi to help you concentrate
+- 📊 **Local tracking**: Track daily focus minutes, completed sessions, and 7-day streaks
+- 🔄 **Auto-update**: Seamless updates via Sparkle framework
 
-#### Using Homebrew (Recommended)
+## Installation
+
+### Using Homebrew (Recommended)
 
 ```bash
 # Add the tap
@@ -44,14 +61,7 @@ brew tap jellydn/oak https://github.com/jellydn/oak
 brew install --cask oak
 ```
 
-#### From Source
-
-**Prerequisites:**
-
-- macOS 13+ (Apple Silicon recommended)
-- XcodeGen (`brew install xcodegen`)
-- SwiftLint (optional, for code linting: `brew install swiftlint`)
-- SwiftFormat (optional, for code formatting: `brew install swiftformat`)
+### From Source
 
 ```bash
 # Clone the repository
@@ -213,19 +223,35 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👤 Author
+## Author
 
-**Dung Huynh**
+👤 **Dung Huynh**
 
 - Website: [https://productsway.com](https://productsway.com)
 - Twitter: [@jellydn](https://twitter.com/jellydn)
 - GitHub: [@jellydn](https://github.com/jellydn)
 
-## 💖 Support
+## Show your support
 
-[![ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd)
+Give a ⭐️ if this project helped you!
+
+[![kofi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd)
 [![paypal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/dunghd)
 [![buymeacoffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dunghd)
+
+## Contributors ✨
+
+Thanks goes to these wonderful people:
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
 ## 🎵 Sound Attribution
 
