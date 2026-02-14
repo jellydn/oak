@@ -185,6 +185,14 @@ internal class NotchWindowController: NSWindowController {
 
     private func notchYPosition(for screen: NSScreen?, alwaysOnTop: Bool) -> CGFloat {
         guard let screen else { return 0 }
+        
+        // For notch-first UI: position at top of screen if display has a notch
+        // This aligns Oak's window with the actual notch hardware on built-in displays
+        if screen.hasNotch {
+            return screen.frame.maxY - NotchLayout.height
+        }
+        
+        // For non-notched displays: respect menu bar and always-on-top setting
         if alwaysOnTop {
             return screen.visibleFrame.maxY - NotchLayout.height
         }
@@ -206,7 +214,19 @@ internal class NotchWindow: NSPanel {
         let screenFrame = screen?.frame ?? .zero
         let visibleFrame = screen?.visibleFrame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
-        let yPosition = alwaysOnTop ? visibleFrame.maxY - height : screenFrame.maxY - height
+        
+        // Position for notch-first UI: align with actual notch on built-in displays
+        let yPosition: CGFloat
+        if screen?.hasNotch == true {
+            // On notched displays, position at top of screen to overlay the notch
+            yPosition = screenFrame.maxY - height
+        } else if alwaysOnTop {
+            // On non-notched displays with always-on-top, position below menu bar
+            yPosition = visibleFrame.maxY - height
+        } else {
+            // On non-notched displays without always-on-top, position at top
+            yPosition = screenFrame.maxY - height
+        }
 
         super.init(
             contentRect: NSRect(x: xPosition, y: yPosition, width: width, height: height),

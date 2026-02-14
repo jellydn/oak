@@ -28,7 +28,9 @@ internal extension NSScreen {
     }
 
     private static func notchedScreen() -> NSScreen? {
-        NSScreen.screens.first { $0.auxiliaryTopLeftArea != nil }
+        // Prefer screens with actual notch (safeAreaInsets.top > 0) over just auxiliary areas
+        NSScreen.screens.first { $0.hasNotch }
+            ?? NSScreen.screens.first { $0.auxiliaryTopLeftArea != nil }
     }
 
     private static func screen(forDisplayID id: CGDirectDisplayID?) -> NSScreen? {
@@ -45,10 +47,13 @@ internal extension NSScreen {
         case .mainDisplay:
             return primaryScreen()
         case .notchedDisplay:
+            // Prioritize notched display first (built-in display with notch)
+            if let notched = notchedScreen() {
+                return notched
+            }
+            // Fall back to secondary screen if no notch found
             let primary = primaryScreen()
-            return secondaryScreen(excluding: primary)
-                ?? notchedScreen()
-                ?? primary
+            return secondaryScreen(excluding: primary) ?? primary
         }
     }
 
