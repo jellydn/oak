@@ -35,6 +35,16 @@
 - SwiftLint (optional, for code linting: `brew install swiftlint`)
 - SwiftFormat (optional, for code formatting: `brew install swiftformat`)
 
+---
+> [!IMPORTANT]
+> We don't have an Apple Developer account yet. The application will show a popup on first launch that the app is from an unidentified developer.
+> 1. Click **OK** to close the popup.
+> 2. Open **System Settings** > **Privacy & Security**.
+> 3. Scroll down and click **Open Anyway** next to the warning about the app.
+> 4. Confirm your choice if prompted.
+>
+> You only need to do this once.
+
 ## Motivation
 
 In today's world of constant distractions, deep work has become increasingly rare and valuable. Oak was created to help you reclaim your focus and establish productive work sessions without cluttering your screen. By leveraging the MacBook's notch area, Oak provides a subtle, always-visible timer that keeps you accountable without being intrusive.
