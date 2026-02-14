@@ -23,6 +23,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var displayTarget: DisplayTarget
     @Published private(set) var mainDisplayID: UInt32?
     @Published private(set) var notchedDisplayID: UInt32?
+    @Published private(set) var notchPositionMode: NotchPositionMode
     @Published private(set) var playSoundOnSessionCompletion: Bool
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
     @Published private(set) var alwaysOnTop: Bool
@@ -40,6 +41,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let displayTarget = "display.target"
         static let mainDisplayID = "display.main.id"
         static let notchedDisplayID = "display.notched.id"
+        static let notchPositionMode = "display.notch.positionMode"
         static let playSoundOnSessionCompletion = "session.completion.playSound"
         static let countdownDisplayMode = "countdown.displayMode"
         static let alwaysOnTop = "window.alwaysOnTop"
@@ -57,6 +59,7 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.longLongBreakMinutes: Preset.long.defaultLongBreakMinutes,
             Keys.roundsBeforeLongBreak: 4,
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
+            Keys.notchPositionMode: NotchPositionMode.insideNotch.rawValue,
             Keys.playSoundOnSessionCompletion: true,
             Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
             Keys.alwaysOnTop: false
@@ -76,6 +79,9 @@ internal final class PresetSettingsStore: ObservableObject {
         displayTarget = DisplayTarget(rawValue: rawDisplayTarget) ?? .mainDisplay
         mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
         notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
+        let rawNotchPositionMode = userDefaults.string(forKey: Keys.notchPositionMode)
+            ?? NotchPositionMode.insideNotch.rawValue
+        notchPositionMode = NotchPositionMode(rawValue: rawNotchPositionMode) ?? .insideNotch
         playSoundOnSessionCompletion = userDefaults.bool(forKey: Keys.playSoundOnSessionCompletion)
         let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode)
             ?? CountdownDisplayMode.number.rawValue
@@ -176,9 +182,16 @@ internal final class PresetSettingsStore: ObservableObject {
         setLongBreakMinutes(Preset.long.defaultLongBreakMinutes, for: .long)
         setRoundsBeforeLongBreak(4)
         setDisplayTarget(.mainDisplay, screenID: nil)
+        setNotchPositionMode(.insideNotch)
         setPlaySoundOnSessionCompletion(true)
         setCountdownDisplayMode(.number)
         setAlwaysOnTop(false)
+    }
+
+    func setNotchPositionMode(_ mode: NotchPositionMode) {
+        guard notchPositionMode != mode else { return }
+        notchPositionMode = mode
+        userDefaults.set(mode.rawValue, forKey: Keys.notchPositionMode)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {

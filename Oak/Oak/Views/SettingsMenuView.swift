@@ -6,6 +6,7 @@ internal struct SettingsMenuView: View {
     @ObservedObject var notificationService: NotificationService
     @ObservedObject var sparkleUpdater: SparkleUpdater
     @State private var selectedDisplayTarget: DisplayTarget
+    @State private var selectedNotchPositionMode: NotchPositionMode
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
 
     init(
@@ -17,6 +18,7 @@ internal struct SettingsMenuView: View {
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
+        _selectedNotchPositionMode = State(initialValue: presetSettings.notchPositionMode)
         _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
     }
 
@@ -30,6 +32,7 @@ internal struct SettingsMenuView: View {
                 if NSScreen.screens.count > 1 {
                     displayTargetPicker
                 }
+                notchPositionModePicker
                 countdownDisplayModePicker
                 alwaysOnTopToggle
             }
@@ -216,6 +219,21 @@ internal struct SettingsMenuView: View {
         .font(.caption)
     }
 
+    private var notchPositionModePicker: some View {
+        Picker("Notch position", selection: notchPositionModeBinding) {
+            ForEach(NotchPositionMode.allCases, id: \.rawValue) { mode in
+                Text(mode.displayName)
+                    .tag(mode)
+            }
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .onChange(of: presetSettings.notchPositionMode) { newValue in
+            guard selectedNotchPositionMode != newValue else { return }
+            selectedNotchPositionMode = newValue
+        }
+    }
+
     private var notificationSettings: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(notificationStatusText)
@@ -327,6 +345,18 @@ private extension SettingsMenuView {
                 selectedCountdownDisplayMode = newValue
                 DispatchQueue.main.async {
                     presetSettings.setCountdownDisplayMode(newValue)
+                }
+            }
+        )
+    }
+
+    var notchPositionModeBinding: Binding<NotchPositionMode> {
+        Binding(
+            get: { selectedNotchPositionMode },
+            set: { newValue in
+                selectedNotchPositionMode = newValue
+                DispatchQueue.main.async {
+                    presetSettings.setNotchPositionMode(newValue)
                 }
             }
         )

@@ -67,3 +67,19 @@ internal enum DisplayTarget: String, CaseIterable, Identifiable {
         }
     }
 }
+
+internal enum NotchPositionMode: String, CaseIterable, Identifiable {
+    case insideNotch
+    case belowNotch
+
+    var id: String {
+        rawValue
+    }
+
+    var displayName: String {
+        switch self {
+        case .insideNotch: return "Inside notch"
+        case .belowNotch: return "Below notch"
+        }
+    }
+}
