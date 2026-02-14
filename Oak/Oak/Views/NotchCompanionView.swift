@@ -137,7 +137,7 @@ internal struct NotchCompanionView: View {
                 notificationService: notificationService,
                 sparkleUpdater: sparkleUpdater
             )
-            .frame(width: 280)
+            .frame(width: 340)
         }
     }
 
