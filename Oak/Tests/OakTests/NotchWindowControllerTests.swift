@@ -194,35 +194,54 @@ internal final class NotchWindowControllerTests: XCTestCase {
     func testNotchWindowIsStatusBarWhenAlwaysOnTopEnabled() {
         presetSettings.setAlwaysOnTop(true)
 
-        // Wait for the subscription to update the window level
-        let expectation = expectation(description: "Window level updated")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1.0)
-
+        // Poll for window level change
         let window = windowController.window as? NotchWindow
+        var levelChanged = false
+        let endTime = Date().addingTimeInterval(1.0)
+
+        while Date() < endTime {
+            if window?.level == .statusBar {
+                levelChanged = true
+                break
+            }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        }
+
+        XCTAssertTrue(levelChanged, "NotchWindow should have statusBar level when alwaysOnTop is enabled")
         XCTAssertEqual(window?.level, .statusBar, "NotchWindow should have statusBar level when alwaysOnTop is enabled")
     }
 
     func testNotchWindowReturnsToFloatingWhenAlwaysOnTopDisabled() {
+        let window = windowController.window as? NotchWindow
+
         // First enable
         presetSettings.setAlwaysOnTop(true)
-        let enableExpectation = expectation(description: "Window level set to statusBar")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            enableExpectation.fulfill()
+        var levelChangedToStatusBar = false
+        var endTime = Date().addingTimeInterval(1.0)
+
+        while Date() < endTime {
+            if window?.level == .statusBar {
+                levelChangedToStatusBar = true
+                break
+            }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
-        wait(for: [enableExpectation], timeout: 1.0)
+        XCTAssertTrue(levelChangedToStatusBar, "Window should change to statusBar level")
 
         // Then disable
         presetSettings.setAlwaysOnTop(false)
-        let disableExpectation = expectation(description: "Window level returned to floating")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            disableExpectation.fulfill()
-        }
-        wait(for: [disableExpectation], timeout: 1.0)
+        var levelChangedToFloating = false
+        endTime = Date().addingTimeInterval(1.0)
 
-        let window = windowController.window as? NotchWindow
+        while Date() < endTime {
+            if window?.level == .floating {
+                levelChangedToFloating = true
+                break
+            }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        }
+
+        XCTAssertTrue(levelChangedToFloating, "Window should change back to floating level")
         XCTAssertEqual(window?.level, .floating, "NotchWindow should return to floating level when alwaysOnTop is disabled")
     }
 
