@@ -16,6 +16,7 @@ internal class NotchWindowController: NSWindowController {
     private let viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
     private var displayTargetCancellable: AnyCancellable?
+    private var alwaysOnTopCancellable: AnyCancellable?
 
     convenience init() {
         self.init(presetSettings: nil)
@@ -30,7 +31,8 @@ internal class NotchWindowController: NSWindowController {
             width: NotchLayout.collapsedWidth,
             height: NotchLayout.height,
             displayTarget: settings.displayTarget,
-            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
+            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget),
+            alwaysOnTop: settings.alwaysOnTop
         )
         super.init(window: window)
 
@@ -65,6 +67,13 @@ internal class NotchWindowController: NSWindowController {
                 guard let self else { return }
                 self.requestFrameUpdate(for: lastExpandedState, forceReposition: true, targetOverride: nextTarget)
             }
+
+        alwaysOnTopCancellable = settings.$alwaysOnTop
+            .sink { [weak self] isAlwaysOnTop in
+                guard let self, let window = self.window as? NotchWindow else { return }
+                window.level = isAlwaysOnTop ? .statusBar : .floating
+                self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
+            }
     }
 
     @available(*, unavailable)
@@ -79,12 +88,14 @@ internal class NotchWindowController: NSWindowController {
         }
         NotificationCenter.default.removeObserver(self)
         displayTargetCancellable?.cancel()
+        alwaysOnTopCancellable?.cancel()
     }
 
     func cleanup() {
         guard !hasCleanedUp else { return }
         hasCleanedUp = true
         displayTargetCancellable?.cancel()
+        alwaysOnTopCancellable?.cancel()
         viewModel.cleanup()
     }
 
@@ -145,8 +156,8 @@ internal class NotchWindowController: NSWindowController {
             for: activeTarget,
             preferredDisplayID: preferredDisplayID
         )
+        let yPosition = notchYPosition(for: resolvedScreen, alwaysOnTop: presetSettings.alwaysOnTop)
         let screenFrame = resolvedScreen?.frame ?? .zero
-        let yPosition = screenFrame.maxY - NotchLayout.height
         let xPosition = screenFrame.midX - (targetWidth / 2)
         let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: NotchLayout.height)
 
@@ -171,23 +182,40 @@ internal class NotchWindowController: NSWindowController {
             abs(current.width - target.width) > 0.5 ||
             abs(current.height - target.height) > 0.5
     }
+
+    private func notchYPosition(for screen: NSScreen?, alwaysOnTop: Bool) -> CGFloat {
+        guard let screen else { return 0 }
+        if alwaysOnTop {
+            return screen.visibleFrame.maxY - NotchLayout.height
+        }
+        return screen.frame.maxY - NotchLayout.height
+    }
 }
 
 // MARK: - NotchWindow
 
 internal class NotchWindow: NSPanel {
-    init(width: CGFloat, height: CGFloat, displayTarget: DisplayTarget, preferredDisplayID: CGDirectDisplayID?) {
-        let screenFrame = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
+    init(
+        width: CGFloat,
+        height: CGFloat,
+        displayTarget: DisplayTarget,
+        preferredDisplayID: CGDirectDisplayID?,
+        alwaysOnTop: Bool = false
+    ) {
+        let screen = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)
+        let screenFrame = screen?.frame ?? .zero
+        let visibleFrame = screen?.visibleFrame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
+        let yPosition = alwaysOnTop ? visibleFrame.maxY - height : screenFrame.maxY - height
 
         super.init(
-            contentRect: NSRect(x: xPosition, y: screenFrame.maxY - height, width: width, height: height),
+            contentRect: NSRect(x: xPosition, y: yPosition, width: width, height: height),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
 
-        level = .floating
+        level = alwaysOnTop ? .statusBar : .floating
         collectionBehavior = [.canJoinAllSpaces, .stationary]
         backgroundColor = .clear
         isOpaque = false

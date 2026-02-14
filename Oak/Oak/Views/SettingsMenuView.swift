@@ -31,6 +31,7 @@ internal struct SettingsMenuView: View {
                     displayTargetPicker
                 }
                 countdownDisplayModePicker
+                alwaysOnTopToggle
             }
 
             section(title: "Session Presets") {
@@ -202,6 +203,17 @@ internal struct SettingsMenuView: View {
             guard selectedCountdownDisplayMode != newValue else { return }
             selectedCountdownDisplayMode = newValue
         }
+    }
+
+    private var alwaysOnTopToggle: some View {
+        Toggle(
+            "Always on top",
+            isOn: Binding(
+                get: { presetSettings.alwaysOnTop },
+                set: { presetSettings.setAlwaysOnTop($0) }
+            )
+        )
+        .font(.caption)
     }
 
     private var notificationSettings: some View {
