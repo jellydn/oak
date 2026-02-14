@@ -58,8 +58,7 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.roundsBeforeLongBreak: 4,
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
             Keys.playSoundOnSessionCompletion: true,
-            Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
-            Keys.launchAtLogin: false
+            Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue
         ]
         userDefaults.register(defaults: defaults)
 

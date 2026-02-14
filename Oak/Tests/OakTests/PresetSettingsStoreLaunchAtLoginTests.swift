@@ -5,19 +5,19 @@ import XCTest
 final class PresetSettingsStoreLaunchAtLoginTests: XCTestCase {
     var sut: PresetSettingsStore!
     var userDefaults: UserDefaults!
+    var suiteName: String!
 
     override func setUp() async throws {
         try await super.setUp()
         // Use a unique suite name for test isolation
-        let suiteName = "PresetSettingsStoreLaunchAtLoginTests-\(UUID().uuidString)"
+        suiteName = "PresetSettingsStoreLaunchAtLoginTests-\(UUID().uuidString)"
         userDefaults = UserDefaults(suiteName: suiteName)!
         sut = PresetSettingsStore(userDefaults: userDefaults)
     }
 
     override func tearDown() async throws {
-        if let suiteName = userDefaults.dictionaryRepresentation().keys.first {
-            userDefaults.removePersistentDomain(forName: suiteName)
-        }
+        userDefaults.removePersistentDomain(forName: suiteName)
+        suiteName = nil
         userDefaults = nil
         sut = nil
         try await super.tearDown()
