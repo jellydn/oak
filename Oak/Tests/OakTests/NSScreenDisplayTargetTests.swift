@@ -27,9 +27,10 @@ internal final class NSScreenDisplayTargetTests: XCTestCase {
         XCTAssertNotNil(result, "Notched display target should resolve to a screen")
 
         // If there's a notched screen available, it should be selected
-        if let notchedScreen = NSScreen.screens.first(where: { $0.auxiliaryTopLeftArea != nil }) {
+        if let notchedScreen = NSScreen.screens.first(where: { $0.auxiliaryTopLeftArea != nil }),
+           let resolvedScreen = result {
             XCTAssertEqual(
-                NSScreen.displayID(for: result!),
+                NSScreen.displayID(for: resolvedScreen),
                 NSScreen.displayID(for: notchedScreen),
                 "When a notched screen exists, .notchedDisplay should prioritize it"
             )
@@ -51,11 +52,13 @@ internal final class NSScreenDisplayTargetTests: XCTestCase {
         if !hasNotchedScreen && NSScreen.screens.count > 1 {
             // Should select secondary screen when available
             XCTAssertNotNil(result, "Should fall back to secondary screen when no notch exists")
-        } else if !hasNotchedScreen && NSScreen.screens.count == 1 {
+        } else if !hasNotchedScreen && NSScreen.screens.count == 1,
+                  let resolvedScreen = result,
+                  let mainScreen = NSScreen.main {
             // Should fall back to primary screen
             XCTAssertEqual(
-                NSScreen.displayID(for: result!),
-                NSScreen.displayID(for: NSScreen.main!),
+                NSScreen.displayID(for: resolvedScreen),
+                NSScreen.displayID(for: mainScreen),
                 "Should fall back to primary screen when only one screen exists"
             )
         }
@@ -72,11 +75,13 @@ internal final class NSScreenDisplayTargetTests: XCTestCase {
         let result = NSScreen.screen(for: .notchedDisplay, preferredDisplayID: mainDisplayID)
 
         XCTAssertNotNil(result, "Preferred display ID should resolve to a screen")
-        XCTAssertEqual(
-            NSScreen.displayID(for: result!),
-            mainDisplayID,
-            "Preferred display ID should override target selection logic"
-        )
+        if let resolvedScreen = result {
+            XCTAssertEqual(
+                NSScreen.displayID(for: resolvedScreen),
+                mainDisplayID,
+                "Preferred display ID should override target selection logic"
+            )
+        }
     }
 
     func testDisplayNameReturnsCorrectName() throws {
