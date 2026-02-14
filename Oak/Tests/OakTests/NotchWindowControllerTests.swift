@@ -211,6 +211,33 @@ internal final class NotchWindowControllerTests: XCTestCase {
         XCTAssertEqual(window?.level, .statusBar, "NotchWindow should have statusBar level when alwaysOnTop is enabled")
     }
 
+    func testNotchWindowMovesToVisibleFrameWhenAlwaysOnTopEnabled() {
+        let window = windowController.window as? NotchWindow
+
+        presetSettings.setAlwaysOnTop(true)
+
+        let target = presetSettings.displayTarget
+        let preferredDisplayID = presetSettings.preferredDisplayID(for: target)
+        let resolvedScreen = NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)
+        let expectedY = (resolvedScreen?.visibleFrame.maxY ?? 0) - NotchLayout.height
+
+        var yPositionMatchesVisibleFrame = false
+        let endTime = Date().addingTimeInterval(1.0)
+
+        while Date() < endTime {
+            if abs((window?.frame.minY ?? 0) - expectedY) <= 1.0 {
+                yPositionMatchesVisibleFrame = true
+                break
+            }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        }
+
+        XCTAssertTrue(
+            yPositionMatchesVisibleFrame,
+            "NotchWindow should align to visibleFrame top when alwaysOnTop is enabled"
+        )
+    }
+
     func testNotchWindowReturnsToFloatingWhenAlwaysOnTopDisabled() {
         let window = windowController.window as? NotchWindow
 
@@ -242,7 +269,11 @@ internal final class NotchWindowControllerTests: XCTestCase {
         }
 
         XCTAssertTrue(levelChangedToFloating, "Window should change back to floating level")
-        XCTAssertEqual(window?.level, .floating, "NotchWindow should return to floating level when alwaysOnTop is disabled")
+        XCTAssertEqual(
+            window?.level,
+            .floating,
+            "NotchWindow should return to floating level when alwaysOnTop is disabled"
+        )
     }
 
     func testNotchWindowJoinsAllSpaces() {
