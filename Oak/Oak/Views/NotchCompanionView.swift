@@ -139,23 +139,6 @@ internal struct NotchCompanionView: View {
             )
             .frame(width: 280)
         }
-        .contextMenu {
-            if #available(macOS 14.0, *) {
-                SettingsLink {
-                    Text("Settings...")
-                }
-            } else {
-                Button("Settings...") {
-                    NSApp.sendAction(NSSelectorFromString("showSettingsWindow:"), to: nil, from: nil)
-                }
-            }
-
-            Divider()
-
-            Button("Quit Oak") {
-                NSApp.terminate(nil)
-            }
-        }
     }
 
     private var compactView: some View {
