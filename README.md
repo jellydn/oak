@@ -124,11 +124,17 @@ Oak expects bundled ambient files under `Oak/Oak/Resources/Sounds` with these ba
 
 Supported extensions: `.m4a` (preferred), `.wav`, `.mp3`.
 
-Sourcing options:
+### 🎵 Sound Attribution
 
-- Mixkit: https://mixkit.co/license/
-- Pixabay: https://pixabay.com/service/license-summary/
-- Freesound (check CC license/attribution per file): https://freesound.org/help/faq/
+The ambient sounds included in Oak are sourced from [Pixabay](https://pixabay.com/) under the [Pixabay Content License](https://pixabay.com/service/license-summary/):
+
+- **Rain Sound**: [Real Rain Sound](https://pixabay.com/sound-effects/real-rain-sound-379215/) by feedthestraycats
+- **Forest Sound**: [Ambient Spring Forest](https://pixabay.com/sound-effects/ambient-spring-forest-323801/) by soundreality
+- **Cafe Sound**: [Cafe Noise](https://pixabay.com/sound-effects/cafe-noise-32940/) by freesound_community
+- **Brown Noise**: [Brown Noise](https://pixabay.com/sound-effects/brown-noise-by-digitalspa-170337/) by digitalspa
+- **Lo-fi Sound**: [Lofi Guitar](https://pixabay.com/sound-effects/lofi-guitar-105361/) by freesound_community
+
+We are grateful to these creators for making their work available for projects like Oak.
 
 ### Auto-Update
 
@@ -252,15 +258,3 @@ Thanks goes to these wonderful people:
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
-
-## 🎵 Sound Attribution
-
-The ambient sounds included in Oak are sourced from [Pixabay](https://pixabay.com/) under the [Pixabay Content License](https://pixabay.com/service/license-summary/):
-
-- **Rain Sound**: [Real Rain Sound](https://pixabay.com/sound-effects/real-rain-sound-379215/) by feedthestraycats
-- **Forest Sound**: [Ambient Spring Forest](https://pixabay.com/sound-effects/ambient-spring-forest-323801/) by soundreality
-- **Cafe Sound**: [Cafe Noise](https://pixabay.com/sound-effects/cafe-noise-32940/) by freesound_community
-- **Brown Noise**: [Brown Noise](https://pixabay.com/sound-effects/brown-noise-by-digitalspa-170337/) by digitalspa
-- **Lo-fi Sound**: [Lofi Guitar](https://pixabay.com/sound-effects/lofi-guitar-105361/) by freesound_community
-
-We are grateful to these creators for making their work available for projects like Oak.
