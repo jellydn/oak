@@ -1,4 +1,4 @@
-name: Update Sparkle Appcast
+name: Update Release Metadata
 
 on:
   release:
@@ -107,6 +107,10 @@ jobs:
           # Get file size in bytes
           FILE_SIZE=$(stat -f%z /tmp/Oak.dmg)
           echo "file_size=$FILE_SIZE" >> "$GITHUB_OUTPUT"
+
+          # Calculate SHA256 for Homebrew cask update
+          SHA256=$(shasum -a 256 /tmp/Oak.dmg | awk '{print $1}')
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
           
       - name: Sign DMG with Sparkle EdDSA key
         id: sign
@@ -211,12 +215,23 @@ jobs:
           echo "Updated appcast.xml:"
           cat appcast.xml
 
+      - name: Update Homebrew cask
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          SHA256: ${{ steps.dmg_info.outputs.sha256 }}
+        run: |
+          sed -i '' "s/version \".*\"/version \"$VERSION\"/" Casks/oak.rb
+          sed -i '' "s/sha256 \".*\"/sha256 \"$SHA256\"/" Casks/oak.rb
+
+          echo "Updated Cask formula:"
+          cat Casks/oak.rb
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add appcast.xml
+          git add appcast.xml Casks/oak.rb
           
           # Check if there are changes to commit
           if git diff --staged --quiet; then
@@ -224,5 +239,5 @@ jobs:
             exit 0
           fi
           
-          git commit -m "chore: update appcast for v${{ steps.release.outputs.version }} [skip ci]"
+          git commit -m "chore: update appcast and Homebrew cask for v${{ steps.release.outputs.version }} [skip ci]"
           git push origin main
