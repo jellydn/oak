@@ -1,8 +1,9 @@
 import SwiftUI
 
-// swiftlint:disable type_body_length
+// swiftlint:disable file_length type_body_length
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
+    let onAuxiliaryMenuPresentationChanged: (Bool) -> Void
     @StateObject private var viewModel: FocusSessionViewModel
     @StateObject private var notificationService = NotificationService.shared
     @StateObject private var sparkleUpdater = SparkleUpdater.shared
@@ -15,55 +16,86 @@ internal struct NotchCompanionView: View {
     @State private var lastReportedExpansion: Bool?
     @State private var presetSelection: Preset = .short
     private let horizontalPadding: CGFloat = 8
-    private let verticalPadding: CGFloat = 5
+    private let collapsedTopPadding: CGFloat = 0
+    private let expandedTopPadding: CGFloat = 0
     private let contentSpacing: CGFloat = 10
     private let controlSize: CGFloat = 20
     private let compactRingSize: CGFloat = 20
     private let expandedRingSize: CGFloat = 26
     init(
         viewModel: FocusSessionViewModel,
-        onExpansionChanged: @escaping (Bool) -> Void = { _ in }
+        onExpansionChanged: @escaping (Bool) -> Void = { _ in },
+        onAuxiliaryMenuPresentationChanged: @escaping (Bool) -> Void = { _ in }
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.onExpansionChanged = onExpansionChanged
+        self.onAuxiliaryMenuPresentationChanged = onAuxiliaryMenuPresentationChanged
     }
 
     @MainActor
-    init(onExpansionChanged: @escaping (Bool) -> Void = { _ in }) {
+    init(
+        onExpansionChanged: @escaping (Bool) -> Void = { _ in },
+        onAuxiliaryMenuPresentationChanged: @escaping (Bool) -> Void = { _ in }
+    ) {
         _viewModel = StateObject(wrappedValue: FocusSessionViewModel())
         self.onExpansionChanged = onExpansionChanged
+        self.onAuxiliaryMenuPresentationChanged = onAuxiliaryMenuPresentationChanged
     }
 
     private var isExpanded: Bool {
-        isExpandedByToggle
+        return isExpandedByToggle
     }
 
     private var containerShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: 15, style: .continuous)
     }
 
-    var body: some View {
-        ZStack {
-            containerShape
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.8),
-                            Color(red: 0.11, green: 0.12, blue: 0.15).opacity(0.86)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    containerShape
-                        .stroke(
-                            viewModel.isSessionComplete ? Color.green.opacity(0.45) : Color.white.opacity(0.14),
-                            lineWidth: viewModel.isSessionComplete ? 1.4 : 1
-                        )
-                )
-                .shadow(color: Color.black.opacity(0.28), radius: 10, x: 0, y: 4)
+    private var collapsedShape: NotchCapShape {
+        NotchCapShape(cornerRadius: 14)
+    }
 
+    private var expandedShape: NotchCapShape {
+        NotchCapShape(cornerRadius: 15)
+    }
+
+    private var backgroundFill: some View {
+        Group {
+            if isExpanded {
+                expandedShape
+                    .fill(Color.black.opacity(0.97))
+                    .overlay {
+                        if viewModel.isSessionComplete {
+                            expandedShape
+                                .stroke(Color.green.opacity(0.45), lineWidth: 1.4)
+                        }
+                    }
+            } else {
+                collapsedShape
+                    .fill(Color.black.opacity(0.98))
+                    .overlay {
+                        if viewModel.isSessionComplete {
+                            collapsedShape
+                                .stroke(Color.green.opacity(0.45), lineWidth: 1.2)
+                        }
+                    }
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard !isExpandedByToggle else { return }
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.82)) {
+                isExpandedByToggle = true
+            }
+        }
+    }
+
+    private var currentTopPadding: CGFloat {
+        isExpanded ? expandedTopPadding : collapsedTopPadding
+    }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            backgroundFill
             HStack(spacing: contentSpacing) {
                 if isExpanded {
                     if viewModel.canStart {
@@ -85,8 +117,9 @@ internal struct NotchCompanionView: View {
 
                 expandToggleButton
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             .padding(.horizontal, horizontalPadding)
-            .padding(.vertical, verticalPadding)
+            .padding(.top, currentTopPadding)
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
 
@@ -95,14 +128,23 @@ internal struct NotchCompanionView: View {
                     .allowsHitTesting(false)
             }
         }
-        .frame(height: NotchLayout.height)
-        .contentShape(Rectangle())
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onChange(of: isExpanded) { expanded in
             notifyExpansionChanged(expanded)
         }
         .onAppear {
             notifyExpansionChanged(isExpanded)
+            notifyAuxiliaryPresentationChanged()
             presetSelection = viewModel.selectedPreset
+        }
+        .onChange(of: showAudioMenu) { _ in
+            notifyAuxiliaryPresentationChanged()
+        }
+        .onChange(of: showProgressMenu) { _ in
+            notifyAuxiliaryPresentationChanged()
+        }
+        .onChange(of: showSettingsMenu) { _ in
+            notifyAuxiliaryPresentationChanged()
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
             if isComplete {
@@ -476,6 +518,13 @@ internal struct NotchCompanionView: View {
         lastReportedExpansion = expanded
         DispatchQueue.main.async {
             onExpansionChanged(expanded)
+        }
+    }
+
+    private func notifyAuxiliaryPresentationChanged() {
+        let isPresented = showAudioMenu || showProgressMenu || showSettingsMenu
+        DispatchQueue.main.async {
+            onAuxiliaryMenuPresentationChanged(isPresented)
         }
     }
 }
