@@ -46,8 +46,8 @@ internal extension NSScreen {
             return primaryScreen()
         case .notchedDisplay:
             let primary = primaryScreen()
-            return secondaryScreen(excluding: primary)
-                ?? notchedScreen()
+            return notchedScreen()
+                ?? secondaryScreen(excluding: primary)
                 ?? primary
         }
     }
