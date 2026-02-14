@@ -11,5 +11,8 @@ internal enum NotchLayout {
     static let collapsedWidth: CGFloat = 120
 
     /// Width of the expanded notch window
-    static let expandedWidth: CGFloat = 320
+    ///
+    /// Tuned to avoid right-edge cutoff for expanded controls when rendered
+    /// inside the notch panel.
+    static let expandedWidth: CGFloat = 344
 }
