@@ -28,12 +28,9 @@ internal extension NSScreen {
     }
 
     private static func notchedScreen() -> NSScreen? {
-        // Prefer screens with actual notch (safeAreaInsets.top > 0) over just auxiliary areas
-        // Single pass through screens checking both conditions for efficiency
         for screen in NSScreen.screens where screen.hasNotch {
             return screen
         }
-        // Fall back to screens with auxiliary areas if no actual notch found
         return NSScreen.screens.first { $0.auxiliaryTopLeftArea != nil }
     }
 
@@ -51,11 +48,9 @@ internal extension NSScreen {
         case .mainDisplay:
             return primaryScreen()
         case .notchedDisplay:
-            // Prioritize display with actual notch hardware
             if let notched = notchedScreen() {
                 return notched
             }
-            // Fall back to secondary screen if no notch found
             let primary = primaryScreen()
             return secondaryScreen(excluding: primary) ?? primary
         }

@@ -2,10 +2,8 @@ import AppKit
 import CoreGraphics
 
 internal extension NSScreen {
-    /// Device description key for NSScreenNumber
     private static let screenNumberKey = NSDeviceDescriptionKey("NSScreenNumber")
     
-    /// Returns a persistent UUID for this display based on CoreGraphics display ID
     var displayUUID: String? {
         guard let number = deviceDescription[Self.screenNumberKey] as? NSNumber else {
             return nil
@@ -22,29 +20,19 @@ internal extension NSScreen {
         return uuidString
     }
 
-    /// Find a screen by its UUID
     @MainActor static func screen(withUUID uuid: String) -> NSScreen? {
         return NSScreenUUIDCache.shared.screen(forUUID: uuid)
     }
 
-    /// Get UUID to NSScreen mapping for all screens
     @MainActor static var screensByUUID: [String: NSScreen] {
         return NSScreenUUIDCache.shared.allScreens
     }
 
-    /// Check if this screen has a notch by examining safe area insets
-    /// 
-    /// This property detects displays with actual notch hardware (like MacBook Pro 14"/16" with notch)
-    /// by checking if the top safe area inset is greater than zero. The safe area inset represents
-    /// the area occupied by the notch where regular window content cannot be displayed.
-    ///
-    /// - Returns: `true` if the display has a notch, `false` otherwise
     var hasNotch: Bool {
         return safeAreaInsets.top > 0
     }
 }
 
-/// Cache for UUID to NSScreen mappings to avoid repeated lookups
 @MainActor
 internal final class NSScreenUUIDCache {
     internal static let shared = NSScreenUUIDCache()
