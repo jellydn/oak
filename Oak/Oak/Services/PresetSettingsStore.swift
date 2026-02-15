@@ -61,7 +61,7 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
             Keys.playSoundOnSessionCompletion: true,
             Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
-            Keys.alwaysOnTop: false,
+            Keys.alwaysOnTop: true,
             Keys.showBelowNotch: false
         ]
         userDefaults.register(defaults: defaults)
@@ -182,7 +182,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setDisplayTarget(.mainDisplay, screenID: nil)
         setPlaySoundOnSessionCompletion(true)
         setCountdownDisplayMode(.number)
-        setAlwaysOnTop(false)
+        setAlwaysOnTop(true)
         setShowBelowNotch(false)
     }
 

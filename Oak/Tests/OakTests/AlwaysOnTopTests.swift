@@ -29,8 +29,8 @@ internal final class AlwaysOnTopTests: XCTestCase {
 
     // MARK: - Default Value Tests
 
-    func testAlwaysOnTopDefaultsToFalse() {
-        XCTAssertFalse(presetSettings.alwaysOnTop, "alwaysOnTop should default to false")
+    func testAlwaysOnTopDefaultsToTrue() {
+        XCTAssertTrue(presetSettings.alwaysOnTop, "alwaysOnTop should default to true")
     }
 
     // MARK: - Setter Tests
@@ -81,21 +81,21 @@ internal final class AlwaysOnTopTests: XCTestCase {
 
     // MARK: - Reset to Default Tests
 
-    func testResetToDefaultSetsAlwaysOnTopToFalse() {
-        presetSettings.setAlwaysOnTop(true)
-        XCTAssertTrue(presetSettings.alwaysOnTop, "Precondition: alwaysOnTop should be true")
+    func testResetToDefaultSetsAlwaysOnTopToTrue() {
+        presetSettings.setAlwaysOnTop(false)
+        XCTAssertFalse(presetSettings.alwaysOnTop, "Precondition: alwaysOnTop should be false")
 
         presetSettings.resetToDefault()
 
-        XCTAssertFalse(presetSettings.alwaysOnTop, "resetToDefault should set alwaysOnTop to false")
+        XCTAssertTrue(presetSettings.alwaysOnTop, "resetToDefault should set alwaysOnTop to true")
     }
 
     func testResetToDefaultPersistsAlwaysOnTopToUserDefaults() {
-        presetSettings.setAlwaysOnTop(true)
+        presetSettings.setAlwaysOnTop(false)
         presetSettings.resetToDefault()
 
         let persistedValue = userDefaults.bool(forKey: "window.alwaysOnTop")
-        XCTAssertFalse(persistedValue, "resetToDefault should persist false to UserDefaults")
+        XCTAssertTrue(persistedValue, "resetToDefault should persist true to UserDefaults")
     }
 
     // MARK: - Published Property Tests
