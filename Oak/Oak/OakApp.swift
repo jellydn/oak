@@ -58,11 +58,4 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
             await notificationService.refreshAuthorizationStatus()
         }
     }
-
-    deinit {
-        let windowController = notchWindowController
-        Task { @MainActor in
-            windowController?.cleanup()
-        }
-    }
 }

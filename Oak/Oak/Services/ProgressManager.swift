@@ -6,6 +6,7 @@ internal class ProgressManager: ObservableObject {
 
     private let userDefaults: UserDefaults
     private let progressKey = "progressHistory"
+    private let retentionDays = 90
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
@@ -25,7 +26,7 @@ internal class ProgressManager: ObservableObject {
         }
 
         records.sort { $0.date > $1.date }
-        saveRecords(records)
+        saveRecords(pruneOldRecords(records))
         loadProgress()
     }
 
@@ -36,6 +37,13 @@ internal class ProgressManager: ObservableObject {
             return []
         }
         return records
+    }
+
+    private func pruneOldRecords(_ records: [ProgressData]) -> [ProgressData] {
+        guard let cutoffDate = Calendar.current.date(byAdding: .day, value: -retentionDays, to: Date()) else {
+            return records
+        }
+        return records.filter { $0.date >= cutoffDate }
     }
 
     private func saveRecords(_ records: [ProgressData]) {

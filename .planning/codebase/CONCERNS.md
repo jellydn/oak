@@ -13,11 +13,7 @@
 
 ## Known Bugs
 
-**NoiseGenerator is not thread-safe but accessed from audio render thread:**
-- Symptoms: Potential data races on `brownNoiseLast` and `rainSeed` properties when `AVAudioSourceNode` render callback fires on the audio thread while `NoiseGenerator` is accessed from `@MainActor` context
-- Files: `Oak/Oak/Services/AudioManager.swift:237-276`
-- Trigger: Start any generated ambient sound track (when no bundled file exists); the render callback runs on a real-time audio thread
-- Workaround: Currently works because `NoiseGenerator` is only mutated from the render callback, but `AudioManager` is `@MainActor` and creates/replaces `NoiseGenerator` instances on main thread while callbacks may still fire
+None currently tracked.
 
 ## Security Considerations
 
@@ -40,12 +36,6 @@
 - Recommendations: Consider adding sandbox if possible in future; document why it's unsandboxed
 
 ## Performance Bottlenecks
-
-**Progress history grows unbounded:**
-- Problem: `ProgressManager` stores all historical `ProgressData` records in UserDefaults with no pruning
-- Files: `Oak/Oak/Services/ProgressManager.swift:15-29,32-39`
-- Cause: Every session completion appends a new record; `loadRecords()` decodes the entire array; `recordSessionCompletion` sorts all records on every write
-- Improvement path: Prune records older than 90 days; only keep daily aggregates for streak calculation
 
 **NSScreen UUID cache rebuilds on every display change:**
 - Problem: `NSScreenUUIDCache.rebuildCache()` iterates all screens and calls `CGDisplayCreateUUIDFromDisplayID` on each notification
@@ -72,12 +62,6 @@
 - Why fragile: View logic is split across 4 files with shared `@State` properties; `isExpandedByToggle`, `showAudioMenu`, `lastReportedExpansion` are all defined in the main file but mutated from extensions; changing state variable names requires updates across all 4 files
 - Safe modification: Search all `NotchCompanionView` extensions when changing any `@State` property
 - Test coverage: No direct view tests; only ViewModel-level testing via US00x tests
-
-**AppDelegate deinit cleanup pattern:**
-- Files: `Oak/Oak/OakApp.swift:72-77`
-- Why fragile: `deinit` captures `notchWindowController` into a `Task { @MainActor in }` to call `cleanup()`, but `deinit` is not guaranteed to run on `@MainActor`, and the task may execute after the process is already terminating
-- Safe modification: Rely on `applicationWillTerminate` for cleanup instead
-- Test coverage: None for app lifecycle
 
 ## Scaling Limits
 
@@ -150,6 +134,9 @@
 - ~~Empty `deinit` in ProgressManager~~ — Removed placeholder deinit
 - ~~Timer drift over long sessions~~ — Switched from decrement-by-1 to wall-clock `Date`-based remaining time calculation
 - ~~US005Tests are effectively no-ops~~ — Rewrote 6 tests with real assertions testing completion state, rounds, and session type transitions
+- ~~NoiseGenerator thread safety~~ — Made generator a local variable captured by render closures; marked `@unchecked Sendable`; no shared mutable state (#66)
+- ~~AppDelegate deinit cleanup pattern~~ — Removed fragile `deinit`; `applicationWillTerminate` already handles cleanup (#73)
+- ~~Progress history grows unbounded~~ — Added 90-day retention pruning via `pruneOldRecords()` on each write (#71)
 
 ---
 *Concerns audit: 2026-02-15*

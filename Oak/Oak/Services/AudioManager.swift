@@ -17,7 +17,6 @@ internal class AudioManager: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var audioEngine: AVAudioEngine?
     private var audioNodes: [AVAudioNode] = []
-    private var noiseGenerator = NoiseGenerator()
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
 
     func play(track: AudioTrack) {
@@ -110,7 +109,7 @@ internal class AudioManager: ObservableObject {
 
     private func generateAmbientSound(for track: AudioTrack) {
         stop()
-        noiseGenerator = NoiseGenerator()
+        let generator = NoiseGenerator()
 
         let engine = AVAudioEngine()
         let mainMixer = engine.mainMixerNode
@@ -131,19 +130,19 @@ internal class AudioManager: ObservableObject {
             return
 
         case .brownNoise:
-            sourceNode = createBrownNoiseNode(generator: noiseGenerator)
+            sourceNode = createBrownNoiseNode(generator: generator)
 
         case .rain:
-            sourceNode = createRainNode(generator: noiseGenerator)
+            sourceNode = createRainNode(generator: generator)
 
         case .forest:
-            sourceNode = createForestNode(generator: noiseGenerator)
+            sourceNode = createForestNode(generator: generator)
 
         case .cafe:
-            sourceNode = createCafeNode(generator: noiseGenerator)
+            sourceNode = createCafeNode(generator: generator)
 
         case .lofi:
-            sourceNode = createLofiNode(generator: noiseGenerator)
+            sourceNode = createLofiNode(generator: generator)
         }
 
         if let source = sourceNode {
@@ -234,7 +233,7 @@ internal class AudioManager: ObservableObject {
     }
 }
 
-private final class NoiseGenerator {
+private final class NoiseGenerator: @unchecked Sendable {
     private var brownNoiseLast: Float = 0
     private var rainSeed: Float = 0
 
