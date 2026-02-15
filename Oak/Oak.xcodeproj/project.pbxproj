@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		088CE53BA008F2E0ED7225E3 /* SparkleUpdaterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */; };
 		08B16A2D203D68C5D8E64806 /* NSScreenNotchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */; };
+		11949A6E7635E4BC247D1A97 /* TransientPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9239254E9493D78E223CE6D /* TransientPopover.swift */; };
 		16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */; };
 		1941B67DA3C25D4A42BB7D6D /* PresetSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */; };
 		1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74BB88C04B3824E97E3C561 /* US001Tests.swift */; };
@@ -23,6 +24,7 @@
 		4A698BFDAA1F8E649D836ACF /* NotchCompanionView+Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452D0B99FA21480DB4AD6A5 /* NotchCompanionView+Controls.swift */; };
 		4B5B7AD41E542963653F229A /* NotchWindowControllerTests+WindowBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814659335F8FBC1EB95296FD /* NotchWindowControllerTests+WindowBehavior.swift */; };
 		4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */; };
+		542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */; };
 		5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */; };
 		610C05D4C9C49C70A78B7D69 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = B1EB99EC9EF014772EA562EF /* README.md */; };
 		61F4A962C9C52E757FAE25FE /* ambient_brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7663A82B3FFE2837587C2B2F /* ambient_brown_noise.m4a */; };
@@ -80,6 +82,7 @@
 		0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlwaysOnTopTests.swift; sourceTree = "<group>"; };
 		08E0A4A56EADCDB21276DE81 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickOutsideModifierTests.swift; sourceTree = "<group>"; };
 		1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenNotchTests.swift; sourceTree = "<group>"; };
 		131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompletionNotificationTests.swift; sourceTree = "<group>"; };
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
@@ -121,6 +124,7 @@
 		B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */ = {isa = PBXFileReference; path = ambient_rain.m4a; sourceTree = "<group>"; };
 		B93F85CD94F4CCB44AC7296C /* OakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C348F7E99471145836A04408 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
+		C9239254E9493D78E223CE6D /* TransientPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransientPopover.swift; sourceTree = "<group>"; };
 		D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowControllerTests.swift; sourceTree = "<group>"; };
 		D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressRing.swift; sourceTree = "<group>"; };
 		D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
@@ -212,6 +216,7 @@
 			children = (
 				0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */,
 				309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */,
+				0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */,
 				14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */,
 				F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */,
 				83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */,
@@ -250,6 +255,7 @@
 				3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */,
 				D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */,
 				23364F4B016E445E5657BF63 /* SettingsMenuView.swift */,
+				C9239254E9493D78E223CE6D /* TransientPopover.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -409,6 +415,7 @@
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */,
 				D9BC1320EE869D9AD7FE40AE /* SparkleUpdater.swift in Sources */,
+				11949A6E7635E4BC247D1A97 /* TransientPopover.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,6 +425,7 @@
 			files = (
 				82E4101ABE93B5EB4104D57F /* AlwaysOnTopTests.swift in Sources */,
 				A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */,
+				542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */,
 				EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */,
 				EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */,
 				4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */,
@@ -589,14 +597,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5008;
+				CURRENT_PROJECT_VERSION = 5009;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.8;
+				MARKETING_VERSION = 0.5.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -625,14 +633,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5008;
+				CURRENT_PROJECT_VERSION = 5009;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.8;
+				MARKETING_VERSION = 0.5.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";

@@ -2,8 +2,6 @@ import AppKit
 import Combine
 import SwiftUI
 
-// MARK: - NotchWindowController
-
 @MainActor
 internal class NotchWindowController: NSWindowController {
     private var lastExpandedState: Bool = false

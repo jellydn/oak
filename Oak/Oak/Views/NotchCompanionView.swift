@@ -132,10 +132,16 @@ internal struct NotchCompanionView: View {
         .popover(isPresented: $showAudioMenu) {
             AudioMenuView(audioManager: viewModel.audioManager)
                 .frame(width: 200)
+                .dismissOnClickOutside { [self] in
+                    showAudioMenu = false
+                }
         }
         .popover(isPresented: $showProgressMenu) {
             ProgressMenuView(viewModel: viewModel)
                 .frame(width: 200)
+                .dismissOnClickOutside { [self] in
+                    showProgressMenu = false
+                }
         }
         .popover(isPresented: $showSettingsMenu) {
             SettingsMenuView(
@@ -144,6 +150,9 @@ internal struct NotchCompanionView: View {
                 sparkleUpdater: sparkleUpdater
             )
             .frame(width: 340)
+            .dismissOnClickOutside { [self] in
+                showSettingsMenu = false
+            }
         }
     }
 }
