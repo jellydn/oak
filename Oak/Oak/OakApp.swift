@@ -24,7 +24,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) lazy var sparkleUpdater = SparkleUpdater()
     private(set) lazy var notificationService = NotificationService()
     private(set) lazy var presetSettings = PresetSettingsStore()
-    
+
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
         return environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil

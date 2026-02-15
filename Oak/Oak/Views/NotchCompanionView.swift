@@ -3,8 +3,8 @@ import SwiftUI
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
     @StateObject var viewModel: FocusSessionViewModel
-    @ObservedObject var notificationService: NotificationService
-    @ObservedObject var sparkleUpdater: SparkleUpdater
+    @ObservedObject private var notificationService: NotificationService
+    @ObservedObject private var sparkleUpdater: SparkleUpdater
     @State var showAudioMenu = false
     @State var showProgressMenu = false
     @State var showSettingsMenu = false
