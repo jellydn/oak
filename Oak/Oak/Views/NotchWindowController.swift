@@ -15,47 +15,40 @@ internal class NotchWindowController: NSWindowController {
     private var pendingTargetOverride: DisplayTarget?
     private let viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
+    private let notificationService: NotificationService
+    private let sparkleUpdater: SparkleUpdater
     private var displayTargetCancellable: AnyCancellable?
     private var alwaysOnTopCancellable: AnyCancellable?
     private var showBelowNotchCancellable: AnyCancellable?
 
-    convenience init() {
-        self.init(presetSettings: nil)
-    }
-
-    init(presetSettings: PresetSettingsStore?) {
-        let settings = presetSettings ?? PresetSettingsStore.shared
-        self.presetSettings = settings
-        viewModel = FocusSessionViewModel(presetSettings: settings)
-        let initialWidths = Self.initialWidths(for: settings)
+    init(
+        presetSettings: PresetSettingsStore,
+        notificationService: NotificationService,
+        sparkleUpdater: SparkleUpdater
+    ) {
+        self.presetSettings = presetSettings
+        self.notificationService = notificationService
+        self.sparkleUpdater = sparkleUpdater
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: notificationService
+        )
+        let initialWidths = Self.initialWidths(for: presetSettings)
 
         let window = NotchWindow(
             width: initialWidths.collapsed,
             height: NotchLayout.height,
-            displayTarget: settings.displayTarget,
-            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget),
-            alwaysOnTop: settings.alwaysOnTop,
-            showBelowNotch: settings.showBelowNotch
+            displayTarget: presetSettings.displayTarget,
+            preferredDisplayID: presetSettings.preferredDisplayID(for: presetSettings.displayTarget),
+            alwaysOnTop: presetSettings.alwaysOnTop,
+            showBelowNotch: presetSettings.showBelowNotch
         )
         super.init(window: window)
 
-        let contentView = NotchCompanionView(viewModel: viewModel) { [weak self] expanded in
-            self?.handleExpansionChange(expanded)
-        }
-        let hostingView = NSHostingView(rootView: contentView)
-        if #available(macOS 13.0, *) {
-            // Notch width/position is controlled by the window controller, not by NSHostingView sizing.
-            hostingView.sizingOptions = []
-        }
-        if #available(macOS 13.3, *) {
-            // Borderless notch UI should not react to safe-area changes from AppKit window layout.
-            hostingView.safeAreaRegions = []
-        }
-        window.contentView = hostingView
-        window.contentMinSize = NSSize(width: initialWidths.collapsed, height: NotchLayout.height)
-        window.contentMaxSize = NSSize(width: initialWidths.expanded, height: NotchLayout.height)
-        setExpanded(false, forceReposition: true, targetOverride: settings.displayTarget)
+        setupWindowContent(in: window)
+        setupBindings()
 
+        setExpanded(false, forceReposition: true, targetOverride: presetSettings.displayTarget)
         window.orderFrontRegardless()
 
         NotificationCenter.default.addObserver(
@@ -64,21 +57,45 @@ internal class NotchWindowController: NSWindowController {
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
+    }
 
-        displayTargetCancellable = settings.$displayTarget
+    private func setupWindowContent(in window: NotchWindow) {
+        let contentView = NotchCompanionView(
+            viewModel: viewModel,
+            notificationService: notificationService,
+            sparkleUpdater: sparkleUpdater
+        ) { [weak self] expanded in
+            self?.handleExpansionChange(expanded)
+        }
+        let hostingView = NSHostingView(rootView: contentView)
+        if #available(macOS 13.0, *) {
+            hostingView.sizingOptions = []
+        }
+        if #available(macOS 13.3, *) {
+            hostingView.safeAreaRegions = []
+        }
+        window.contentView = hostingView
+
+        let initialWidths = Self.initialWidths(for: presetSettings)
+        window.contentMinSize = NSSize(width: initialWidths.collapsed, height: NotchLayout.height)
+        window.contentMaxSize = NSSize(width: initialWidths.expanded, height: NotchLayout.height)
+    }
+
+    private func setupBindings() {
+        displayTargetCancellable = presetSettings.$displayTarget
             .sink { [weak self] nextTarget in
                 guard let self else { return }
                 requestFrameUpdate(for: lastExpandedState, forceReposition: true, targetOverride: nextTarget)
             }
 
-        alwaysOnTopCancellable = settings.$alwaysOnTop
+        alwaysOnTopCancellable = presetSettings.$alwaysOnTop
             .sink { [weak self] isAlwaysOnTop in
-                guard let self, let window = self.window as? NotchWindow else { return }
+                guard let self, let window = window as? NotchWindow else { return }
                 window.level = isAlwaysOnTop ? .statusBar : .floating
                 requestFrameUpdate(for: lastExpandedState, forceReposition: true)
             }
 
-        showBelowNotchCancellable = settings.$showBelowNotch
+        showBelowNotchCancellable = presetSettings.$showBelowNotch
             .sink { [weak self] _ in
                 guard let self else { return }
                 requestFrameUpdate(for: lastExpandedState, forceReposition: true)

@@ -10,14 +10,12 @@ internal protocol SessionCompletionNotifying {
 
 @MainActor
 internal class NotificationService: ObservableObject, SessionCompletionNotifying {
-    static let shared = NotificationService()
-
     @Published private(set) var isAuthorized: Bool = false
     @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
 
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "NotificationService")
 
-    private init() {
+    internal init() {
         Task {
             await refreshAuthorizationStatus()
         }

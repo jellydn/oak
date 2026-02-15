@@ -16,7 +16,10 @@ internal final class US001Tests: XCTestCase {
         userDefaults.removePersistentDomain(forName: suiteName)
         presetSuiteName = suiteName
         presetSettings = PresetSettingsStore(userDefaults: userDefaults)
-        viewModel = FocusSessionViewModel(presetSettings: presetSettings)
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: NotificationService()
+        )
     }
 
     override func tearDown() async throws {
@@ -28,7 +31,11 @@ internal final class US001Tests: XCTestCase {
 
     func testNotchCompanionIsVisible() {
         // Test that notch companion can be instantiated
-        let notchView = NotchCompanionView()
+        let notchView = NotchCompanionView(
+            viewModel: viewModel,
+            notificationService: NotificationService(),
+            sparkleUpdater: SparkleUpdater()
+        )
         XCTAssertNotNil(notchView)
     }
 

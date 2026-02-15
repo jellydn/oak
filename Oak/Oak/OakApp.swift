@@ -4,15 +4,13 @@ import SwiftUI
 @main
 internal struct OakApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var presetSettings = PresetSettingsStore.shared
-    @StateObject private var notificationService = NotificationService.shared
 
     var body: some Scene {
         Settings {
             SettingsMenuView(
-                presetSettings: presetSettings,
-                notificationService: notificationService,
-                sparkleUpdater: appDelegate.sparkleUpdater ?? SparkleUpdater.shared
+                presetSettings: appDelegate.presetSettings,
+                notificationService: appDelegate.notificationService,
+                sparkleUpdater: appDelegate.sparkleUpdater
             )
             .frame(width: 420)
             .padding(8)
@@ -23,8 +21,10 @@ internal struct OakApp: App {
 @MainActor
 internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
-    var sparkleUpdater: SparkleUpdater?
-    private let notificationService = NotificationService.shared
+    private(set) var sparkleUpdater = SparkleUpdater()
+    private(set) var notificationService = NotificationService()
+    private(set) var presetSettings = PresetSettingsStore()
+
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
         return environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil
@@ -37,11 +37,13 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSApp.setActivationPolicy(.accessory)
 
-        notchWindowController = NotchWindowController()
+        // Pass dependencies to NotchWindowController
+        notchWindowController = NotchWindowController(
+            presetSettings: presetSettings,
+            notificationService: notificationService,
+            sparkleUpdater: sparkleUpdater
+        )
         notchWindowController?.window?.orderFrontRegardless()
-
-        // Initialize Sparkle updater to enable automatic update checks on launch
-        sparkleUpdater = SparkleUpdater.shared
 
         // Keep status in sync at launch; permission requests are user-initiated from Settings.
         Task { @MainActor in

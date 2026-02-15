@@ -16,7 +16,10 @@ internal final class US002Tests: XCTestCase {
         userDefaults.removePersistentDomain(forName: suiteName)
         presetSuiteName = suiteName
         presetSettings = PresetSettingsStore(userDefaults: userDefaults)
-        viewModel = FocusSessionViewModel(presetSettings: presetSettings)
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: NotificationService()
+        )
     }
 
     override func tearDown() async throws {
@@ -93,7 +96,10 @@ internal final class US002Tests: XCTestCase {
 
         // Reset and test long preset (50/10)
         viewModel.cleanup()
-        viewModel = FocusSessionViewModel(presetSettings: presetSettings)
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: NotificationService()
+        )
         viewModel.selectedPreset = .long
         viewModel.startSession()
         XCTAssertEqual(viewModel.displayTime, "50:00", "Long preset should show 50 minutes")

@@ -19,7 +19,11 @@ internal final class NotchWindowControllerTests: XCTestCase {
         testUserDefaults.removePersistentDomain(forName: suiteName)
         presetSettings = PresetSettingsStore(userDefaults: testUserDefaults)
         presetSettings.setDisplayTarget(.mainDisplay, screenID: CGMainDisplayID())
-        windowController = NotchWindowController(presetSettings: presetSettings)
+        windowController = NotchWindowController(
+            presetSettings: presetSettings,
+            notificationService: NotificationService(),
+            sparkleUpdater: SparkleUpdater()
+        )
     }
 
     override func tearDown() async throws {

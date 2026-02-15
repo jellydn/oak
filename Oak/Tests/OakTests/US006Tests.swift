@@ -143,7 +143,11 @@ internal final class US006Tests: XCTestCase {
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
         let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         let manager = ProgressManager(userDefaults: userDefaults)
-        let viewModel = FocusSessionViewModel(presetSettings: presetSettings, progressManager: manager)
+        let viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            progressManager: manager,
+            notificationService: NotificationService()
+        )
 
         // Record a session
         manager.recordSessionCompletion(durationMinutes: 25)
@@ -163,7 +167,11 @@ internal final class US006Tests: XCTestCase {
         defer { userDefaults.removePersistentDomain(forName: suiteName) }
         let presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         let manager = ProgressManager(userDefaults: userDefaults)
-        let viewModel = FocusSessionViewModel(presetSettings: presetSettings, progressManager: manager)
+        let viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            progressManager: manager,
+            notificationService: NotificationService()
+        )
 
         // Record some progress
         viewModel.progressManager.recordSessionCompletion(durationMinutes: 25)

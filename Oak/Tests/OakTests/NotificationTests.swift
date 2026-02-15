@@ -8,7 +8,7 @@ internal final class NotificationTests: XCTestCase {
     var notificationService: NotificationService!
 
     override func setUp() async throws {
-        notificationService = NotificationService.shared
+        notificationService = NotificationService()
     }
 
     override func tearDown() async throws {

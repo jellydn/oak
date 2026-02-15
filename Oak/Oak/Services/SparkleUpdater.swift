@@ -7,8 +7,6 @@ private let sparkleAppcastFeedURL = "https://raw.githubusercontent.com/jellydn/o
 
 @MainActor
 internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDelegate {
-    internal static let shared = SparkleUpdater()
-
     @Published var canCheckForUpdates = false
     @Published var automaticallyChecksForUpdates = true
     @Published var automaticallyDownloadsUpdates = false
