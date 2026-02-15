@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.10</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.10</link>
+  <sparkle:version>5010</sparkle:version>
+  <sparkle:shortVersionString>0.5.10</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.10</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>docs: Mark singleton DI concern as resolved by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3944455852" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/83" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/83/hovercard" href="https://github.com/jellydn/oak/pull/83">#83</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.9...v0.5.10"><tt>v0.5.9...v0.5.10</tt></a></p>
+  ]]></description>
+  <pubDate>Sun, 15 Feb 2026 17:11:26 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.10/Oak-0.5.10.dmg"
+             sparkle:version="5010"
+             sparkle:shortVersionString="0.5.10"
+             sparkle:edSignature="2XwbxQpWCetaIo2IrrR1wFOZP03Tfw36Rm7DMWbE6QM7jsE2x/7wyfUfOx5kMjj1GaxOiZCVx0L5k5T9E64YAA=="
+             length="6604235"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.9</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.9</link>
   <sparkle:version>5009</sparkle:version>
@@ -42,27 +63,6 @@
              sparkle:shortVersionString="0.5.8"
              sparkle:edSignature="3xHahCuE11+lXU1m7xvD9wZwrcbOwmMLwb+POvUnfxTR/NgvWfH/ScUsP0FuY9NiH53VSBJ3ERBWiXHsEtlVAg=="
              length="6611185"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.7</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.7</link>
-  <sparkle:version>5007</sparkle:version>
-  <sparkle:shortVersionString>0.5.7</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.7</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>Change default for 'Always on top' to true by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3944192571" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/81" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/81/hovercard" href="https://github.com/jellydn/oak/pull/81">#81</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.6...v0.5.7"><tt>v0.5.6...v0.5.7</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 15 Feb 2026 14:50:51 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.7/Oak-0.5.7.dmg"
-             sparkle:version="5007"
-             sparkle:shortVersionString="0.5.7"
-             sparkle:edSignature="JNDbHUqRosOp/L9anLtG1ynyrWeJ1wpULUBxOxR++LFPO8QmZSmyQ+jhsWAjX9yuDzkbY71TUs93TyLWvXSHAA=="
-             length="6611230"
              type="application/octet-stream" />
 </item>
   </channel>
