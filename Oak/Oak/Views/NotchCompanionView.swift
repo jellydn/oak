@@ -39,7 +39,14 @@ internal struct NotchCompanionView: View {
     }
 
     private var containerShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 15, style: .continuous)
+        RoundedRectangle(cornerRadius: visualStyle.cornerRadius, style: .continuous)
+    }
+
+    private var visualStyle: NotchVisualStyle {
+        NotchVisualStyle.make(
+            isExpanded: isExpanded,
+            isSessionComplete: viewModel.isSessionComplete
+        )
     }
 
     var body: some View {
@@ -47,22 +54,16 @@ internal struct NotchCompanionView: View {
             containerShape
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.8),
-                            Color(red: 0.11, green: 0.12, blue: 0.15).opacity(0.86)
-                        ],
+                        colors: visualStyle.backgroundColors,
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .overlay(
                     containerShape
-                        .stroke(
-                            viewModel.isSessionComplete ? Color.green.opacity(0.45) : Color.white.opacity(0.14),
-                            lineWidth: viewModel.isSessionComplete ? 1.4 : 1
-                        )
+                        .stroke(visualStyle.borderColor, lineWidth: visualStyle.borderWidth)
                 )
-                .shadow(color: Color.black.opacity(0.28), radius: 10, x: 0, y: 4)
+                .shadow(color: visualStyle.shadowColor, radius: visualStyle.shadowRadius, x: 0, y: 4)
 
             HStack(spacing: contentSpacing) {
                 if isExpanded {
@@ -72,7 +73,7 @@ internal struct NotchCompanionView: View {
                         sessionView
                     }
                     Rectangle()
-                        .fill(Color.white.opacity(0.15))
+                        .fill(visualStyle.dividerColor)
                         .frame(width: 1, height: controlSize)
                     HStack(spacing: 6) {
                         audioButton
@@ -353,7 +354,11 @@ private extension NotchCompanionView {
             label: {
                 ZStack {
                     Circle()
-                        .fill(viewModel.audioManager.isPlaying ? Color.blue.opacity(0.25) : Color.white.opacity(0.08))
+                        .fill(
+                            viewModel.audioManager.isPlaying
+                                ? Color.blue.opacity(isExpanded ? 0.25 : 0.34)
+                                : Color.white.opacity(visualStyle.neutralControlOpacity)
+                        )
                         .frame(width: controlSize, height: controlSize)
 
                     Image(systemName: viewModel.audioManager.selectedTrack.systemImageName)
@@ -373,7 +378,11 @@ private extension NotchCompanionView {
             label: {
                 ZStack {
                     Circle()
-                        .fill(viewModel.streakDays > 0 ? Color.orange.opacity(0.24) : Color.white.opacity(0.08))
+                        .fill(
+                            viewModel.streakDays > 0
+                                ? Color.orange.opacity(isExpanded ? 0.24 : 0.34)
+                                : Color.white.opacity(visualStyle.neutralControlOpacity)
+                        )
                         .frame(width: controlSize, height: controlSize)
 
                     if viewModel.streakDays > 0 {
@@ -399,7 +408,7 @@ private extension NotchCompanionView {
             label: {
                 ZStack {
                     Circle()
-                        .fill(Color.white.opacity(0.08))
+                        .fill(Color.white.opacity(visualStyle.neutralControlOpacity))
                         .frame(width: controlSize, height: controlSize)
 
                     Image(systemName: "gearshape.fill")
@@ -430,7 +439,7 @@ private extension NotchCompanionView {
                     .frame(width: controlSize, height: controlSize)
                     .background(
                         Circle()
-                            .fill(Color.white.opacity(0.08))
+                            .fill(Color.white.opacity(visualStyle.toggleControlOpacity))
                     )
             }
         )
@@ -447,7 +456,7 @@ private extension NotchCompanionView {
         .padding(2)
         .background(
             Capsule(style: .continuous)
-                .fill(Color.white.opacity(0.08))
+                .fill(Color.white.opacity(visualStyle.presetCapsuleOpacity))
         )
     }
 
