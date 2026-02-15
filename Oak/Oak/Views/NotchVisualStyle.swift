@@ -1,6 +1,7 @@
 import SwiftUI
 
 internal struct NotchVisualStyle {
+    let isInsideNotchStyle: Bool
     let backgroundColors: [Color]
     let borderColor: Color
     let borderWidth: CGFloat

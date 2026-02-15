@@ -1,9 +1,49 @@
+import AppKit
 import SwiftUI
 
 internal extension NotchVisualStyle {
-    static func make(isExpanded: Bool, isSessionComplete: Bool) -> NotchVisualStyle {
+    @MainActor
+    static func make(isExpanded: Bool, viewModel: FocusSessionViewModel) -> NotchVisualStyle {
+        let isSessionComplete = viewModel.isSessionComplete
+        let shouldUseInsideNotchStyle = isInsideNotch(viewModel: viewModel) && !isExpanded
+        if shouldUseInsideNotchStyle {
+            return insideNotchCompact(isSessionComplete: isSessionComplete)
+        }
+        return standard(isExpanded: isExpanded, isSessionComplete: isSessionComplete)
+    }
+
+    @MainActor
+    private static func isInsideNotch(viewModel: FocusSessionViewModel) -> Bool {
+        let settings = viewModel.presetSettings
+        let target = settings.displayTarget
+        let preferredDisplayID = settings.preferredDisplayID(for: target)
+        let targetScreen = NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)
+        return targetScreen?.hasNotch == true && !settings.showBelowNotch
+    }
+
+    private static func insideNotchCompact(isSessionComplete: Bool) -> NotchVisualStyle {
+        NotchVisualStyle(
+            isInsideNotchStyle: true,
+            backgroundColors: [
+                Color.black.opacity(0.98),
+                Color(red: 0.01, green: 0.01, blue: 0.02).opacity(0.99)
+            ],
+            borderColor: isSessionComplete ? Color.green.opacity(0.60) : Color.white.opacity(0.30),
+            borderWidth: isSessionComplete ? 1.6 : 1.2,
+            shadowColor: Color.black.opacity(0.44),
+            shadowRadius: 6,
+            dividerColor: Color.white.opacity(0.26),
+            neutralControlOpacity: 0.17,
+            toggleControlOpacity: 0.20,
+            presetCapsuleOpacity: 0.18,
+            cornerRadius: 12
+        )
+    }
+
+    private static func standard(isExpanded: Bool, isSessionComplete: Bool) -> NotchVisualStyle {
         if isExpanded {
             return NotchVisualStyle(
+                isInsideNotchStyle: false,
                 backgroundColors: [
                     Color(red: 0.14, green: 0.16, blue: 0.20).opacity(0.92),
                     Color(red: 0.08, green: 0.09, blue: 0.12).opacity(0.96)
@@ -21,6 +61,7 @@ internal extension NotchVisualStyle {
         }
 
         return NotchVisualStyle(
+            isInsideNotchStyle: false,
             backgroundColors: [
                 Color(red: 0.04, green: 0.05, blue: 0.07).opacity(0.94),
                 Color.black.opacity(0.98)
