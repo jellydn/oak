@@ -24,6 +24,7 @@
 		4A698BFDAA1F8E649D836ACF /* NotchCompanionView+Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452D0B99FA21480DB4AD6A5 /* NotchCompanionView+Controls.swift */; };
 		4B5B7AD41E542963653F229A /* NotchWindowControllerTests+WindowBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814659335F8FBC1EB95296FD /* NotchWindowControllerTests+WindowBehavior.swift */; };
 		4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */; };
+		542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */; };
 		5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */; };
 		610C05D4C9C49C70A78B7D69 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = B1EB99EC9EF014772EA562EF /* README.md */; };
 		61F4A962C9C52E757FAE25FE /* ambient_brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7663A82B3FFE2837587C2B2F /* ambient_brown_noise.m4a */; };
@@ -81,6 +82,7 @@
 		0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlwaysOnTopTests.swift; sourceTree = "<group>"; };
 		08E0A4A56EADCDB21276DE81 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickOutsideModifierTests.swift; sourceTree = "<group>"; };
 		1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenNotchTests.swift; sourceTree = "<group>"; };
 		131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompletionNotificationTests.swift; sourceTree = "<group>"; };
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 			children = (
 				0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */,
 				309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */,
+				0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */,
 				14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */,
 				F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */,
 				83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */,
@@ -422,6 +425,7 @@
 			files = (
 				82E4101ABE93B5EB4104D57F /* AlwaysOnTopTests.swift in Sources */,
 				A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */,
+				542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */,
 				EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */,
 				EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */,
 				4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */,
