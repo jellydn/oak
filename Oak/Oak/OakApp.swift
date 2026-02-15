@@ -37,6 +37,11 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSApp.setActivationPolicy(.accessory)
 
+        // Eagerly initialize services before they can be accessed by Settings view
+        _ = presetSettings
+        _ = notificationService
+        _ = sparkleUpdater
+
         // Pass dependencies to NotchWindowController
         notchWindowController = NotchWindowController(
             presetSettings: presetSettings,
