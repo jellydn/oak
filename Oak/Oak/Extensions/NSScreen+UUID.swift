@@ -47,7 +47,7 @@ internal extension NSScreen {
 /// Cache for UUID to NSScreen mappings to avoid repeated lookups
 @MainActor
 internal final class NSScreenUUIDCache {
-    static let shared = NSScreenUUIDCache()
+    internal static let shared = NSScreenUUIDCache()
 
     private var cache: [String: NSScreen] = [:]
     private var observer: Any?

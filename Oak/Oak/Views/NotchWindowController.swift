@@ -17,6 +17,7 @@ internal class NotchWindowController: NSWindowController {
     private let presetSettings: PresetSettingsStore
     private var displayTargetCancellable: AnyCancellable?
     private var alwaysOnTopCancellable: AnyCancellable?
+    private var showBelowNotchCancellable: AnyCancellable?
 
     convenience init() {
         self.init(presetSettings: nil)
@@ -32,7 +33,8 @@ internal class NotchWindowController: NSWindowController {
             height: NotchLayout.height,
             displayTarget: settings.displayTarget,
             preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget),
-            alwaysOnTop: settings.alwaysOnTop
+            alwaysOnTop: settings.alwaysOnTop,
+            showBelowNotch: settings.showBelowNotch
         )
         super.init(window: window)
 
@@ -74,6 +76,12 @@ internal class NotchWindowController: NSWindowController {
                 window.level = isAlwaysOnTop ? .statusBar : .floating
                 self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
             }
+
+        showBelowNotchCancellable = settings.$showBelowNotch
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
+            }
     }
 
     @available(*, unavailable)
@@ -89,6 +97,7 @@ internal class NotchWindowController: NSWindowController {
         NotificationCenter.default.removeObserver(self)
         displayTargetCancellable?.cancel()
         alwaysOnTopCancellable?.cancel()
+        showBelowNotchCancellable?.cancel()
     }
 
     func cleanup() {
@@ -96,6 +105,7 @@ internal class NotchWindowController: NSWindowController {
         hasCleanedUp = true
         displayTargetCancellable?.cancel()
         alwaysOnTopCancellable?.cancel()
+        showBelowNotchCancellable?.cancel()
         viewModel.cleanup()
     }
 
@@ -184,7 +194,12 @@ internal class NotchWindowController: NSWindowController {
     }
 
     private func notchYPosition(for screen: NSScreen?, alwaysOnTop: Bool) -> CGFloat {
-        return NotchWindow.calculateYPosition(for: screen, height: NotchLayout.height, alwaysOnTop: alwaysOnTop)
+        return NotchWindow.calculateYPosition(
+            for: screen,
+            height: NotchLayout.height,
+            alwaysOnTop: alwaysOnTop,
+            showBelowNotch: presetSettings.showBelowNotch
+        )
     }
 }
 
@@ -196,12 +211,18 @@ internal class NotchWindow: NSPanel {
         height: CGFloat,
         displayTarget: DisplayTarget,
         preferredDisplayID: CGDirectDisplayID?,
-        alwaysOnTop: Bool = false
+        alwaysOnTop: Bool = false,
+        showBelowNotch: Bool = false
     ) {
         let screen = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)
         let screenFrame = screen?.frame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
-        let yPosition = Self.calculateYPosition(for: screen, height: height, alwaysOnTop: alwaysOnTop)
+        let yPosition = Self.calculateYPosition(
+            for: screen,
+            height: height,
+            alwaysOnTop: alwaysOnTop,
+            showBelowNotch: showBelowNotch
+        )
 
         super.init(
             contentRect: NSRect(x: xPosition, y: yPosition, width: width, height: height),
@@ -223,13 +244,25 @@ internal class NotchWindow: NSPanel {
     ///   - screen: The target screen
     ///   - height: The window height
     ///   - alwaysOnTop: Whether the window should be always on top
+    ///   - showBelowNotch: Whether to show below the notch on notched displays
     /// - Returns: The calculated Y position
-    internal static func calculateYPosition(for screen: NSScreen?, height: CGFloat, alwaysOnTop: Bool) -> CGFloat {
+    internal static func calculateYPosition(
+        for screen: NSScreen?,
+        height: CGFloat,
+        alwaysOnTop: Bool,
+        showBelowNotch: Bool = false
+    ) -> CGFloat {
         guard let screen = screen else { return 0 }
         
-        // For notch-first UI: position at top of screen if display has a notch
+        // For notch-first UI: position based on user preference
         if screen.hasNotch {
-            return screen.frame.maxY - height
+            if showBelowNotch {
+                // Position below the notch (below menu bar)
+                return screen.visibleFrame.maxY - height
+            } else {
+                // Position at top of screen (overlay the notch)
+                return screen.frame.maxY - height
+            }
         }
         
         // For non-notched displays: position below menu bar if alwaysOnTop, otherwise at top of screen

@@ -412,7 +412,8 @@ internal final class NotchWindowControllerTests: XCTestCase {
                 let expectedY = NotchWindow.calculateYPosition(
                     for: screen,
                     height: NotchLayout.height,
-                    alwaysOnTop: presetSettings.alwaysOnTop
+                    alwaysOnTop: presetSettings.alwaysOnTop,
+                    showBelowNotch: presetSettings.showBelowNotch
                 )
 
                 if abs((window?.frame.minY ?? 0) - expectedY) <= 1.0 {
