@@ -69,11 +69,6 @@ internal struct NotchCompanionView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .overlay(
-                    containerShape
-                        .stroke(visualStyle.borderColor, lineWidth: visualStyle.borderWidth)
-                )
-                .shadow(color: visualStyle.shadowColor, radius: visualStyle.shadowRadius, x: 0, y: 4)
 
             HStack(spacing: contentSpacing) {
                 if isInsideNotch {
