@@ -260,14 +260,13 @@ internal class NotchWindow: NSPanel {
                 // Position below the notch (below menu bar)
                 return screen.visibleFrame.maxY - height
             } else {
-                // Position at top of screen, but ensure content is visible below the notch
-                // The window should extend into the notch area, but content should start below it
+                // Position to avoid content cutoff by the notch
                 let notchHeight = screen.safeAreaInsets.top
-                // If our window is smaller than the notch, position it so it sits right below the notch
+                // If window is smaller than notch, position it just below the notch to avoid clipping
                 if height < notchHeight {
                     return screen.frame.maxY - notchHeight
                 }
-                // Otherwise, position at the top with content extending below the notch
+                // For taller windows, position at top of screen - content extends below the notch
                 return screen.frame.maxY - height
             }
         }
