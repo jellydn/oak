@@ -2,7 +2,7 @@ import SwiftUI
 
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
-    @StateObject var viewModel: FocusSessionViewModel
+    @ObservedObject var viewModel: FocusSessionViewModel
     @ObservedObject private var notificationService: NotificationService
     @ObservedObject private var sparkleUpdater: SparkleUpdater
     @State var showAudioMenu = false
@@ -26,7 +26,7 @@ internal struct NotchCompanionView: View {
         sparkleUpdater: SparkleUpdater,
         onExpansionChanged: @escaping (Bool) -> Void = { _ in }
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        self.viewModel = viewModel
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
         self.onExpansionChanged = onExpansionChanged

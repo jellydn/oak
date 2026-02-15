@@ -16,7 +16,10 @@ internal final class CountdownDisplayModeTests: XCTestCase {
         userDefaults.removePersistentDomain(forName: suiteName)
         presetSuiteName = suiteName
         presetSettings = PresetSettingsStore(userDefaults: userDefaults)
-        viewModel = FocusSessionViewModel(presetSettings: presetSettings)
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: NotificationService()
+        )
     }
 
     override func tearDown() async throws {

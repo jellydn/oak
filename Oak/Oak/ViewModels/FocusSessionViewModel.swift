@@ -35,12 +35,12 @@ internal class FocusSessionViewModel: ObservableObject {
     init(
         presetSettings: PresetSettingsStore,
         progressManager: ProgressManager? = nil,
-        notificationService: (any SessionCompletionNotifying)? = nil,
+        notificationService: any SessionCompletionNotifying,
         completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil
     ) {
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
-        self.notificationService = notificationService ?? NotificationService()
+        self.notificationService = notificationService
         self.completionSoundPlayer = completionSoundPlayer ?? SystemSessionCompletionSoundPlayer()
         presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
