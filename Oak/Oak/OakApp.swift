@@ -21,9 +21,9 @@ internal struct OakApp: App {
 @MainActor
 internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
-    private(set) lazy var sparkleUpdater = SparkleUpdater()
-    private(set) lazy var notificationService = NotificationService()
-    private(set) lazy var presetSettings = PresetSettingsStore()
+    private(set) var sparkleUpdater = SparkleUpdater()
+    private(set) var notificationService = NotificationService()
+    private(set) var presetSettings = PresetSettingsStore()
 
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
@@ -36,11 +36,6 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         NSApp.setActivationPolicy(.accessory)
-
-        // Eagerly initialize services before they can be accessed by Settings view
-        _ = presetSettings
-        _ = notificationService
-        _ = sparkleUpdater
 
         // Pass dependencies to NotchWindowController
         notchWindowController = NotchWindowController(
