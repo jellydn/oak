@@ -50,7 +50,6 @@ internal struct NotchCompanionView: View {
         )
     }
 
-    /// Determines if the UI should use inside-notch styling based on target display
     private var isInsideNotch: Bool {
         let settings = viewModel.presetSettings
         let target = settings.displayTarget

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Standard (non-notch) view builders for the notch companion view
 extension NotchCompanionView {
     var compactView: some View {
         HStack(spacing: contentSpacing) {

@@ -1,10 +1,6 @@
 import SwiftUI
 
-/// UI components for displaying the notch companion inside a physical MacBook notch.
-/// This mode is activated when the target display has a notch and showBelowNotch is disabled.
-/// The UI uses wider dimensions and darker styling to blend seamlessly with the notch area.
 extension NotchCompanionView {
-    /// Compact UI content when showing inside the notch (non-expanded state)
     var insideNotchCompactContent: some View {
         HStack(spacing: 0) {
             compactLeadingDisplay
@@ -18,7 +14,6 @@ extension NotchCompanionView {
         }
     }
 
-    /// Expanded UI content when showing inside the notch
     var insideNotchExpandedContent: some View {
         HStack(spacing: 6) {
             insideNotchExpandedLeading

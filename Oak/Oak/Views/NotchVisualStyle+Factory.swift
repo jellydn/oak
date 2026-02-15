@@ -1,8 +1,6 @@
 import SwiftUI
 
 internal extension NotchVisualStyle {
-    /// Creates a unified visual style for all UI states.
-    /// Uses a clean, minimal style without borders or shadows.
     static func make(
         isExpanded: Bool,
         isSessionComplete: Bool,
