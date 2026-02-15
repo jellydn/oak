@@ -20,13 +20,13 @@ extension NotchCompanionView {
 
     /// Expanded UI content when showing inside the notch
     var insideNotchExpandedContent: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 6) {
             insideNotchExpandedLeading
+            insideNotchExpandedPrimaryControls
 
-            Spacer(minLength: 12)
+            Spacer(minLength: 8)
 
             HStack(spacing: 6) {
-                insideNotchExpandedPrimaryControls
                 audioButton
                 progressButton
                 settingsButton
