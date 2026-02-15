@@ -277,25 +277,19 @@ internal class NotchWindow: NSPanel {
         showBelowNotch: Bool = false
     ) -> CGFloat {
         guard let screen = screen else { return 0 }
-        
-        // For notch-first UI: position based on user preference
+
         if screen.hasNotch {
             if showBelowNotch {
-                // Position below the notch (below menu bar)
                 return screen.visibleFrame.maxY - height
             } else {
-                // Position to avoid content cutoff by the notch
                 let notchHeight = screen.safeAreaInsets.top
-                // If window is smaller than notch, position it just below the notch to avoid clipping
                 if height < notchHeight {
                     return screen.frame.maxY - notchHeight
                 }
-                // For taller windows, position at top of screen - content extends below the notch
                 return screen.frame.maxY - height
             }
         }
-        
-        // For non-notched displays: position below menu bar if alwaysOnTop, otherwise at top of screen
+
         if alwaysOnTop {
             return screen.visibleFrame.maxY - height
         }
