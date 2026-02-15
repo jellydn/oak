@@ -28,7 +28,11 @@ internal final class US001Tests: XCTestCase {
 
     func testNotchCompanionIsVisible() {
         // Test that notch companion can be instantiated
-        let notchView = NotchCompanionView()
+        let notchView = NotchCompanionView(
+            viewModel: viewModel,
+            notificationService: NotificationService(),
+            sparkleUpdater: SparkleUpdater()
+        )
         XCTAssertNotNil(notchView)
     }
 

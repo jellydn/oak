@@ -17,7 +17,7 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
 
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "NotificationService")
 
-    private init() {
+    init() {
         Task {
             await refreshAuthorizationStatus()
         }

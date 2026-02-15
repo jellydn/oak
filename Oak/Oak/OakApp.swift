@@ -4,15 +4,13 @@ import SwiftUI
 @main
 internal struct OakApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var presetSettings = PresetSettingsStore.shared
-    @StateObject private var notificationService = NotificationService.shared
 
     var body: some Scene {
         Settings {
             SettingsMenuView(
-                presetSettings: presetSettings,
-                notificationService: notificationService,
-                sparkleUpdater: appDelegate.sparkleUpdater ?? SparkleUpdater.shared
+                presetSettings: appDelegate.presetSettings ?? PresetSettingsStore(),
+                notificationService: appDelegate.notificationService ?? NotificationService(),
+                sparkleUpdater: appDelegate.sparkleUpdater ?? SparkleUpdater()
             )
             .frame(width: 420)
             .padding(8)
@@ -24,7 +22,8 @@ internal struct OakApp: App {
 internal class AppDelegate: NSObject, NSApplicationDelegate {
     var notchWindowController: NotchWindowController?
     var sparkleUpdater: SparkleUpdater?
-    private let notificationService = NotificationService.shared
+    var notificationService: NotificationService?
+    var presetSettings: PresetSettingsStore?
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
         return environment["XCTestConfigurationFilePath"] != nil || environment["XCTestBundlePath"] != nil
@@ -37,15 +36,22 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSApp.setActivationPolicy(.accessory)
 
-        notchWindowController = NotchWindowController()
-        notchWindowController?.window?.orderFrontRegardless()
+        // Create shared instances
+        presetSettings = PresetSettingsStore()
+        notificationService = NotificationService()
+        sparkleUpdater = SparkleUpdater()
 
-        // Initialize Sparkle updater to enable automatic update checks on launch
-        sparkleUpdater = SparkleUpdater.shared
+        // Pass dependencies to NotchWindowController
+        notchWindowController = NotchWindowController(
+            presetSettings: presetSettings!,
+            notificationService: notificationService!,
+            sparkleUpdater: sparkleUpdater!
+        )
+        notchWindowController?.window?.orderFrontRegardless()
 
         // Keep status in sync at launch; permission requests are user-initiated from Settings.
         Task { @MainActor in
-            await notificationService.refreshAuthorizationStatus()
+            await notificationService?.refreshAuthorizationStatus()
         }
     }
 
@@ -55,7 +61,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidBecomeActive(_: Notification) {
         Task { @MainActor in
-            await notificationService.refreshAuthorizationStatus()
+            await notificationService?.refreshAuthorizationStatus()
         }
     }
 }
