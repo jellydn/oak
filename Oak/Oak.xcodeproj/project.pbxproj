@@ -20,7 +20,6 @@
 		3ED5BDC623247CE16B62E99B /* ambient_rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */; };
 		4404053F80F1F1F3265EF06E /* ambient_cafe.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */; };
 		4590D899C3874037F87EE821 /* NotchVisualStyle+Factory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309530434B76C0BB37A8FA0D /* NotchVisualStyle+Factory.swift */; };
-		4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155853CBF9374645092FE699 /* UpdateChecker.swift */; };
 		4A698BFDAA1F8E649D836ACF /* NotchCompanionView+Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452D0B99FA21480DB4AD6A5 /* NotchCompanionView+Controls.swift */; };
 		4B5B7AD41E542963653F229A /* NotchWindowControllerTests+WindowBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814659335F8FBC1EB95296FD /* NotchWindowControllerTests+WindowBehavior.swift */; };
 		4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */; };
@@ -49,7 +48,6 @@
 		B961DAB61BE6B064D46152D3 /* NotchCompanionView+StandardViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E581D2529EA9F9B22AEB5DE /* NotchCompanionView+StandardViews.swift */; };
 		B9FD45AD05705636C1173EAC /* NotchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */; };
 		BC0152F64748D50B856DA0C1 /* ambient_forest.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7D93E5502BBC8DD90FD136BB /* ambient_forest.m4a */; };
-		BF73E986CFE97F74C3BFF877 /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */; };
 		BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451C36F9BC7A6103BF32362C /* OakApp.swift */; };
 		C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */; };
 		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
@@ -86,11 +84,9 @@
 		131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompletionNotificationTests.swift; sourceTree = "<group>"; };
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
 		14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiViewTests.swift; sourceTree = "<group>"; };
-		155853CBF9374645092FE699 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		164FAFB05B901C05BD1479BF /* NotchLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchLayout.swift; sourceTree = "<group>"; };
 		1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */ = {isa = PBXFileReference; path = ambient_cafe.m4a; sourceTree = "<group>"; };
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
-		1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		22F9A4FB15C8C324972DB6D6 /* NotchWindowControllerTests+NotchWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchWindowControllerTests+NotchWindow.swift"; sourceTree = "<group>"; };
 		23364F4B016E445E5657BF63 /* SettingsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuView.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
@@ -228,7 +224,6 @@
 				131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */,
-				1FE4B38761648E58087E9741 /* UpdateCheckerTests.swift */,
 				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
 				26934C0C6B7C8A90F9D57916 /* US002Tests.swift */,
 				85C93F37E0AC4AA71C304FDD /* US003Tests.swift */,
@@ -275,7 +270,6 @@
 				1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */,
 				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
 				770CCC886CF6A5E903159704 /* SparkleUpdater.swift */,
-				155853CBF9374645092FE699 /* UpdateChecker.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -415,7 +409,6 @@
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */,
 				D9BC1320EE869D9AD7FE40AE /* SparkleUpdater.swift in Sources */,
-				4A1C33DCF3B211925C5D9858 /* UpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,7 +436,6 @@
 				8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */,
 				F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */,
 				AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */,
-				BF73E986CFE97F74C3BFF877 /* UpdateCheckerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

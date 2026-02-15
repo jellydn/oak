@@ -90,8 +90,4 @@ internal class ProgressManager: ObservableObject {
 
         return streak
     }
-
-    deinit {
-        // Safety net for future resources held by this manager.
-    }
 }

@@ -25,6 +25,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var isWorkSession: Bool = true
     private var isLongBreak: Bool = false
     private var sessionStartSeconds: Int = 0
+    private var sessionEndDate: Date?
     private var presetSettingsCancellable: AnyCancellable?
     let audioManager = AudioManager()
     let progressManager: ProgressManager
@@ -189,6 +190,7 @@ internal class FocusSessionViewModel: ObservableObject {
     func pauseSession() {
         timer?.invalidate()
         timer = nil
+        sessionEndDate = nil
         sessionState = .paused(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
     }
 
@@ -230,6 +232,7 @@ internal class FocusSessionViewModel: ObservableObject {
         isWorkSession = true
         isLongBreak = false
         sessionStartSeconds = 0
+        sessionEndDate = nil
         isSessionComplete = false
         completedRounds = 0
         audioManager.stop()
@@ -238,6 +241,7 @@ internal class FocusSessionViewModel: ObservableObject {
 
     private func startTimer() {
         timer?.invalidate()
+        sessionEndDate = Date().addingTimeInterval(TimeInterval(currentRemainingSeconds))
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.tick()
@@ -246,7 +250,11 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     private func tick() {
-        currentRemainingSeconds -= 1
+        guard let sessionEndDate else {
+            completeSession()
+            return
+        }
+        currentRemainingSeconds = max(0, Int(ceil(sessionEndDate.timeIntervalSinceNow)))
 
         if currentRemainingSeconds <= 0 {
             completeSession()
@@ -255,7 +263,7 @@ internal class FocusSessionViewModel: ObservableObject {
         }
     }
 
-    private func completeSession() {
+    func completeSession() {
         if isWorkSession {
             let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
             if durationMinutes > 0 {
@@ -280,6 +288,7 @@ internal class FocusSessionViewModel: ObservableObject {
 
         timer?.invalidate()
         timer = nil
+        sessionEndDate = nil
         sessionState = .completed(isWorkSession: isWorkSession)
 
         // Trigger UI animations after state is updated
@@ -290,10 +299,6 @@ internal class FocusSessionViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
         }
-    }
-
-    func completeSessionForTesting() {
-        completeSession()
     }
 
     deinit {

@@ -35,10 +35,10 @@ internal final class LongBreakTests: XCTestCase {
             } else {
                 viewModel.startNextSession()
             }
-            viewModel.completeSessionForTesting()
+            viewModel.completeSession()
             if round < 4 {
                 viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
+                viewModel.completeSession()
             }
         }
     }
@@ -68,20 +68,20 @@ internal final class LongBreakTests: XCTestCase {
         XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should be 0 before completion")
 
         // Simulate work session completion
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1, "Rounds should increment to 1 after work completion")
     }
 
     func testRoundCounterDoesNotIncrementAfterBreakSession() {
         // Start and complete a work session first
         viewModel.startSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1)
 
         // Start and complete a break session
         viewModel.startNextSession()
         XCTAssertEqual(viewModel.currentSessionType, "Break")
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
 
         // Rounds should still be 1
         XCTAssertEqual(viewModel.completedRounds, 1, "Rounds should not increment after break")
@@ -98,7 +98,7 @@ internal final class LongBreakTests: XCTestCase {
             } else {
                 viewModel.startNextSession()
             }
-            viewModel.completeSessionForTesting()
+            viewModel.completeSession()
             XCTAssertEqual(viewModel.completedRounds, round)
 
             // Start break and verify it's a short break
@@ -115,7 +115,7 @@ internal final class LongBreakTests: XCTestCase {
             }
 
             // Complete break
-            viewModel.completeSessionForTesting()
+            viewModel.completeSession()
         }
     }
 
@@ -159,7 +159,7 @@ internal final class LongBreakTests: XCTestCase {
         XCTAssertEqual(viewModel.completedRounds, 4, "Rounds should remain at 4 during long break")
 
         // Complete the long break
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
 
         // Rounds should be reset to 0 after long break completes
         XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
@@ -191,7 +191,7 @@ internal final class LongBreakTests: XCTestCase {
     func testRoundCounterResetsOnSessionReset() {
         // Complete a work session
         viewModel.startSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1)
 
         // Reset session
@@ -202,7 +202,7 @@ internal final class LongBreakTests: XCTestCase {
     func testRoundCounterResetsOnNewSession() {
         // Complete a work session
         viewModel.startSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1)
 
         // Start a new session from idle
@@ -275,20 +275,20 @@ internal final class LongBreakTests: XCTestCase {
 
         // Round 1
         viewModel.startSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         viewModel.startNextSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
 
         // Round 2
         viewModel.startNextSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         XCTAssertEqual(viewModel.currentSessionType, "Break", "Should still be short break before configured interval")
         viewModel.startNextSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
 
         // Round 3 should trigger long break
         viewModel.startNextSession()
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
         XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should trigger long break at configured interval")
     }
 

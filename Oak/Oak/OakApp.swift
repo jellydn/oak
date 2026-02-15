@@ -9,23 +9,13 @@ internal struct OakApp: App {
 
     var body: some Scene {
         Settings {
-            if let sparkleUpdater = appDelegate.sparkleUpdater {
-                SettingsMenuView(
-                    presetSettings: presetSettings,
-                    notificationService: notificationService,
-                    sparkleUpdater: sparkleUpdater
-                )
-                .frame(width: 420)
-                .padding(8)
-            } else {
-                SettingsMenuView(
-                    presetSettings: presetSettings,
-                    notificationService: notificationService,
-                    sparkleUpdater: SparkleUpdater.shared
-                )
-                .frame(width: 420)
-                .padding(8)
-            }
+            SettingsMenuView(
+                presetSettings: presetSettings,
+                notificationService: notificationService,
+                sparkleUpdater: appDelegate.sparkleUpdater ?? SparkleUpdater.shared
+            )
+            .frame(width: 420)
+            .padding(8)
         }
     }
 }

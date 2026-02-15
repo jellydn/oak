@@ -62,7 +62,7 @@ internal final class SessionCompletionNotificationTests: XCTestCase {
         viewModel.startSession()
         XCTAssertFalse(viewModel.isSessionComplete, "Session should not be complete initially")
 
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
 
         XCTAssertTrue(viewModel.isSessionComplete, "Session should be marked complete")
         XCTAssertEqual(
@@ -84,7 +84,7 @@ internal final class SessionCompletionNotificationTests: XCTestCase {
         presetSettings.setPlaySoundOnSessionCompletion(false)
         viewModel.startSession()
 
-        viewModel.completeSessionForTesting()
+        viewModel.completeSession()
 
         XCTAssertEqual(
             notificationService.sentNotifications,

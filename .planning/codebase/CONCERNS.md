@@ -1,38 +1,15 @@
 # Codebase Concerns
 
 **Analysis Date:** 2026-02-15
+**Last Updated:** 2026-02-15
 
 ## Tech Debt
-
-**Deprecated UpdateChecker still in codebase:**
-- Issue: Legacy `UpdateChecker` service is fully deprecated in favor of Sparkle but remains in the source tree with its own test file
-- Files: `Oak/Oak/Services/UpdateChecker.swift`, `Oak/Tests/OakTests/UpdateCheckerTests.swift`
-- Impact: Maintenance burden; developers may accidentally use it; ~157 lines of dead code plus ~140 lines of tests
-- Fix approach: Remove both files entirely since Sparkle is the active update mechanism
 
 **Singleton overuse via `static let shared`:**
 - Issue: Multiple services use singletons (`PresetSettingsStore.shared`, `NotificationService.shared`, `SparkleUpdater.shared`, `NSScreenUUIDCache.shared`) making DI inconsistent — some paths use injected instances while others reference `.shared` directly
 - Files: `Oak/Oak/Services/PresetSettingsStore.swift:7`, `Oak/Oak/Services/NotificationService.swift:13`, `Oak/Oak/Services/SparkleUpdater.swift:10`, `Oak/Oak/Views/NotchCompanionView.swift:6-7`
 - Impact: `NotchCompanionView` creates its own `@StateObject` from `.shared` singletons (line 6-7) instead of receiving injected instances, creating parallel object graphs; hard to test in isolation
 - Fix approach: Inject all dependencies through initializers consistently; remove `@StateObject private var notificationService` and `sparkleUpdater` from `NotchCompanionView` and pass from parent
-
-**`completeSessionForTesting()` exposes internal method:**
-- Issue: Test-only method `completeSessionForTesting()` is part of the production API surface
-- Files: `Oak/Oak/ViewModels/FocusSessionViewModel.swift:295-297`
-- Impact: Pollutes the public interface; could be called accidentally in production
-- Fix approach: Use `@testable import` access or move to an extension in the test target
-
-**Duplicate SettingsMenuView instantiation in OakApp:**
-- Issue: `OakApp.body` has a duplicated `SettingsMenuView(...)` block — one for when `sparkleUpdater` exists, one as fallback — with identical frame/padding
-- Files: `Oak/Oak/OakApp.swift:10-29`
-- Impact: Any UI change to Settings must be duplicated in both branches
-- Fix approach: Resolve `sparkleUpdater` before the view builder and use a single `SettingsMenuView` instantiation
-
-**Empty `deinit` in ProgressManager:**
-- Issue: `ProgressManager.deinit` contains only a comment placeholder ("Safety net for future resources")
-- Files: `Oak/Oak/Services/ProgressManager.swift:94-96`
-- Impact: Minor noise; no actual cleanup occurs
-- Fix approach: Remove the empty deinit
 
 ## Known Bugs
 
@@ -41,18 +18,6 @@
 - Files: `Oak/Oak/Services/AudioManager.swift:237-276`
 - Trigger: Start any generated ambient sound track (when no bundled file exists); the render callback runs on a real-time audio thread
 - Workaround: Currently works because `NoiseGenerator` is only mutated from the render callback, but `AudioManager` is `@MainActor` and creates/replaces `NoiseGenerator` instances on main thread while callbacks may still fire
-
-**Timer drift over long sessions:**
-- Symptoms: Session duration may drift from wall-clock time over long focus sessions (50+ minutes)
-- Files: `Oak/Oak/ViewModels/FocusSessionViewModel.swift:239-246`
-- Trigger: Run a long focus session; `Timer.scheduledTimer` with 1-second interval accumulates drift because each tick decrements by 1 second regardless of actual elapsed time
-- Workaround: Sessions are short enough that drift is typically <1 second, but edge cases exist
-
-**US005Tests contain mostly trivially-passing assertions:**
-- Symptoms: Tests like `testCompletionFeedbackDoesNotStealKeyboardFocus()` always pass with `XCTAssertTrue(... || true)` (line 92) — they don't actually test anything
-- Files: `Oak/Tests/OakTests/US005Tests.swift:42,92`
-- Trigger: Run tests — they always pass regardless of code changes
-- Workaround: None; these tests provide false confidence
 
 ## Security Considerations
 
@@ -65,7 +30,7 @@
 **Network entitlement is broad:**
 - Risk: `com.apple.security.network.client` allows any outbound network connection, not just update checks
 - Files: `Oak/Oak/Oak.entitlements:5-6`
-- Current mitigation: App only makes requests to GitHub (appcast.xml, legacy update checker)
+- Current mitigation: App only makes requests to GitHub (appcast.xml for Sparkle updates)
 - Recommendations: Acceptable for current use; monitor if new network calls are added
 
 **No App Sandbox entitlement:**
@@ -131,7 +96,7 @@
 **Sparkle 2.6.4+:**
 - Risk: External dependency for auto-updates; if Sparkle is abandoned or has breaking changes, update mechanism stops working
 - Impact: Users won't receive automatic updates; manual download required
-- Migration plan: Sparkle is well-maintained and widely used; low risk. Fallback: the legacy `UpdateChecker` pattern (GitHub API) could be modernized if needed
+- Migration plan: Sparkle is well-maintained and widely used; low risk. Fallback: a simple GitHub API release checker could be built if needed
 
 ## Missing Critical Features
 
@@ -171,17 +136,20 @@
 - Risk: Settings changes may not propagate correctly to `PresetSettingsStore`
 - Priority: Low — covered indirectly by `PresetSettingsStore` tests but UI binding bugs possible
 
-**US005Tests are effectively no-ops:**
-- What's not tested: Despite having 6 test methods, most use `XCTAssertTrue(... || true)` or test constant values — they verify nothing about actual session completion behavior
-- Files: `Oak/Tests/OakTests/US005Tests.swift`
-- Risk: Session completion animation and feedback could break without any test failing
-- Priority: High — rewrite to actually test completion flow using `completeSessionForTesting()`
-
 **ProgressManager streak calculation edge cases:**
 - What's not tested: Timezone changes during streak, daylight saving transitions, records with 0 completed sessions in the middle of a streak
 - Files: `Oak/Oak/Services/ProgressManager.swift:63-91`
 - Risk: Streak could incorrectly reset or inflate across timezone boundaries
 - Priority: Low — unlikely in practice but could confuse users
+
+## Resolved
+
+- ~~Deprecated UpdateChecker still in codebase~~ — Removed `UpdateChecker.swift` and `UpdateCheckerTests.swift` (~300 lines deleted)
+- ~~`completeSessionForTesting()` exposes internal method~~ — Removed wrapper; made `completeSession()` internal, accessible via `@testable import`
+- ~~Duplicate SettingsMenuView instantiation in OakApp~~ — Collapsed if/else to single instantiation with nil-coalescing `??`
+- ~~Empty `deinit` in ProgressManager~~ — Removed placeholder deinit
+- ~~Timer drift over long sessions~~ — Switched from decrement-by-1 to wall-clock `Date`-based remaining time calculation
+- ~~US005Tests are effectively no-ops~~ — Rewrote 6 tests with real assertions testing completion state, rounds, and session type transitions
 
 ---
 *Concerns audit: 2026-02-15*
