@@ -1,60 +1,64 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-02-13
+**Analysis Date:** 2026-02-15
 
 ## Test Framework
-
 **Runner:**
-- XCTest (built-in)
-- Swift 5.9+, macOS 13.0+ deployment target
-- Config: `project.yml` via XcodeGen
-
+- XCTest (Apple built-in)
+- Config: `Oak/project.yml` (OakTests target), built via `xcodebuild`
 **Assertion Library:**
-- XCTest assertions (`XCTAssertEqual`, `XCTAssertTrue`, `XCTFail`)
-
+- XCTest assertions: `XCTAssertEqual`, `XCTAssertTrue`, `XCTAssertFalse`, `XCTAssertNotNil`, `XCTAssertNil`, `XCTAssertNoThrow`, `XCTAssertLessThan`, `XCTAssertGreaterThan`, `XCTAssertGreaterThanOrEqual`, `XCTAssertLessThanOrEqual`
 **Run Commands:**
 ```bash
-just test               # Run all tests
-just test-verbose       # Run tests with verbose output
-just test-class Tests   # Run specific test class
-just test-method Tests "testName"  # Run specific test method
+just test                                          # Run all tests
+just test-verbose                                  # Run tests with verbose output
+just test-class US001Tests                         # Run specific test class
+just test-method US001Tests testStartSession       # Run specific test method
 ```
 
 ## Test File Organization
-
 **Location:**
-- Separate `Tests/` directory mirrored from source structure
-- Test bundle target: `OakTests`
-- Source: `Oak/Tests/OakTests/`
-
+- Separate directory: `Oak/Tests/OakTests/` (not co-located with source)
 **Naming:**
-- Test files: Source name + `Tests` suffix (`LongBreakTests.swift`, `US001Tests.swift`)
-- Test classes: Match filename (`internal final class US001Tests: XCTestCase`)
-- Test methods: `test` prefix describing what is tested (`testLongBreakTriggeredAfterFourthRound`)
-
+- User story tests: `US001Tests.swift`, `US002Tests.swift` ... `US006Tests.swift`
+- Feature tests: `LongBreakTests.swift`, `AlwaysOnTopTests.swift`, `CountdownDisplayModeTests.swift`, `NotificationTests.swift`
+- Component tests: `NotchWindowControllerTests.swift`, `ConfettiViewTests.swift`, `NSScreenNotchTests.swift`
+- Service tests: `UpdateCheckerTests.swift`, `SparkleUpdaterTests.swift`, `AppcastVersionParserTests.swift`
+- Smoke tests: `SmokeTests.swift`
+- Extension files for large test classes: `NotchWindowControllerTests+WindowBehavior.swift`, `NotchWindowControllerTests+NotchWindow.swift`, `NotchWindowControllerTests+NotchFirstUI.swift`
 **Structure:**
 ```
 Oak/Tests/OakTests/
-├── SmokeTests.swift           # Basic smoke tests
-├── US001Tests.swift           # User Story 1 tests
-├── US002Tests.swift           # User Story 2 tests
-├── US003Tests.swift
-├── US004Tests.swift
-├── US005Tests.swift
-├── US006Tests.swift
-├── LongBreakTests.swift       # Long break feature tests
-├── NotificationTests.swift    # Notification service tests
-├── ConfettiViewTests.swift
-├── CountdownDisplayModeTests.swift
-├── NotchWindowControllerTests.swift
-├── SessionCompletionNotificationTests.swift
-└── UpdateCheckerTests.swift
+├── SmokeTests.swift                                    # Basic sanity check
+├── US001Tests.swift                                    # User story: Start session
+├── US002Tests.swift                                    # User story: Preset selection
+├── US003Tests.swift                                    # User story: Pause/Resume
+├── US004Tests.swift                                    # User story: Audio & settings
+├── US005Tests.swift                                    # User story: Completion feedback
+├── US006Tests.swift                                    # User story: Progress tracking
+├── LongBreakTests.swift                                # Long break feature
+├── AlwaysOnTopTests.swift                              # Always-on-top window
+├── CountdownDisplayModeTests.swift                     # Display mode switching
+├── NotificationTests.swift                             # Notification service
+├── SessionCompletionNotificationTests.swift            # Completion + sound mocking
+├── ConfettiViewTests.swift                             # Confetti view init
+├── NSScreenNotchTests.swift                            # Screen notch detection
+├── NotchWindowControllerTests.swift                    # Window controller base + helpers
+├── NotchWindowControllerTests+WindowBehavior.swift     # Expansion/collapse behavior
+├── NotchWindowControllerTests+NotchWindow.swift        # Window properties
+├── NotchWindowControllerTests+NotchFirstUI.swift       # Notch-first positioning
+├── UpdateCheckerTests.swift                            # Legacy update checker
+├── SparkleUpdaterTests.swift                           # Sparkle updater
+└── AppcastVersionParserTests.swift                     # Appcast XML parsing
 ```
 
 ## Test Structure
-
 **Suite Organization:**
 ```swift
+import SwiftUI
+import XCTest
+@testable import Oak
+
 @MainActor
 internal final class US001Tests: XCTestCase {
     var viewModel: FocusSessionViewModel!
@@ -79,173 +83,238 @@ internal final class US001Tests: XCTestCase {
         }
     }
 
-    // MARK: - Helper Methods
-
-    private func completeFourWorkSessions() {
-        for round in 1 ... 4 {
-            if round == 1 {
-                viewModel.startSession()
-            } else {
-                viewModel.startNextSession()
-            }
-            viewModel.completeSessionForTesting()
-            if round < 4 {
-                viewModel.startNextSession()
-                viewModel.completeSessionForTesting()
-            }
-        }
+    func testPrimaryActionStarts25MinuteSession() {
+        XCTAssertEqual(viewModel.canStart, true)
+        viewModel.startSession()
+        XCTAssertEqual(viewModel.isRunning, true)
     }
 }
 ```
-
 **Patterns:**
-- `@MainActor` annotation on all test classes
-- `setUp() async throws` - fixture setup with unique UserDefaults suite
-- `tearDown() async throws` - cleanup and UserDefaults removal
-- `// MARK: - Helper Methods` section for test utilities
-- Descriptive test names that read as assertions
-- Given/When/Then structure in test body
+- `@MainActor` on all test classes that touch UI/ViewModel code
+- `internal final class` with explicit access control
+- `override func setUp() async throws` for async setup
+- `override func tearDown() async throws` for cleanup
+- Force-unwrapped (`!`) instance variables set in `setUp`
+- `// MARK: -` sections to group related tests within a class
+- Extension files (e.g., `+WindowBehavior`) to split large test classes across files
 
 ## Mocking
-
-**Framework:** Protocol-based injection with `any` type
-
+**Framework:** Manual protocol-based mocks (no third-party mocking library)
 **Patterns:**
 ```swift
-// Protocol for dependency abstraction
+// Protocol defined in production code (Oak/Oak/Services/NotificationService.swift)
+@MainActor
 internal protocol SessionCompletionNotifying {
     func sendSessionCompletionNotification(isWorkSession: Bool)
 }
 
-// Constructor injection for testability
-init(
-    presetSettings: PresetSettingsStore,
-    notificationService: (any SessionCompletionNotifying)? = nil,
-    completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil
-) {
-    self.notificationService = notificationService ?? NotificationService.shared
-    self.completionSoundPlayer = completionSoundPlayer ?? SystemSessionCompletionSoundPlayer()
+// Mock in test file (Oak/Tests/OakTests/SessionCompletionNotificationTests.swift)
+@MainActor
+private final class MockNotificationService: SessionCompletionNotifying {
+    private(set) var sentNotifications: [Bool] = []
+
+    func sendSessionCompletionNotification(isWorkSession: Bool) {
+        sentNotifications.append(isWorkSession)
+    }
+}
+
+// URLProtocol-based network mocking (Oak/Tests/OakTests/UpdateCheckerTests.swift)
+private class MockURLProtocol: URLProtocol {
+    static var statusCode = 200
+    static var responseData = Data()
+
+    override class func canInit(with _: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() { /* return mock response */ }
+    override func stopLoading() {}
 }
 ```
-
 **What to Mock:**
-- External services (notifications, sound, updates)
-- System dependencies (UserDefaults, network, file system)
-- Cross-cutting concerns (time, randomness)
+- Notification services (`MockNotificationService`)
+- Sound players (`MockSessionCompletionSoundPlayer`)
+- Network sessions via `URLProtocol` subclass (`MockURLProtocol`)
+- UserDefaults with unique suite names per test class
 
 **What NOT to Mock:**
-- Data models and simple value types
-- ViewModels in integration tests
-- Pure functions and computed properties
+- ViewModels (tested directly with real instances)
+- Models and enums (pure value types, tested directly)
+- `PresetSettingsStore` (uses isolated UserDefaults instead)
+- Window/screen APIs (use `XCTSkip` when hardware unavailable)
 
 ## Fixtures and Factories
-
 **Test Data:**
-- Helper methods for complex state setup
-- Example: `completeFourWorkSessions()` in LongBreakTests
-
-**Location:**
-- Inline within test classes as private methods
-- Shared fixtures via base class (not currently used)
-
-**UserDefaults Isolation:**
 ```swift
+// Isolated UserDefaults per test class (standard pattern in all test files)
 let suiteName = "OakTests.US001.\(UUID().uuidString)"
 guard let userDefaults = UserDefaults(suiteName: suiteName) else {
     throw NSError(domain: "US001Tests", code: 1)
 }
 userDefaults.removePersistentDomain(forName: suiteName)
+
+// XML fixtures inline for parser tests (Oak/Tests/OakTests/AppcastVersionParserTests.swift)
+let appcast = """
+<rss>
+  <channel>
+    <item>
+      <sparkle:shortVersionString>0.4.10</sparkle:shortVersionString>
+    </item>
+  </channel>
+</rss>
+"""
+
+// Helper methods for complex setup (Oak/Tests/OakTests/LongBreakTests.swift)
+private func completeFourWorkSessions() {
+    for round in 1 ... 4 {
+        if round == 1 { viewModel.startSession() }
+        else { viewModel.startNextSession() }
+        viewModel.completeSessionForTesting()
+        if round < 4 {
+            viewModel.startNextSession()
+            viewModel.completeSessionForTesting()
+        }
+    }
+}
+
+// Polling helper for async window behavior (Oak/Tests/OakTests/NotchWindowControllerTests.swift)
+@discardableResult
+func waitForFrameWidth(_ width: CGFloat, timeout: TimeInterval) -> Bool {
+    let endTime = Date().addingTimeInterval(timeout)
+    while Date() < endTime {
+        if let window = windowController.window as? NotchWindow,
+           abs(window.frame.width - width) <= 1.0 { return true }
+        RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+    }
+    return false
+}
 ```
+**Location:**
+- Inline in test files (no shared fixtures directory)
+- Helper methods defined as `private func` or in `internal extension` blocks within test files
 
 ## Coverage
-
-**Requirements:** No enforced minimum, aim for high-value coverage
-
-**View Coverage:** Not tracked
-
-**Coverage Focus:**
-- ViewModel state transitions and computed properties
-- Settings persistence and validation
-- Edge cases (bounds checking, state resets)
-- Long break cycle logic (complex state machine)
+**Requirements:** None enforced (no coverage threshold configured)
+**View Coverage:**
+```bash
+# No built-in coverage command in justfile; use Xcode or:
+cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak \
+  -destination 'platform=macOS' -enableCodeCoverage YES test
+```
 
 ## Test Types
-
 **Unit Tests:**
-- Individual ViewModel behavior
-- Settings validation and clamping
-- Helper function correctness
-- Enum case handling
+- Primary test type; all 21 test files are unit tests
+- State machine transitions: idle → running → paused → resumed → completed (see `Oak/Tests/OakTests/US003Tests.swift`)
+- Computed property verification: `displayTime`, `canStart`, `canPause`, `progressPercentage`
+- Persistence round-trips: write to UserDefaults → create new instance → verify loaded values
+- Model/enum validation: preset durations, case counts
+- `completeSessionForTesting()` method exposed on ViewModel for test-only session completion
 
 **Integration Tests:**
-- ViewModel + SettingsStore interaction
-- Multi-round session cycles
-- Progress tracking and streaks
-- Audio state during session lifecycle
+- Window behavior tests act as integration tests: `NotchWindowControllerTests` creates real `NotchWindowController` with real `NotchWindow` (see `Oak/Tests/OakTests/NotchWindowControllerTests.swift`)
+- Notification observer tests: post `NSApplication.didChangeScreenParametersNotification` and verify response
+- Published property observation with Combine: `presetSettings.$alwaysOnTop.dropFirst().sink { ... }` (see `Oak/Tests/OakTests/AlwaysOnTopTests.swift`)
 
 **E2E Tests:**
-- Not used (macOS app limitation)
-- SmokeTests.swift verifies basic app instantiation
+- Not used (no UI testing target or XCUITest)
 
 ## Common Patterns
-
 **Async Testing:**
 ```swift
-@MainActor
-internal final class NotificationTests: XCTestCase {
-    override func setUp() async throws {
-        notificationService = NotificationService.shared
+// Expectation-based async (Oak/Tests/OakTests/UpdateCheckerTests.swift)
+func testHandles403RateLimitResponse() async {
+    let expectation = self.expectation(description: "Update check completes")
+    Task {
+        checker.checkForUpdatesOnLaunch()
+        try? await Task.sleep(nanoseconds: 100000000)
+        expectation.fulfill()
     }
+    await fulfillment(of: [expectation], timeout: 2.0)
+    XCTAssertNil(userDefaults.string(forKey: "oak.lastPromptedUpdateVersion"))
+}
 
-    func testNotificationServiceAuthorizationRequest() async throws {
-        // Test async methods
-    }
+// Combine publisher observation (Oak/Tests/OakTests/AlwaysOnTopTests.swift)
+func testAlwaysOnTopIsPublished() async {
+    let expectation = expectation(description: "Published value changed")
+    var receivedValue: Bool?
+    let cancellable = presetSettings.$alwaysOnTop
+        .dropFirst()
+        .sink { value in
+            receivedValue = value
+            expectation.fulfill()
+        }
+    presetSettings.setAlwaysOnTop(true)
+    await fulfillment(of: [expectation], timeout: 1.0)
+    XCTAssertEqual(receivedValue, true)
+    cancellable.cancel()
+}
+
+// RunLoop polling for window animations (Oak/Tests/OakTests/NotchWindowControllerTests.swift)
+let endTime = Date().addingTimeInterval(1.0)
+while Date() < endTime {
+    if window?.level == .statusBar { break }
+    RunLoop.main.run(until: Date().addingTimeInterval(0.02))
 }
 ```
-
 **Error Testing:**
 ```swift
+// XCTSkip for environment-dependent tests (Oak/Tests/OakTests/NotchWindowControllerTests.swift)
+override func setUp() async throws {
+    guard NSScreen.main != nil else {
+        throw XCTSkip("No display available for window tests")
+    }
+}
+
+// XCTSkip for system prompt avoidance (Oak/Tests/OakTests/NotificationTests.swift)
 func testNotificationServiceAuthorizationRequest() throws {
-    throw XCTSkip("Skipping authorization request test to avoid system notification prompts in automated runs")
+    throw XCTSkip("Skipping authorization request test to avoid system notification prompts")
+}
+
+// XCTAssertNoThrow for crash-safety verification (Oak/Tests/OakTests/NotchWindowControllerTests+WindowBehavior.swift)
+XCTAssertNoThrow(windowController.cleanup(), "Cleanup should not throw")
+XCTAssertNoThrow(
+    NotificationCenter.default.post(
+        name: NSApplication.didChangeScreenParametersNotification, object: NSApp
+    ),
+    "Posting notification after cleanup should not crash"
+)
+
+// Guard-based test failures (Oak/Tests/OakTests/NotchWindowControllerTests.swift)
+guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+    throw NSError(domain: "US001Tests", code: 1)
 }
 ```
-
 **State Transition Testing:**
 ```swift
-func testRoundCounterIncrementsAfterWorkSession() {
+// Full lifecycle: idle → running → paused → resumed → completed (Oak/Tests/OakTests/US003Tests.swift)
+func testUIIndicatesPausedState() {
     viewModel.startSession()
-    XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should be 0 before completion")
+    XCTAssertFalse(viewModel.isPaused)
+    XCTAssertTrue(viewModel.isRunning)
 
+    viewModel.pauseSession()
+    XCTAssertTrue(viewModel.isPaused)
+    XCTAssertFalse(viewModel.isRunning)
+
+    viewModel.resumeSession()
+    XCTAssertFalse(viewModel.isPaused)
+    XCTAssertTrue(viewModel.isRunning)
+}
+
+// Round counter lifecycle (Oak/Tests/OakTests/LongBreakTests.swift)
+func testRoundCounterResetsAfterLongBreak() {
+    completeFourWorkSessions()
+    XCTAssertEqual(viewModel.completedRounds, 4)
+    viewModel.startNextSession()
     viewModel.completeSessionForTesting()
-    XCTAssertEqual(viewModel.completedRounds, 1, "Rounds should increment to 1 after work completion")
+    XCTAssertEqual(viewModel.completedRounds, 0)
 }
 ```
 
-**Bounds Testing:**
-```swift
-func testRoundsBeforeLongBreakIsClampedToValidRange() {
-    presetSettings.setRoundsBeforeLongBreak(0)
-    XCTAssertEqual(presetSettings.roundsBeforeLongBreak, PresetSettingsStore.minRoundsBeforeLongBreak)
-
-    presetSettings.setRoundsBeforeLongBreak(100)
-    XCTAssertEqual(presetSettings.roundsBeforeLongBreak, PresetSettingsStore.maxRoundsBeforeLongBreak)
-}
-```
-
-**Persistence Testing:**
-```swift
-func testDisplayTargetIsPersisted() {
-    presetSettings.setDisplayTarget(.notchedDisplay)
-
-    guard let reloadedDefaults = UserDefaults(suiteName: presetSuiteName) else {
-        XCTFail("Failed to create UserDefaults with suite name")
-        return
-    }
-    let reloadedStore = PresetSettingsStore(userDefaults: reloadedDefaults)
-    XCTAssertEqual(reloadedStore.displayTarget, .notchedDisplay)
-}
-```
+## Test Naming Convention
+- Method names describe behavior: `testPrimaryActionStarts25MinuteSession`, `testCanPauseActiveSession`, `testAlwaysOnTopDefaultsToFalse`
+- Pattern: `test[Subject][Behavior]` or `test[Subject][Condition][Expectation]`
+- Assertion messages describe expected behavior: `XCTAssertEqual(viewModel.canStart, true, "Should be able to pause active session")`
 
 ---
-
-*Testing analysis: 2026-02-13*
+*Testing analysis: 2026-02-15*
