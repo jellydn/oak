@@ -37,7 +37,6 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSApp.setActivationPolicy(.accessory)
 
-        // Pass dependencies to NotchWindowController
         notchWindowController = NotchWindowController(
             presetSettings: presetSettings,
             notificationService: notificationService,
