@@ -26,6 +26,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var playSoundOnSessionCompletion: Bool
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
     @Published private(set) var alwaysOnTop: Bool
+    @Published private(set) var showBelowNotch: Bool
 
     private let userDefaults: UserDefaults
 
@@ -43,6 +44,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let playSoundOnSessionCompletion = "session.completion.playSound"
         static let countdownDisplayMode = "countdown.displayMode"
         static let alwaysOnTop = "window.alwaysOnTop"
+        static let showBelowNotch = "window.showBelowNotch"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -59,7 +61,8 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
             Keys.playSoundOnSessionCompletion: true,
             Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
-            Keys.alwaysOnTop: false
+            Keys.alwaysOnTop: false,
+            Keys.showBelowNotch: false
         ]
         userDefaults.register(defaults: defaults)
 
@@ -81,6 +84,7 @@ internal final class PresetSettingsStore: ObservableObject {
             ?? CountdownDisplayMode.number.rawValue
         countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
         alwaysOnTop = userDefaults.bool(forKey: Keys.alwaysOnTop)
+        showBelowNotch = userDefaults.bool(forKey: Keys.showBelowNotch)
         ensureDisplayIDsInitialized()
     }
 
@@ -179,6 +183,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setPlaySoundOnSessionCompletion(true)
         setCountdownDisplayMode(.number)
         setAlwaysOnTop(false)
+        setShowBelowNotch(false)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {
@@ -197,6 +202,12 @@ internal final class PresetSettingsStore: ObservableObject {
         guard alwaysOnTop != value else { return }
         alwaysOnTop = value
         userDefaults.set(value, forKey: Keys.alwaysOnTop)
+    }
+
+    func setShowBelowNotch(_ value: Bool) {
+        guard showBelowNotch != value else { return }
+        showBelowNotch = value
+        userDefaults.set(value, forKey: Keys.showBelowNotch)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {

@@ -17,6 +17,7 @@ internal class NotchWindowController: NSWindowController {
     private let presetSettings: PresetSettingsStore
     private var displayTargetCancellable: AnyCancellable?
     private var alwaysOnTopCancellable: AnyCancellable?
+    private var showBelowNotchCancellable: AnyCancellable?
 
     convenience init() {
         self.init(presetSettings: nil)
@@ -26,13 +27,15 @@ internal class NotchWindowController: NSWindowController {
         let settings = presetSettings ?? PresetSettingsStore.shared
         self.presetSettings = settings
         viewModel = FocusSessionViewModel(presetSettings: settings)
+        let initialWidths = Self.initialWidths(for: settings)
 
         let window = NotchWindow(
-            width: NotchLayout.collapsedWidth,
+            width: initialWidths.collapsed,
             height: NotchLayout.height,
             displayTarget: settings.displayTarget,
             preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget),
-            alwaysOnTop: settings.alwaysOnTop
+            alwaysOnTop: settings.alwaysOnTop,
+            showBelowNotch: settings.showBelowNotch
         )
         super.init(window: window)
 
@@ -49,8 +52,8 @@ internal class NotchWindowController: NSWindowController {
             hostingView.safeAreaRegions = []
         }
         window.contentView = hostingView
-        window.contentMinSize = NSSize(width: NotchLayout.collapsedWidth, height: NotchLayout.height)
-        window.contentMaxSize = NSSize(width: NotchLayout.expandedWidth, height: NotchLayout.height)
+        window.contentMinSize = NSSize(width: initialWidths.collapsed, height: NotchLayout.height)
+        window.contentMaxSize = NSSize(width: initialWidths.expanded, height: NotchLayout.height)
         setExpanded(false, forceReposition: true, targetOverride: settings.displayTarget)
 
         window.orderFrontRegardless()
@@ -74,6 +77,12 @@ internal class NotchWindowController: NSWindowController {
                 window.level = isAlwaysOnTop ? .statusBar : .floating
                 self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
             }
+
+        showBelowNotchCancellable = settings.$showBelowNotch
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
+            }
     }
 
     @available(*, unavailable)
@@ -89,6 +98,7 @@ internal class NotchWindowController: NSWindowController {
         NotificationCenter.default.removeObserver(self)
         displayTargetCancellable?.cancel()
         alwaysOnTopCancellable?.cancel()
+        showBelowNotchCancellable?.cancel()
     }
 
     func cleanup() {
@@ -96,6 +106,7 @@ internal class NotchWindowController: NSWindowController {
         hasCleanedUp = true
         displayTargetCancellable?.cancel()
         alwaysOnTopCancellable?.cancel()
+        showBelowNotchCancellable?.cancel()
         viewModel.cleanup()
     }
 
@@ -149,15 +160,19 @@ internal class NotchWindowController: NSWindowController {
         guard !isApplyingFrameChange else { return }
         guard forceReposition || lastExpandedState != expanded else { return }
 
-        let targetWidth = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         let activeTarget = targetOverride ?? presetSettings.displayTarget
         let preferredDisplayID = presetSettings.preferredDisplayID(for: activeTarget)
         let resolvedScreen = NSScreen.screen(
             for: activeTarget,
             preferredDisplayID: preferredDisplayID
         )
+        let widths = Self.widths(for: resolvedScreen, showBelowNotch: presetSettings.showBelowNotch)
+        window.contentMinSize = NSSize(width: widths.collapsed, height: NotchLayout.height)
+        window.contentMaxSize = NSSize(width: widths.expanded, height: NotchLayout.height)
+
         let yPosition = notchYPosition(for: resolvedScreen, alwaysOnTop: presetSettings.alwaysOnTop)
         let screenFrame = resolvedScreen?.frame ?? .zero
+        let targetWidth = expanded ? widths.expanded : widths.collapsed
         let xPosition = screenFrame.midX - (targetWidth / 2)
         let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: NotchLayout.height)
 
@@ -184,11 +199,31 @@ internal class NotchWindowController: NSWindowController {
     }
 
     private func notchYPosition(for screen: NSScreen?, alwaysOnTop: Bool) -> CGFloat {
-        guard let screen else { return 0 }
-        if alwaysOnTop {
-            return screen.visibleFrame.maxY - NotchLayout.height
+        return NotchWindow.calculateYPosition(
+            for: screen,
+            height: NotchLayout.height,
+            alwaysOnTop: alwaysOnTop,
+            showBelowNotch: presetSettings.showBelowNotch
+        )
+    }
+
+    private static func widths(for screen: NSScreen?, showBelowNotch: Bool) -> (collapsed: CGFloat, expanded: CGFloat) {
+        let isInsideNotch = screen?.hasNotch == true && !showBelowNotch
+        if isInsideNotch {
+            return (
+                collapsed: NotchLayout.insideNotchCollapsedWidth,
+                expanded: NotchLayout.insideNotchExpandedWidth
+            )
         }
-        return screen.frame.maxY - NotchLayout.height
+        return (collapsed: NotchLayout.collapsedWidth, expanded: NotchLayout.expandedWidth)
+    }
+
+    private static func initialWidths(for settings: PresetSettingsStore) -> (collapsed: CGFloat, expanded: CGFloat) {
+        let initialScreen = NSScreen.screen(
+            for: settings.displayTarget,
+            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
+        )
+        return widths(for: initialScreen, showBelowNotch: settings.showBelowNotch)
     }
 }
 
@@ -200,13 +235,18 @@ internal class NotchWindow: NSPanel {
         height: CGFloat,
         displayTarget: DisplayTarget,
         preferredDisplayID: CGDirectDisplayID?,
-        alwaysOnTop: Bool = false
+        alwaysOnTop: Bool = false,
+        showBelowNotch: Bool = false
     ) {
         let screen = NSScreen.screen(for: displayTarget, preferredDisplayID: preferredDisplayID)
         let screenFrame = screen?.frame ?? .zero
-        let visibleFrame = screen?.visibleFrame ?? .zero
         let xPosition = screenFrame.midX - (width / 2)
-        let yPosition = alwaysOnTop ? visibleFrame.maxY - height : screenFrame.maxY - height
+        let yPosition = Self.calculateYPosition(
+            for: screen,
+            height: height,
+            alwaysOnTop: alwaysOnTop,
+            showBelowNotch: showBelowNotch
+        )
 
         super.init(
             contentRect: NSRect(x: xPosition, y: yPosition, width: width, height: height),
@@ -221,5 +261,38 @@ internal class NotchWindow: NSPanel {
         isOpaque = false
         hasShadow = false
         ignoresMouseEvents = false
+    }
+
+    /// Calculate Y position for notch-first UI
+    /// - Parameters:
+    ///   - screen: The target screen
+    ///   - height: The window height
+    ///   - alwaysOnTop: Whether the window should be always on top
+    ///   - showBelowNotch: Whether to show below the notch on notched displays
+    /// - Returns: The calculated Y position
+    internal static func calculateYPosition(
+        for screen: NSScreen?,
+        height: CGFloat,
+        alwaysOnTop: Bool,
+        showBelowNotch: Bool = false
+    ) -> CGFloat {
+        guard let screen = screen else { return 0 }
+
+        if screen.hasNotch {
+            if showBelowNotch {
+                return screen.visibleFrame.maxY - height
+            } else {
+                let notchHeight = screen.safeAreaInsets.top
+                if height < notchHeight {
+                    return screen.frame.maxY - notchHeight
+                }
+                return screen.frame.maxY - height
+            }
+        }
+
+        if alwaysOnTop {
+            return screen.visibleFrame.maxY - height
+        }
+        return screen.frame.maxY - height
     }
 }

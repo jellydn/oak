@@ -1,166 +1,194 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-02-13
+**Analysis Date:** 2026-02-15
 
 ## Directory Layout
-
 ```
-Oak/ (Xcode project root)
-├── Oak/ # Main application target source
-│   ├── Models/ # Domain data types and enums
-│   ├── Views/ # SwiftUI views and window management
-│   ├── ViewModels/ # MVVM view models and business logic
-│   ├── Services/ # Business logic, persistence, external integrations
-│   ├── Extensions/ # Utility extensions on system types
-│   ├── Resources/ # Assets, sounds, configuration (optional)
-│   └── OakApp.swift # App entry point
-├── Tests/ # Test bundles
-│   └── OakTests/ # Unit tests
-├── Oak.xcodeproj/ # Generated Xcode project
-├── project.yml # XcodeGen configuration
-├── justfile # Just command runner
-├── .swiftlint.yml # SwiftLint configuration
-├── .swiftformat # SwiftFormat configuration
-└── .github/ # CI/CD workflows
+oak/
+├── Oak/                            # Xcode project root
+│   ├── Oak/                        # Main app source
+│   │   ├── Extensions/             # AppKit/CoreGraphics extensions
+│   │   ├── Models/                 # Data models, enums, constants
+│   │   ├── Resources/              # Assets and bundled files
+│   │   │   ├── Assets.xcassets/     # App icons and image assets
+│   │   │   └── Sounds/             # Bundled ambient audio tracks (.m4a)
+│   │   ├── Services/               # Business logic and system integrations
+│   │   ├── ViewModels/             # ObservableObject classes
+│   │   ├── Views/                  # SwiftUI views and AppKit window management
+│   │   ├── Info.plist              # App configuration (Sparkle, LSUIElement)
+│   │   ├── Oak.entitlements        # App sandbox entitlements
+│   │   └── OakApp.swift            # @main entry point and AppDelegate
+│   ├── Oak.xcodeproj/              # Generated Xcode project (via XcodeGen)
+│   ├── Tests/                      # Test target
+│   │   └── OakTests/               # Unit test files
+│   ├── .gitignore                  # Xcode-specific ignores
+│   └── project.yml                 # XcodeGen project definition
+├── doc/                            # Documentation
+│   └── adr/                        # Architecture Decision Records
+├── docs/                           # GitHub Pages / public docs
+├── tasks/                          # PRDs and feature specifications
+├── scripts/                        # Build/release automation
+│   ├── ralph/                      # Ralph agent scripts
+│   ├── release/                    # Release automation
+│   └── check-ambient-sounds.sh     # Sound file validator
+├── assets/                         # Project assets (screenshots, etc.)
+├── Casks/                          # Homebrew Cask formula
+├── .github/                        # GitHub Actions workflows
+│   └── workflows/                  # CI/CD pipeline definitions
+├── .planning/                      # Planning documents
+├── .swiftformat                    # SwiftFormat configuration
+├── .swiftlint.yml                  # SwiftLint rules
+├── appcast.xml                     # Sparkle update feed
+├── justfile                        # Task runner commands
+├── AGENTS.md                       # Agent coding guidelines
+├── CLAUDE.md                       # Claude AI context
+└── README.md                       # Project documentation
 ```
 
 ## Directory Purposes
 
-**Oak/Oak/Models:**
-- Purpose: Domain models, value objects, enums, and data structures
-- Contains: Session state machine, preset configurations, display targets, audio tracks, progress tracking, layout constants
-- Key files: `SessionModels.swift` (SessionState, Preset, DisplayTarget), `AudioTrack.swift`, `ProgressData.swift`, `NotchLayout.swift`, `CountdownDisplayMode.swift`
+**`Oak/Oak/Models/`:**
+- Purpose: Pure data types, enums, and layout constants
+- Contains: Swift enums (`SessionState`, `Preset`, `DisplayTarget`, `AudioTrack`, `CountdownDisplayMode`), structs (`ProgressData`, `DailyStats`), constants (`NotchLayout`)
+- Key files: `SessionModels.swift`, `AudioTrack.swift`, `NotchLayout.swift`, `ProgressData.swift`
 
-**Oak/Oak/Views:**
-- Purpose: SwiftUI UI components and NSWindow/NSPanel management
-- Contains: Main notch view, settings menu, audio menu, progress menu, window controller, custom UI components (progress ring, confetti)
-- Key files: `NotchCompanionView.swift`, `NotchWindowController.swift`, `SettingsMenuView.swift`, `AudioMenuView.swift`, `ProgressMenuView.swift`, `CircularProgressRing.swift`, `ConfettiView.swift`
-
-**Oak/Oak/ViewModels:**
-- Purpose: MVVM view models coordinating business logic and state
-- Contains: Focus session state machine, timer management, progress tracking coordination
+**`Oak/Oak/ViewModels/`:**
+- Purpose: Session state machine and timer logic
+- Contains: Single ViewModel class
 - Key files: `FocusSessionViewModel.swift`
 
-**Oak/Oak/Services:**
-- Purpose: Business logic, persistence, and external system integrations
-- Contains: Audio playback, system notifications, progress tracking/persistence, update checking, settings persistence
-- Key files: `AudioManager.swift`, `NotificationService.swift`, `ProgressManager.swift`, `UpdateChecker.swift`, `PresetSettingsStore.swift`
+**`Oak/Oak/Views/`:**
+- Purpose: All UI code — SwiftUI views and AppKit window management
+- Contains: Main view with extensions split by concern, window controller, visual styling, reusable components, popover menus
+- Key files: `NotchCompanionView.swift`, `NotchWindowController.swift`, `NotchVisualStyle.swift`, `SettingsMenuView.swift`
 
-**Oak/Oak/Extensions:**
-- Purpose: Utility extensions on Apple frameworks
-- Contains: NSScreen extensions for multi-display support
-- Key files: `NSScreen+DisplayTarget.swift`
+**`Oak/Oak/Services/`:**
+- Purpose: System integrations and business logic decoupled from UI
+- Contains: Audio engine, settings persistence, progress tracking, notifications, auto-updates
+- Key files: `AudioManager.swift`, `PresetSettingsStore.swift`, `ProgressManager.swift`, `NotificationService.swift`, `SparkleUpdater.swift`
 
-**Oak/Tests/OakTests:**
-- Purpose: Unit tests and integration tests
-- Contains: Smoke tests, user story tests (US001-US006), component tests, long break tests
-- Key files: `SmokeTests.swift`, `US001Tests.swift` through `US006Tests.swift`, `LongBreakTests.swift`, component-specific tests
+**`Oak/Oak/Extensions/`:**
+- Purpose: Platform API extensions for display detection and identification
+- Contains: NSScreen extensions for display target resolution, UUID generation, notch detection
+- Key files: `NSScreen+DisplayTarget.swift`, `NSScreen+UUID.swift`
+
+**`Oak/Oak/Resources/Sounds/`:**
+- Purpose: Bundled ambient audio tracks for focus sessions
+- Contains: 5 `.m4a` files (`ambient_rain.m4a`, `ambient_forest.m4a`, `ambient_cafe.m4a`, `ambient_brown_noise.m4a`, `ambient_lofi.m4a`)
+- Key files: `README.md` (sound file documentation)
+
+**`Oak/Tests/OakTests/`:**
+- Purpose: Unit tests for all layers
+- Contains: 21 test files covering ViewModels, Views, Services, and user stories
+- Key files: `US001Tests.swift`–`US006Tests.swift` (user story tests), `NotchWindowControllerTests.swift` (split across 3 files)
 
 ## Key File Locations
 
 **Entry Points:**
-- `Oak/Oak/OakApp.swift`: Application entry point (@main), app delegate
-- `Oak/Oak/Views/NotchWindowController.swift`: Window management for notch UI
+- `Oak/Oak/OakApp.swift`: `@main` app struct + `AppDelegate` — creates window controller, initializes services
+- `Oak/project.yml`: XcodeGen project definition — targets, dependencies, build settings
 
 **Configuration:**
-- `Oak/project.yml`: XcodeGen project configuration (targets, sources, settings)
-- `Oak/.swiftlint.yml`: SwiftLint rules and opt-in rules
-- `Oak/.swiftformat`: SwiftFormat formatting configuration
-- `Oak/justfile`: Just command runner for build/test/lint commands
+- `Oak/Oak/Info.plist`: App metadata, `LSUIElement` (accessory app), Sparkle feed URL, EdDSA public key
+- `Oak/Oak/Oak.entitlements`: App sandbox permissions
+- `.swiftlint.yml`: SwiftLint rules and opt-in rules
+- `.swiftformat`: SwiftFormat configuration
+- `justfile`: Task runner with build, test, lint, format commands
 
 **Core Logic:**
-- `Oak/Oak/ViewModels/FocusSessionViewModel.swift`: Focus session state machine, timer, session lifecycle
-- `Oak/Oak/Services/PresetSettingsStore.swift`: Settings persistence, validation, defaults
-- `Oak/Oak/Services/AudioManager.swift`: Audio playback (bundled files and generated)
-- `Oak/Oak/Services/ProgressManager.swift`: Daily progress tracking, streak calculation, persistence
-- `Oak/Oak/Services/NotificationService.swift`: System notifications, authorization management
+- `Oak/Oak/ViewModels/FocusSessionViewModel.swift`: Session state machine, timer, work/break cycling, long break logic
+- `Oak/Oak/Services/PresetSettingsStore.swift`: All user preferences with UserDefaults persistence
+- `Oak/Oak/Services/AudioManager.swift`: Audio playback — bundled files + procedural generation
+- `Oak/Oak/Services/ProgressManager.swift`: Session history, daily stats, streak calculation
+- `Oak/Oak/Models/SessionModels.swift`: `SessionState` enum, `Preset` enum, `DisplayTarget` enum
 
 **Testing:**
-- `Oak/Tests/OakTests/SmokeTests.swift`: Basic smoke tests
-- `Oak/Tests/OakTests/US001Tests.swift` through `US006Tests.swift`: User story tests
-- `Oak/Tests/OakTests/LongBreakTests.swift`: Long break cycle tests
-- `Oak/Tests/OakTests/ComponentNameTests.swift`: Component-specific tests
+- `Oak/Tests/OakTests/US001Tests.swift`–`US006Tests.swift`: User story acceptance tests
+- `Oak/Tests/OakTests/NotchWindowControllerTests.swift`: Window controller tests (+ 3 extension files)
+- `Oak/Tests/OakTests/SparkleUpdaterTests.swift`: Auto-update tests
+- `Oak/Tests/OakTests/CountdownDisplayModeTests.swift`: Display mode tests
+- `Oak/Tests/OakTests/LongBreakTests.swift`: Long break session logic
 
 ## Naming Conventions
 
 **Files:**
-- `{Feature}View.swift`: SwiftUI views (e.g., `SettingsMenuView.swift`, `AudioMenuView.swift`)
-- `{Feature}ViewModel.swift`: ViewModels (e.g., `FocusSessionViewModel.swift`)
-- `{Feature}Manager.swift`: Services managing external resources (e.g., `AudioManager.swift`, `ProgressManager.swift`)
-- `{Feature}Store.swift`: Persistence stores (e.g., `PresetSettingsStore.swift`)
-- `{Feature}Service.swift`: Business logic services (e.g., `NotificationService.swift`)
-- `{ModelName}Models.swift`: Grouped model types (e.g., `SessionModels.swift`)
-- `{Type}+{Feature}.swift`: Extensions on system types (e.g., `NSScreen+DisplayTarget.swift`)
+- Views: PascalCase with `View` suffix — `NotchCompanionView.swift`, `SettingsMenuView.swift`
+- View extensions: `ViewName+Feature.swift` — `NotchCompanionView+Controls.swift`, `NotchCompanionView+InsideNotch.swift`
+- ViewModels: `FeatureViewModel.swift` — `FocusSessionViewModel.swift`
+- Services: PascalCase describing responsibility — `AudioManager.swift`, `PresetSettingsStore.swift`
+- Models: PascalCase describing data — `SessionModels.swift`, `AudioTrack.swift`
+- Extensions: `Type+Feature.swift` — `NSScreen+DisplayTarget.swift`, `NSScreen+UUID.swift`
+- Tests: `FeatureTests.swift` or `USxxxTests.swift` — `SmokeTests.swift`, `US001Tests.swift`
+- Bundled audio: `ambient_trackname.m4a` — `ambient_rain.m4a`, `ambient_lofi.m4a`
 
 **Directories:**
-- `Models/`: Data types, enums, structs
-- `Views/`: SwiftUI views, window management
-- `ViewModels/`: MVVM view models
-- `Services/`: Business logic, persistence, external integrations
-- `Extensions/`: Type extensions
-- `Resources/`: Assets, sounds, configuration
+- PascalCase for source directories: `Models/`, `Views/`, `ViewModels/`, `Services/`, `Extensions/`, `Resources/`
+- lowercase for project-level directories: `doc/`, `docs/`, `tasks/`, `scripts/`, `assets/`
 
-**Types:**
-- Enums: PascalCase with lowerCamelCase cases (e.g., `SessionState`, `DisplayTarget.mainDisplay`)
-- Classes: PascalCase (e.g., `FocusSessionViewModel`, `NotchWindowController`)
-- Structs: PascalCase (e.g., `ProgressData`, `DailyStats`)
-- Protocols: PascalCase ending in type/category (e.g., `SessionCompletionNotifying`, `UpdateChecking`)
-- Functions: lowerCamelCase (e.g., `startSession()`, `setWorkMinutes()`)
-- Constants: lowerCamelCase for instance, PascalCase for static
-
-**Tests:**
-- `SmokeTests.swift`: Basic smoke tests
-- `US{N}Tests.swift`: User story tests (e.g., `US001Tests.swift`, `US004Tests.swift`)
-- `{Component}Tests.swift`: Component-specific tests (e.g., `NotificationTests.swift`, `LongBreakTests.swift`)
+**Code:**
+- Types: PascalCase — `FocusSessionViewModel`, `NotchWindowController`
+- Properties/methods: camelCase — `sessionState`, `startSession()`
+- Booleans: `is`/`has`/`can`/`should` prefix — `isWorkSession`, `canStart`, `hasNotch`
+- Singletons: `.shared` static property — `PresetSettingsStore.shared`, `NotificationService.shared`
+- UserDefaults keys: dot-delimited strings — `"preset.short.workMinutes"`, `"session.roundsBeforeLongBreak"`
 
 ## Where to Add New Code
 
 **New Feature:**
-- Primary code: `Oak/Oak/ViewModels/` (if state management needed) or `Oak/Oak/Services/` (if pure business logic)
-- Tests: `Oak/Tests/OakTests/{Feature}Tests.swift` or `Oak/Tests/OakTests/US{N}Tests.swift` (user story)
-
-**New UI View:**
-- Implementation: `Oak/Oak/Views/{Feature}View.swift`
-- View model: `Oak/Oak/ViewModels/{Feature}ViewModel.swift` (if needed)
-- Tests: `Oak/Tests/OakTests/{Feature}ViewTests.swift`
+- Primary code: `Oak/Oak/ViewModels/` (logic), `Oak/Oak/Views/` (UI)
+- Tests: `Oak/Tests/OakTests/`
 
 **New Service:**
-- Implementation: `Oak/Oak/Services/{Feature}Service.swift` or `{Feature}Manager.swift` or `{Feature}Store.swift`
-- Protocol: Define protocol with `{Feature}Service` suffix for testability
-- Tests: `Oak/Tests/OakTests/{Feature}Tests.swift`
+- Implementation: `Oak/Oak/Services/`
+- Protocol: Define in the service file or `Oak/Oak/Models/` if shared
 
-**New Model/Enum:**
-- Implementation: `Oak/Oak/Models/{Feature}Models.swift` (grouped) or `{ModelName}.swift` (standalone)
+**New Model:**
+- Implementation: `Oak/Oak/Models/`
 
-**Utilities:**
-- Shared helpers: `Oak/Oak/Extensions/` (extending system types) or `Oak/Oak/Services/` (standalone utilities)
+**New View Component:**
+- Implementation: `Oak/Oak/Views/`
+- Use extensions (`+Feature.swift`) to split large views by concern
+
+**New Extension:**
+- Implementation: `Oak/Oak/Extensions/`
+- Follow `Type+Feature.swift` naming
+
+**New Audio Track:**
+- Audio file: `Oak/Oak/Resources/Sounds/` (as `.m4a`)
+- Enum case: `Oak/Oak/Models/AudioTrack.swift`
+- Generator: `Oak/Oak/Services/AudioManager.swift` (add noise generator method)
 
 ## Special Directories
 
-**Oak/Oak/Resources:**
-- Purpose: Assets, sounds, configuration files
+**`Oak/Oak.xcodeproj/`:**
+- Purpose: Xcode project files generated by XcodeGen
+- Generated: Yes (from `Oak/project.yml`)
+- Committed: Yes
+
+**`.planning/`:**
+- Purpose: Architecture analysis and planning documents
+- Generated: No (manual)
+- Committed: Yes
+
+**`doc/adr/`:**
+- Purpose: Architecture Decision Records (numbered: `0001-*.md`, `0002-*.md`)
+- Generated: No (manual)
+- Committed: Yes
+
+**`.github/workflows/`:**
+- Purpose: CI/CD pipeline definitions (GitHub Actions)
 - Generated: No
 - Committed: Yes
-- Contains: Ambient audio files (optional - falls back to generated audio), AppIcon assets
 
-**Oak/Oak.xcodeproj:**
-- Purpose: Xcode project file (generated by XcodeGen)
-- Generated: Yes
-- Committed: Yes
-- Regenerate with: `cd Oak && xcodegen generate` or `just open`
-
-**Oak/.build:**
-- Purpose: Build artifacts, intermediate build files
-- Generated: Yes
-- Committed: No
-- In .gitignore: Yes
-
-**Oak/.github/workflows:**
-- Purpose: CI/CD workflows
+**`Casks/`:**
+- Purpose: Homebrew Cask formula for distribution
 - Generated: No
 - Committed: Yes
-- Contains: GitHub Actions workflows
+
+**`scripts/`:**
+- Purpose: Build automation, release scripts, sound validation
+- Generated: No
+- Committed: Yes
 
 ---
-
-*Structure analysis: 2026-02-13*
+*Structure analysis: 2026-02-15*

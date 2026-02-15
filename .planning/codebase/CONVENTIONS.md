@@ -1,213 +1,141 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-02-13
+**Analysis Date:** 2026-02-15
 
 ## Naming Patterns
-
 **Files:**
-- PascalCase for types matching the type name (`FocusSessionViewModel.swift` → `FocusSessionViewModel`)
-- `Tests` suffix for test files matching source structure (`OakTests/`)
-- Descriptive names that reflect contents (`PresetSettingsStore.swift`, `AudioManager.swift`)
+- Types use PascalCase matching the primary type declared: `FocusSessionViewModel.swift`, `SessionModels.swift`, `AudioManager.swift`
+- Extensions use `TypeName+Feature.swift` pattern: `NSScreen+DisplayTarget.swift`, `NSScreen+UUID.swift`
+- Views split via extensions: `NotchCompanionView+Controls.swift`, `NotchCompanionView+InsideNotch.swift`, `NotchCompanionView+StandardViews.swift`
+- Style/layout helpers: `NotchVisualStyle.swift`, `NotchVisualStyle+Factory.swift`
 
 **Functions:**
-- camelCase for all functions (`startSession()`, `setWorkMinutes()`)
-- Verb-first names for actions (`play()`, `stop()`, `requestAuthorization()`)
-- Computed properties use camelCase (`displayTime`, `canStart`, `isRunning`)
-- Bool properties prefixed with `is`, `has`, `should`, `can` (`isRunning`, `canPause`, `hasSoundPermission`)
+- camelCase: `startSession()`, `pauseSession()`, `completeSessionForTesting()`
+- Setters prefixed with `set`: `setWorkMinutes(_:for:)`, `setAlwaysOnTop(_:)`, `setVolume(_:)`
+- Boolean-returning computed properties: `canStart`, `canPause`, `canResume`, `isRunning`, `isPaused`
+- Private helpers: `startTimer()`, `tick()`, `completeSession()`, `fillOutputBuffer(_:sample:)`
 
 **Variables:**
-- camelCase for local variables and parameters (`remainingSeconds`, `isWorkSession`)
-- Descriptive names over abbreviations (`preferredDisplayID` not `dispID`)
-- `_` prefix for @StateObject wrappers in views when external binding is needed
+- camelCase for instances: `viewModel`, `presetSettings`, `audioManager`, `windowController`
+- Booleans prefixed with `is/has/should/can`: `isWorkSession`, `isLongBreak`, `isPlaying`, `hasNotch`, `canStart`, `showBelowNotch`
+- Published properties use `private(set)` for read-only external access: `@Published private(set) var completedRounds: Int`
 
 **Types:**
-- PascalCase for all types (`SessionState`, `AudioTrack`, `Preset`)
-- Enums use PascalCase with lowerCamelCase cases (`DisplayTarget.mainDisplay`, `SessionState.idle`)
-- Protocols use -ing suffix for capabilities (`SessionCompletionNotifying`, `UpdateChecking`)
-- `internal` access control by default, explicit `public` for exposed APIs
+- PascalCase for all types: `FocusSessionViewModel`, `PresetSettingsStore`, `NotchWindowController`
+- Enums use PascalCase with lowerCamelCase cases: `SessionState.idle`, `Preset.short`, `DisplayTarget.mainDisplay`
+- Enums with associated values for state machines: `SessionState.running(remainingSeconds:isWorkSession:)`
+- Protocols use `-ing`/`-able` suffixes: `SessionCompletionNotifying`, `SessionCompletionSoundPlaying`
+- Static constants use PascalCase: `PresetSettingsStore.minWorkMinutes`, `PresetSettingsStore.maxWorkMinutes`
 
 ## Code Style
-
 **Formatting:**
-- **Tool:** SwiftFormat + SwiftLint
-- **Indentation:** 4 spaces
-- **Line length:** 120 chars (warning), 150 chars (error)
-- **Trailing newline:** Required
-- **Single-line statements:** Single `if`/`guard` without braces allowed for early returns
+- Tool: SwiftFormat (config: `.swiftformat`)
+- Indent: 4 spaces
+- Max line width: 120 characters
+- Wrap arguments: `before-first`
+- Wrap parameters: `before-first`
+- Wrap collections: `before-first`
+- Closing paren: `balanced`
+- Else position: `same-line`
+- Line breaks: `lf`
+- Semicolons: `never`
+- Self: `remove` (redundant self removed)
+- Strip unused args: `always`
+- Trailing commas: enabled
+- Import grouping: `testable-bottom`
+- Header: `strip` (no file headers)
 
 **Linting:**
-- **Tool:** SwiftLint
-- **Key rules:**
-  - `explicit_init` - Require explicit `self.init()` calls
-  - `explicit_top_level_acl` - Require explicit access control at top level
-  - `trailing_closure` - Prefer trailing closure syntax
-  - `empty_count` - Use `.isEmpty` instead of `.count == 0`
-  - `first_where` - Use `.first(where:)` instead of `.filter{}.first`
-  - `toggle_bool` - Use `toggle()` for bools
-  - `modifier_order` - Enforce SwiftUI modifier order
-  - `custom: no_print_statements` - Warn against `print()` in production
+- Tool: SwiftLint (config: `.swiftlint.yml`)
+- Line length: warning at 120, error at 150 (ignores comments and URLs)
+- File length: warning at 500, error at 1000
+- Type body length: warning at 300, error at 500
+- Function body length: warning at 50, error at 100
+- Identifier names: min 2 chars, max 50 (warning) / 60 (error); excluded: `id`, `x`, `y`
+- Opt-in rules: `explicit_init`, `explicit_top_level_acl`, `trailing_closure`, `vertical_parameter_alignment_on_call`, `closure_spacing`, `empty_count`, `first_where`, `sorted_first_last`, `modifier_order`, `redundant_type_annotation`, `toggle_bool`, `yoda_condition`
+- Analyzer rules: `explicit_self`, `unused_import`
+- Disabled rules: `todo`, `trailing_whitespace`
+- Custom rule `no_print_statements`: warns on `print()` calls in production code
 
 ## Import Organization
-
 **Order:**
-1. AppKit/Foundation (system frameworks)
-2. Combine/SwiftUI (Apple frameworks)
-3. Third-party (if any)
-4. `@testable import Oak` (test imports last)
+1. Foundation / core frameworks (`Foundation`, `AppKit`, `CoreGraphics`)
+2. Combine
+3. SwiftUI / UI frameworks
+4. Apple frameworks (`AVFoundation`, `UserNotifications`, `os`)
+5. `@testable import Oak` (last, in test files only)
 
-**Examples:**
-```swift
-import AppKit
-import Combine
-import Foundation
-import os
-import SwiftUI
-@testable import Oak
-```
+**Path Aliases:**
+- None used; all imports are direct module imports
 
-**No blank lines** between import groups of same level, one blank line between type declarations.
-
-**Path Aliases:** None used - direct module imports only.
+**Grouping Rules:**
+- No blank lines between imports (enforced by SwiftFormat `--importgrouping testable-bottom`)
+- `@testable` imports always placed last
 
 ## Error Handling
-
 **Patterns:**
-- `Result` type for async operations where failure is expected
-- `try?` for optional failure handling (seen in persistence)
-- `guard let` for early returns on unavailable data
-- Early returns with `guard` statements over nested conditions
-- `XCTSkip` for tests that should not run in CI (notification permission tests)
-
-**UserDefaults persistence:**
-```swift
-guard let data = userDefaults.data(forKey: key),
-      let records = try? JSONDecoder().decode([T].self, from: data) else { return [] }
-```
-
-**Optional error logging:**
-```swift
-if let error {
-    Task { @MainActor in
-        self.logger.error("Failed: \(error.localizedDescription)")
-    }
-}
-```
+- `guard` clauses for early returns: `guard canStart else { return }`, `guard track != .none else { stop(); return }`
+- `guard let` for optional unwrapping: `guard let data = userDefaults.data(forKey: key)` (see `PresetSettingsStore.swift`)
+- `do/catch` for recoverable errors: `do { try engine.start() } catch { logger.error(...) }` (see `AudioManager.swift`)
+- `try?` for optional error suppression in non-critical paths: `try? await Task.sleep(nanoseconds: ...)`
+- `Result` type referenced in guidelines but not widely used in current codebase
+- `XCTSkip` in tests for environment-dependent checks: `throw XCTSkip("No display available for window tests")`
 
 ## Logging
-
-**Framework:** `os.log` (Logger) for production, `print()` acceptable in dev/debug tests
-
+**Framework:** `os.Logger` for production code
 **Patterns:**
-- `Logger(subsystem: "com.productsway.oak.app", category: "ClassName")`
-- Use `privacy: .public` for non-sensitive log data
-- Error logging uses `logger.error()`, debug uses `logger.debug()`
-- Custom SwiftLint rule warns against `print()` in production code
-
-**Example:**
-```swift
-private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
-logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")
-```
+- Loggers declared as private constants with subsystem and category: `private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")` (see `Oak/Oak/Services/AudioManager.swift`)
+- Privacy-aware logging with `privacy: .public` for non-sensitive data: `logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")`
+- Log levels: `.error` for failures, `.debug` for informational, `.info` for expected non-critical states
+- `print()` usage is warned by custom SwiftLint rule `no_print_statements`
+- `print()` acceptable only in dev/debug contexts
 
 ## Comments
-
 **When to Comment:**
-- `///` for public API documentation
-- `// MARK: -` for code organization (section dividers)
-- Inline comments for non-obvious logic (noise generation algorithms)
-- Property comments for shared constants (`NotchLayout.swift`)
+- `///` doc comments on protocols and their methods: `/// Tests for the legacy manual UpdateChecker service` (see `Oak/Tests/OakTests/UpdateCheckerTests.swift`)
+- `// MARK: -` sections to organize test groups and extension blocks: `// MARK: - Rate Limit Tests`, `// MARK: - Initialization Tests`
+- Inline comments for non-obvious logic or constraints: `// Let AVAudioEngine negotiate the best internal format` (see `Oak/Oak/Services/AudioManager.swift`)
+- No excessive commenting; code is self-documenting by convention
 
-**Documentation:**
-- Triple-slash `///` for public types and properties
-- Explanation of "why" not "what"
-- Parameter descriptions where intent isn't obvious
-
-**Example:**
-```swift
-/// Shared layout constants for notch companion UI.
-/// These values define window dimensions and ensure consistency
-/// between NotchCompanionView and NotchWindowController.
-internal enum NotchLayout { ... }
-```
+**JSDoc/TSDoc:**
+- N/A (Swift project); `///` used sparingly for public/internal protocol APIs
 
 ## Function Design
-
-**Size:**
-- Target under 50 lines (warning at 50, error at 100 per SwiftLint)
-- Extract complex view modifiers to `private var someView: some View`
-- Extract logic to private helper methods
-
-**Parameters:**
-- Prefer parameter labels that read naturally at call site
-- Default values for optional parameters (`preset: Preset? = nil`)
-- Closure parameters use trailing closure syntax
-
-**Return Values:**
-- Computed properties for derived state
-- `-> Bool` for validation/predicates
-- `-> some View` for SwiftUI view builders
-- `async throws` for operations that can fail
+**Size:** Warning at 50 lines, error at 100 (enforced by SwiftLint `function_body_length`)
+**Parameters:** Wrap before-first when exceeding line width; labeled parameters with Swift API design conventions: `func setWorkMinutes(_ minutes: Int, for preset: Preset)`
+**Return Values:** Computed properties preferred for derived state (`displayTime`, `progressPercentage`, `canStart`); explicit `-> Bool` / `-> String` on methods
 
 ## Module Design
+**Exports:** Explicit `internal` access control on all top-level declarations (enforced by SwiftLint `explicit_top_level_acl`)
+**Barrel Files:** Not used; each file declares one primary type
+**Singletons:** `static let shared` pattern for services: `PresetSettingsStore.shared`, `NotificationService.shared`, `SparkleUpdater.shared`
+**Dependency Injection:** Constructor injection with defaults: `init(presetSettings: PresetSettingsStore, progressManager: ProgressManager? = nil, ...)`
+**Protocols for testability:** `SessionCompletionNotifying`, `SessionCompletionSoundPlaying` enable mock injection in tests
 
-**Exports:** All types use `internal` by default, `public` where needed
-
-**Barrel Files:** Not used - direct imports
-
-**Access Control:**
-- Explicit `internal` on top-level declarations (SwiftLint rule)
-- `private` for implementation details
-- `private(set)` for read-only published properties
-- `fileprivate` avoided, prefer `private`
-
-**Shared Instances:**
-- Singleton pattern with `static let shared = ClassName()` for services
-- Shared instances: `PresetSettingsStore.shared`, `NotificationService.shared`
-
-**Dependency Injection:**
-- Constructor injection for testability
-```swift
-init(presetSettings: PresetSettingsStore,
-     progressManager: ProgressManager? = nil,
-     notificationService: (any SessionCompletionNotifying)? = nil)
-```
-
-## SwiftUI Conventions
-
-**State Management:**
-- `@MainActor` on all ViewModels and UI-related classes
-- `@Published` for observable properties
-- `@StateObject` for view-owned ViewModel instances
-- `@ObservedObject` for passed-in dependencies
-- `private(set)` for externally read-only published properties
-
-**View Organization:**
-- Extract reusable views as `private var someView: some View`
-- Use `#available` checks for version-specific APIs
-- Defer view updates to next run loop to prevent "Publishing changes from within view updates"
-- `onChange` handlers wrap state updates in `DispatchQueue.main.async`
-
-**Protocols for Testing:**
-- Protocol-based dependencies for mockable services
-- `any SessionCompletionNotifying` protocol for notification abstraction
-- `any SessionCompletionSoundPlaying` for sound abstraction
+## Architecture Patterns
+**MVVM:** ViewModels are `@MainActor ObservableObject` classes in `Oak/Oak/ViewModels/`; Views in `Oak/Oak/Views/`; Models in `Oak/Oak/Models/`
+**State Machine:** `SessionState` enum with `.idle`, `.running`, `.paused`, `.completed` and associated values (see `Oak/Oak/Models/SessionModels.swift`)
+**View Decomposition:** Large views split into extensions across files: `NotchCompanionView+Controls.swift`, `NotchCompanionView+InsideNotch.swift`
+**View Update Safety:** `DispatchQueue.main.async` or `DispatchQueue.main.asyncAfter` used to avoid publishing changes from within view updates (see `Oak/Oak/Views/NotchCompanionView.swift`)
 
 ## Memory & Concurrency
+- `[weak self]` in all escaping closures: `Timer.scheduledTimer { [weak self] _ in ... }` (see `Oak/Oak/ViewModels/FocusSessionViewModel.swift`)
+- `Task { @MainActor in ... }` for timer callbacks and async work
+- Timers always invalidated in `cleanup()` and `deinit`
+- `deinit` captures local references to avoid accessing `self`: `let engine = audioEngine; engine?.stop()` (see `Oak/Oak/Services/AudioManager.swift`)
+- `AnyCancellable` stored and cancelled in `deinit`: `presetSettingsCancellable?.cancel()` (see `Oak/Oak/ViewModels/FocusSessionViewModel.swift`)
 
-**Patterns:**
-- `[weak self]` in escaping closures to prevent retain cycles
-- Timer callbacks wrapped in `Task { @MainActor in self?.tick() }`
-- Always `invalidate()` timers in `cleanup()` or `deinit`
-- `@MainActor` for UI-related classes
-- `deinit` cleanup with `Task { @MainActor in ... }` for async cleanup
+## Persistence
+- `UserDefaults` with namespaced string keys via private enum: `Keys.shortWorkMinutes = "preset.short.workMinutes"` (see `Oak/Oak/Services/PresetSettingsStore.swift`)
+- `userDefaults.register(defaults:)` for default values
+- Validation on read with clamping: `validatedWorkMinutes()`, `validatedBreakMinutes()`
+- Guard against redundant writes: `guard alwaysOnTop != value else { return }`
 
-**Example:**
-```swift
-timer?.invalidate()
-timer = nil
-presetSettingsCancellable?.cancel()
-```
+## Project Configuration
+- XcodeGen via `Oak/project.yml` for project generation
+- `justfile` as task runner (see root `justfile`)
+- SPM for dependencies (Sparkle 2.6.4+)
+- Deployment target: macOS 13.0
 
 ---
-
-*Convention analysis: 2026-02-13*
+*Convention analysis: 2026-02-15*

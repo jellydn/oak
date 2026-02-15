@@ -32,6 +32,9 @@ internal struct SettingsMenuView: View {
                 }
                 countdownDisplayModePicker
                 alwaysOnTopToggle
+                if hasNotchedScreen {
+                    showBelowNotchToggle
+                }
             }
 
             section(title: "Session Presets") {
@@ -214,6 +217,21 @@ internal struct SettingsMenuView: View {
             )
         )
         .font(.caption)
+    }
+
+    private var showBelowNotchToggle: some View {
+        Toggle(
+            "Show below notch",
+            isOn: Binding(
+                get: { presetSettings.showBelowNotch },
+                set: { presetSettings.setShowBelowNotch($0) }
+            )
+        )
+        .font(.caption)
+    }
+
+    private var hasNotchedScreen: Bool {
+        NSScreen.screens.contains { $0.hasNotch }
     }
 
     private var notificationSettings: some View {
