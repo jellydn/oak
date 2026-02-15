@@ -25,7 +25,7 @@
 ## 🎬 Demo
 
 <div align="center">
-  <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak Demo - Focus session in action" width="600"/>
+  <img src="https://gyazo.com/95dc23363c754bd58a902318726fd911.gif" alt="Oak Demo - Focus session in action" width="600"/>
 </div>
 
 ## Installation Requirements
