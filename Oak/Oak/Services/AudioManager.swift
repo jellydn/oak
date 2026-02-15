@@ -42,9 +42,8 @@ internal class AudioManager: ObservableObject {
     }
 
     func stop() {
+        detachSourceNodes()
         audioEngine?.stop()
-        audioNodes.forEach { $0.removeTap(onBus: 0) }
-        audioNodes.removeAll()
         audioEngine = nil
 
         audioPlayer?.stop()
@@ -52,6 +51,14 @@ internal class AudioManager: ObservableObject {
 
         isPlaying = false
         selectedTrack = .none
+    }
+
+    private func detachSourceNodes() {
+        for node in audioNodes {
+            node.removeTap(onBus: 0)
+            audioEngine?.detach(node)
+        }
+        audioNodes.removeAll()
     }
 
     private func updateAudioEngineVolume() {
@@ -108,10 +115,17 @@ internal class AudioManager: ObservableObject {
     }
 
     private func generateAmbientSound(for track: AudioTrack) {
-        stop()
-        let generator = NoiseGenerator()
+        audioPlayer?.stop()
+        audioPlayer = nil
 
-        let engine = AVAudioEngine()
+        detachSourceNodes()
+
+        let generator = NoiseGenerator()
+        guard let sourceNode = createSourceNode(for: track, generator: generator) else { return }
+
+        let engine = audioEngine ?? AVAudioEngine()
+        let isNewEngine = audioEngine == nil
+
         let mainMixer = engine.mainMixerNode
         mainMixer.outputVolume = Float(volume)
         let outputFormat = engine.outputNode.outputFormat(forBus: 0)
@@ -123,44 +137,35 @@ internal class AudioManager: ObservableObject {
             return
         }
 
-        var sourceNode: AVAudioNode?
-
-        switch track {
-        case .none:
-            return
-
-        case .brownNoise:
-            sourceNode = createBrownNoiseNode(generator: generator)
-
-        case .rain:
-            sourceNode = createRainNode(generator: generator)
-
-        case .forest:
-            sourceNode = createForestNode(generator: generator)
-
-        case .cafe:
-            sourceNode = createCafeNode(generator: generator)
-
-        case .lofi:
-            sourceNode = createLofiNode(generator: generator)
-        }
-
-        if let source = sourceNode {
-            engine.attach(source)
-            // Let AVAudioEngine negotiate the best internal format for the current hardware route.
-            engine.connect(source, to: mainMixer, format: nil)
-            audioNodes.append(source)
-        }
+        engine.attach(sourceNode)
+        engine.connect(sourceNode, to: mainMixer, format: nil)
+        audioNodes.append(sourceNode)
 
         audioEngine = engine
-        engine.prepare()
+
+        if isNewEngine {
+            engine.prepare()
+        }
 
         do {
-            try engine.start()
+            if !engine.isRunning {
+                try engine.start()
+            }
             isPlaying = true
             selectedTrack = track
         } catch {
             logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func createSourceNode(for track: AudioTrack, generator: NoiseGenerator) -> AVAudioSourceNode? {
+        switch track {
+        case .none: return nil
+        case .brownNoise: return createBrownNoiseNode(generator: generator)
+        case .rain: return createRainNode(generator: generator)
+        case .forest: return createForestNode(generator: generator)
+        case .cafe: return createCafeNode(generator: generator)
+        case .lofi: return createLofiNode(generator: generator)
         }
     }
 

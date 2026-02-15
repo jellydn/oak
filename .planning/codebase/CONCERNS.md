@@ -43,12 +43,6 @@ None currently tracked.
 - Cause: Rebuilds entire cache even for minor screen parameter changes (brightness, resolution)
 - Improvement path: Minor concern for typical 1-3 displays; acceptable but could debounce
 
-**Audio engine recreation on every track change:**
-- Problem: `generateAmbientSound()` calls `stop()` (tears down entire audio engine) then builds a new one for each track switch
-- Files: `Oak/Oak/Services/AudioManager.swift:111-166`
-- Cause: No reuse of `AVAudioEngine` instance; full teardown/rebuild cycle
-- Improvement path: Reuse the audio engine and swap only the source node
-
 ## Fragile Areas
 
 **NotchWindowController frame update scheduling:**
@@ -137,6 +131,7 @@ None currently tracked.
 - ~~NoiseGenerator thread safety~~ — Made generator a local variable captured by render closures; marked `@unchecked Sendable`; no shared mutable state (#66)
 - ~~AppDelegate deinit cleanup pattern~~ — Removed fragile `deinit`; `applicationWillTerminate` already handles cleanup (#73)
 - ~~Progress history grows unbounded~~ — Added 90-day retention pruning via `pruneOldRecords()` on each write (#71)
+- ~~Audio engine recreation on every track change~~ — Reuse `AVAudioEngine` across track switches; only swap source node (#72)
 
 ---
 *Concerns audit: 2026-02-15*
