@@ -16,7 +16,7 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
     private var canCheckObservation: NSKeyValueObservation?
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "SparkleUpdater")
 
-    init() {
+    override init() {
         super.init()
 
         guard Self.hasValidPublicEDKey else {

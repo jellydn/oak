@@ -45,6 +45,21 @@ internal class NotchWindowController: NSWindowController {
         )
         super.init(window: window)
 
+        setupWindowContent(in: window)
+        setupBindings()
+
+        setExpanded(false, forceReposition: true, targetOverride: presetSettings.displayTarget)
+        window.orderFrontRegardless()
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(screenConfigurationChanged),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+    }
+
+    private func setupWindowContent(in window: NotchWindow) {
         let contentView = NotchCompanionView(
             viewModel: viewModel,
             notificationService: notificationService,
@@ -54,27 +69,19 @@ internal class NotchWindowController: NSWindowController {
         }
         let hostingView = NSHostingView(rootView: contentView)
         if #available(macOS 13.0, *) {
-            // Notch width/position is controlled by the window controller, not by NSHostingView sizing.
             hostingView.sizingOptions = []
         }
         if #available(macOS 13.3, *) {
-            // Borderless notch UI should not react to safe-area changes from AppKit window layout.
             hostingView.safeAreaRegions = []
         }
         window.contentView = hostingView
+
+        let initialWidths = Self.initialWidths(for: presetSettings)
         window.contentMinSize = NSSize(width: initialWidths.collapsed, height: NotchLayout.height)
         window.contentMaxSize = NSSize(width: initialWidths.expanded, height: NotchLayout.height)
-        setExpanded(false, forceReposition: true, targetOverride: presetSettings.displayTarget)
+    }
 
-        window.orderFrontRegardless()
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(screenConfigurationChanged),
-            name: NSApplication.didChangeScreenParametersNotification,
-            object: nil
-        )
-
+    private func setupBindings() {
         displayTargetCancellable = presetSettings.$displayTarget
             .sink { [weak self] nextTarget in
                 guard let self else { return }
@@ -83,7 +90,7 @@ internal class NotchWindowController: NSWindowController {
 
         alwaysOnTopCancellable = presetSettings.$alwaysOnTop
             .sink { [weak self] isAlwaysOnTop in
-                guard let self, let window = self.window as? NotchWindow else { return }
+                guard let self, let window = window as? NotchWindow else { return }
                 window.level = isAlwaysOnTop ? .statusBar : .floating
                 requestFrameUpdate(for: lastExpandedState, forceReposition: true)
             }

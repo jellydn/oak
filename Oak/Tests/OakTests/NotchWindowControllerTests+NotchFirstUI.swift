@@ -18,7 +18,11 @@ internal extension NotchWindowControllerTests {
         notchedPresetSettings.setDisplayTarget(.notchedDisplay, screenID: notchedScreenID)
         notchedPresetSettings.setAlwaysOnTop(false)
 
-        let notchedController = NotchWindowController(presetSettings: notchedPresetSettings)
+        let notchedController = NotchWindowController(
+            presetSettings: notchedPresetSettings,
+            notificationService: NotificationService(),
+            sparkleUpdater: SparkleUpdater()
+        )
         defer { notchedController.cleanup() }
 
         let window = notchedController.window as? NotchWindow
