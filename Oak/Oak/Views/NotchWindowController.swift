@@ -27,9 +27,10 @@ internal class NotchWindowController: NSWindowController {
         let settings = presetSettings ?? PresetSettingsStore.shared
         self.presetSettings = settings
         viewModel = FocusSessionViewModel(presetSettings: settings)
+        let initialWidths = Self.initialWidths(for: settings)
 
         let window = NotchWindow(
-            width: NotchLayout.collapsedWidth,
+            width: initialWidths.collapsed,
             height: NotchLayout.height,
             displayTarget: settings.displayTarget,
             preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget),
@@ -51,8 +52,8 @@ internal class NotchWindowController: NSWindowController {
             hostingView.safeAreaRegions = []
         }
         window.contentView = hostingView
-        window.contentMinSize = NSSize(width: NotchLayout.collapsedWidth, height: NotchLayout.height)
-        window.contentMaxSize = NSSize(width: NotchLayout.expandedWidth, height: NotchLayout.height)
+        window.contentMinSize = NSSize(width: initialWidths.collapsed, height: NotchLayout.height)
+        window.contentMaxSize = NSSize(width: initialWidths.expanded, height: NotchLayout.height)
         setExpanded(false, forceReposition: true, targetOverride: settings.displayTarget)
 
         window.orderFrontRegardless()
@@ -159,15 +160,19 @@ internal class NotchWindowController: NSWindowController {
         guard !isApplyingFrameChange else { return }
         guard forceReposition || lastExpandedState != expanded else { return }
 
-        let targetWidth = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         let activeTarget = targetOverride ?? presetSettings.displayTarget
         let preferredDisplayID = presetSettings.preferredDisplayID(for: activeTarget)
         let resolvedScreen = NSScreen.screen(
             for: activeTarget,
             preferredDisplayID: preferredDisplayID
         )
+        let widths = Self.widths(for: resolvedScreen, showBelowNotch: presetSettings.showBelowNotch)
+        window.contentMinSize = NSSize(width: widths.collapsed, height: NotchLayout.height)
+        window.contentMaxSize = NSSize(width: widths.expanded, height: NotchLayout.height)
+
         let yPosition = notchYPosition(for: resolvedScreen, alwaysOnTop: presetSettings.alwaysOnTop)
         let screenFrame = resolvedScreen?.frame ?? .zero
+        let targetWidth = expanded ? widths.expanded : widths.collapsed
         let xPosition = screenFrame.midX - (targetWidth / 2)
         let frame = NSRect(x: xPosition, y: yPosition, width: targetWidth, height: NotchLayout.height)
 
@@ -200,6 +205,25 @@ internal class NotchWindowController: NSWindowController {
             alwaysOnTop: alwaysOnTop,
             showBelowNotch: presetSettings.showBelowNotch
         )
+    }
+
+    private static func widths(for screen: NSScreen?, showBelowNotch: Bool) -> (collapsed: CGFloat, expanded: CGFloat) {
+        let isInsideNotch = screen?.hasNotch == true && !showBelowNotch
+        if isInsideNotch {
+            return (
+                collapsed: NotchLayout.insideNotchCollapsedWidth,
+                expanded: NotchLayout.insideNotchExpandedWidth
+            )
+        }
+        return (collapsed: NotchLayout.collapsedWidth, expanded: NotchLayout.expandedWidth)
+    }
+
+    private static func initialWidths(for settings: PresetSettingsStore) -> (collapsed: CGFloat, expanded: CGFloat) {
+        let initialScreen = NSScreen.screen(
+            for: settings.displayTarget,
+            preferredDisplayID: settings.preferredDisplayID(for: settings.displayTarget)
+        )
+        return widths(for: initialScreen, showBelowNotch: settings.showBelowNotch)
     }
 }
 
