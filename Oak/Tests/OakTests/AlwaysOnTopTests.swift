@@ -111,11 +111,11 @@ internal final class AlwaysOnTopTests: XCTestCase {
                 expectation.fulfill()
             }
 
-        presetSettings.setAlwaysOnTop(true)
+        presetSettings.setAlwaysOnTop(false)
 
         await fulfillment(of: [expectation], timeout: 1.0)
 
-        XCTAssertEqual(receivedValue, true, "Published property should emit new value")
+        XCTAssertEqual(receivedValue, false, "Published property should emit new value")
         cancellable.cancel()
     }
 }
