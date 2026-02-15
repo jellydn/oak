@@ -6,9 +6,9 @@ import XCTest
 internal final class NSScreenNotchTests: XCTestCase {
     // MARK: - Display UUID Tests
 
-    func testDisplayUUIDIsNotNil() {
+    func testDisplayUUIDIsNotNil() throws {
         guard let mainScreen = NSScreen.main else {
-            XCTSkip("No main screen available for testing")
+            throw XCTSkip("No main screen available for testing")
         }
 
         let uuid = mainScreen.displayUUID
@@ -17,9 +17,9 @@ internal final class NSScreenNotchTests: XCTestCase {
         XCTAssertFalse(uuid?.isEmpty ?? true, "Display UUID should not be empty")
     }
 
-    func testDisplayUUIDIsPersistent() {
+    func testDisplayUUIDIsPersistent() throws {
         guard let mainScreen = NSScreen.main else {
-            XCTSkip("No main screen available for testing")
+            throw XCTSkip("No main screen available for testing")
         }
 
         let uuid1 = mainScreen.displayUUID
@@ -28,9 +28,9 @@ internal final class NSScreenNotchTests: XCTestCase {
         XCTAssertEqual(uuid1, uuid2, "Display UUID should be consistent across multiple calls")
     }
 
-    func testScreenLookupByUUID() {
+    func testScreenLookupByUUID() throws {
         guard let mainScreen = NSScreen.main, let uuid = mainScreen.displayUUID else {
-            XCTSkip("No main screen or UUID available for testing")
+            throw XCTSkip("No main screen or UUID available for testing")
         }
 
         let foundScreen = NSScreen.screen(withUUID: uuid)
@@ -90,9 +90,9 @@ internal final class NSScreenNotchTests: XCTestCase {
 
     // MARK: - Notch Detection Tests
 
-    func testHasNotchProperty() {
+    func testHasNotchProperty() throws {
         guard let mainScreen = NSScreen.main else {
-            XCTSkip("No main screen available for testing")
+            throw XCTSkip("No main screen available for testing")
         }
 
         let hasNotch = mainScreen.hasNotch

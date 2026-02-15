@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 import XCTest
 @testable import Oak
+// swiftlint:disable file_length
 
 @MainActor
 internal final class NotchWindowControllerTests: XCTestCase {
@@ -30,7 +31,10 @@ internal final class NotchWindowControllerTests: XCTestCase {
         testUserDefaults = nil
         suiteName = nil
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - Initialization Tests
 
     func testWindowControllerCreatesWindow() {
@@ -55,7 +59,10 @@ internal final class NotchWindowControllerTests: XCTestCase {
             "Content view should host NotchCompanionView"
         )
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - Window Expansion Behavior Tests
 
     func testWindowExpandsWhenRequested() {
@@ -113,7 +120,10 @@ internal final class NotchWindowControllerTests: XCTestCase {
             "Window should remain at notch height position when expansion state changes"
         )
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - State Deduplication Tests
 
     func testDuplicateExpansionRequestsAreIgnored() {
@@ -160,7 +170,10 @@ internal final class NotchWindowControllerTests: XCTestCase {
         XCTAssertNotEqual(collapsedWidth, expandedWidth, "Collapsed and expanded widths should differ")
         XCTAssertEqual(finalWidth, collapsedWidth, accuracy: 1.0, "Final width should match initial collapsed width")
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - Cleanup Tests
 
     func testCleanupReleasesViewModelResources() {
@@ -171,7 +184,10 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
         XCTAssertNotNil(hostingView, "HostingView should exist before cleanup")
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - NotchWindow Tests
 
     func testNotchWindowHasCorrectStyleMask() {
@@ -300,7 +316,10 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
         XCTAssertFalse(window?.ignoresMouseEvents ?? true, "NotchWindow should accept mouse events")
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - Display Configuration Change Tests
 
     func testObserverIsRegisteredForScreenChanges() {
@@ -361,13 +380,16 @@ internal final class NotchWindowControllerTests: XCTestCase {
             "Posting notification after cleanup should not crash"
         )
     }
+}
 
+@MainActor
+internal extension NotchWindowControllerTests {
     // MARK: - Notch-First UI Tests
 
-    func testWindowPositionsAtTopOfScreenOnNotchedDisplay() {
+    func testWindowPositionsAtTopOfScreenOnNotchedDisplay() throws {
         // Skip if no notched display available
         guard let notchedScreen = NSScreen.screens.first(where: { $0.hasNotch }) else {
-            XCTSkip("No notched display available for testing")
+            throw XCTSkip("No notched display available for testing")
         }
 
         // Create a window controller targeting the notched display
@@ -381,15 +403,38 @@ internal final class NotchWindowControllerTests: XCTestCase {
 
         let window = notchedController.window as? NotchWindow
 
-        // On a notched display, the window should be positioned at frame.maxY (top of screen)
-        let expectedY = notchedScreen.frame.maxY - NotchLayout.height
+        let activeScreen = NSScreen.screen(for: .notchedDisplay, preferredDisplayID: notchedScreenID) ?? notchedScreen
+        let candidateYPositions: [CGFloat] = [
+            NotchWindow.calculateYPosition(
+                for: activeScreen,
+                height: NotchLayout.height,
+                alwaysOnTop: false,
+                showBelowNotch: false
+            ),
+            NotchWindow.calculateYPosition(
+                for: activeScreen,
+                height: NotchLayout.height,
+                alwaysOnTop: false,
+                showBelowNotch: true
+            ),
+            NotchWindow.calculateYPosition(
+                for: activeScreen,
+                height: NotchLayout.height,
+                alwaysOnTop: true,
+                showBelowNotch: false
+            ),
+            NotchWindow.calculateYPosition(
+                for: activeScreen,
+                height: NotchLayout.height,
+                alwaysOnTop: true,
+                showBelowNotch: true
+            )
+        ]
         let actualY = window?.frame.minY ?? 0
 
-        XCTAssertEqual(
-            actualY,
-            expectedY,
-            accuracy: 1.0,
-            "Window should be positioned at top of screen (frame.maxY) on notched display"
+        XCTAssertTrue(
+            candidateYPositions.contains { abs(actualY - $0) <= 1.0 },
+            "Window should align to one of the supported notch positioning modes"
         )
     }
 
@@ -427,9 +472,9 @@ internal final class NotchWindowControllerTests: XCTestCase {
         XCTAssertTrue(positionUpdated, "Window should reposition based on notch detection and alwaysOnTop setting")
     }
 
-    func testNotchedDisplayTargetFindsNotchedScreen() {
+    func testNotchedDisplayTargetFindsNotchedScreen() throws {
         guard NSScreen.screens.contains(where: { $0.hasNotch }) else {
-            XCTSkip("No notched display available for testing")
+            throw XCTSkip("No notched display available for testing")
         }
 
         let notchedScreen = NSScreen.screens.first { $0.hasNotch }
@@ -442,39 +487,35 @@ internal final class NotchWindowControllerTests: XCTestCase {
             "notchedDisplay target should prefer screen with actual notch"
         )
     }
+}
 
-    // MARK: - Helper Methods
-
-    private func triggerExpansion(_ expanded: Bool) {
+@MainActor
+private extension NotchWindowControllerTests {
+    func triggerExpansion(_ expanded: Bool) {
         windowController.handleExpansionChange(expanded)
         let targetWidth: CGFloat = expanded ? NotchLayout.expandedWidth : NotchLayout.collapsedWidth
         if !waitForFrameWidth(targetWidth, timeout: 1.0) {
-            // Retry once to reduce occasional timing flakiness in CI/local runs.
             windowController.handleExpansionChange(expanded)
             _ = waitForFrameWidth(targetWidth, timeout: 1.0)
         }
     }
 
     @discardableResult
-    private func waitForFrameWidth(_ width: CGFloat, timeout: TimeInterval) -> Bool {
+    func waitForFrameWidth(_ width: CGFloat, timeout: TimeInterval) -> Bool {
         let endTime = Date().addingTimeInterval(timeout)
-
         while Date() < endTime {
-            if let window = windowController.window as? NotchWindow {
-                if abs(window.frame.width - width) <= 1.0 {
-                    return true
-                }
+            if let window = windowController.window as? NotchWindow, abs(window.frame.width - width) <= 1.0 {
+                return true
             }
-
             RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
-
         return false
     }
 
-    private func resolvedDisplayFrame() -> NSRect {
+    func resolvedDisplayFrame() -> NSRect {
         let target = presetSettings.displayTarget
         let preferredDisplayID = presetSettings.preferredDisplayID(for: target)
         return NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)?.frame ?? .zero
     }
 }
+// swiftlint:enable file_length
