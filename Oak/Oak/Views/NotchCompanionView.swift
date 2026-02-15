@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable type_body_length
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
     @StateObject private var viewModel: FocusSessionViewModel
@@ -20,6 +19,7 @@ internal struct NotchCompanionView: View {
     private let controlSize: CGFloat = 20
     private let compactRingSize: CGFloat = 20
     private let expandedRingSize: CGFloat = 26
+
     init(
         viewModel: FocusSessionViewModel,
         onExpansionChanged: @escaping (Bool) -> Void = { _ in }
@@ -140,8 +140,10 @@ internal struct NotchCompanionView: View {
             .frame(width: 340)
         }
     }
+}
 
-    private var compactView: some View {
+private extension NotchCompanionView {
+    var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {
                 Text(presetLabel(for: presetSelection))
@@ -196,7 +198,7 @@ internal struct NotchCompanionView: View {
         }
     }
 
-    private func countdownDisplay(
+    func countdownDisplay(
         mode: CountdownDisplayMode,
         size: CGFloat,
         fontSize: CGFloat,
@@ -235,7 +237,7 @@ internal struct NotchCompanionView: View {
         }
     }
 
-    private var startView: some View {
+    var startView: some View {
         HStack(spacing: 6) {
             presetSelector
             Button(
@@ -255,7 +257,7 @@ internal struct NotchCompanionView: View {
         }
     }
 
-    private var sessionView: some View {
+    var sessionView: some View {
         HStack(spacing: 6) {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
             if displayMode == .circleRing {
@@ -340,8 +342,10 @@ internal struct NotchCompanionView: View {
             .help("Stop and reset")
         }
     }
+}
 
-    private var audioButton: some View {
+private extension NotchCompanionView {
+    var audioButton: some View {
         Button(
             action: {
                 showAudioMenu.toggle()
@@ -361,7 +365,7 @@ internal struct NotchCompanionView: View {
         .buttonStyle(.plain)
     }
 
-    private var progressButton: some View {
+    var progressButton: some View {
         Button(
             action: {
                 showProgressMenu.toggle()
@@ -387,7 +391,7 @@ internal struct NotchCompanionView: View {
         .buttonStyle(.plain)
     }
 
-    private var settingsButton: some View {
+    var settingsButton: some View {
         Button(
             action: {
                 showSettingsMenu.toggle()
@@ -408,7 +412,7 @@ internal struct NotchCompanionView: View {
         .help("Settings")
     }
 
-    private var expandToggleButton: some View {
+    var expandToggleButton: some View {
         Button(
             action: {
                 let shouldExpand = !isExpandedByToggle
@@ -435,7 +439,7 @@ internal struct NotchCompanionView: View {
         .help(isExpanded ? "Collapse" : "Expand")
     }
 
-    private var presetSelector: some View {
+    var presetSelector: some View {
         HStack(spacing: 2) {
             presetChip(.short)
             presetChip(.long)
@@ -447,7 +451,7 @@ internal struct NotchCompanionView: View {
         )
     }
 
-    private func presetChip(_ preset: Preset) -> some View {
+    func presetChip(_ preset: Preset) -> some View {
         let isSelected = presetSelection == preset
         return Button(
             action: {
@@ -467,11 +471,11 @@ internal struct NotchCompanionView: View {
         .buttonStyle(.plain)
     }
 
-    private func presetLabel(for preset: Preset) -> String {
+    func presetLabel(for preset: Preset) -> String {
         viewModel.presetSettings.displayName(for: preset)
     }
 
-    private func notifyExpansionChanged(_ expanded: Bool) {
+    func notifyExpansionChanged(_ expanded: Bool) {
         guard lastReportedExpansion != expanded else { return }
         lastReportedExpansion = expanded
         DispatchQueue.main.async {
@@ -479,5 +483,3 @@ internal struct NotchCompanionView: View {
         }
     }
 }
-
-// swiftlint:enable type_body_length
