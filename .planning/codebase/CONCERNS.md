@@ -5,11 +5,7 @@
 
 ## Tech Debt
 
-**Singleton overuse via `static let shared`:**
-- Issue: Multiple services use singletons (`PresetSettingsStore.shared`, `NotificationService.shared`, `SparkleUpdater.shared`, `NSScreenUUIDCache.shared`) making DI inconsistent — some paths use injected instances while others reference `.shared` directly
-- Files: `Oak/Oak/Services/PresetSettingsStore.swift:7`, `Oak/Oak/Services/NotificationService.swift:13`, `Oak/Oak/Services/SparkleUpdater.swift:10`, `Oak/Oak/Views/NotchCompanionView.swift:6-7`
-- Impact: `NotchCompanionView` creates its own `@StateObject` from `.shared` singletons (line 6-7) instead of receiving injected instances, creating parallel object graphs; hard to test in isolation
-- Fix approach: Inject all dependencies through initializers consistently; remove `@StateObject private var notificationService` and `sparkleUpdater` from `NotchCompanionView` and pass from parent
+None currently tracked.
 
 ## Known Bugs
 
@@ -132,6 +128,7 @@ None currently tracked.
 - ~~AppDelegate deinit cleanup pattern~~ — Removed fragile `deinit`; `applicationWillTerminate` already handles cleanup (#73)
 - ~~Progress history grows unbounded~~ — Added 90-day retention pruning via `pruneOldRecords()` on each write (#71)
 - ~~Audio engine recreation on every track change~~ — Reuse `AVAudioEngine` across track switches; only swap source node (#72)
+- ~~Singleton overuse via `static let shared`~~ — All major services (`PresetSettingsStore`, `NotificationService`, `SparkleUpdater`) use constructor-based dependency injection; `AppDelegate` creates instances and passes through `NotchWindowController` → `NotchCompanionView`; `NSScreenUUIDCache.shared` remains as a performance cache but is only used in extension methods and tests
 
 ---
 *Concerns audit: 2026-02-15*
