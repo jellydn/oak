@@ -20,7 +20,11 @@ internal extension NotchWindowControllerTests {
     func testNotchWindowIsFloating() {
         let window = windowController.window as? NotchWindow
 
-        XCTAssertEqual(window?.level, .floating, "NotchWindow should have floating level by default")
+        XCTAssertEqual(
+            window?.level,
+            .statusBar,
+            "NotchWindow should have statusBar level by default (alwaysOnTop is true)"
+        )
     }
 
     func testNotchWindowIsStatusBarWhenAlwaysOnTopEnabled() {

@@ -97,7 +97,7 @@ internal extension NotchWindowControllerTests {
     }
 
     func testNotchedDisplayTargetFindsNotchedScreen() throws {
-        guard NSScreen.screens.contains(where: { $0.hasNotch }) else {
+        guard NSScreen.screens.contains(where: \.hasNotch) else {
             throw XCTSkip("No notched display available for testing")
         }
 

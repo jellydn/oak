@@ -61,7 +61,7 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
             Keys.playSoundOnSessionCompletion: true,
             Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
-            Keys.alwaysOnTop: false,
+            Keys.alwaysOnTop: true,
             Keys.showBelowNotch: false
         ]
         userDefaults.register(defaults: defaults)
@@ -106,22 +106,22 @@ internal final class PresetSettingsStore: ObservableObject {
 
     func workMinutes(for preset: Preset) -> Int {
         switch preset {
-        case .short: return shortWorkMinutes
-        case .long: return longWorkMinutes
+        case .short: shortWorkMinutes
+        case .long: longWorkMinutes
         }
     }
 
     func breakMinutes(for preset: Preset) -> Int {
         switch preset {
-        case .short: return shortBreakMinutes
-        case .long: return longBreakMinutes
+        case .short: shortBreakMinutes
+        case .long: longBreakMinutes
         }
     }
 
     func longBreakMinutes(for preset: Preset) -> Int {
         switch preset {
-        case .short: return shortLongBreakMinutes
-        case .long: return longLongBreakMinutes
+        case .short: shortLongBreakMinutes
+        case .long: longLongBreakMinutes
         }
     }
 
@@ -182,7 +182,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setDisplayTarget(.mainDisplay, screenID: nil)
         setPlaySoundOnSessionCompletion(true)
         setCountdownDisplayMode(.number)
-        setAlwaysOnTop(false)
+        setAlwaysOnTop(true)
         setShowBelowNotch(false)
     }
 

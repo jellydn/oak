@@ -160,12 +160,12 @@ internal class AudioManager: ObservableObject {
 
     private func createSourceNode(for track: AudioTrack, generator: NoiseGenerator) -> AVAudioSourceNode? {
         switch track {
-        case .none: return nil
-        case .brownNoise: return createBrownNoiseNode(generator: generator)
-        case .rain: return createRainNode(generator: generator)
-        case .forest: return createForestNode(generator: generator)
-        case .cafe: return createCafeNode(generator: generator)
-        case .lofi: return createLofiNode(generator: generator)
+        case .none: nil
+        case .brownNoise: createBrownNoiseNode(generator: generator)
+        case .rain: createRainNode(generator: generator)
+        case .forest: createForestNode(generator: generator)
+        case .cafe: createCafeNode(generator: generator)
+        case .lofi: createLofiNode(generator: generator)
         }
     }
 

@@ -7,9 +7,9 @@ internal enum CountdownDisplayMode: String, CaseIterable {
     var displayName: String {
         switch self {
         case .number:
-            return "Number"
+            "Number"
         case .circleRing:
-            return "Circle Ring"
+            "Circle Ring"
         }
     }
 }

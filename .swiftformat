@@ -1,5 +1,8 @@
 # SwiftFormat Configuration for Oak
 
+# Swift version
+--swiftversion 5.9
+
 # File options
 --exclude Oak.xcodeproj,.build,.swiftpm,DerivedData,.planning
 
@@ -24,7 +27,7 @@
 
 # Rules to enable
 --enable isEmpty
---enable sortedImports
+--enable sortImports
 --enable blankLinesAtEndOfScope
 --enable blankLinesAtStartOfScope
 --enable blankLinesBetweenScopes
