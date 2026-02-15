@@ -3,7 +3,7 @@ import CoreGraphics
 
 internal extension NSScreen {
     private static let screenNumberKey = NSDeviceDescriptionKey("NSScreenNumber")
-    
+
     var displayUUID: String? {
         guard let number = deviceDescription[Self.screenNumberKey] as? NSNumber else {
             return nil
@@ -16,8 +16,7 @@ internal extension NSScreen {
         }
         // CFUUIDCreateString also returns a +1 retained reference; Swift's automatic
         // bridging to String properly releases the CFString for us
-        let uuidString = CFUUIDCreateString(nil, uuid) as String
-        return uuidString
+        return CFUUIDCreateString(nil, uuid) as String
     }
 
     @MainActor static func screen(withUUID uuid: String) -> NSScreen? {

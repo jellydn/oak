@@ -24,7 +24,9 @@ internal extension NotchWindowControllerTests {
         let window = notchedController.window as? NotchWindow
 
         let activeScreen = NSScreen.screen(for: .notchedDisplay, preferredDisplayID: notchedScreenID) ?? notchedScreen
-        let candidateYPositions: [CGFloat] = [
+
+        // Calculate all possible valid Y positions for this configuration
+        let expectedYPositions = [
             NotchWindow.calculateYPosition(
                 for: activeScreen,
                 height: NotchLayout.height,
@@ -35,26 +37,28 @@ internal extension NotchWindowControllerTests {
                 for: activeScreen,
                 height: NotchLayout.height,
                 alwaysOnTop: false,
-                showBelowNotch: true
-            ),
-            NotchWindow.calculateYPosition(
-                for: activeScreen,
-                height: NotchLayout.height,
-                alwaysOnTop: true,
-                showBelowNotch: false
-            ),
-            NotchWindow.calculateYPosition(
-                for: activeScreen,
-                height: NotchLayout.height,
-                alwaysOnTop: true,
                 showBelowNotch: true
             )
         ]
-        let actualY = window?.frame.minY ?? 0
+
+        // Wait for window to be positioned
+        var actualY: CGFloat = 0
+        var positionUpdated = false
+        let endTime = Date().addingTimeInterval(1.0)
+
+        while Date() < endTime {
+            actualY = window?.frame.minY ?? 0
+            if expectedYPositions.contains(where: { abs(actualY - $0) <= 1.0 }) {
+                positionUpdated = true
+                break
+            }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        }
 
         XCTAssertTrue(
-            candidateYPositions.contains { abs(actualY - $0) <= 1.0 },
-            "Window should align to one of the supported notch positioning modes"
+            positionUpdated,
+            "Window should be positioned at one of the expected Y positions "
+                + "\(expectedYPositions), but was at Y=\(actualY)"
         )
     }
 

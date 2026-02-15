@@ -43,11 +43,7 @@ internal struct NotchCompanionView: View {
     }
 
     var visualStyle: NotchVisualStyle {
-        NotchVisualStyle.make(
-            isExpanded: isExpanded,
-            isSessionComplete: viewModel.isSessionComplete,
-            isInsideNotch: isInsideNotch
-        )
+        NotchVisualStyle.make(isInsideNotch: isInsideNotch)
     }
 
     private var isInsideNotch: Bool {

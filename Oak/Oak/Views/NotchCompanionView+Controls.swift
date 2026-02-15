@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Control buttons for the notch companion view (audio, progress, settings, expand, preset selector)
-extension NotchCompanionView {
+internal extension NotchCompanionView {
     var audioButton: some View {
         Button(
             action: { showAudioMenu.toggle() },

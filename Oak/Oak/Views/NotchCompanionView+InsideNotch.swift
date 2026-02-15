@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension NotchCompanionView {
+internal extension NotchCompanionView {
     var insideNotchCompactContent: some View {
         HStack(spacing: 0) {
             compactLeadingDisplay
@@ -37,13 +37,21 @@ extension NotchCompanionView {
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(.white.opacity(0.68))
         } else {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(viewModel.displayTime)
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
-                Text(viewModel.currentSessionType)
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundColor(.white.opacity(0.56))
+            let displayMode = viewModel.presetSettings.countdownDisplayMode
+            if displayMode == .circleRing {
+                countdownDisplay(
+                    mode: displayMode,
+                    size: expandedRingSize,
+                    fontSize: 14,
+                    showSessionType: true
+                )
+            } else {
+                VStack(alignment: .leading, spacing: 1) {
+                    countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 13)
+                    Text(viewModel.currentSessionType)
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundColor(.white.opacity(0.56))
+                }
             }
         }
     }
@@ -128,9 +136,11 @@ extension NotchCompanionView {
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(.white.opacity(0.68))
         } else {
-            Text(viewModel.displayTime)
-                .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                .foregroundColor(viewModel.isPaused ? Color.orange.opacity(0.95) : Color.white.opacity(0.95))
+            countdownDisplay(
+                mode: viewModel.presetSettings.countdownDisplayMode,
+                size: compactRingSize,
+                fontSize: 13
+            )
         }
     }
 

@@ -183,6 +183,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setPlaySoundOnSessionCompletion(true)
         setCountdownDisplayMode(.number)
         setAlwaysOnTop(false)
+        setShowBelowNotch(false)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {

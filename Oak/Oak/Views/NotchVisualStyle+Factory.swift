@@ -1,11 +1,7 @@
 import SwiftUI
 
 internal extension NotchVisualStyle {
-    static func make(
-        isExpanded: Bool,
-        isSessionComplete: Bool,
-        isInsideNotch: Bool
-    ) -> NotchVisualStyle {
+    static func make(isInsideNotch: Bool) -> NotchVisualStyle {
         NotchVisualStyle(
             isInsideNotchStyle: isInsideNotch,
             backgroundColors: [

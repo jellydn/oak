@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension NotchCompanionView {
+internal extension NotchCompanionView {
     var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {

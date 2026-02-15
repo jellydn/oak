@@ -60,9 +60,17 @@ internal final class NSScreenNotchTests: XCTestCase {
         }
     }
 
-    func testUUIDCacheUpdatesOnScreenChange() {
+    func testUUIDCacheUpdatesOnScreenChange() throws {
         let initialCache = NSScreen.screensByUUID
-        let initialCount = initialCache.count
+        guard let mainScreen = NSScreen.main, let mainUUID = mainScreen.displayUUID else {
+            throw XCTSkip("No main screen or UUID available for testing")
+        }
+
+        // Verify main screen is initially in cache
+        XCTAssertNotNil(
+            initialCache[mainUUID],
+            "Main screen UUID should be present in initial cache"
+        )
 
         // Simulate screen configuration change
         NotificationCenter.default.post(
@@ -75,16 +83,10 @@ internal final class NSScreenNotchTests: XCTestCase {
 
         let updatedCache = NSScreen.screensByUUID
 
-        // Cache should still be functional after notification
-        XCTAssertGreaterThanOrEqual(
-            updatedCache.count,
-            0,
-            "Cache should still contain entries after screen configuration change"
-        )
-        XCTAssertEqual(
-            initialCount,
-            updatedCache.count,
-            "Cache size should remain consistent if no actual screen change occurred"
+        // Verify main screen UUID is still present after cache rebuild
+        XCTAssertNotNil(
+            updatedCache[mainUUID],
+            "Main screen UUID should still be present in cache after screen configuration change"
         )
     }
 
