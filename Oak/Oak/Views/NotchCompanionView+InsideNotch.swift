@@ -1,19 +1,29 @@
 import SwiftUI
 
+/// UI components for displaying the notch companion inside a physical MacBook notch.
+/// This mode is activated when the target display has a notch and showBelowNotch is disabled.
+/// The UI uses wider dimensions and darker styling to blend seamlessly with the notch area.
 extension NotchCompanionView {
-    var isInsideNotchCompactMode: Bool {
-        visualStyle.isInsideNotchStyle && !isExpanded
+    /// Compact UI content when showing inside the notch (non-expanded state)
+    var insideNotchCompactContent: some View {
+        HStack(spacing: 0) {
+            compactLeadingDisplay
+
+            Spacer(minLength: 24)
+
+            HStack(spacing: 6) {
+                compactPrimaryActionButton
+                expandToggleButton
+            }
+        }
     }
 
-    var isInsideNotchExpandedMode: Bool {
-        visualStyle.isInsideNotchStyle && isExpanded
-    }
-
-    var insideNotchExpandedView: some View {
+    /// Expanded UI content when showing inside the notch
+    var insideNotchExpandedContent: some View {
         HStack(spacing: 0) {
             insideNotchExpandedLeading
 
-            Spacer(minLength: 32)
+            Spacer(minLength: 12)
 
             HStack(spacing: 6) {
                 insideNotchExpandedPrimaryControls
@@ -26,7 +36,7 @@ extension NotchCompanionView {
     }
 
     @ViewBuilder
-    var insideNotchExpandedLeading: some View {
+    private var insideNotchExpandedLeading: some View {
         if viewModel.canStart {
             Text("Ready")
                 .font(.system(size: 10, weight: .semibold))
@@ -44,12 +54,10 @@ extension NotchCompanionView {
     }
 
     @ViewBuilder
-    var insideNotchExpandedPrimaryControls: some View {
+    private var insideNotchExpandedPrimaryControls: some View {
         if viewModel.canStart {
             Button(
-                action: {
-                    viewModel.startSession()
-                },
+                action: { viewModel.startSession() },
                 label: {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
@@ -63,9 +71,7 @@ extension NotchCompanionView {
         } else {
             if viewModel.canPause {
                 Button(
-                    action: {
-                        viewModel.pauseSession()
-                    },
+                    action: { viewModel.pauseSession() },
                     label: {
                         Image(systemName: "pause.fill")
                             .foregroundColor(.white)
@@ -78,9 +84,7 @@ extension NotchCompanionView {
                 .buttonStyle(.plain)
             } else if viewModel.canResume {
                 Button(
-                    action: {
-                        viewModel.resumeSession()
-                    },
+                    action: { viewModel.resumeSession() },
                     label: {
                         Image(systemName: "play.fill")
                             .foregroundColor(.white)
@@ -93,9 +97,7 @@ extension NotchCompanionView {
                 .buttonStyle(.plain)
             } else if viewModel.canStartNext {
                 Button(
-                    action: {
-                        viewModel.startNextSession()
-                    },
+                    action: { viewModel.startNextSession() },
                     label: {
                         Image(systemName: "forward.fill")
                             .foregroundColor(.white)
@@ -109,9 +111,7 @@ extension NotchCompanionView {
             }
 
             Button(
-                action: {
-                    viewModel.resetSession()
-                },
+                action: { viewModel.resetSession() },
                 label: {
                     Image(systemName: "stop.fill")
                         .foregroundColor(.white)
@@ -126,21 +126,8 @@ extension NotchCompanionView {
         }
     }
 
-    var insideNotchCompactView: some View {
-        HStack(spacing: 0) {
-            compactLeadingDisplay
-
-            Spacer(minLength: 24)
-
-            HStack(spacing: 6) {
-                compactPrimaryActionButton
-                expandToggleButton
-            }
-        }
-    }
-
     @ViewBuilder
-    var compactLeadingDisplay: some View {
+    private var compactLeadingDisplay: some View {
         if viewModel.canStart {
             Text("Focus")
                 .font(.system(size: 9, weight: .semibold))
@@ -153,74 +140,54 @@ extension NotchCompanionView {
     }
 
     @ViewBuilder
-    var compactPrimaryActionButton: some View {
+    private var compactPrimaryActionButton: some View {
         if viewModel.canStart {
             Button(
-                action: {
-                    viewModel.startSession()
-                },
+                action: { viewModel.startSession() },
                 label: {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
                         .font(.system(size: 9, weight: .bold))
                         .frame(width: 16, height: 16)
-                        .background(
-                            Circle()
-                                .fill(Color.green.opacity(0.85))
-                        )
+                        .background(Circle().fill(Color.green.opacity(0.85)))
                 }
             )
             .buttonStyle(.plain)
         } else if viewModel.canStartNext {
             Button(
-                action: {
-                    viewModel.startNextSession()
-                },
+                action: { viewModel.startNextSession() },
                 label: {
                     Image(systemName: "forward.fill")
                         .foregroundColor(.white)
                         .font(.system(size: 9, weight: .bold))
                         .frame(width: 16, height: 16)
-                        .background(
-                            Circle()
-                                .fill(Color.blue.opacity(0.88))
-                        )
+                        .background(Circle().fill(Color.blue.opacity(0.88)))
                 }
             )
             .buttonStyle(.plain)
             .help("Start \(viewModel.currentSessionType)")
         } else if viewModel.canPause {
             Button(
-                action: {
-                    viewModel.pauseSession()
-                },
+                action: { viewModel.pauseSession() },
                 label: {
                     Image(systemName: "pause.fill")
                         .foregroundColor(.white)
                         .font(.system(size: 9, weight: .bold))
                         .frame(width: 16, height: 16)
-                        .background(
-                            Circle()
-                                .fill(Color.orange.opacity(0.88))
-                        )
+                        .background(Circle().fill(Color.orange.opacity(0.88)))
                 }
             )
             .buttonStyle(.plain)
             .help("Pause")
         } else if viewModel.canResume {
             Button(
-                action: {
-                    viewModel.resumeSession()
-                },
+                action: { viewModel.resumeSession() },
                 label: {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
                         .font(.system(size: 9, weight: .bold))
                         .frame(width: 16, height: 16)
-                        .background(
-                            Circle()
-                                .fill(Color.green.opacity(0.88))
-                        )
+                        .background(Circle().fill(Color.green.opacity(0.88)))
                 }
             )
             .buttonStyle(.plain)

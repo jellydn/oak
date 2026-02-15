@@ -1,24 +1,20 @@
-import AppKit
 import SwiftUI
 
 internal extension NotchVisualStyle {
-    @MainActor
-    static func make(isExpanded: Bool, viewModel: FocusSessionViewModel) -> NotchVisualStyle {
-        let isSessionComplete = viewModel.isSessionComplete
-        let shouldUseInsideNotchStyle = isInsideNotch(viewModel: viewModel) && !isExpanded
-        if shouldUseInsideNotchStyle {
+    /// Creates a visual style based on the current UI state.
+    /// - Parameters:
+    ///   - isExpanded: Whether the UI is in expanded mode
+    ///   - isSessionComplete: Whether the current focus session is complete
+    ///   - isInsideNotch: Whether the UI should adapt to display inside a physical notch
+    static func make(
+        isExpanded: Bool,
+        isSessionComplete: Bool,
+        isInsideNotch: Bool
+    ) -> NotchVisualStyle {
+        if isInsideNotch && !isExpanded {
             return insideNotchCompact(isSessionComplete: isSessionComplete)
         }
         return standard(isExpanded: isExpanded, isSessionComplete: isSessionComplete)
-    }
-
-    @MainActor
-    private static func isInsideNotch(viewModel: FocusSessionViewModel) -> Bool {
-        let settings = viewModel.presetSettings
-        let target = settings.displayTarget
-        let preferredDisplayID = settings.preferredDisplayID(for: target)
-        let targetScreen = NSScreen.screen(for: target, preferredDisplayID: preferredDisplayID)
-        return targetScreen?.hasNotch == true && !settings.showBelowNotch
     }
 
     private static func insideNotchCompact(isSessionComplete: Bool) -> NotchVisualStyle {

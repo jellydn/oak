@@ -13,9 +13,17 @@ internal enum NotchLayout {
     /// Width of the expanded notch window
     static let expandedWidth: CGFloat = 320
 
+    /// Width multiplier for compact mode inside a physical notch.
+    /// 2.5x provides enough space for "Focus" label + play button + expand toggle.
+    private static let insideNotchCompactMultiplier: CGFloat = 2.5
+
+    /// Width multiplier for expanded mode inside a physical notch.
+    /// 4x provides space for timer display, session type, and all control buttons.
+    private static let insideNotchExpandedMultiplier: CGFloat = 4
+
     /// Width used for compact mode when showing inside a physical notch
-    static let insideNotchCollapsedWidth: CGFloat = collapsedWidth * 3
+    static let insideNotchCollapsedWidth: CGFloat = collapsedWidth * insideNotchCompactMultiplier
 
     /// Width used for expanded mode when showing inside a physical notch
-    static let insideNotchExpandedWidth: CGFloat = collapsedWidth * 4
+    static let insideNotchExpandedWidth: CGFloat = collapsedWidth * insideNotchExpandedMultiplier
 }
