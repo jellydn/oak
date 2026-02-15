@@ -4,8 +4,6 @@ import SwiftUI
 
 @MainActor
 internal final class PresetSettingsStore: ObservableObject {
-    static let shared = PresetSettingsStore()
-
     static let minWorkMinutes = 1
     static let maxWorkMinutes = 180
     static let minBreakMinutes = 1

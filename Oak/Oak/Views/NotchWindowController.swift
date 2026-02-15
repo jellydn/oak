@@ -21,14 +21,6 @@ internal class NotchWindowController: NSWindowController {
     private var alwaysOnTopCancellable: AnyCancellable?
     private var showBelowNotchCancellable: AnyCancellable?
 
-    convenience init() {
-        self.init(
-            presetSettings: PresetSettingsStore.shared,
-            notificationService: NotificationService.shared,
-            sparkleUpdater: SparkleUpdater.shared
-        )
-    }
-
     init(
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
