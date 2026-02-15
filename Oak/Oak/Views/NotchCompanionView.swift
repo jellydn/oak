@@ -2,7 +2,7 @@ import SwiftUI
 
 internal struct NotchCompanionView: View {
     let onExpansionChanged: (Bool) -> Void
-    @StateObject private var viewModel: FocusSessionViewModel
+    @StateObject var viewModel: FocusSessionViewModel
     @StateObject private var notificationService = NotificationService.shared
     @StateObject private var sparkleUpdater = SparkleUpdater.shared
     @State private var showAudioMenu = false
@@ -34,7 +34,7 @@ internal struct NotchCompanionView: View {
         self.onExpansionChanged = onExpansionChanged
     }
 
-    private var isExpanded: Bool {
+    var isExpanded: Bool {
         isExpandedByToggle
     }
 
@@ -42,11 +42,8 @@ internal struct NotchCompanionView: View {
         RoundedRectangle(cornerRadius: visualStyle.cornerRadius, style: .continuous)
     }
 
-    private var visualStyle: NotchVisualStyle {
-        NotchVisualStyle.make(
-            isExpanded: isExpanded,
-            isSessionComplete: viewModel.isSessionComplete
-        )
+    var visualStyle: NotchVisualStyle {
+        NotchVisualStyle.make(isExpanded: isExpanded, viewModel: viewModel)
     }
 
     var body: some View {
@@ -66,31 +63,40 @@ internal struct NotchCompanionView: View {
                 .shadow(color: visualStyle.shadowColor, radius: visualStyle.shadowRadius, x: 0, y: 4)
 
             HStack(spacing: contentSpacing) {
-                if isExpanded {
-                    if viewModel.canStart {
-                        startView
-                    } else {
-                        sessionView
+                if isInsideNotchExpandedMode {
+                    insideNotchExpandedView
+                } else if isExpanded {
+                    HStack(spacing: contentSpacing) {
+                        if viewModel.canStart {
+                            startView
+                        } else {
+                            sessionView
+                        }
+
+                        Spacer(minLength: 20)
+
+                        Rectangle()
+                            .fill(visualStyle.dividerColor)
+                            .frame(width: 1, height: controlSize)
+                        HStack(spacing: 6) {
+                            audioButton
+                            progressButton
+                            settingsButton
+                        }
                     }
-                    Rectangle()
-                        .fill(visualStyle.dividerColor)
-                        .frame(width: 1, height: controlSize)
-                    HStack(spacing: 6) {
-                        audioButton
-                        progressButton
-                        settingsButton
-                    }
+                } else if isInsideNotchCompactMode {
+                    insideNotchCompactView
                 } else {
                     compactView
                 }
-
-                expandToggleButton
+                if !isInsideNotchCompactMode, !isInsideNotchExpandedMode {
+                    expandToggleButton
+                }
             }
             .padding(.horizontal, horizontalPadding)
-            .padding(.vertical, verticalPadding)
+            .padding(.vertical, verticalPadding + (visualStyle.isInsideNotchStyle ? 1 : 0))
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
-
             if showConfetti {
                 ConfettiView()
                     .allowsHitTesting(false)
@@ -143,11 +149,11 @@ internal struct NotchCompanionView: View {
     }
 }
 
-private extension NotchCompanionView {
+extension NotchCompanionView {
     var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {
-                Text(presetLabel(for: presetSelection))
+                Text(visualStyle.isInsideNotchStyle ? "Focus" : presetLabel(for: presetSelection))
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.white.opacity(0.62))
                 Button(
@@ -345,7 +351,7 @@ private extension NotchCompanionView {
     }
 }
 
-private extension NotchCompanionView {
+extension NotchCompanionView {
     var audioButton: some View {
         Button(
             action: {
