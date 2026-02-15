@@ -14,6 +14,7 @@
 		1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74BB88C04B3824E97E3C561 /* US001Tests.swift */; };
 		1D12A36EE6767DD4A7CF73C9 /* NotchWindowControllerTests+NotchFirstUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E680D8D9839B944EB6CB5723 /* NotchWindowControllerTests+NotchFirstUI.swift */; };
 		25BAA3E90290CE446B9F7BFC /* NotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3912FED25041D62DE77347EA /* NotificationTests.swift */; };
+		29EFC7CC8DBCDE421107C0E6 /* NotchCompanionView+InsideNotch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B20E550402C5D04E55B6E /* NotchCompanionView+InsideNotch.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		39B659A9DA438E70743E07F9 /* CircularProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */; };
 		3ED5BDC623247CE16B62E99B /* ambient_rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */; };
@@ -74,6 +75,7 @@
 
 /* Begin PBXFileReference section */
 		03D90651E33152E3C952CE1D /* Oak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Oak.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		047B20E550402C5D04E55B6E /* NotchCompanionView+InsideNotch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionView+InsideNotch.swift"; sourceTree = "<group>"; };
 		0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchCompanionView.swift; sourceTree = "<group>"; };
 		0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlwaysOnTopTests.swift; sourceTree = "<group>"; };
 		08E0A4A56EADCDB21276DE81 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */,
 				F287A617D7BF92425C7BD22A /* ConfettiView.swift */,
 				0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */,
+				047B20E550402C5D04E55B6E /* NotchCompanionView+InsideNotch.swift */,
 				3DCAC7004FB57BBA5CEBB9B3 /* NotchVisualStyle.swift */,
 				309530434B76C0BB37A8FA0D /* NotchVisualStyle+Factory.swift */,
 				3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */,
@@ -389,6 +392,7 @@
 				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
 				5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */,
 				67136E958CB86E30F7443B8B /* NSScreen+UUID.swift in Sources */,
+				29EFC7CC8DBCDE421107C0E6 /* NotchCompanionView+InsideNotch.swift in Sources */,
 				8CA3EDDEB1C3C37D3CB1CF54 /* NotchCompanionView.swift in Sources */,
 				B561D0C04BC57500AF7A7EF0 /* NotchLayout.swift in Sources */,
 				4590D899C3874037F87EE821 /* NotchVisualStyle+Factory.swift in Sources */,
