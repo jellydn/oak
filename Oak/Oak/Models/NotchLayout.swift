@@ -12,4 +12,10 @@ internal enum NotchLayout {
 
     /// Width of the expanded notch window
     static let expandedWidth: CGFloat = 320
+
+    /// Width used for compact mode when showing inside a physical notch
+    static let insideNotchCollapsedWidth: CGFloat = collapsedWidth * 3
+
+    /// Width used for expanded mode when showing inside a physical notch
+    static let insideNotchExpandedWidth: CGFloat = collapsedWidth * 4
 }
