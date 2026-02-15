@@ -120,6 +120,7 @@ Oak/
 │   ├── Views/               # SwiftUI Views
 │   ├── ViewModels/          # ObservableObject classes
 │   ├── Services/            # Business logic, audio, persistence
+│   ├── Extensions/          # Swift extensions
 │   ├── Resources/           # Assets, sounds, config files
 │   └── OakApp.swift        # App entry point
 ├── Oak.xcodeproj/
