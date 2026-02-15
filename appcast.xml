@@ -7,6 +7,23 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.5</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.5</link>
+  <sparkle:version>5005</sparkle:version>
+  <sparkle:shortVersionString>0.5.5</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.5</h2>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.4...v0.5.5"><tt>v0.5.4...v0.5.5</tt></a></p>
+  ]]></description>
+  <pubDate>Sun, 15 Feb 2026 13:39:54 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.5/Oak-0.5.5.dmg"
+             sparkle:version="5005"
+             sparkle:shortVersionString="0.5.5"
+             sparkle:edSignature="TmWH7QgIuWwUKGVDRQF1rRsdHTMUS42Ml7t257n/63dY/y44ir1YWf+6F6hK9P87HptbdUdnZBCvXtyNk2QGCw=="
+             length="6611162"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.4</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.4</link>
   <sparkle:version>5004</sparkle:version>
@@ -38,23 +55,6 @@
              sparkle:shortVersionString="0.5.3"
              sparkle:edSignature="LlPvL4e0wCLvXx+y7vhfVWmpykQ+nCEYSo+53Z8qJ6OzMgUF/LTnsD5lCLTZA3F2aw8tXoinH1exJ3YKaoh5AQ=="
              length="6605983"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.2</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.2</link>
-  <sparkle:version>5002</sparkle:version>
-  <sparkle:shortVersionString>0.5.2</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.2</h2>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.1...v0.5.2"><tt>v0.5.1...v0.5.2</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 15 Feb 2026 13:17:48 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.2/Oak-0.5.2.dmg"
-             sparkle:version="5002"
-             sparkle:shortVersionString="0.5.2"
-             sparkle:edSignature="/81DpqdMZkPU2LbMH2JPEyBe9L0IuM2lNj4TAI5kKPEOSp8vImLpULydBHTutpdyHVPvpip/Ytk/vNvWulwRDg=="
-             length="6605578"
              type="application/octet-stream" />
 </item>
   </channel>
