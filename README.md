@@ -28,14 +28,10 @@
   <img src="https://gyazo.com/9a9aaa5e66bb016218745ce4b1e26942.gif" alt="Oak Demo - Focus session in action" width="600"/>
 </div>
 
-## Prerequisites
+## Installation Requirements
 
 - macOS 13+ (Apple Silicon recommended)
-- XcodeGen (`brew install xcodegen`) - for building from source
-- SwiftLint (optional, for code linting: `brew install swiftlint`)
-- SwiftFormat (optional, for code formatting: `brew install swiftformat`)
 
----
 > [!IMPORTANT]
 > We don't have an Apple Developer account yet. The application will show a popup on first launch that the app is from an unidentified developer.
 > 1. Click **OK** to close the popup.
@@ -73,160 +69,22 @@ brew install --cask oak
 
 ### From Source
 
-```bash
-# Clone the repository
-git clone https://github.com/jellydn/oak.git
-cd oak
+See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed build instructions and development setup.
 
-# Generate Xcode project
-cd Oak && xcodegen generate
+## Auto-Update
 
-# Build and run
-open Oak.xcodeproj
-```
+Oak uses the [Sparkle framework](https://sparkle-project.org/) to provide automatic updates:
 
-### Build Commands
-
-```bash
-# Show available commands
-just
-
-# Build the project
-just build
-
-# Build release version
-just build-release
-
-# Run all tests
-just test
-
-# Run tests with verbose output
-just test-verbose
-
-# Run a specific test class
-just test-class FocusSessionViewModelTests
-
-# Run a specific test method
-just test-method FocusSessionViewModelTests testStartSession
-
-# Check for compilation errors
-just check
-
-# Clean build artifacts
-just clean
-
-# Open in Xcode
-just open
-
-# Validate bundled ambient sound files
-just check-sounds
-```
-
-### Ambient Sound Assets
-
-Oak expects bundled ambient files under `Oak/Oak/Resources/Sounds` with these base names:
-
-- `ambient_rain`
-- `ambient_forest`
-- `ambient_cafe`
-- `ambient_brown_noise`
-- `ambient_lofi`
-
-Supported extensions: `.m4a` (preferred), `.wav`, `.mp3`.
-
-### 🎵 Sound Attribution
-
-The ambient sounds included in Oak are sourced from [Pixabay](https://pixabay.com/) under the [Pixabay Content License](https://pixabay.com/service/license-summary/):
-
-- **Rain Sound**: [Real Rain Sound](https://pixabay.com/sound-effects/real-rain-sound-379215/) by feedthestraycats
-- **Forest Sound**: [Ambient Spring Forest](https://pixabay.com/sound-effects/ambient-spring-forest-323801/) by soundreality
-- **Cafe Sound**: [Cafe Noise](https://pixabay.com/sound-effects/cafe-noise-32940/) by freesound_community
-- **Brown Noise**: [Brown Noise](https://pixabay.com/sound-effects/brown-noise-by-digitalspa-170337/) by digitalspa
-- **Lo-fi Sound**: [Lofi Guitar](https://pixabay.com/sound-effects/lofi-guitar-105361/) by freesound_community
-
-We are grateful to these creators for making their work available for projects like Oak.
-
-### Auto-Update
-
-Oak uses the [Sparkle framework](https://sparkle-project.org/) to provide automatic updates. Updates are checked automatically on launch and can be configured in Settings:
-
-- **Automatic update checks**: Enable/disable automatic update checking (enabled by default)
-- **Automatic downloads**: Enable/disable automatic download of updates (disabled by default for user control)
+- **Automatic update checks**: Enable/disable in Settings (enabled by default)
+- **Automatic downloads**: Enable/disable in Settings (disabled by default)
 - **Manual check**: Check for updates on demand via Settings
 
-The appcast feed is served from `appcast.xml` in the repository root and is automatically updated when new releases are published.
-Oak is configured with Sparkle EdDSA signing (`SUPublicEDKey`) and appcast entries include `sparkle:edSignature`.
-
-### Code Quality Commands
-
-```bash
-# Lint Swift code
-just lint
-
-# Auto-fix linting issues
-just lint-fix
-
-# Format Swift code
-just format
-
-# Check if code is formatted correctly
-just format-check
-
-# Run both lint and format checks
-just check-style
-```
-
-## CI/CD and Releases
-
-- CI runs on GitHub Actions (`.github/workflows/ci.yml`) for `push` to `main` and all PRs.
-- **Auto-release** (`.github/workflows/auto-release.yml`) automatically creates a new release when changes are merged to `main`:
-  - Automatically increments the patch version (e.g., `v0.1.0` → `v0.1.1`)
-  - Creates a Git tag
-  - Builds and publishes artifacts to GitHub Releases
-- Manual release workflow (`.github/workflows/release.yml`) builds and publishes unsigned artifacts on:
-  - tag push: `v*` (example: `v0.1.0`)
-  - manual dispatch with a `version` input (example: `v0.1.0`)
-
-### Create a Manual Release
-
-If you need to create a specific version manually:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-The release uploads:
-
-- `Oak-<version>.dmg`
-- `Oak-<version>.zip`
-
-### No Apple Account Notes
-
-- Artifacts are built unsigned (`CODE_SIGNING_ALLOWED=NO`).
-- The app is not notarized.
-- Users will need to bypass Gatekeeper on first launch (Right-click app -> Open).
-
-## 📁 Project Structure
-
-```
-Oak/
-├── Oak/
-│   ├── Models/              # Data models, enums, protocols
-│   ├── Views/               # SwiftUI Views
-│   ├── ViewModels/          # ObservableObject classes
-│   ├── Services/            # Business logic, audio, persistence
-│   ├── Resources/           # Assets, sounds, config files
-│   └── OakApp.swift        # App entry point
-├── Oak.xcodeproj/           # Generated by XcodeGen
-├── project.yml              # XcodeGen config (project definition)
-└── Tests/                   # Unit tests
-```
-
-**Note**: This project uses [XcodeGen](https://github.com/yonaskolb/XcodeGen) for project management. The Xcode project is generated from `project.yml`. Do not use Swift Package Manager (`swift build` or `swift test`) for this project.
+For more details about the update system, see [RELEASES.md](RELEASES.md).
 
 ## 📝 Documentation
 
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Build commands and development setup
+- [RELEASES.md](RELEASES.md) - CI/CD pipeline and release process
 - [PRD](tasks/prd-macos-focus-companion-app.md) - Product Requirements Document
 - [Architecture Decisions](doc/adr/) - ADRs for key technical decisions
 - [Agent Guidelines](AGENTS.md) - Development guidelines for contributors
