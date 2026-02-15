@@ -1,7 +1,7 @@
 # SwiftFormat Configuration for Oak
 
 # Swift version
---swiftversion 5.9
+--swiftversion 6.2
 
 # File options
 --exclude Oak.xcodeproj,.build,.swiftpm,DerivedData,.planning
