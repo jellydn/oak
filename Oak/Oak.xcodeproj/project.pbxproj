@@ -589,14 +589,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5003;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.4.3;
+				MARKETING_VERSION = 0.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -625,14 +625,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5003;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.4.3;
+				MARKETING_VERSION = 0.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";

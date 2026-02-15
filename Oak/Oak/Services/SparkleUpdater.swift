@@ -15,6 +15,7 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
     @Published private(set) var isConfigured = false
 
     private var updaterController: SPUStandardUpdaterController?
+    private var canCheckObservation: NSKeyValueObservation?
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "SparkleUpdater")
 
     override init() {
@@ -35,6 +36,15 @@ internal final class SparkleUpdater: NSObject, ObservableObject, SPUUpdaterDeleg
         canCheckForUpdates = controller.updater.canCheckForUpdates
         automaticallyChecksForUpdates = controller.updater.automaticallyChecksForUpdates
         automaticallyDownloadsUpdates = controller.updater.automaticallyDownloadsUpdates
+
+        canCheckObservation = controller.updater.observe(
+            \.canCheckForUpdates,
+            options: [.new]
+        ) { [weak self] _, change in
+            Task { @MainActor [weak self] in
+                self?.canCheckForUpdates = change.newValue ?? false
+            }
+        }
 
         logger.info("Sparkle updater initialized")
     }
