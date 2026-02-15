@@ -41,16 +41,20 @@ internal struct ClickOutsideModifier: ViewModifier {
                     }
                 }
 
-                localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { event in
+                let localEventMonitor: (NSEvent) -> NSEvent = { [popoverWindow] event in
                     guard let popoverWindow else { return event }
 
-                    if !popoverWindow.frame.contains(NSEvent.mouseLocation) {
+                    if event.window != popoverWindow {
                         DispatchQueue.main.async {
                             action()
                         }
                     }
                     return event
                 }
+                localMonitor = NSEvent.addLocalMonitorForEvents(
+                    matching: [.leftMouseDown, .rightMouseDown],
+                    handler: localEventMonitor
+                )
             }
             .onDisappear {
                 if let monitor {
