@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.11</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.11</link>
+  <sparkle:version>5011</sparkle:version>
+  <sparkle:shortVersionString>0.5.11</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.11</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>feat(ui): add dismiss-on-click-outside modifier for popovers by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3944418025" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/82" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/82/hovercard" href="https://github.com/jellydn/oak/pull/82">#82</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.10...v0.5.11"><tt>v0.5.10...v0.5.11</tt></a></p>
+  ]]></description>
+  <pubDate>Sun, 15 Feb 2026 22:33:58 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.11/Oak-0.5.11.dmg"
+             sparkle:version="5011"
+             sparkle:shortVersionString="0.5.11"
+             sparkle:edSignature="OeH4RUUd1G8R6Riz5Nm8YdtENn/6bEVZH2EqzPsnOqHw9++93ZnZq8qIHQA52IW0WgElqg2cNG8+E2EzFTfeDw=="
+             length="6617830"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.10</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.10</link>
   <sparkle:version>5010</sparkle:version>
@@ -46,23 +67,6 @@
              sparkle:shortVersionString="0.5.9"
              sparkle:edSignature="EGRGD5VdXl5UyQno8d07ZgOk78V9IR6MRXtLY3ZWTGCViSrcs0xbnxcIPe2NwUtVXAtWAcBatt8A99Sgs75HBQ=="
              length="6604248"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.8</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.8</link>
-  <sparkle:version>5008</sparkle:version>
-  <sparkle:shortVersionString>0.5.8</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.8</h2>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.7...v0.5.8"><tt>v0.5.7...v0.5.8</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 15 Feb 2026 15:00:10 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.8/Oak-0.5.8.dmg"
-             sparkle:version="5008"
-             sparkle:shortVersionString="0.5.8"
-             sparkle:edSignature="3xHahCuE11+lXU1m7xvD9wZwrcbOwmMLwb+POvUnfxTR/NgvWfH/ScUsP0FuY9NiH53VSBJ3ERBWiXHsEtlVAg=="
-             length="6611185"
              type="application/octet-stream" />
 </item>
   </channel>
