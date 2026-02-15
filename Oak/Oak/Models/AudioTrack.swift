@@ -15,29 +15,29 @@ internal enum AudioTrack: String, CaseIterable, Identifiable {
 
     var systemImageName: String {
         switch self {
-        case .none: return "speaker.slash"
-        case .rain: return "cloud.rain"
-        case .forest: return "tree"
-        case .cafe: return "cup.and.saucer"
-        case .brownNoise: return "waveform"
-        case .lofi: return "music.note"
+        case .none: "speaker.slash"
+        case .rain: "cloud.rain"
+        case .forest: "tree"
+        case .cafe: "cup.and.saucer"
+        case .brownNoise: "waveform"
+        case .lofi: "music.note"
         }
     }
 
     var bundledFileBaseName: String? {
         switch self {
         case .none:
-            return nil
+            nil
         case .rain:
-            return "ambient_rain"
+            "ambient_rain"
         case .forest:
-            return "ambient_forest"
+            "ambient_forest"
         case .cafe:
-            return "ambient_cafe"
+            "ambient_cafe"
         case .brownNoise:
-            return "ambient_brown_noise"
+            "ambient_brown_noise"
         case .lofi:
-            return "ambient_lofi"
+            "ambient_lofi"
         }
     }
 

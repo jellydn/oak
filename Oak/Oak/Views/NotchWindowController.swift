@@ -68,20 +68,20 @@ internal class NotchWindowController: NSWindowController {
         displayTargetCancellable = settings.$displayTarget
             .sink { [weak self] nextTarget in
                 guard let self else { return }
-                self.requestFrameUpdate(for: lastExpandedState, forceReposition: true, targetOverride: nextTarget)
+                requestFrameUpdate(for: lastExpandedState, forceReposition: true, targetOverride: nextTarget)
             }
 
         alwaysOnTopCancellable = settings.$alwaysOnTop
             .sink { [weak self] isAlwaysOnTop in
                 guard let self, let window = self.window as? NotchWindow else { return }
                 window.level = isAlwaysOnTop ? .statusBar : .floating
-                self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
+                requestFrameUpdate(for: lastExpandedState, forceReposition: true)
             }
 
         showBelowNotchCancellable = settings.$showBelowNotch
             .sink { [weak self] _ in
                 guard let self else { return }
-                self.requestFrameUpdate(for: self.lastExpandedState, forceReposition: true)
+                requestFrameUpdate(for: lastExpandedState, forceReposition: true)
             }
     }
 
@@ -134,16 +134,16 @@ internal class NotchWindowController: NSWindowController {
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            self.isFrameUpdateScheduled = false
-            guard let expandedState = self.pendingExpandedState else { return }
-            let shouldForceReposition = self.pendingForceReposition
-            let target = self.pendingTargetOverride
+            isFrameUpdateScheduled = false
+            guard let expandedState = pendingExpandedState else { return }
+            let shouldForceReposition = pendingForceReposition
+            let target = pendingTargetOverride
 
-            self.pendingExpandedState = nil
-            self.pendingForceReposition = false
-            self.pendingTargetOverride = nil
+            pendingExpandedState = nil
+            pendingForceReposition = false
+            pendingTargetOverride = nil
 
-            self.setExpanded(
+            setExpanded(
                 expandedState,
                 forceReposition: shouldForceReposition,
                 targetOverride: target
@@ -199,7 +199,7 @@ internal class NotchWindowController: NSWindowController {
     }
 
     private func notchYPosition(for screen: NSScreen?, alwaysOnTop: Bool) -> CGFloat {
-        return NotchWindow.calculateYPosition(
+        NotchWindow.calculateYPosition(
             for: screen,
             height: NotchLayout.height,
             alwaysOnTop: alwaysOnTop,
@@ -276,7 +276,7 @@ internal class NotchWindow: NSPanel {
         alwaysOnTop: Bool,
         showBelowNotch: Bool = false
     ) -> CGFloat {
-        guard let screen = screen else { return 0 }
+        guard let screen else { return 0 }
 
         if screen.hasNotch {
             if showBelowNotch {

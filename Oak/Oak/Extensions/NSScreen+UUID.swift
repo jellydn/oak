@@ -20,15 +20,15 @@ internal extension NSScreen {
     }
 
     @MainActor static func screen(withUUID uuid: String) -> NSScreen? {
-        return NSScreenUUIDCache.shared.screen(forUUID: uuid)
+        NSScreenUUIDCache.shared.screen(forUUID: uuid)
     }
 
     @MainActor static var screensByUUID: [String: NSScreen] {
-        return NSScreenUUIDCache.shared.allScreens
+        NSScreenUUIDCache.shared.allScreens
     }
 
     var hasNotch: Bool {
-        return safeAreaInsets.top > 0
+        safeAreaInsets.top > 0
     }
 }
 
@@ -45,7 +45,7 @@ internal final class NSScreenUUIDCache {
     }
 
     deinit {
-        if let observer = observer {
+        if let observer {
             NotificationCenter.default.removeObserver(observer)
         }
     }
@@ -73,10 +73,10 @@ internal final class NSScreenUUIDCache {
     }
 
     func screen(forUUID uuid: String) -> NSScreen? {
-        return cache[uuid]
+        cache[uuid]
     }
 
     var allScreens: [String: NSScreen] {
-        return cache
+        cache
     }
 }

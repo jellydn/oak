@@ -111,7 +111,7 @@ internal final class NSScreenNotchTests: XCTestCase {
         // Find screen with actual notch
         let notchedScreen = NSScreen.screens.first { $0.hasNotch }
 
-        if let notchedScreen = notchedScreen {
+        if let notchedScreen {
             XCTAssertTrue(notchedScreen.hasNotch, "Notched screen should have hasNotch == true")
             XCTAssertGreaterThan(
                 notchedScreen.safeAreaInsets.top,
@@ -141,7 +141,7 @@ internal final class NSScreenNotchTests: XCTestCase {
 
         // If a notched screen exists, it should be preferred
         let notchedScreen = NSScreen.screens.first { $0.hasNotch }
-        if let notchedScreen = notchedScreen {
+        if let notchedScreen {
             XCTAssertEqual(
                 targetScreen,
                 notchedScreen,

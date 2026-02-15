@@ -106,22 +106,22 @@ internal final class PresetSettingsStore: ObservableObject {
 
     func workMinutes(for preset: Preset) -> Int {
         switch preset {
-        case .short: return shortWorkMinutes
-        case .long: return longWorkMinutes
+        case .short: shortWorkMinutes
+        case .long: longWorkMinutes
         }
     }
 
     func breakMinutes(for preset: Preset) -> Int {
         switch preset {
-        case .short: return shortBreakMinutes
-        case .long: return longBreakMinutes
+        case .short: shortBreakMinutes
+        case .long: longBreakMinutes
         }
     }
 
     func longBreakMinutes(for preset: Preset) -> Int {
         switch preset {
-        case .short: return shortLongBreakMinutes
-        case .long: return longLongBreakMinutes
+        case .short: shortLongBreakMinutes
+        case .long: longLongBreakMinutes
         }
     }
 

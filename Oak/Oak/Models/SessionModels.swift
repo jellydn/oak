@@ -25,29 +25,29 @@ internal enum Preset: CaseIterable {
 
     var defaultWorkMinutes: Int {
         switch self {
-        case .short: return 25
-        case .long: return 50
+        case .short: 25
+        case .long: 50
         }
     }
 
     var defaultBreakMinutes: Int {
         switch self {
-        case .short: return 5
-        case .long: return 10
+        case .short: 5
+        case .long: 10
         }
     }
 
     var defaultLongBreakMinutes: Int {
         switch self {
-        case .short: return 15
-        case .long: return 20
+        case .short: 15
+        case .long: 20
         }
     }
 
     var displayName: String {
         switch self {
-        case .short: return "25/5"
-        case .long: return "50/10"
+        case .short: "25/5"
+        case .long: "50/10"
         }
     }
 }
@@ -62,8 +62,8 @@ internal enum DisplayTarget: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .mainDisplay: return "Main display"
-        case .notchedDisplay: return "Notched display"
+        case .mainDisplay: "Main display"
+        case .notchedDisplay: "Notched display"
         }
     }
 }
