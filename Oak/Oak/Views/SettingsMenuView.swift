@@ -38,21 +38,25 @@ internal struct SettingsMenuView: View {
             }
 
             section(title: "Session Presets") {
+                autoStartNextIntervalToggle
                 longBreakCycleEditor
                 presetEditor(title: presetSettings.displayName(for: .short), preset: .short)
                 presetEditor(title: presetSettings.displayName(for: .long), preset: .long)
             }
 
             section(title: "Notifications") {
-                notificationSettings
+                NotificationSettingsView(
+                    presetSettings: presetSettings,
+                    notificationService: notificationService
+                )
             }
 
             section(title: "Updates") {
-                updateSettings
+                UpdateSettingsView(sparkleUpdater: sparkleUpdater)
             }
 
             section(title: "Support") {
-                supportSection
+                SupportSectionView()
             }
 
             Divider()
@@ -234,98 +238,19 @@ internal struct SettingsMenuView: View {
         .font(.caption)
     }
 
+    private var autoStartNextIntervalToggle: some View {
+        Toggle(
+            "Auto-start next interval (10s delay)",
+            isOn: Binding(
+                get: { presetSettings.autoStartNextInterval },
+                set: { presetSettings.setAutoStartNextInterval($0) }
+            )
+        )
+        .font(.caption)
+    }
+
     private var hasNotchedScreen: Bool {
         NSScreen.screens.contains { $0.hasNotch }
-    }
-
-    private var notificationSettings: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(notificationStatusText)
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            Toggle(
-                "Play completion sound",
-                isOn: Binding(
-                    get: { presetSettings.playSoundOnSessionCompletion },
-                    set: { presetSettings.setPlaySoundOnSessionCompletion($0) }
-                )
-            )
-            .font(.caption)
-
-            HStack(spacing: 8) {
-                if notificationService.authorizationStatus == .notDetermined {
-                    Button("Allow Notifications") {
-                        Task {
-                            await notificationService.requestAuthorization()
-                        }
-                    }
-                } else if !notificationService.isAuthorized {
-                    Button("Open System Settings") {
-                        notificationService.openNotificationSettings()
-                    }
-                }
-
-                Button("Refresh Status") {
-                    Task {
-                        await notificationService.refreshAuthorizationStatus()
-                    }
-                }
-            }
-            .buttonStyle(.link)
-        }
-    }
-
-    private var supportSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("If Oak helps you focus, consider supporting the project ⭐️")
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            HStack(spacing: 12) {
-                Link("⭐ Star on GitHub", destination: URL(string: "https://github.com/jellydn/oak")!)
-                Link("☕ Buy Me a Coffee", destination: URL(string: "https://www.buymeacoffee.com/dunghd")!)
-                Link("❤️ Ko-fi", destination: URL(string: "https://ko-fi.com/dunghd")!)
-                Link("💙 PayPal", destination: URL(string: "https://paypal.me/dunghd")!)
-            }
-            .font(.caption)
-        }
-    }
-
-    private var updateSettings: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if !sparkleUpdater.isConfigured {
-                Text("Update signing is not configured (missing SUPublicEDKey).")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            Toggle(
-                "Automatically check for updates",
-                isOn: Binding(
-                    get: { sparkleUpdater.automaticallyChecksForUpdates },
-                    set: { sparkleUpdater.setAutomaticallyChecksForUpdates($0) }
-                )
-            )
-            .font(.caption)
-            .disabled(!sparkleUpdater.isConfigured)
-
-            Toggle(
-                "Automatically download updates",
-                isOn: Binding(
-                    get: { sparkleUpdater.automaticallyDownloadsUpdates },
-                    set: { sparkleUpdater.setAutomaticallyDownloadsUpdates($0) }
-                )
-            )
-            .font(.caption)
-            .disabled(!sparkleUpdater.isConfigured || !sparkleUpdater.automaticallyChecksForUpdates)
-
-            Button("Check for Updates Now") {
-                sparkleUpdater.checkForUpdates()
-            }
-            .buttonStyle(.link)
-            .disabled(!sparkleUpdater.isConfigured || !sparkleUpdater.canCheckForUpdates)
-        }
     }
 }
 
@@ -405,18 +330,5 @@ private extension SettingsMenuView {
         let cycleRange = "\(PresetSettingsStore.minRoundsBeforeLongBreak)"
             + "-\(PresetSettingsStore.maxRoundsBeforeLongBreak)"
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min, Long cycle \(cycleRange) sessions"
-    }
-
-    var notificationStatusText: String {
-        switch notificationService.authorizationStatus {
-        case .authorized, .provisional, .ephemeral:
-            return "Notifications are enabled."
-        case .notDetermined:
-            return "Notifications have not been requested yet."
-        case .denied:
-            return "Notifications are disabled. Enable them in System Settings."
-        @unknown default:
-            return "Notification status is unknown."
-        }
     }
 }

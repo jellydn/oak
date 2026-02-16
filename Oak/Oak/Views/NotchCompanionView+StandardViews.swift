@@ -19,11 +19,22 @@ internal extension NotchCompanionView {
                 )
                 .buttonStyle(.plain)
             } else if viewModel.canStartNext {
-                countdownDisplay(
-                    mode: viewModel.presetSettings.countdownDisplayMode,
-                    size: compactRingSize,
-                    fontSize: 13
-                )
+                if viewModel.autoStartCountdown > 0 {
+                    HStack(spacing: 4) {
+                        Text("\(viewModel.autoStartCountdown)")
+                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                            .foregroundColor(.blue.opacity(0.95))
+                        Text("starting...")
+                            .font(.system(size: 8, weight: .medium))
+                            .foregroundColor(.white.opacity(0.52))
+                    }
+                } else {
+                    countdownDisplay(
+                        mode: viewModel.presetSettings.countdownDisplayMode,
+                        size: compactRingSize,
+                        fontSize: 13
+                    )
+                }
                 Button(
                     action: { viewModel.startNextSession() },
                     label: {
@@ -148,6 +159,38 @@ internal extension NotchCompanionView {
                 )
                 .buttonStyle(.plain)
             } else if viewModel.canStartNext {
+                if viewModel.autoStartCountdown > 0 {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 4) {
+                            Text("\(viewModel.autoStartCountdown)")
+                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                                .foregroundColor(.blue.opacity(0.95))
+                            Text("starting...")
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundColor(.white.opacity(0.62))
+                        }
+                        Text("Next: \(viewModel.currentSessionType)")
+                            .font(.system(size: 8, weight: .medium))
+                            .foregroundColor(.white.opacity(0.52))
+                    }
+                } else {
+                    let displayMode = viewModel.presetSettings.countdownDisplayMode
+                    if displayMode == .circleRing {
+                        countdownDisplay(
+                            mode: displayMode,
+                            size: expandedRingSize,
+                            fontSize: 14,
+                            showSessionType: true
+                        )
+                    } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
+                            Text(viewModel.currentSessionType)
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundColor(.white.opacity(0.52))
+                        }
+                    }
+                }
                 Button(
                     action: { viewModel.startNextSession() },
                     label: {

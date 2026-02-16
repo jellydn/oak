@@ -97,4 +97,131 @@ internal final class SessionCompletionNotificationTests: XCTestCase {
             "Completion sound should not play when opted out"
         )
     }
+
+    func testBreakCompletionSoundSettingDefaultsToEnabled() {
+        XCTAssertTrue(
+            presetSettings.playSoundOnBreakCompletion,
+            "Break completion sound should be enabled by default"
+        )
+    }
+
+    func testBreakCompletionPlaysSoundByDefault() {
+        // Start and complete a work session
+        viewModel.startSession()
+        viewModel.completeSession()
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Work session completion should play sound")
+
+        // Start and complete a break session
+        viewModel.startNextSession() // This starts the break session
+        viewModel.completeSession() // Complete the break session
+
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 2, "Break session completion should play sound by default")
+    }
+
+    func testBreakCompletionDoesNotPlaySoundWhenDisabled() {
+        presetSettings.setPlaySoundOnBreakCompletion(false)
+
+        // Start and complete a work session
+        viewModel.startSession()
+        viewModel.completeSession()
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Work session completion should play sound")
+
+        // Start and complete a break session
+        viewModel.startNextSession() // This starts the break session
+        viewModel.completeSession() // Complete the break session
+
+        XCTAssertEqual(
+            completionSoundPlayer.playCallCount, 1,
+            "Break session completion should not play sound when disabled"
+        )
+    }
+
+    func testWorkSessionAlwaysPlaysSoundRegardlessOfBreakSetting() {
+        presetSettings.setPlaySoundOnBreakCompletion(false)
+
+        // Complete work session - should still play sound
+        viewModel.startSession()
+        viewModel.completeSession()
+
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Work session should always play sound")
+    }
+
+    func testPlaySoundOnBreakCompletionPersistence() {
+        let suiteName = "OakTests.BreakSoundPersistence.\(UUID().uuidString)"
+        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+            XCTFail("Failed to create UserDefaults")
+            return
+        }
+
+        let store = PresetSettingsStore(userDefaults: userDefaults)
+        XCTAssertTrue(store.playSoundOnBreakCompletion, "Should default to true")
+
+        store.setPlaySoundOnBreakCompletion(false)
+        XCTAssertFalse(store.playSoundOnBreakCompletion, "Should be false after setting")
+
+        // Create a new store with same UserDefaults
+        let reloadedStore = PresetSettingsStore(userDefaults: userDefaults)
+        XCTAssertFalse(reloadedStore.playSoundOnBreakCompletion, "Should persist as false")
+
+        UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
+    }
+
+    func testResetToDefaultSetsPlaySoundOnBreakCompletionToTrue() {
+        presetSettings.setPlaySoundOnBreakCompletion(false)
+        XCTAssertFalse(presetSettings.playSoundOnBreakCompletion)
+
+        presetSettings.resetToDefault()
+        XCTAssertTrue(presetSettings.playSoundOnBreakCompletion, "Should reset to true")
+    }
+
+    func testAutoStartedBreakSessionDoesNotPlaySound() {
+        // Start a work session and complete it
+        viewModel.startSession()
+        viewModel.completeSession()
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Work session should play sound")
+
+        // Manually start next session (simulating auto-start with isAutoStart: true)
+        viewModel.startNextSession(isAutoStart: true)
+
+        // Complete the break session - should NOT play sound even though playSoundOnBreakCompletion is true
+        viewModel.completeSession()
+
+        XCTAssertEqual(
+            completionSoundPlayer.playCallCount, 1,
+            "Auto-started break session should not play sound"
+        )
+    }
+
+    func testManuallyStartedBreakSessionPlaysSound() {
+        // Start a work session and complete it
+        viewModel.startSession()
+        viewModel.completeSession()
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Work session should play sound")
+
+        // Manually start next session (default isAutoStart: false)
+        viewModel.startNextSession()
+
+        // Complete the break session - should play sound
+        viewModel.completeSession()
+
+        XCTAssertEqual(
+            completionSoundPlayer.playCallCount, 2,
+            "Manually-started break session should play sound"
+        )
+    }
+
+    func testResetClearsAutoStartFlag() {
+        // Start and auto-complete a work session
+        viewModel.startSession()
+        viewModel.startNextSession(isAutoStart: true)
+
+        // Reset should clear the wasAutoStarted flag
+        viewModel.resetSession()
+
+        // Start a new session and complete it (now it's not auto-started)
+        viewModel.startSession()
+        viewModel.completeSession()
+
+        XCTAssertEqual(completionSoundPlayer.playCallCount, 1, "Should play sound after reset")
+    }
 }

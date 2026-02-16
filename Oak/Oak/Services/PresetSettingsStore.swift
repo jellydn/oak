@@ -22,9 +22,11 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var mainDisplayID: UInt32?
     @Published private(set) var notchedDisplayID: UInt32?
     @Published private(set) var playSoundOnSessionCompletion: Bool
+    @Published private(set) var playSoundOnBreakCompletion: Bool
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
     @Published private(set) var alwaysOnTop: Bool
     @Published private(set) var showBelowNotch: Bool
+    @Published private(set) var autoStartNextInterval: Bool
 
     private let userDefaults: UserDefaults
 
@@ -40,9 +42,11 @@ internal final class PresetSettingsStore: ObservableObject {
         static let mainDisplayID = "display.main.id"
         static let notchedDisplayID = "display.notched.id"
         static let playSoundOnSessionCompletion = "session.completion.playSound"
+        static let playSoundOnBreakCompletion = "session.completion.playSound.break"
         static let countdownDisplayMode = "countdown.displayMode"
         static let alwaysOnTop = "window.alwaysOnTop"
         static let showBelowNotch = "window.showBelowNotch"
+        static let autoStartNextInterval = "session.autoStartNextInterval"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -58,9 +62,11 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.roundsBeforeLongBreak: 4,
             Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
             Keys.playSoundOnSessionCompletion: true,
+            Keys.playSoundOnBreakCompletion: true,
             Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
             Keys.alwaysOnTop: true,
-            Keys.showBelowNotch: false
+            Keys.showBelowNotch: false,
+            Keys.autoStartNextInterval: false
         ]
         userDefaults.register(defaults: defaults)
 
@@ -78,11 +84,13 @@ internal final class PresetSettingsStore: ObservableObject {
         mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
         notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
         playSoundOnSessionCompletion = userDefaults.bool(forKey: Keys.playSoundOnSessionCompletion)
+        playSoundOnBreakCompletion = userDefaults.bool(forKey: Keys.playSoundOnBreakCompletion)
         let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode)
             ?? CountdownDisplayMode.number.rawValue
         countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
         alwaysOnTop = userDefaults.bool(forKey: Keys.alwaysOnTop)
         showBelowNotch = userDefaults.bool(forKey: Keys.showBelowNotch)
+        autoStartNextInterval = userDefaults.bool(forKey: Keys.autoStartNextInterval)
         ensureDisplayIDsInitialized()
     }
 
@@ -179,15 +187,23 @@ internal final class PresetSettingsStore: ObservableObject {
         setRoundsBeforeLongBreak(4)
         setDisplayTarget(.mainDisplay, screenID: nil)
         setPlaySoundOnSessionCompletion(true)
+        setPlaySoundOnBreakCompletion(true)
         setCountdownDisplayMode(.number)
         setAlwaysOnTop(true)
         setShowBelowNotch(false)
+        setAutoStartNextInterval(false)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {
         guard playSoundOnSessionCompletion != value else { return }
         playSoundOnSessionCompletion = value
         userDefaults.set(value, forKey: Keys.playSoundOnSessionCompletion)
+    }
+
+    func setPlaySoundOnBreakCompletion(_ value: Bool) {
+        guard playSoundOnBreakCompletion != value else { return }
+        playSoundOnBreakCompletion = value
+        userDefaults.set(value, forKey: Keys.playSoundOnBreakCompletion)
     }
 
     func setCountdownDisplayMode(_ mode: CountdownDisplayMode) {
@@ -206,6 +222,12 @@ internal final class PresetSettingsStore: ObservableObject {
         guard showBelowNotch != value else { return }
         showBelowNotch = value
         userDefaults.set(value, forKey: Keys.showBelowNotch)
+    }
+
+    func setAutoStartNextInterval(_ value: Bool) {
+        guard autoStartNextInterval != value else { return }
+        autoStartNextInterval = value
+        userDefaults.set(value, forKey: Keys.autoStartNextInterval)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {
