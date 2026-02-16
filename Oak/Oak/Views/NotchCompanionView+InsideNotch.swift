@@ -33,9 +33,7 @@ internal extension NotchCompanionView {
     @ViewBuilder
     private var insideNotchExpandedLeading: some View {
         if viewModel.canStart {
-            Text(viewModel.presetSettings.displayName(for: viewModel.selectedPreset))
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(.white.opacity(0.68))
+            presetSelector
         } else {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
             if displayMode == .circleRing {
@@ -60,7 +58,7 @@ internal extension NotchCompanionView {
     private var insideNotchExpandedPrimaryControls: some View {
         if viewModel.canStart {
             Button(
-                action: { viewModel.startSession() },
+                action: { viewModel.startSession(using: presetSelection) },
                 label: {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
@@ -132,9 +130,17 @@ internal extension NotchCompanionView {
     @ViewBuilder
     private var compactLeadingDisplay: some View {
         if viewModel.canStart {
-            Text(viewModel.presetSettings.displayName(for: viewModel.selectedPreset))
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(.white.opacity(0.68))
+            Button(
+                action: {
+                    presetSelection = presetSelection == .short ? .long : .short
+                },
+                label: {
+                    Text(presetLabel(for: presetSelection))
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.68))
+                }
+            )
+            .buttonStyle(.plain)
         } else {
             countdownDisplay(
                 mode: viewModel.presetSettings.countdownDisplayMode,
@@ -148,7 +154,7 @@ internal extension NotchCompanionView {
     private var compactPrimaryActionButton: some View {
         if viewModel.canStart {
             Button(
-                action: { viewModel.startSession() },
+                action: { viewModel.startSession(using: presetSelection) },
                 label: {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
