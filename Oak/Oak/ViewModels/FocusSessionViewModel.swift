@@ -18,6 +18,7 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
     @Published private(set) var completedRounds: Int = 0
+    @Published private(set) var autoStartCountdown: Int = 0
 
     let presetSettings: PresetSettingsStore
     private var timer: Timer?
@@ -201,6 +202,13 @@ internal class FocusSessionViewModel: ObservableObject {
             return
         }
 
+        // Cancel auto-start countdown if manually starting
+        if autoStartCountdown > 0 {
+            timer?.invalidate()
+            timer = nil
+            autoStartCountdown = 0
+        }
+
         isWorkSession = !completedWorkSession
 
         if isWorkSession {
@@ -231,6 +239,7 @@ internal class FocusSessionViewModel: ObservableObject {
         sessionEndDate = nil
         isSessionComplete = false
         completedRounds = 0
+        autoStartCountdown = 0
         audioManager.stop()
         sessionState = .idle
     }
@@ -294,6 +303,32 @@ internal class FocusSessionViewModel: ObservableObject {
         Task {
             try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
+            
+            // Start auto-start countdown if enabled
+            if presetSettings.autoStartNextInterval {
+                startAutoStartCountdown()
+            }
+        }
+    }
+
+    private func startAutoStartCountdown() {
+        autoStartCountdown = 10
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.tickAutoStartCountdown()
+            }
+        }
+    }
+
+    private func tickAutoStartCountdown() {
+        autoStartCountdown -= 1
+        if autoStartCountdown <= 0 {
+            timer?.invalidate()
+            timer = nil
+            autoStartCountdown = 0
+            if case .completed = sessionState {
+                startNextSession()
+            }
         }
     }
 

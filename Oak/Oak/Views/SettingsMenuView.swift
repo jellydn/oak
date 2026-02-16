@@ -38,6 +38,7 @@ internal struct SettingsMenuView: View {
             }
 
             section(title: "Session Presets") {
+                autoStartNextIntervalToggle
                 longBreakCycleEditor
                 presetEditor(title: presetSettings.displayName(for: .short), preset: .short)
                 presetEditor(title: presetSettings.displayName(for: .long), preset: .long)
@@ -229,6 +230,17 @@ internal struct SettingsMenuView: View {
             isOn: Binding(
                 get: { presetSettings.showBelowNotch },
                 set: { presetSettings.setShowBelowNotch($0) }
+            )
+        )
+        .font(.caption)
+    }
+
+    private var autoStartNextIntervalToggle: some View {
+        Toggle(
+            "Auto-start next interval (10s delay)",
+            isOn: Binding(
+                get: { presetSettings.autoStartNextInterval },
+                set: { presetSettings.setAutoStartNextInterval($0) }
             )
         )
         .font(.caption)

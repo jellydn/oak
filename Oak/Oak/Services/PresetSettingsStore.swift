@@ -25,6 +25,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
     @Published private(set) var alwaysOnTop: Bool
     @Published private(set) var showBelowNotch: Bool
+    @Published private(set) var autoStartNextInterval: Bool
 
     private let userDefaults: UserDefaults
 
@@ -43,6 +44,7 @@ internal final class PresetSettingsStore: ObservableObject {
         static let countdownDisplayMode = "countdown.displayMode"
         static let alwaysOnTop = "window.alwaysOnTop"
         static let showBelowNotch = "window.showBelowNotch"
+        static let autoStartNextInterval = "session.autoStartNextInterval"
     }
 
     init(userDefaults: UserDefaults = .standard) {
@@ -60,7 +62,8 @@ internal final class PresetSettingsStore: ObservableObject {
             Keys.playSoundOnSessionCompletion: true,
             Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
             Keys.alwaysOnTop: true,
-            Keys.showBelowNotch: false
+            Keys.showBelowNotch: false,
+            Keys.autoStartNextInterval: false
         ]
         userDefaults.register(defaults: defaults)
 
@@ -83,6 +86,7 @@ internal final class PresetSettingsStore: ObservableObject {
         countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
         alwaysOnTop = userDefaults.bool(forKey: Keys.alwaysOnTop)
         showBelowNotch = userDefaults.bool(forKey: Keys.showBelowNotch)
+        autoStartNextInterval = userDefaults.bool(forKey: Keys.autoStartNextInterval)
         ensureDisplayIDsInitialized()
     }
 
@@ -182,6 +186,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setCountdownDisplayMode(.number)
         setAlwaysOnTop(true)
         setShowBelowNotch(false)
+        setAutoStartNextInterval(false)
     }
 
     func setPlaySoundOnSessionCompletion(_ value: Bool) {
@@ -206,6 +211,12 @@ internal final class PresetSettingsStore: ObservableObject {
         guard showBelowNotch != value else { return }
         showBelowNotch = value
         userDefaults.set(value, forKey: Keys.showBelowNotch)
+    }
+
+    func setAutoStartNextInterval(_ value: Bool) {
+        guard autoStartNextInterval != value else { return }
+        autoStartNextInterval = value
+        userDefaults.set(value, forKey: Keys.autoStartNextInterval)
     }
 
     func setDisplayTarget(_ target: DisplayTarget) {
