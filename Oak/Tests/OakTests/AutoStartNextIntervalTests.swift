@@ -12,7 +12,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
     // Test timing constants
     private let animationCompletionDelay: UInt64 = 2_000_000_000 // 2 seconds in nanoseconds
     private let autoStartCountdownDuration: Int = 10 // 10 seconds
-    private let autoStartCompletionDelay: UInt64 = 13_000_000_000 // 13 seconds (1.5s animation + 10s countdown + 1.5s buffer)
+    private let autoStartCompletionDelay: UInt64 = 13_000_000_000 // 13s total (1.5s + 10s + 1.5s buffer)
 
     override func setUp() async throws {
         let suiteName = "AutoStartNextIntervalTests.\(UUID().uuidString)"
@@ -157,7 +157,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         XCTAssertGreaterThan(viewModel.autoStartCountdown, 0, "Countdown should start when auto-start is enabled")
-        XCTAssertLessThanOrEqual(viewModel.autoStartCountdown, autoStartCountdownDuration, "Countdown should not exceed 10 seconds")
+        XCTAssertLessThanOrEqual(viewModel.autoStartCountdown, autoStartCountdownDuration, "Countdown ≤ 10s")
     }
 
     func testAutoStartCountdownDecrementsOverTime() async {

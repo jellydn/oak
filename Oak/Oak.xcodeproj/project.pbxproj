@@ -31,6 +31,7 @@
 		67136E958CB86E30F7443B8B /* NSScreen+UUID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC19349D6F25778FBE54A06F /* NSScreen+UUID.swift */; };
 		6BF9354EE28ABB4B59A9E051 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B28E445B82B7BC8D6C4D0984 /* Sparkle */; };
 		716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23364F4B016E445E5657BF63 /* SettingsMenuView.swift */; };
+		81C83510720895955C3CAF42 /* AutoStartNextIntervalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC50430910EB73FAE1074FE /* AutoStartNextIntervalTests.swift */; };
 		82C6E45CC0A2D94BBBB83623 /* CountdownDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53A901D48495497B38B2A1E /* CountdownDisplayMode.swift */; };
 		82E4101ABE93B5EB4104D57F /* AlwaysOnTopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */; };
 		8C3115D9C4790B089D6977E9 /* US004Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFE863ED8125FD3D3029341 /* US004Tests.swift */; };
@@ -43,6 +44,7 @@
 		AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */; };
 		ADE41CB716798207A29851E9 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F287A617D7BF92425C7BD22A /* ConfettiView.swift */; };
 		AFED79B456244DE748741039 /* NotchWindowControllerTests+NotchWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F9A4FB15C8C324972DB6D6 /* NotchWindowControllerTests+NotchWindow.swift */; };
+		B50A1597C7F08585BA009886 /* AudioPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0983D0B297B59CB4626F50 /* AudioPersistenceTests.swift */; };
 		B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841F3EFAB628759B783D66D3 /* AudioTrack.swift */; };
 		B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C93F37E0AC4AA71C304FDD /* US003Tests.swift */; };
 		B561D0C04BC57500AF7A7EF0 /* NotchLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164FAFB05B901C05BD1479BF /* NotchLayout.swift */; };
@@ -99,6 +101,7 @@
 		37E445602CAD3F9843BA531B /* US006Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US006Tests.swift; sourceTree = "<group>"; };
 		3912FED25041D62DE77347EA /* NotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTests.swift; sourceTree = "<group>"; };
 		3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+DisplayTarget.swift"; sourceTree = "<group>"; };
+		3CC50430910EB73FAE1074FE /* AutoStartNextIntervalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoStartNextIntervalTests.swift; sourceTree = "<group>"; };
 		3DCAC7004FB57BBA5CEBB9B3 /* NotchVisualStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchVisualStyle.swift; sourceTree = "<group>"; };
 		3DE8639CEB8A5AB873283533 /* NotchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindowController.swift; sourceTree = "<group>"; };
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
@@ -109,6 +112,7 @@
 		732AEE30E8FEC2D900C8224A /* US005Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US005Tests.swift; sourceTree = "<group>"; };
 		7663A82B3FFE2837587C2B2F /* ambient_brown_noise.m4a */ = {isa = PBXFileReference; path = ambient_brown_noise.m4a; sourceTree = "<group>"; };
 		770CCC886CF6A5E903159704 /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
+		7D0983D0B297B59CB4626F50 /* AudioPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPersistenceTests.swift; sourceTree = "<group>"; };
 		7D93E5502BBC8DD90FD136BB /* ambient_forest.m4a */ = {isa = PBXFileReference; path = ambient_forest.m4a; sourceTree = "<group>"; };
 		814659335F8FBC1EB95296FD /* NotchWindowControllerTests+WindowBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchWindowControllerTests+WindowBehavior.swift"; sourceTree = "<group>"; };
 		83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongBreakTests.swift; sourceTree = "<group>"; };
@@ -216,6 +220,8 @@
 			children = (
 				0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */,
 				309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */,
+				7D0983D0B297B59CB4626F50 /* AudioPersistenceTests.swift */,
+				3CC50430910EB73FAE1074FE /* AutoStartNextIntervalTests.swift */,
 				0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */,
 				14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */,
 				F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */,
@@ -425,6 +431,8 @@
 			files = (
 				82E4101ABE93B5EB4104D57F /* AlwaysOnTopTests.swift in Sources */,
 				A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */,
+				B50A1597C7F08585BA009886 /* AudioPersistenceTests.swift in Sources */,
+				81C83510720895955C3CAF42 /* AutoStartNextIntervalTests.swift in Sources */,
 				542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */,
 				EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */,
 				EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */,
@@ -597,14 +605,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5011;
+				CURRENT_PROJECT_VERSION = 5013;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.11;
+				MARKETING_VERSION = 0.5.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -633,14 +641,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5011;
+				CURRENT_PROJECT_VERSION = 5013;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.11;
+				MARKETING_VERSION = 0.5.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
