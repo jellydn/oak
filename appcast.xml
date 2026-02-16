@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.14</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.14</link>
+  <sparkle:version>5014</sparkle:version>
+  <sparkle:shortVersionString>0.5.14</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.14</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>Add troubleshooting documentation for Gatekeeper warnings by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3946392394" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/88" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/88/hovercard" href="https://github.com/jellydn/oak/pull/88">#88</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.13...v0.5.14"><tt>v0.5.13...v0.5.14</tt></a></p>
+  ]]></description>
+  <pubDate>Mon, 16 Feb 2026 08:00:25 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.14/Oak-0.5.14.dmg"
+             sparkle:version="5014"
+             sparkle:shortVersionString="0.5.14"
+             sparkle:edSignature="tpPtraV4fWwpMxosra5Qa3MzyDDL6CuLLVZtPAeSqBoQJXs7MTK2htanRpPAyAPnVlhtCfjuE+5K9XckUK63Aw=="
+             length="8863457"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.13</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.13</link>
   <sparkle:version>5013</sparkle:version>
@@ -42,27 +63,6 @@
              sparkle:shortVersionString="0.5.12"
              sparkle:edSignature="m+0xCG9pOFipHe6wzeERFPMsi6Xu0H64LjTtd6yx6SJacOt8aEP5FwHDl40yEqx8GX2VbRFiEI7MD69TwEWXBg=="
              length="6621987"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.11</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.11</link>
-  <sparkle:version>5011</sparkle:version>
-  <sparkle:shortVersionString>0.5.11</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.11</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>feat(ui): add dismiss-on-click-outside modifier for popovers by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3944418025" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/82" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/82/hovercard" href="https://github.com/jellydn/oak/pull/82">#82</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.10...v0.5.11"><tt>v0.5.10...v0.5.11</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 15 Feb 2026 22:33:58 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.11/Oak-0.5.11.dmg"
-             sparkle:version="5011"
-             sparkle:shortVersionString="0.5.11"
-             sparkle:edSignature="OeH4RUUd1G8R6Riz5Nm8YdtENn/6bEVZH2EqzPsnOqHw9++93ZnZq8qIHQA52IW0WgElqg2cNG8+E2EzFTfeDw=="
-             length="6617830"
              type="application/octet-stream" />
 </item>
   </channel>
