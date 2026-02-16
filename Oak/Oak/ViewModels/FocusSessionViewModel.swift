@@ -29,6 +29,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var sessionStartSeconds: Int = 0
     private var sessionEndDate: Date?
     private var presetSettingsCancellable: AnyCancellable?
+    private var lastPlayingAudioTrack: AudioTrack = .none
     let audioManager = AudioManager()
     let progressManager: ProgressManager
     let notificationService: any SessionCompletionNotifying
@@ -227,6 +228,12 @@ internal class FocusSessionViewModel: ObservableObject {
 
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        
+        // Resume the previously playing audio track if there was one
+        if lastPlayingAudioTrack != .none {
+            audioManager.play(track: lastPlayingAudioTrack)
+        }
+        
         startTimer()
     }
 
@@ -243,6 +250,7 @@ internal class FocusSessionViewModel: ObservableObject {
         isSessionComplete = false
         completedRounds = 0
         autoStartCountdown = 0
+        lastPlayingAudioTrack = .none
         audioManager.stop()
         sessionState = .idle
     }
@@ -286,6 +294,11 @@ internal class FocusSessionViewModel: ObservableObject {
 
         // Send notification
         notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
+
+        // Remember the currently playing audio track before stopping
+        if audioManager.isPlaying && audioManager.selectedTrack != .none {
+            lastPlayingAudioTrack = audioManager.selectedTrack
+        }
 
         // Stop audio when any session ends
         audioManager.stop()
