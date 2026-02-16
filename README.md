@@ -33,11 +33,12 @@
 - macOS 13+ (Apple Silicon recommended)
 
 > [!IMPORTANT]
-> **First Launch Security Warning**  
+> **First Launch Security Warning**
+>
 > Oak is not yet signed with an Apple Developer certificate. macOS may show a warning that the app cannot be opened.
-> 
+>
 > **Quick Fix**: Right-click the app → select **Open** → click **Open** in the dialog.
-> 
+>
 > For detailed instructions and alternative methods, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Motivation

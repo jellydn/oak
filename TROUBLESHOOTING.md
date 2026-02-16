@@ -6,7 +6,7 @@ This guide helps you resolve common issues when running Oak on macOS.
 
 When you first try to open Oak, you may see this error:
 
-> **"Oak" Not Opened**  
+> **"Oak" Not Opened**
 > Apple could not verify "Oak" is free of malware that may harm your Mac or compromise your privacy.
 
 ### Why does this happen?
