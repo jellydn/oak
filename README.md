@@ -33,13 +33,13 @@
 - macOS 13+ (Apple Silicon recommended)
 
 > [!IMPORTANT]
-> We don't have an Apple Developer account yet. The application will show a popup on first launch that the app is from an unidentified developer.
-> 1. Click **OK** to close the popup.
-> 2. Open **System Settings** > **Privacy & Security**.
-> 3. Scroll down and click **Open Anyway** next to the warning about the app.
-> 4. Confirm your choice if prompted.
+> **First Launch Security Warning**
 >
-> You only need to do this once.
+> Oak is not yet signed with an Apple Developer certificate. macOS may show a warning that the app cannot be opened.
+>
+> **Quick Fix**: Right-click the app → select **Open** → click **Open** in the dialog.
+>
+> For detailed instructions and alternative methods, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Motivation
 
@@ -83,6 +83,7 @@ For more details about the update system, see [RELEASES.md](RELEASES.md).
 
 ## 📝 Documentation
 
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions (Gatekeeper warnings, etc.)
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Build commands and development setup
 - [RELEASES.md](RELEASES.md) - CI/CD pipeline and release process
 - [PRD](tasks/prd-macos-focus-companion-app.md) - Product Requirements Document
