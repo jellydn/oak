@@ -228,12 +228,12 @@ internal class FocusSessionViewModel: ObservableObject {
 
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
-        
+
         // Resume the previously playing audio track if there was one
         if lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
         }
-        
+
         startTimer()
     }
 
@@ -319,7 +319,7 @@ internal class FocusSessionViewModel: ObservableObject {
         Task {
             try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
-            
+
             // Start auto-start countdown if enabled
             if presetSettings.autoStartNextInterval {
                 startAutoStartCountdown()
