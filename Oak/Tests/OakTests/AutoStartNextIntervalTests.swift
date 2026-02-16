@@ -9,6 +9,11 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
     var presetSuiteName: String!
     var userDefaults: UserDefaults!
 
+    // Test timing constants
+    private let animationCompletionDelay: UInt64 = 2_000_000_000 // 2 seconds in nanoseconds
+    private let autoStartCountdownDuration: Int = 10 // 10 seconds
+    private let autoStartCompletionDelay: UInt64 = 13_000_000_000 // 13 seconds (1.5s animation + 10s countdown + 1.5s buffer)
+
     override func setUp() async throws {
         let suiteName = "AutoStartNextIntervalTests.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -136,8 +141,8 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.startSession()
         viewModel.completeSession()
 
-        // Wait for animation to complete (1.5 seconds)
-        try? await Task.sleep(nanoseconds: 2000000000)
+        // Wait for animation to complete
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         XCTAssertEqual(viewModel.autoStartCountdown, 0, "Countdown should not start when auto-start is disabled")
     }
@@ -148,11 +153,11 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.startSession()
         viewModel.completeSession()
 
-        // Wait for animation to complete (1.5 seconds)
-        try? await Task.sleep(nanoseconds: 2000000000)
+        // Wait for animation to complete
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         XCTAssertGreaterThan(viewModel.autoStartCountdown, 0, "Countdown should start when auto-start is enabled")
-        XCTAssertLessThanOrEqual(viewModel.autoStartCountdown, 10, "Countdown should not exceed 10 seconds")
+        XCTAssertLessThanOrEqual(viewModel.autoStartCountdown, autoStartCountdownDuration, "Countdown should not exceed 10 seconds")
     }
 
     func testAutoStartCountdownDecrementsOverTime() async {
@@ -162,13 +167,13 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.completeSession()
 
         // Wait for animation to complete
-        try? await Task.sleep(nanoseconds: 2000000000)
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         let initialCount = viewModel.autoStartCountdown
         XCTAssertGreaterThan(initialCount, 0, "Initial countdown should be greater than 0")
 
         // Wait for 2 more seconds
-        try? await Task.sleep(nanoseconds: 2000000000)
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         let laterCount = viewModel.autoStartCountdown
         XCTAssertLessThan(laterCount, initialCount, "Countdown should decrement over time")
@@ -181,7 +186,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.completeSession()
 
         // Wait for animation to complete
-        try? await Task.sleep(nanoseconds: 2000000000)
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         XCTAssertGreaterThan(viewModel.autoStartCountdown, 0, "Countdown should be active")
 
@@ -197,7 +202,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.completeSession()
 
         // Wait for animation to complete
-        try? await Task.sleep(nanoseconds: 2000000000)
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         XCTAssertGreaterThan(viewModel.autoStartCountdown, 0, "Countdown should be active")
 
@@ -215,7 +220,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.completeSession()
 
         // Wait for animation and countdown to complete
-        try? await Task.sleep(nanoseconds: 13000000000) // 13 seconds to ensure countdown completes
+        try? await Task.sleep(nanoseconds: autoStartCompletionDelay)
 
         XCTAssertEqual(viewModel.autoStartCountdown, 0, "Countdown should reset to 0 after auto-start")
         XCTAssertTrue(viewModel.isRunning, "Session should be running after auto-start")

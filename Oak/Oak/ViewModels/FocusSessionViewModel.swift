@@ -22,6 +22,7 @@ internal class FocusSessionViewModel: ObservableObject {
 
     let presetSettings: PresetSettingsStore
     private var timer: Timer?
+    private var autoStartTimer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
     private var isLongBreak: Bool = false
@@ -204,8 +205,8 @@ internal class FocusSessionViewModel: ObservableObject {
 
         // Cancel auto-start countdown if manually starting
         if autoStartCountdown > 0 {
-            timer?.invalidate()
-            timer = nil
+            autoStartTimer?.invalidate()
+            autoStartTimer = nil
             autoStartCountdown = 0
         }
 
@@ -232,6 +233,8 @@ internal class FocusSessionViewModel: ObservableObject {
     func resetSession() {
         timer?.invalidate()
         timer = nil
+        autoStartTimer?.invalidate()
+        autoStartTimer = nil
         currentRemainingSeconds = 0
         isWorkSession = true
         isLongBreak = false
@@ -313,7 +316,8 @@ internal class FocusSessionViewModel: ObservableObject {
 
     private func startAutoStartCountdown() {
         autoStartCountdown = 10
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        autoStartTimer?.invalidate()
+        autoStartTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 self?.tickAutoStartCountdown()
             }
@@ -323,8 +327,8 @@ internal class FocusSessionViewModel: ObservableObject {
     private func tickAutoStartCountdown() {
         autoStartCountdown -= 1
         if autoStartCountdown <= 0 {
-            timer?.invalidate()
-            timer = nil
+            autoStartTimer?.invalidate()
+            autoStartTimer = nil
             autoStartCountdown = 0
             if case .completed = sessionState {
                 startNextSession()
@@ -334,6 +338,7 @@ internal class FocusSessionViewModel: ObservableObject {
 
     deinit {
         timer?.invalidate()
+        autoStartTimer?.invalidate()
         presetSettingsCancellable?.cancel()
         let manager = audioManager
         Task { @MainActor in
