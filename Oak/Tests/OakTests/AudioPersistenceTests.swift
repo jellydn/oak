@@ -261,7 +261,8 @@ internal final class AudioPersistenceTests: XCTestCase {
                 break
             } else {
                 // We're in a break session now, audio should NOT have resumed
-                XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT resume on break session \(sessionCount)")
+                let msg = "Audio should NOT resume on break session \(sessionCount)"
+                XCTAssertFalse(viewModel.audioManager.isPlaying, msg)
 
                 // Complete break and start next focus
                 viewModel.completeSession()
