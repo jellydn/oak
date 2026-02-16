@@ -306,7 +306,9 @@ internal class FocusSessionViewModel: ObservableObject {
         // Stop audio when any session ends
         audioManager.stop()
 
-        if presetSettings.playSoundOnSessionCompletion {
+        let shouldPlaySound = presetSettings.playSoundOnSessionCompletion &&
+            (isWorkSession || presetSettings.playSoundOnBreakCompletion)
+        if shouldPlaySound {
             completionSoundPlayer.playCompletionSound()
         }
 

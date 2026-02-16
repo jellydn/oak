@@ -265,6 +265,16 @@ internal struct SettingsMenuView: View {
             )
             .font(.caption)
 
+            Toggle(
+                "Play sound on break completion",
+                isOn: Binding(
+                    get: { presetSettings.playSoundOnBreakCompletion },
+                    set: { presetSettings.setPlaySoundOnBreakCompletion($0) }
+                )
+            )
+            .font(.caption)
+            .disabled(!presetSettings.playSoundOnSessionCompletion)
+
             HStack(spacing: 8) {
                 if notificationService.authorizationStatus == .notDetermined {
                     Button("Allow Notifications") {
