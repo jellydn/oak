@@ -10,9 +10,9 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
     var userDefaults: UserDefaults!
 
     // Test timing constants
-    private let animationCompletionDelay: UInt64 = 2_000_000_000 // 2 seconds in nanoseconds
+    private let animationCompletionDelay: UInt64 = 2000000000 // 2 seconds in nanoseconds
     private let autoStartCountdownDuration: Int = 10 // 10 seconds
-    private let autoStartCompletionDelay: UInt64 = 13_000_000_000 // 13s total (1.5s + 10s + 1.5s buffer)
+    private let autoStartCompletionDelay: UInt64 = 13000000000 // 13s total (1.5s + 10s + 1.5s buffer)
 
     override func setUp() async throws {
         let suiteName = "AutoStartNextIntervalTests.\(UUID().uuidString)"
@@ -251,7 +251,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         XCTAssertGreaterThan(viewModel.autoStartCountdown, 0, "Countdown should start in completed state")
     }
 
-    func testAutoStartCountdownIsPublished() async {
+    func testAutoStartCountdownIsPublished() async throws {
         presetSettings.setAutoStartNextInterval(true)
 
         let expectation = expectation(description: "Countdown value changed")
@@ -272,7 +272,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 3.0)
 
         XCTAssertNotNil(receivedValue, "Published property should emit new value")
-        XCTAssertGreaterThan(receivedValue!, 0, "Countdown value should be greater than 0")
+        XCTAssertGreaterThan(try XCTUnwrap(receivedValue), 0, "Countdown value should be greater than 0")
         cancellable.cancel()
     }
 }

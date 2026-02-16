@@ -73,7 +73,7 @@ internal final class AudioPersistenceTests: XCTestCase {
         XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should stop on completion")
 
         // Wait for auto-start countdown and next session to start
-        try? await Task.sleep(nanoseconds: 13_000_000_000) // 13 seconds for auto-start
+        try? await Task.sleep(nanoseconds: 13000000000) // 13 seconds for auto-start
 
         // Audio should resume with forest
         XCTAssertTrue(viewModel.isRunning, "Next session should have auto-started")
