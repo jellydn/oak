@@ -33,7 +33,7 @@ internal extension NotchCompanionView {
     @ViewBuilder
     private var insideNotchExpandedLeading: some View {
         if viewModel.canStart {
-            Text("Ready")
+            Text(viewModel.presetSettings.displayName(for: viewModel.selectedPreset))
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(.white.opacity(0.68))
         } else {
@@ -132,7 +132,7 @@ internal extension NotchCompanionView {
     @ViewBuilder
     private var compactLeadingDisplay: some View {
         if viewModel.canStart {
-            Text("Focus")
+            Text(viewModel.presetSettings.displayName(for: viewModel.selectedPreset))
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(.white.opacity(0.68))
         } else {
