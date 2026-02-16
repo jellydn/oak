@@ -245,7 +245,7 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         viewModel.completeSession()
 
         // Wait for animation to complete
-        try? await Task.sleep(nanoseconds: 2000000000)
+        try? await Task.sleep(nanoseconds: animationCompletionDelay)
 
         // Now countdown should start
         XCTAssertGreaterThan(viewModel.autoStartCountdown, 0, "Countdown should start in completed state")

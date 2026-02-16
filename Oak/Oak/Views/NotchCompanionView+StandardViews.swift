@@ -165,7 +165,7 @@ internal extension NotchCompanionView {
                             Text("\(viewModel.autoStartCountdown)")
                                 .font(.system(size: 14, weight: .semibold, design: .monospaced))
                                 .foregroundColor(.blue.opacity(0.95))
-                            Text("auto-starting...")
+                            Text("starting...")
                                 .font(.system(size: 8, weight: .medium))
                                 .foregroundColor(.white.opacity(0.62))
                         }
