@@ -33,6 +33,8 @@ internal class FocusSessionViewModel: ObservableObject {
     private var presetSettingsCancellable: AnyCancellable?
     /// Stores the last playing audio track to resume after auto-start.
     private var lastPlayingAudioTrack: AudioTrack = .none
+    /// Whether the current session was started via auto-start (affects sound on break).
+    private var wasAutoStarted: Bool = false
     let audioManager = AudioManager()
     let progressManager: ProgressManager
     let notificationService: any SessionCompletionNotifying
@@ -171,6 +173,24 @@ internal class FocusSessionViewModel: ObservableObject {
         progressManager.dailyStats.streakDays
     }
 
+    func cleanup() {
+        resetSession()
+    }
+
+    deinit {
+        timer?.invalidate()
+        autoStartTimer?.invalidate()
+        presetSettingsCancellable?.cancel()
+        let manager = audioManager
+        Task { @MainActor in
+            manager.stop()
+        }
+    }
+}
+
+// MARK: - Session Control
+@MainActor
+internal extension FocusSessionViewModel {
     func selectPreset(_ preset: Preset) {
         guard canStart else { return }
         selectedPreset = preset
@@ -201,7 +221,7 @@ internal class FocusSessionViewModel: ObservableObject {
         startTimer()
     }
 
-    func startNextSession() {
+    func startNextSession(isAutoStart: Bool = false) {
         let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
         guard case let .completed(completedWorkSession) = sessionState else {
             return
@@ -214,6 +234,7 @@ internal class FocusSessionViewModel: ObservableObject {
             autoStartCountdown = 0
         }
 
+        wasAutoStarted = isAutoStart
         isWorkSession = !completedWorkSession
 
         if isWorkSession {
@@ -254,6 +275,7 @@ internal class FocusSessionViewModel: ObservableObject {
         completedRounds = 0
         autoStartCountdown = 0
         lastPlayingAudioTrack = .none
+        wasAutoStarted = false
         audioManager.stop()
         sessionState = .idle
     }
@@ -306,8 +328,9 @@ internal class FocusSessionViewModel: ObservableObject {
         // Stop audio when any session ends
         audioManager.stop()
 
+        // Don't play sound on break sessions that were auto-started
         let shouldPlaySound = presetSettings.playSoundOnSessionCompletion &&
-            (isWorkSession || presetSettings.playSoundOnBreakCompletion)
+            (isWorkSession || (presetSettings.playSoundOnBreakCompletion && !wasAutoStarted))
         if shouldPlaySound {
             completionSoundPlayer.playCompletionSound()
         }
@@ -351,22 +374,8 @@ internal class FocusSessionViewModel: ObservableObject {
             autoStartTimer = nil
             autoStartCountdown = 0
             if case .completed = sessionState {
-                startNextSession()
+                startNextSession(isAutoStart: true)
             }
         }
-    }
-
-    deinit {
-        timer?.invalidate()
-        autoStartTimer?.invalidate()
-        presetSettingsCancellable?.cancel()
-        let manager = audioManager
-        Task { @MainActor in
-            manager.stop()
-        }
-    }
-
-    func cleanup() {
-        resetSession()
     }
 }
