@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.12</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.12</link>
+  <sparkle:version>5012</sparkle:version>
+  <sparkle:shortVersionString>0.5.12</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.12</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>Show presets and allow selection in notch UI by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3945623176" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/85" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/85/hovercard" href="https://github.com/jellydn/oak/pull/85">#85</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.11...v0.5.12"><tt>v0.5.11...v0.5.12</tt></a></p>
+  ]]></description>
+  <pubDate>Mon, 16 Feb 2026 03:17:52 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.12/Oak-0.5.12.dmg"
+             sparkle:version="5012"
+             sparkle:shortVersionString="0.5.12"
+             sparkle:edSignature="m+0xCG9pOFipHe6wzeERFPMsi6Xu0H64LjTtd6yx6SJacOt8aEP5FwHDl40yEqx8GX2VbRFiEI7MD69TwEWXBg=="
+             length="6621987"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.11</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.11</link>
   <sparkle:version>5011</sparkle:version>
@@ -46,27 +67,6 @@
              sparkle:shortVersionString="0.5.10"
              sparkle:edSignature="2XwbxQpWCetaIo2IrrR1wFOZP03Tfw36Rm7DMWbE6QM7jsE2x/7wyfUfOx5kMjj1GaxOiZCVx0L5k5T9E64YAA=="
              length="6604235"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.9</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.9</link>
-  <sparkle:version>5009</sparkle:version>
-  <sparkle:shortVersionString>0.5.9</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.9</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>refactor: Replace singleton pattern with dependency injection by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3944137000" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/79" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/79/hovercard" href="https://github.com/jellydn/oak/pull/79">#79</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.8...v0.5.9"><tt>v0.5.8...v0.5.9</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 15 Feb 2026 15:42:30 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.9/Oak-0.5.9.dmg"
-             sparkle:version="5009"
-             sparkle:shortVersionString="0.5.9"
-             sparkle:edSignature="EGRGD5VdXl5UyQno8d07ZgOk78V9IR6MRXtLY3ZWTGCViSrcs0xbnxcIPe2NwUtVXAtWAcBatt8A99Sgs75HBQ=="
-             length="6604248"
              type="application/octet-stream" />
 </item>
   </channel>
