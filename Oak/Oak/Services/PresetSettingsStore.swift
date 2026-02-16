@@ -25,6 +25,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
     @Published private(set) var alwaysOnTop: Bool
     @Published private(set) var showBelowNotch: Bool
+    /// Whether to automatically start the next interval after the current one completes.
     @Published private(set) var autoStartNextInterval: Bool
 
     private let userDefaults: UserDefaults
@@ -213,6 +214,7 @@ internal final class PresetSettingsStore: ObservableObject {
         userDefaults.set(value, forKey: Keys.showBelowNotch)
     }
 
+    /// Sets whether to automatically start the next interval after the current one completes.
     func setAutoStartNextInterval(_ value: Bool) {
         guard autoStartNextInterval != value else { return }
         autoStartNextInterval = value

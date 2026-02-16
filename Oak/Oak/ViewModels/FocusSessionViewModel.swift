@@ -18,10 +18,12 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
     @Published private(set) var completedRounds: Int = 0
+    /// The countdown value in seconds before auto-starting the next session.
     @Published private(set) var autoStartCountdown: Int = 0
 
     let presetSettings: PresetSettingsStore
     private var timer: Timer?
+    /// Timer that handles the auto-start countdown.
     private var autoStartTimer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
@@ -29,6 +31,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var sessionStartSeconds: Int = 0
     private var sessionEndDate: Date?
     private var presetSettingsCancellable: AnyCancellable?
+    /// Stores the last playing audio track to resume after auto-start.
     private var lastPlayingAudioTrack: AudioTrack = .none
     let audioManager = AudioManager()
     let progressManager: ProgressManager
@@ -327,6 +330,7 @@ internal class FocusSessionViewModel: ObservableObject {
         }
     }
 
+    /// Starts the auto-start countdown timer for the next session.
     private func startAutoStartCountdown() {
         autoStartCountdown = 10
         autoStartTimer?.invalidate()
@@ -337,6 +341,7 @@ internal class FocusSessionViewModel: ObservableObject {
         }
     }
 
+    /// Decrements the auto-start countdown and starts the next session when it reaches zero.
     private func tickAutoStartCountdown() {
         autoStartCountdown -= 1
         if autoStartCountdown <= 0 {
