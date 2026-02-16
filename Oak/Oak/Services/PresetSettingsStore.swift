@@ -22,12 +22,10 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var mainDisplayID: UInt32?
     @Published private(set) var notchedDisplayID: UInt32?
     @Published private(set) var playSoundOnSessionCompletion: Bool
-    /// Whether to play sound when a break session completes. Defaults to true.
     @Published private(set) var playSoundOnBreakCompletion: Bool
     @Published private(set) var countdownDisplayMode: CountdownDisplayMode
     @Published private(set) var alwaysOnTop: Bool
     @Published private(set) var showBelowNotch: Bool
-    /// Whether to automatically start the next interval after the current one completes.
     @Published private(set) var autoStartNextInterval: Bool
 
     private let userDefaults: UserDefaults
@@ -202,7 +200,6 @@ internal final class PresetSettingsStore: ObservableObject {
         userDefaults.set(value, forKey: Keys.playSoundOnSessionCompletion)
     }
 
-    /// Sets whether to play a sound when a break session completes.
     func setPlaySoundOnBreakCompletion(_ value: Bool) {
         guard playSoundOnBreakCompletion != value else { return }
         playSoundOnBreakCompletion = value
@@ -227,7 +224,6 @@ internal final class PresetSettingsStore: ObservableObject {
         userDefaults.set(value, forKey: Keys.showBelowNotch)
     }
 
-    /// Sets whether to automatically start the next interval after the current one completes.
     func setAutoStartNextInterval(_ value: Bool) {
         guard autoStartNextInterval != value else { return }
         autoStartNextInterval = value

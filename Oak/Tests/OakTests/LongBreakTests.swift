@@ -47,55 +47,44 @@ internal final class LongBreakTests: XCTestCase {
     }
 
     func testLongBreakDurationsAreConfigured() {
-        // Verify long break durations are defined
         XCTAssertEqual(
             presetSettings.longBreakDuration(for: .short),
-            15 * 60,
-            "Short preset long break should be 15 minutes"
+            15 * 60
         )
         XCTAssertEqual(
             presetSettings.longBreakDuration(for: .long),
-            20 * 60,
-            "Long preset long break should be 20 minutes"
+            20 * 60
         )
     }
 
     func testRoundCounterStartsAtZero() {
-        // Verify initial state
-        XCTAssertEqual(viewModel.completedRounds, 0, "Should start with 0 completed rounds")
+        XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testRoundCounterIncrementsAfterWorkSession() {
-        // Start and complete a work session
         viewModel.startSession()
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should be 0 before completion")
+        XCTAssertEqual(viewModel.completedRounds, 0)
 
-        // Simulate work session completion
         viewModel.completeSession()
-        XCTAssertEqual(viewModel.completedRounds, 1, "Rounds should increment to 1 after work completion")
+        XCTAssertEqual(viewModel.completedRounds, 1)
     }
 
     func testRoundCounterDoesNotIncrementAfterBreakSession() {
-        // Start and complete a work session first
         viewModel.startSession()
         viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1)
 
-        // Start and complete a break session
         viewModel.startNextSession()
         XCTAssertEqual(viewModel.currentSessionType, "Break")
         viewModel.completeSession()
 
-        // Rounds should still be 1
-        XCTAssertEqual(viewModel.completedRounds, 1, "Rounds should not increment after break")
+        XCTAssertEqual(viewModel.completedRounds, 1)
     }
 
     func testShortBreakUsedForFirstThreeRounds() {
         viewModel.selectedPreset = .short
 
-        // Complete 3 work sessions and verify short breaks
         for round in 1 ... 3 {
-            // Start work session
             if round == 1 {
                 viewModel.startSession()
             } else {
@@ -104,20 +93,17 @@ internal final class LongBreakTests: XCTestCase {
             viewModel.completeSession()
             XCTAssertEqual(viewModel.completedRounds, round)
 
-            // Start break and verify it's a short break
             viewModel.startNextSession()
             if case let .running(remaining, isWork) = viewModel.sessionState {
-                XCTAssertFalse(isWork, "Should be a break session")
+                XCTAssertFalse(isWork)
                 XCTAssertEqual(
                     remaining,
-                    presetSettings.breakDuration(for: .short),
-                    "Should use short break duration for round \(round)"
+                    presetSettings.breakDuration(for: .short)
                 )
             } else {
                 XCTFail("Should be in running state")
             }
 
-            // Complete break
             viewModel.completeSession()
         }
     }
@@ -125,22 +111,18 @@ internal final class LongBreakTests: XCTestCase {
     func testLongBreakTriggeredAfterFourthRound() {
         viewModel.selectedPreset = .short
 
-        // Complete 4 work sessions
         completeFourWorkSessions()
 
-        // After 4th work session, verify UI shows "Long Break"
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' label after 4th round")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        // Next break should be long
         viewModel.startNextSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' during long break session")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
         if case let .running(remaining, isWork) = viewModel.sessionState {
-            XCTAssertFalse(isWork, "Should be a break session")
+            XCTAssertFalse(isWork)
             XCTAssertEqual(
                 remaining,
-                presetSettings.longBreakDuration(for: .short),
-                "Should use long break duration after 4 rounds"
+                presetSettings.longBreakDuration(for: .short)
             )
         } else {
             XCTFail("Should be in running state")
@@ -150,178 +132,144 @@ internal final class LongBreakTests: XCTestCase {
     func testRoundCounterResetsAfterLongBreak() {
         viewModel.selectedPreset = .short
 
-        // Complete 4 work sessions
         completeFourWorkSessions()
 
-        XCTAssertEqual(viewModel.completedRounds, 4, "Should have 4 completed rounds")
+        XCTAssertEqual(viewModel.completedRounds, 4)
 
-        // Start long break
         viewModel.startNextSession()
 
-        // Rounds should still be 4 while long break is in progress
-        XCTAssertEqual(viewModel.completedRounds, 4, "Rounds should remain at 4 during long break")
+        XCTAssertEqual(viewModel.completedRounds, 4)
 
-        // Complete the long break
         viewModel.completeSession()
 
-        // Rounds should be reset to 0 after long break completes
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
+        XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testRoundCounterResetsAfterLongBreakWithAutoStart() {
         presetSettings.setAutoStartNextInterval(true)
         viewModel.selectedPreset = .short
 
-        // Complete 4 work sessions
         completeFourWorkSessions()
 
-        XCTAssertEqual(viewModel.completedRounds, 4, "Should have 4 completed rounds")
+        XCTAssertEqual(viewModel.completedRounds, 4)
 
-        // Start long break with auto-start
         viewModel.startNextSession(isAutoStart: true)
 
-        // Rounds should still be 4 while long break is in progress
-        XCTAssertEqual(viewModel.completedRounds, 4, "Rounds should remain at 4 during long break")
+        XCTAssertEqual(viewModel.completedRounds, 4)
 
-        // Complete the long break
         viewModel.completeSession()
 
-        // Rounds should be reset to 0 after long break completes
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
+        XCTAssertEqual(viewModel.completedRounds, 0)
 
-        // Auto-start the next work session
         viewModel.startNextSession(isAutoStart: true)
 
-        // Should be in work session with 0 completed rounds
         XCTAssertEqual(viewModel.currentSessionType, "Focus")
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should still be 0 for first session of new cycle")
+        XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testRoundsResetWhenLongBreakCancelled() {
         viewModel.selectedPreset = .short
 
-        // Complete 4 work sessions to trigger long break
         completeFourWorkSessions()
 
         XCTAssertEqual(viewModel.completedRounds, 4)
 
-        // Start long break but reset before completing
         viewModel.startNextSession()
         XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        // Reset session (cancel long break)
         viewModel.resetSession()
 
-        // Rounds should be reset to 0 (session reset always resets rounds)
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 on session reset")
+        XCTAssertEqual(viewModel.completedRounds, 0)
 
-        // Starting a new session should restart the cycle
         viewModel.startSession()
         XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testRoundCounterResetsOnSessionReset() {
-        // Complete a work session
         viewModel.startSession()
         viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1)
 
-        // Reset session
         viewModel.resetSession()
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 on session reset")
+        XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testRoundCounterResetsOnNewSession() {
-        // Complete a work session
         viewModel.startSession()
         viewModel.completeSession()
         XCTAssertEqual(viewModel.completedRounds, 1)
 
-        // Start a new session from idle
         viewModel.resetSession()
         viewModel.startSession()
-        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 on new session start")
+        XCTAssertEqual(viewModel.completedRounds, 0)
     }
 
     func testDisplayTimeShowsLongBreakDurationAfterFourthRound() {
         viewModel.selectedPreset = .short
 
-        // Complete 4 work sessions
         completeFourWorkSessions()
 
-        // After 4th work session completion, display time should show long break duration
-        XCTAssertEqual(viewModel.displayTime, "15:00", "Should display 15 minute long break time")
+        XCTAssertEqual(viewModel.displayTime, "15:00")
     }
 
     func testLongBreakWorksWithLongPreset() {
         viewModel.selectedPreset = .long
 
-        // Complete 4 work sessions
         completeFourWorkSessions()
 
-        // After 4th work session, next break should be long (20 minutes for long preset)
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' label")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
         viewModel.startNextSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' during long break")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
         if case let .running(remaining, isWork) = viewModel.sessionState {
-            XCTAssertFalse(isWork, "Should be a break session")
+            XCTAssertFalse(isWork)
             XCTAssertEqual(
                 remaining,
-                presetSettings.longBreakDuration(for: .long),
-                "Should use long break duration (20 min) for long preset"
+                presetSettings.longBreakDuration(for: .long)
             )
         } else {
             XCTFail("Should be in running state")
         }
 
-        XCTAssertEqual(viewModel.displayTime, "20:00", "Should display 20 minute long break time for long preset")
+        XCTAssertEqual(viewModel.displayTime, "20:00")
     }
 
     func testCurrentSessionTypeDuringLongBreak() {
         viewModel.selectedPreset = .short
 
-        // Complete 4 work sessions to reach long break
         completeFourWorkSessions()
 
-        // Verify label shows "Long Break" in completed state
         XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        // Start the long break and verify label during running state
         viewModel.startNextSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' while running")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        // Pause and verify label during paused state
         viewModel.pauseSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' while paused")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        // Resume and verify label
         viewModel.resumeSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should show 'Long Break' after resume")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
     }
 
     func testLongBreakTriggerUsesConfiguredRoundInterval() {
         presetSettings.setRoundsBeforeLongBreak(3)
         viewModel.selectedPreset = .short
 
-        // Round 1
         viewModel.startSession()
         viewModel.completeSession()
         viewModel.startNextSession()
         viewModel.completeSession()
 
-        // Round 2
         viewModel.startNextSession()
         viewModel.completeSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Break", "Should still be short break before configured interval")
+        XCTAssertEqual(viewModel.currentSessionType, "Break")
         viewModel.startNextSession()
         viewModel.completeSession()
 
-        // Round 3 should trigger long break
         viewModel.startNextSession()
         viewModel.completeSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should trigger long break at configured interval")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
     }
 
     func testLongBreakUsesConfiguredDuration() {
@@ -333,8 +281,8 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.startNextSession()
 
         if case let .running(remaining, isWork) = viewModel.sessionState {
-            XCTAssertFalse(isWork, "Should be a break session")
-            XCTAssertEqual(remaining, 30 * 60, "Should use configured long break duration")
+            XCTAssertFalse(isWork)
+            XCTAssertEqual(remaining, 30 * 60)
         } else {
             XCTFail("Should be in running state")
         }

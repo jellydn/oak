@@ -32,251 +32,195 @@ internal final class AudioPersistenceTests: XCTestCase {
     // MARK: - Audio Track Persistence Tests
 
     func testAudioTrackPersistsAcrossManualSessionTransition() {
-        // Start a focus session
         viewModel.startSession()
-        XCTAssertTrue(viewModel.isRunning, "Session should be running")
+        XCTAssertTrue(viewModel.isRunning)
 
-        // Select and play rain audio
         viewModel.audioManager.play(track: .rain)
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain, "Rain should be playing")
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should be playing")
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
 
-        // Complete the session
         viewModel.completeSession()
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should stop on completion")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none, "Selected track should be none after stop")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
 
-        // Start next session manually (break session)
         viewModel.startNextSession()
-        XCTAssertTrue(viewModel.isRunning, "Next session should be running")
-        XCTAssertEqual(viewModel.currentSessionType, "Break", "Should be break session")
+        XCTAssertTrue(viewModel.isRunning)
+        XCTAssertEqual(viewModel.currentSessionType, "Break")
 
-        // Audio should NOT resume on break sessions
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT resume on break")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none, "No audio on break")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
 
-        // Complete break and start next focus session
         viewModel.completeSession()
         viewModel.startNextSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Focus", "Should be focus session")
+        XCTAssertEqual(viewModel.currentSessionType, "Focus")
 
-        // Audio should resume with rain on focus session
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should resume on focus")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain, "Rain should resume")
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
     }
 
     func testAudioTrackPersistsAcrossAutoStartSessionTransition() async {
-        // Enable auto-start
         presetSettings.setAutoStartNextInterval(true)
 
-        // Start a focus session
         viewModel.startSession()
-        XCTAssertTrue(viewModel.isRunning, "Session should be running")
+        XCTAssertTrue(viewModel.isRunning)
 
-        // Select and play forest audio
         viewModel.audioManager.play(track: .forest)
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .forest, "Forest should be playing")
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should be playing")
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .forest)
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
 
-        // Complete the session
         viewModel.completeSession()
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should stop on completion")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
 
-        // Wait for auto-start countdown and break session to start
-        try? await Task.sleep(nanoseconds: 13000000000) // 13 seconds for auto-start
+        try? await Task.sleep(nanoseconds: 13000000000)
 
-        // Break session should have auto-started
-        XCTAssertTrue(viewModel.isRunning, "Next session should have auto-started")
-        XCTAssertEqual(viewModel.currentSessionType, "Break", "Should be break session")
+        XCTAssertTrue(viewModel.isRunning)
+        XCTAssertEqual(viewModel.currentSessionType, "Break")
 
-        // Audio should NOT resume on break sessions
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT resume on break")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none, "No audio on break")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
     }
 
     func testAudioTrackPersistsThroughMultipleSessions() {
-        // Start with rain audio
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
 
-        // Complete and start next (break) - audio should NOT resume
         viewModel.completeSession()
         viewModel.startNextSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Break", "Should be break session")
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT play on break")
+        XCTAssertEqual(viewModel.currentSessionType, "Break")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
 
-        // Complete break and start next focus - audio should resume
         viewModel.completeSession()
         viewModel.startNextSession()
-        XCTAssertEqual(viewModel.currentSessionType, "Focus", "Should be focus session")
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should resume on focus")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain, "Rain should persist to next focus")
+        XCTAssertEqual(viewModel.currentSessionType, "Focus")
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
     }
 
     func testNoAudioDoesNotStartAutomatically() {
-        // Start a session without selecting audio
         viewModel.startSession()
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "No audio should be playing")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
 
-        // Complete and start next
         viewModel.completeSession()
         viewModel.startNextSession()
 
-        // Audio should still be none
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "No audio should start automatically")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
     }
 
     func testAudioTrackChangeMidSessionPersistsToNext() {
-        // Start with rain
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
 
-        // Change to cafe mid-session
         viewModel.audioManager.play(track: .cafe)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .cafe)
 
-        // Complete and start next (break) - audio should NOT resume
         viewModel.completeSession()
         viewModel.startNextSession()
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT resume on break")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
 
-        // Complete break and start next focus - cafe should resume
         viewModel.completeSession()
         viewModel.startNextSession()
 
-        // Cafe should persist and resume on focus
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should resume on focus")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .cafe, "Cafe should persist as it was last playing")
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .cafe)
     }
 
     func testStoppingAudioMidSessionDoesNotResumeAutomatically() {
-        // Start with rain
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
 
-        // Stop audio mid-session
         viewModel.audioManager.stop()
         XCTAssertFalse(viewModel.audioManager.isPlaying)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
 
-        // Complete and start next
         viewModel.completeSession()
         viewModel.startNextSession()
 
-        // No audio should start (user stopped it)
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should not resume if user stopped it")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
     }
 
     func testAudioTrackClearsOnReset() {
-        // Start with rain
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
 
-        // Complete session
         viewModel.completeSession()
-
-        // Reset session
         viewModel.resetSession()
-
-        // Start a new session
         viewModel.startSession()
 
-        // No audio should play (reset cleared the memory)
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should not resume after reset")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
     }
 
     func testDifferentAudioTracksForDifferentSessionTypes() {
-        // Start focus with rain
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
 
-        // Complete and start break - audio should NOT auto-resume
         viewModel.completeSession()
         viewModel.startNextSession()
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT auto-resume on break")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
 
-        // User manually starts forest during break
         viewModel.audioManager.play(track: .forest)
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .forest)
 
-        // Complete break and start focus
         viewModel.completeSession()
         viewModel.startNextSession()
 
-        // Forest should persist and auto-resume on focus
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should auto-resume on focus")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .forest, "Forest should persist to focus")
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .forest)
     }
 
     func testAudioVolumeIsPreservedAcrossSessions() {
-        // Set volume to 0.7
         viewModel.audioManager.setVolume(0.7)
         XCTAssertEqual(viewModel.audioManager.volume, 0.7)
 
-        // Start session with rain
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
 
-        // Complete and start next (break) - audio should NOT resume
         viewModel.completeSession()
         viewModel.startNextSession()
-        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT resume on break")
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
 
-        // Complete break and start next focus
         viewModel.completeSession()
         viewModel.startNextSession()
 
-        // Volume should be preserved and audio should resume on focus
-        XCTAssertEqual(viewModel.audioManager.volume, 0.7, "Volume should be preserved")
-        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should resume on focus")
-        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain, "Rain should resume")
+        XCTAssertEqual(viewModel.audioManager.volume, 0.7)
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
     }
 
     func testAudioPersistsWithLongBreak() {
-        // Start with brown noise
         viewModel.startSession()
         viewModel.audioManager.play(track: .brownNoise)
 
-        // Complete work sessions until we hit the long break
         var sessionCount = 0
-        while sessionCount < 10 { // Safety limit
-            // Complete current focus session
+        while sessionCount < 10 {
             viewModel.completeSession()
-            // This starts the break session (audio should NOT resume)
             viewModel.startNextSession()
             sessionCount += 1
 
             if viewModel.currentSessionType == "Long Break" {
-                // Audio should NOT auto-resume on long break
-                XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should NOT auto-resume on long break")
+                XCTAssertFalse(viewModel.audioManager.isPlaying)
                 break
             } else {
-                // We're in a break session now, audio should NOT have resumed
-                let msg = "Audio should NOT resume on break session \(sessionCount)"
-                XCTAssertFalse(viewModel.audioManager.isPlaying, msg)
+                XCTAssertFalse(viewModel.audioManager.isPlaying)
 
-                // Complete break and start next focus
                 viewModel.completeSession()
                 viewModel.startNextSession()
                 sessionCount += 1
 
-                // Back to focus - audio should resume
-                XCTAssertEqual(viewModel.currentSessionType, "Focus", "Should be focus session")
-                XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should resume on focus session")
+                XCTAssertEqual(viewModel.currentSessionType, "Focus")
+                XCTAssertTrue(viewModel.audioManager.isPlaying)
                 XCTAssertEqual(viewModel.audioManager.selectedTrack, .brownNoise)
             }
         }
 
-        // Verify we eventually hit the long break
-        XCTAssertEqual(viewModel.currentSessionType, "Long Break", "Should have reached long break")
+        XCTAssertEqual(viewModel.currentSessionType, "Long Break")
     }
 }

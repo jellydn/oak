@@ -18,12 +18,10 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published var selectedPreset: Preset = .short
     @Published var isSessionComplete: Bool = false
     @Published private(set) var completedRounds: Int = 0
-    /// The countdown value in seconds before auto-starting the next session.
     @Published private(set) var autoStartCountdown: Int = 0
 
     let presetSettings: PresetSettingsStore
     private var timer: Timer?
-    /// Timer that handles the auto-start countdown.
     private var autoStartTimer: Timer?
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
@@ -31,9 +29,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var sessionStartSeconds: Int = 0
     private var sessionEndDate: Date?
     private var presetSettingsCancellable: AnyCancellable?
-    /// Stores the last playing audio track to resume after auto-start.
     private var lastPlayingAudioTrack: AudioTrack = .none
-    /// Whether the current session was started via auto-start (affects sound on break).
     private var wasAutoStarted: Bool = false
     let audioManager = AudioManager()
     let progressManager: ProgressManager
@@ -56,30 +52,22 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var canStart: Bool {
-        if case .idle = sessionState {
-            return true
-        }
+        if case .idle = sessionState { return true }
         return false
     }
 
     var canStartNext: Bool {
-        if case .completed = sessionState {
-            return true
-        }
+        if case .completed = sessionState { return true }
         return false
     }
 
     var canPause: Bool {
-        if case .running = sessionState {
-            return true
-        }
+        if case .running = sessionState { return true }
         return false
     }
 
     var canResume: Bool {
-        if case .paused = sessionState {
-            return true
-        }
+        if case .paused = sessionState { return true }
         return false
     }
 
@@ -124,16 +112,12 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var isPaused: Bool {
-        if case .paused = sessionState {
-            return true
-        }
+        if case .paused = sessionState { return true }
         return false
     }
 
     var isRunning: Bool {
-        if case .running = sessionState {
-            return true
-        }
+        if case .running = sessionState { return true }
         return false
     }
 
@@ -228,7 +212,6 @@ internal extension FocusSessionViewModel {
             return
         }
 
-        // Cancel auto-start countdown if manually starting
         if autoStartCountdown > 0 {
             autoStartTimer?.invalidate()
             autoStartTimer = nil
@@ -254,7 +237,6 @@ internal extension FocusSessionViewModel {
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
 
-        // Resume the previously playing audio track if there was one (work sessions only)
         if isWorkSession && lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
         }
@@ -318,20 +300,19 @@ internal extension FocusSessionViewModel {
             }
         }
 
-        // Send notification
         notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
 
-        // Remember the currently playing audio track before stopping
         if audioManager.isPlaying && audioManager.selectedTrack != .none {
             lastPlayingAudioTrack = audioManager.selectedTrack
         }
 
-        // Stop audio when any session ends
         audioManager.stop()
 
-        // Don't play sound on break sessions that were auto-started
-        let shouldPlaySound = presetSettings.playSoundOnSessionCompletion &&
-            (isWorkSession || (presetSettings.playSoundOnBreakCompletion && !wasAutoStarted))
+        let shouldPlaySound = if isWorkSession {
+            presetSettings.playSoundOnSessionCompletion
+        } else {
+            presetSettings.playSoundOnBreakCompletion && !wasAutoStarted
+        }
         if shouldPlaySound {
             completionSoundPlayer.playCompletionSound()
         }
@@ -341,22 +322,18 @@ internal extension FocusSessionViewModel {
         sessionEndDate = nil
         sessionState = .completed(isWorkSession: isWorkSession)
 
-        // Trigger UI animations after state is updated
         isSessionComplete = true
 
-        // Reset animation state after 1.5 seconds
         Task {
             try? await Task.sleep(nanoseconds: 1500000000)
             isSessionComplete = false
 
-            // Start auto-start countdown if enabled
             if presetSettings.autoStartNextInterval {
                 startAutoStartCountdown()
             }
         }
     }
 
-    /// Starts the auto-start countdown timer for the next session.
     private func startAutoStartCountdown() {
         autoStartCountdown = 10
         autoStartTimer?.invalidate()
@@ -367,7 +344,6 @@ internal extension FocusSessionViewModel {
         }
     }
 
-    /// Decrements the auto-start countdown and starts the next session when it reaches zero.
     private func tickAutoStartCountdown() {
         autoStartCountdown -= 1
         if autoStartCountdown <= 0 {
