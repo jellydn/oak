@@ -254,8 +254,8 @@ internal extension FocusSessionViewModel {
         sessionStartSeconds = currentRemainingSeconds
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
 
-        // Resume the previously playing audio track if there was one
-        if lastPlayingAudioTrack != .none {
+        // Resume the previously playing audio track if there was one (work sessions only)
+        if isWorkSession && lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
         }
 
