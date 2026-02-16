@@ -189,6 +189,7 @@ internal class FocusSessionViewModel: ObservableObject {
 }
 
 // MARK: - Session Control
+
 @MainActor
 internal extension FocusSessionViewModel {
     func selectPreset(_ preset: Preset) {

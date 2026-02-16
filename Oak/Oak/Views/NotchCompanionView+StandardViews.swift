@@ -173,6 +173,23 @@ internal extension NotchCompanionView {
                             .font(.system(size: 8, weight: .medium))
                             .foregroundColor(.white.opacity(0.52))
                     }
+                } else {
+                    let displayMode = viewModel.presetSettings.countdownDisplayMode
+                    if displayMode == .circleRing {
+                        countdownDisplay(
+                            mode: displayMode,
+                            size: expandedRingSize,
+                            fontSize: 14,
+                            showSessionType: true
+                        )
+                    } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
+                            Text(viewModel.currentSessionType)
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundColor(.white.opacity(0.52))
+                        }
+                    }
                 }
                 Button(
                     action: { viewModel.startNextSession() },
