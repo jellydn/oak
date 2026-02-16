@@ -168,6 +168,35 @@ internal final class LongBreakTests: XCTestCase {
         XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
     }
 
+    func testRoundCounterResetsAfterLongBreakWithAutoStart() {
+        presetSettings.setAutoStartNextInterval(true)
+        viewModel.selectedPreset = .short
+
+        // Complete 4 work sessions
+        completeFourWorkSessions()
+
+        XCTAssertEqual(viewModel.completedRounds, 4, "Should have 4 completed rounds")
+
+        // Start long break with auto-start
+        viewModel.startNextSession(isAutoStart: true)
+
+        // Rounds should still be 4 while long break is in progress
+        XCTAssertEqual(viewModel.completedRounds, 4, "Rounds should remain at 4 during long break")
+
+        // Complete the long break
+        viewModel.completeSession()
+
+        // Rounds should be reset to 0 after long break completes
+        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should reset to 0 after long break completes")
+
+        // Auto-start the next work session
+        viewModel.startNextSession(isAutoStart: true)
+
+        // Should be in work session with 0 completed rounds
+        XCTAssertEqual(viewModel.currentSessionType, "Focus")
+        XCTAssertEqual(viewModel.completedRounds, 0, "Rounds should still be 0 for first session of new cycle")
+    }
+
     func testRoundsResetWhenLongBreakCancelled() {
         viewModel.selectedPreset = .short
 
