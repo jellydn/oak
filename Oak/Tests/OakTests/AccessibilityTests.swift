@@ -7,6 +7,7 @@ internal final class AccessibilityTests: XCTestCase {
     private var viewModel: FocusSessionViewModel!
     private var notificationService: NotificationService!
     private var sparkleUpdater: SparkleUpdater!
+    private var presetSettings: PresetSettingsStore!
     private var suiteName: String!
 
     override func setUp() async throws {
@@ -15,8 +16,12 @@ internal final class AccessibilityTests: XCTestCase {
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {
             throw NSError(domain: "AccessibilityTests", code: 1)
         }
-        viewModel = FocusSessionViewModel(userDefaults: userDefaults)
+        presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         notificationService = NotificationService()
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: notificationService
+        )
         sparkleUpdater = SparkleUpdater()
     }
 
@@ -160,7 +165,7 @@ internal final class AccessibilityTests: XCTestCase {
             sparkleUpdater: sparkleUpdater
         )
         let countdown = view.countdownDisplay(
-            mode: .digitalClock,
+            mode: .number,
             size: 20,
             fontSize: 13
         )
