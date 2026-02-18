@@ -223,7 +223,6 @@ internal extension NotchCompanionView {
             )
             .buttonStyle(.plain)
             .help("Stop and reset (Escape)")
-            .help("Stop and reset")
         }
     }
 }
