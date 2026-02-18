@@ -19,6 +19,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .help("Start session (Space)")
                 .accessibilityLabel("Start session")
                 .accessibilityHint("Starts a focus session with the selected preset")
                 .accessibilityIdentifier("startButton")
@@ -53,7 +54,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
-                .help("Start \(viewModel.currentSessionType)")
+                .help("Start \(viewModel.currentSessionType) (Return)")
                 .accessibilityLabel("Start next session")
                 .accessibilityHint("Starts the next session: \(viewModel.currentSessionType)")
                 .accessibilityIdentifier("startNextButton")
@@ -126,6 +127,7 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
+            .help("Start session (Space)")
             .accessibilityLabel("Start session")
             .accessibilityHint("Starts a focus session with the selected preset")
             .accessibilityIdentifier("startButton")
@@ -166,6 +168,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .help("Pause session (Space)")
                 .accessibilityLabel("Pause session")
                 .accessibilityIdentifier("pauseButton")
             } else if viewModel.canResume {
@@ -180,6 +183,8 @@ internal extension NotchCompanionView {
                             .clipShape(Circle())
                     }
                 )
+                .buttonStyle(.plain)
+                .help("Resume session (Space)")
                 .buttonStyle(.plain)
                 .accessibilityLabel("Resume session")
                 .accessibilityIdentifier("resumeButton")
@@ -236,6 +241,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .help("Start next session (Return)")
                 .accessibilityLabel("Start next session")
                 .accessibilityHint("Starts the next session: \(viewModel.currentSessionType)")
                 .accessibilityIdentifier("startNextButton")
@@ -252,7 +258,7 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
-            .help("Stop and reset")
+            .help("Stop and reset (Escape)")
             .accessibilityLabel("Stop and reset")
             .accessibilityHint("Stops the current session and resets the timer")
             .accessibilityIdentifier("stopButton")

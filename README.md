@@ -51,9 +51,25 @@ In today's world of constant distractions, deep work has become increasingly rar
 - ⏱️ **Pomodoro presets**: Default `25/5` and `50/10` sessions (fully configurable)
 - 🔄 **Smart breaks**: Automatic 15/20 min long breaks after 4 focus rounds
 - ▶️ **Session controls**: Start, pause, and resume your focus sessions
+- ⌨️ **Keyboard shortcuts**: Control timer with Space (start/pause), Escape (reset), and Return (next)
 - 🎵 **Ambient sounds**: Rain, forest, cafe, brown noise, and lo-fi to help you concentrate
 - 📊 **Local tracking**: Track daily focus minutes, completed sessions, and 7-day streaks
 - 🔄 **Auto-update**: Seamless updates via Sparkle framework
+
+## ⌨️ Keyboard Shortcuts
+
+Oak supports keyboard shortcuts for quick timer control when the notch window is focused:
+
+| Shortcut | Action | State |
+|----------|--------|-------|
+| <kbd>Space</kbd> | Start session | When idle |
+| <kbd>Space</kbd> | Pause session | When running |
+| <kbd>Space</kbd> | Resume session | When paused |
+| <kbd>Return</kbd> | Start next session | When completed |
+| <kbd>Escape</kbd> | Reset session | When running/paused |
+| <kbd>Escape</kbd> | Close menu | When menu is open |
+
+> **Note**: These are local shortcuts that work when the Oak window is focused. No global keyboard shortcuts are used to avoid conflicts with other apps.
 
 ## Installation
 
