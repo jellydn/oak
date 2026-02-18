@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 internal struct NotchCompanionView: View {
@@ -13,6 +14,7 @@ internal struct NotchCompanionView: View {
     @State var isExpandedByToggle = false
     @State var lastReportedExpansion: Bool?
     @State var presetSelection: Preset = .short
+    @State private var localEventMonitor: Any?
     let horizontalPadding: CGFloat = 8
     let verticalPadding: CGFloat = 5
     let contentSpacing: CGFloat = 10
@@ -109,6 +111,10 @@ internal struct NotchCompanionView: View {
         .onAppear {
             notifyExpansionChanged(isExpanded)
             presetSelection = viewModel.selectedPreset
+            setupKeyboardMonitoring()
+        }
+        .onDisappear {
+            removeKeyboardMonitoring()
         }
         .onChange(of: viewModel.isSessionComplete) { isComplete in
             if isComplete {
@@ -154,48 +160,91 @@ internal struct NotchCompanionView: View {
                 showSettingsMenu = false
             }
         }
-        .onKeyPress { keyPress in
-            handleKeyPress(keyPress)
+    }
+
+    private func setupKeyboardMonitoring() {
+        localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [self] event in
+            handleKeyEvent(event)
         }
     }
 
-    private func handleKeyPress(_ keyPress: KeyPress) -> KeyPress.Result {
-        // Close any open menus first
-        if showAudioMenu || showProgressMenu || showSettingsMenu {
-            if keyPress.key == .escape {
-                showAudioMenu = false
-                showProgressMenu = false
-                showSettingsMenu = false
-                return .handled
-            }
-            return .ignored
+    private func removeKeyboardMonitoring() {
+        if let monitor = localEventMonitor {
+            NSEvent.removeMonitor(monitor)
+            localEventMonitor = nil
+        }
+    }
+
+    private func handleKeyEvent(_ event: NSEvent) -> NSEvent? {
+        guard let characters = event.charactersIgnoringModifiers else {
+            return event
         }
 
-        switch keyPress.key {
-        case .space:
-            if viewModel.canStart {
-                viewModel.startSession(using: presetSelection)
-                return .handled
-            } else if viewModel.canPause {
-                viewModel.pauseSession()
-                return .handled
-            } else if viewModel.canResume {
-                viewModel.resumeSession()
-                return .handled
-            }
-        case .escape:
-            if !viewModel.canStart {
-                viewModel.resetSession()
-                return .handled
-            }
-        case .return:
-            if viewModel.canStartNext {
-                viewModel.startNextSession()
-                return .handled
-            }
-        default:
-            break
+        // Handle Escape key
+        if event.keyCode == 53 {
+            return handleEscapeKey()
         }
-        return .ignored
+
+        // Handle other keys
+        switch characters {
+        case " ":
+            return handleSpaceKey()
+        case "\r":
+            return handleReturnKey()
+        default:
+            return event
+        }
+    }
+
+    private func handleEscapeKey() -> NSEvent? {
+        if showAudioMenu || showProgressMenu || showSettingsMenu {
+            showAudioMenu = false
+            showProgressMenu = false
+            showSettingsMenu = false
+            return nil
+        }
+
+        if !viewModel.canStart {
+            viewModel.resetSession()
+            return nil
+        }
+
+        return nil
+    }
+
+    private func handleSpaceKey() -> NSEvent? {
+        guard !showAudioMenu && !showProgressMenu && !showSettingsMenu else {
+            return nil
+        }
+
+        if viewModel.canStart {
+            viewModel.startSession(using: presetSelection)
+            return nil
+        }
+
+        if viewModel.canPause {
+            viewModel.pauseSession()
+            return nil
+        }
+
+        if viewModel.canResume {
+            viewModel.resumeSession()
+            return nil
+        }
+
+        return nil
+    }
+
+    private func handleReturnKey() -> NSEvent? {
+        guard !showAudioMenu && !showProgressMenu && !showSettingsMenu else {
+            return nil
+        }
+
+        if viewModel.canStartNext {
+            viewModel.startNextSession()
+            return nil
+        }
+
+        return nil
     }
 }
