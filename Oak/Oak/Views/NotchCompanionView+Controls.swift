@@ -110,7 +110,9 @@ internal extension NotchCompanionView {
         .contentShape(Circle())
         .help(isExpanded ? "Collapse" : "Expand")
         .accessibilityLabel(isExpanded ? "Collapse" : "Expand")
-        .accessibilityHint(isExpanded ? "Collapses the companion view" : "Expands the companion view to show all controls")
+        .accessibilityHint(
+            isExpanded ? "Collapses the companion view" : "Expands the companion view to show all controls"
+        )
         .accessibilityIdentifier("expandToggleButton")
     }
 

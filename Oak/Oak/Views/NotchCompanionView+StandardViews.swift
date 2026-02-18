@@ -199,7 +199,9 @@ internal extension NotchCompanionView {
                             .foregroundColor(.white.opacity(0.52))
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Auto-starting \(viewModel.currentSessionType) in \(viewModel.autoStartCountdown) seconds")
+                    .accessibilityLabel(
+                        "Auto-starting \(viewModel.currentSessionType) in \(viewModel.autoStartCountdown) seconds"
+                    )
                     .accessibilityIdentifier("autoStartCountdown")
                 } else {
                     let displayMode = viewModel.presetSettings.countdownDisplayMode
