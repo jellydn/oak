@@ -48,6 +48,11 @@ internal extension NotchCompanionView {
                     .font(.system(size: 8, weight: .medium))
                     .foregroundColor(.white.opacity(0.52))
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                "Auto-starting \(viewModel.currentSessionType) in \(viewModel.autoStartCountdown) seconds"
+            )
+            .accessibilityIdentifier("autoStartCountdown")
         } else {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
             if displayMode == .circleRing {
@@ -64,6 +69,9 @@ internal extension NotchCompanionView {
                         .font(.system(size: 8, weight: .medium))
                         .foregroundColor(.white.opacity(0.56))
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
+                .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
             }
         }
     }
@@ -83,6 +91,9 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
+            .accessibilityLabel("Start session")
+            .accessibilityHint("Starts a focus session with the selected preset")
+            .accessibilityIdentifier("startButton")
         } else {
             if viewModel.canPause {
                 Button(
@@ -97,6 +108,8 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .accessibilityLabel("Pause session")
+                .accessibilityIdentifier("pauseButton")
             } else if viewModel.canResume {
                 Button(
                     action: { viewModel.resumeSession() },
@@ -110,6 +123,8 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .accessibilityLabel("Resume session")
+                .accessibilityIdentifier("resumeButton")
             } else if viewModel.canStartNext {
                 Button(
                     action: { viewModel.startNextSession() },
@@ -123,6 +138,9 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .accessibilityLabel("Start next session")
+                .accessibilityHint("Starts the next session: \(viewModel.currentSessionType)")
+                .accessibilityIdentifier("startNextButton")
             }
 
             Button(
@@ -138,6 +156,9 @@ internal extension NotchCompanionView {
             )
             .buttonStyle(.plain)
             .help("Stop and reset")
+            .accessibilityLabel("Stop and reset")
+            .accessibilityHint("Stops the current session and resets the timer")
+            .accessibilityIdentifier("stopButton")
         }
     }
 
@@ -155,6 +176,9 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
+            .accessibilityLabel("Toggle preset: \(presetLabel(for: presetSelection))")
+            .accessibilityHint("Switches between short and long presets")
+            .accessibilityIdentifier("presetToggleButton")
         } else if viewModel.autoStartCountdown > 0 {
             HStack(spacing: 4) {
                 Text("\(viewModel.autoStartCountdown)")
@@ -164,12 +188,17 @@ internal extension NotchCompanionView {
                     .font(.system(size: 8, weight: .medium))
                     .foregroundColor(.white.opacity(0.52))
             }
+            .accessibilityLabel("Auto-starting in \(viewModel.autoStartCountdown) seconds")
+            .accessibilityIdentifier("autoStartCountdown")
         } else {
             countdownDisplay(
                 mode: viewModel.presetSettings.countdownDisplayMode,
                 size: compactRingSize,
                 fontSize: 13
             )
+            .accessibilityLabel("Time remaining: \(viewModel.displayTime)")
+            .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
+            .accessibilityIdentifier("countdownDisplay")
         }
     }
 
@@ -187,6 +216,9 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
+            .accessibilityLabel("Start session")
+            .accessibilityHint("Starts a focus session with the selected preset")
+            .accessibilityIdentifier("startButton")
         } else if viewModel.canStartNext {
             Button(
                 action: { viewModel.startNextSession() },
@@ -200,6 +232,9 @@ internal extension NotchCompanionView {
             )
             .buttonStyle(.plain)
             .help("Start \(viewModel.currentSessionType)")
+            .accessibilityLabel("Start next session")
+            .accessibilityHint("Starts the next session: \(viewModel.currentSessionType)")
+            .accessibilityIdentifier("startNextButton")
         } else if viewModel.canPause {
             Button(
                 action: { viewModel.pauseSession() },
@@ -213,6 +248,8 @@ internal extension NotchCompanionView {
             )
             .buttonStyle(.plain)
             .help("Pause")
+            .accessibilityLabel("Pause session")
+            .accessibilityIdentifier("pauseButton")
         } else if viewModel.canResume {
             Button(
                 action: { viewModel.resumeSession() },
@@ -226,6 +263,8 @@ internal extension NotchCompanionView {
             )
             .buttonStyle(.plain)
             .help("Resume")
+            .accessibilityLabel("Resume session")
+            .accessibilityIdentifier("resumeButton")
         }
     }
 }
