@@ -22,6 +22,9 @@ internal extension NotchCompanionView {
             }
         )
         .buttonStyle(.plain)
+        .accessibilityLabel(viewModel.audioManager.isPlaying ? "Audio playing" : "Audio")
+        .accessibilityHint("Opens audio menu to select ambient sounds")
+        .accessibilityIdentifier("audioButton")
     }
 
     var progressButton: some View {
@@ -50,6 +53,13 @@ internal extension NotchCompanionView {
             }
         )
         .buttonStyle(.plain)
+        .accessibilityLabel(
+            viewModel.streakDays > 0
+                ? "Progress: \(viewModel.streakDays) day streak"
+                : "Progress"
+        )
+        .accessibilityHint("Opens progress menu to view session history")
+        .accessibilityIdentifier("progressButton")
     }
 
     var settingsButton: some View {
@@ -69,6 +79,9 @@ internal extension NotchCompanionView {
         )
         .buttonStyle(.plain)
         .help("Settings")
+        .accessibilityLabel("Settings")
+        .accessibilityHint("Opens settings menu")
+        .accessibilityIdentifier("settingsButton")
     }
 
     var expandToggleButton: some View {
@@ -96,6 +109,9 @@ internal extension NotchCompanionView {
         .buttonStyle(.plain)
         .contentShape(Circle())
         .help(isExpanded ? "Collapse" : "Expand")
+        .accessibilityLabel(isExpanded ? "Collapse" : "Expand")
+        .accessibilityHint(isExpanded ? "Collapses the companion view" : "Expands the companion view to show all controls")
+        .accessibilityIdentifier("expandToggleButton")
     }
 
     var presetSelector: some View {
@@ -108,14 +124,18 @@ internal extension NotchCompanionView {
             Capsule(style: .continuous)
                 .fill(Color.white.opacity(visualStyle.presetCapsuleOpacity))
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Preset selector")
+        .accessibilityIdentifier("presetSelector")
     }
 
     func presetChip(_ preset: Preset) -> some View {
         let isSelected = presetSelection == preset
+        let presetName = presetLabel(for: preset)
         return Button(
             action: { presetSelection = preset },
             label: {
-                Text(presetLabel(for: preset))
+                Text(presetName)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(isSelected ? .white : .white.opacity(0.62))
                     .frame(minWidth: 54, minHeight: 18)
@@ -126,6 +146,10 @@ internal extension NotchCompanionView {
             }
         )
         .buttonStyle(.plain)
+        .accessibilityLabel(presetName)
+        .accessibilityHint(isSelected ? "Currently selected preset" : "Select \(presetName) preset")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityIdentifier("presetChip_\(preset == .short ? "short" : "long")")
     }
 
     func presetLabel(for preset: Preset) -> String {
