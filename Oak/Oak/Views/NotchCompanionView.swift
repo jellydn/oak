@@ -154,5 +154,48 @@ internal struct NotchCompanionView: View {
                 showSettingsMenu = false
             }
         }
+        .onKeyPress { keyPress in
+            handleKeyPress(keyPress)
+        }
+    }
+
+    private func handleKeyPress(_ keyPress: KeyPress) -> KeyPress.Result {
+        // Close any open menus first
+        if showAudioMenu || showProgressMenu || showSettingsMenu {
+            if keyPress.key == .escape {
+                showAudioMenu = false
+                showProgressMenu = false
+                showSettingsMenu = false
+                return .handled
+            }
+            return .ignored
+        }
+
+        switch keyPress.key {
+        case .space:
+            if viewModel.canStart {
+                viewModel.startSession(using: presetSelection)
+                return .handled
+            } else if viewModel.canPause {
+                viewModel.pauseSession()
+                return .handled
+            } else if viewModel.canResume {
+                viewModel.resumeSession()
+                return .handled
+            }
+        case .escape:
+            if !viewModel.canStart {
+                viewModel.resetSession()
+                return .handled
+            }
+        case .return:
+            if viewModel.canStartNext {
+                viewModel.startNextSession()
+                return .handled
+            }
+        default:
+            break
+        }
+        return .ignored
     }
 }

@@ -18,6 +18,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .help("Start session (Space)")
             } else if viewModel.canStartNext {
                 if viewModel.autoStartCountdown > 0 {
                     HStack(spacing: 4) {
@@ -46,7 +47,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
-                .help("Start \(viewModel.currentSessionType)")
+                .help("Start \(viewModel.currentSessionType) (Return)")
             } else {
                 countdownDisplay(
                     mode: viewModel.presetSettings.countdownDisplayMode,
@@ -111,6 +112,7 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
+            .help("Start session (Space)")
         }
     }
 
@@ -145,6 +147,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .help("Pause session (Space)")
             } else if viewModel.canResume {
                 Button(
                     action: { viewModel.resumeSession() },
@@ -157,6 +160,8 @@ internal extension NotchCompanionView {
                             .clipShape(Circle())
                     }
                 )
+                .buttonStyle(.plain)
+                .help("Resume session (Space)")
                 .buttonStyle(.plain)
             } else if viewModel.canStartNext {
                 if viewModel.autoStartCountdown > 0 {
@@ -203,6 +208,7 @@ internal extension NotchCompanionView {
                     }
                 )
                 .buttonStyle(.plain)
+                .help("Start next session (Return)")
             }
             Button(
                 action: { viewModel.resetSession() },
@@ -216,6 +222,7 @@ internal extension NotchCompanionView {
                 }
             )
             .buttonStyle(.plain)
+            .help("Stop and reset (Escape)")
             .help("Stop and reset")
         }
     }
