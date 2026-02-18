@@ -19,6 +19,7 @@
 		29EFC7CC8DBCDE421107C0E6 /* NotchCompanionView+InsideNotch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B20E550402C5D04E55B6E /* NotchCompanionView+InsideNotch.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		39B659A9DA438E70743E07F9 /* CircularProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */; };
+		3BB10B768F1CD0C2E7F00EB5 /* AccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E53FB903AF7AF6B4DE091AD /* AccessibilityTests.swift */; };
 		3ED5BDC623247CE16B62E99B /* ambient_rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */; };
 		4404053F80F1F1F3265EF06E /* ambient_cafe.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */; };
 		4590D899C3874037F87EE821 /* NotchVisualStyle+Factory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309530434B76C0BB37A8FA0D /* NotchVisualStyle+Factory.swift */; };
@@ -95,6 +96,7 @@
 		164FAFB05B901C05BD1479BF /* NotchLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchLayout.swift; sourceTree = "<group>"; };
 		1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */ = {isa = PBXFileReference; path = ambient_cafe.m4a; sourceTree = "<group>"; };
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
+		1E53FB903AF7AF6B4DE091AD /* AccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTests.swift; sourceTree = "<group>"; };
 		2248B235C4F98DAE862335B3 /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
 		22F9A4FB15C8C324972DB6D6 /* NotchWindowControllerTests+NotchWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchWindowControllerTests+NotchWindow.swift"; sourceTree = "<group>"; };
 		23364F4B016E445E5657BF63 /* SettingsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuView.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 		7A59316AAFB96A57EDCA1D15 /* OakTests */ = {
 			isa = PBXGroup;
 			children = (
+				1E53FB903AF7AF6B4DE091AD /* AccessibilityTests.swift */,
 				0759FB9C079ECAE57D72A839 /* AlwaysOnTopTests.swift */,
 				309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */,
 				7D0983D0B297B59CB4626F50 /* AudioPersistenceTests.swift */,
@@ -441,6 +444,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BB10B768F1CD0C2E7F00EB5 /* AccessibilityTests.swift in Sources */,
 				82E4101ABE93B5EB4104D57F /* AlwaysOnTopTests.swift in Sources */,
 				A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */,
 				B50A1597C7F08585BA009886 /* AudioPersistenceTests.swift in Sources */,
@@ -617,14 +621,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5013;
+				CURRENT_PROJECT_VERSION = 5015;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.13;
+				MARKETING_VERSION = 0.5.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -653,14 +657,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5013;
+				CURRENT_PROJECT_VERSION = 5015;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.13;
+				MARKETING_VERSION = 0.5.15;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";

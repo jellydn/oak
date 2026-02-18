@@ -12,7 +12,9 @@ internal final class AccessibilityTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         suiteName = "OakTests.AccessibilityTests.\(UUID().uuidString)"
-        let userDefaults = UserDefaults(suiteName: suiteName)!
+        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+            throw NSError(domain: "AccessibilityTests", code: 1)
+        }
         viewModel = FocusSessionViewModel(userDefaults: userDefaults)
         notificationService = NotificationService()
         sparkleUpdater = SparkleUpdater()
@@ -104,7 +106,6 @@ internal final class AccessibilityTests: XCTestCase {
     }
 
     func testSessionViewExistsAfterStartingSession() {
-        // Start a session to make sessionView available
         viewModel.startSession(using: .short)
 
         let view = NotchCompanionView(
@@ -115,7 +116,6 @@ internal final class AccessibilityTests: XCTestCase {
         let sessionView = view.sessionView
         XCTAssertNotNil(sessionView, "Session view should exist when session is running")
 
-        // Clean up
         viewModel.resetSession()
     }
 
@@ -152,7 +152,6 @@ internal final class AccessibilityTests: XCTestCase {
     }
 
     func testCountdownDisplayHasAccessibilityLabel() {
-        // Start a session to make countdown display meaningful
         viewModel.startSession(using: .short)
 
         let view = NotchCompanionView(
@@ -167,13 +166,10 @@ internal final class AccessibilityTests: XCTestCase {
         )
         XCTAssertNotNil(countdown, "Countdown display should exist")
 
-        // Clean up
         viewModel.resetSession()
     }
 
     func testAccessibilityIdentifiersAreUnique() {
-        // This test verifies that all accessibility identifiers follow a consistent pattern
-        // The actual accessibility identifiers are set in the view code
         let identifiers = [
             "audioButton",
             "progressButton",
@@ -192,7 +188,6 @@ internal final class AccessibilityTests: XCTestCase {
             "presetToggleButton"
         ]
 
-        // Ensure no duplicates
         let uniqueIdentifiers = Set(identifiers)
         XCTAssertEqual(
             identifiers.count,
