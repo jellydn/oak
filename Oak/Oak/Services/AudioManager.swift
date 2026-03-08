@@ -41,6 +41,33 @@ internal class AudioManager: ObservableObject {
         generateAmbientSound(for: track)
     }
 
+    /// Pauses all audio playback.
+    /// Stops both the audio player and audio engine, and sets isPlaying to false.
+    func pause() {
+        audioPlayer?.pause()
+        audioEngine?.pause()
+        isPlaying = false
+    }
+
+    /// Resumes audio playback.
+    /// If an audio player exists, it resumes playing. Otherwise, starts the audio engine.
+    func resume() {
+        if let player = audioPlayer {
+            player.play()
+            isPlaying = true
+            return
+        }
+
+        guard let engine = audioEngine else { return }
+
+        do {
+            try engine.start()
+            isPlaying = true
+        } catch {
+            logger.error("Failed to resume audio engine: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
     func stop() {
         detachSourceNodes()
         audioEngine?.stop()
