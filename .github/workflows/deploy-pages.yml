@@ -42,7 +42,7 @@ jobs:
           if [ -d assets ]; then cp -R assets public/; fi
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           # Upload only the generated site content
           path: 'public'
