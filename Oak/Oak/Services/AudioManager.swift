@@ -51,15 +51,16 @@ internal class AudioManager: ObservableObject {
         if let player = audioPlayer {
             player.play()
             isPlaying = true
-        } else if let engine = audioEngine {
-            do {
-                if !engine.isRunning {
-                    try engine.start()
-                }
-                isPlaying = true
-            } catch {
-                logger.error("Failed to resume audio engine: \(error.localizedDescription, privacy: .public)")
-            }
+            return
+        }
+
+        guard let engine = audioEngine else { return }
+
+        do {
+            try engine.start()
+            isPlaying = true
+        } catch {
+            logger.error("Failed to resume audio engine: \(error.localizedDescription, privacy: .public)")
         }
     }
 
