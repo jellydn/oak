@@ -41,12 +41,16 @@ internal class AudioManager: ObservableObject {
         generateAmbientSound(for: track)
     }
 
+    /// Pauses all audio playback.
+    /// Stops both the audio player and audio engine, and sets isPlaying to false.
     func pause() {
         audioPlayer?.pause()
         audioEngine?.pause()
         isPlaying = false
     }
 
+    /// Resumes audio playback.
+    /// If an audio player exists, it resumes playing. Otherwise, starts the audio engine.
     func resume() {
         if let player = audioPlayer {
             player.play()
