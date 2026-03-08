@@ -41,6 +41,28 @@ internal class AudioManager: ObservableObject {
         generateAmbientSound(for: track)
     }
 
+    func pause() {
+        audioPlayer?.pause()
+        audioEngine?.pause()
+        isPlaying = false
+    }
+
+    func resume() {
+        if let player = audioPlayer {
+            player.play()
+            isPlaying = true
+        } else if let engine = audioEngine {
+            do {
+                if !engine.isRunning {
+                    try engine.start()
+                }
+                isPlaying = true
+            } catch {
+                logger.error("Failed to resume audio engine: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+    }
+
     func stop() {
         detachSourceNodes()
         audioEngine?.stop()

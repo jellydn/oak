@@ -198,10 +198,12 @@ internal extension FocusSessionViewModel {
         timer?.invalidate()
         timer = nil
         sessionEndDate = nil
+        audioManager.pause()
         sessionState = .paused(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
     }
 
     func resumeSession() {
+        audioManager.resume()
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
     }

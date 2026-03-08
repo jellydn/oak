@@ -176,6 +176,42 @@ internal final class AudioPersistenceTests: XCTestCase {
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .forest)
     }
 
+    func testAudioPausesWhenSessionIsPaused() {
+        viewModel.startSession()
+        viewModel.audioManager.play(track: .rain)
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain)
+
+        viewModel.pauseSession()
+        XCTAssertFalse(viewModel.audioManager.isPlaying, "Audio should be paused when session is paused")
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain, "Selected track should be preserved while paused")
+    }
+
+    func testAudioResumesWhenSessionIsResumed() {
+        viewModel.startSession()
+        viewModel.audioManager.play(track: .rain)
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+
+        viewModel.pauseSession()
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
+
+        viewModel.resumeSession()
+        XCTAssertTrue(viewModel.audioManager.isPlaying, "Audio should resume when session is resumed")
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .rain, "Selected track should be preserved after resume")
+    }
+
+    func testNoAudioUnaffectedByPauseResume() {
+        viewModel.startSession()
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedTrack, .none)
+
+        viewModel.pauseSession()
+        XCTAssertFalse(viewModel.audioManager.isPlaying, "Should not play audio on pause when no track was selected")
+
+        viewModel.resumeSession()
+        XCTAssertFalse(viewModel.audioManager.isPlaying, "Should not play audio on resume when no track was selected")
+    }
+
     func testAudioVolumeIsPreservedAcrossSessions() {
         viewModel.audioManager.setVolume(0.7)
         XCTAssertEqual(viewModel.audioManager.volume, 0.7)
