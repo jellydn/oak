@@ -4,7 +4,7 @@ import XCTest
 
 // MARK: - MockAudioEngine
 
-internal final class MockAudioEngine: AudioEngineProtocol, @unchecked Sendable {
+internal final class MockAudioEngine: AudioEngineProtocol {
     var isRunning: Bool = false
     var outputChannelCount: AVAudioChannelCount = 2
     var outputSampleRate: Double = 44100
@@ -109,9 +109,9 @@ internal final class NoiseGeneratorTests: XCTestCase {
 
     func testRainNoiseSeedWraps() {
         let generator = NoiseGenerator()
-        // Advance seed past wrap point (maxSeed = pi * 2000 ≈ 6283; step = 0.01; need ~628,320 calls)
-        // A smaller iteration verifies no crash occurs during seed advancement
-        for _ in 0 ..< 10000 {
+        // maxSeed = Float.pi * 2000 ≈ 6283; step = 0.01 per call → ~628,320 calls to wrap.
+        // Run past the wrap point to verify the modulo prevents unbounded growth.
+        for _ in 0 ..< 700_000 {
             _ = generator.generateRainNoise()
         }
         let sample = generator.generateRainNoise()

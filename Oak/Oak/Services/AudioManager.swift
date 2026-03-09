@@ -308,6 +308,10 @@ internal class AudioManager: ObservableObject {
     }
 }
 
+/// Generates procedural ambient noise samples for each audio track.
+/// Marked `@unchecked Sendable` because instances are created inside `AVAudioSourceNode`
+/// render callbacks (audio thread), but each instance is owned exclusively by its render
+/// callback—there is no cross-thread sharing of state.
 internal final class NoiseGenerator: @unchecked Sendable {
     private var brownNoiseLast: Float = 0
     private var rainSeed: Float = 0
