@@ -97,13 +97,8 @@ internal final class NoiseGeneratorTests: XCTestCase {
 
     func testBrownNoiseAccumulatesState() {
         let generator = NoiseGenerator()
-        var hasMagnitude = false
-        for _ in 0 ..< 100 {
-            if abs(generator.generateBrownNoise()) > 0 {
-                hasMagnitude = true
-                break
-            }
-        }
+        let samples = (0 ..< 100).map { _ in generator.generateBrownNoise() }
+        let hasMagnitude = samples.contains { abs($0) > 0 }
         XCTAssertTrue(hasMagnitude, "Brown noise should produce non-zero values over time")
     }
 
