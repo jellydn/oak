@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.20</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.20</link>
+  <sparkle:version>5020</sparkle:version>
+  <sparkle:shortVersionString>0.5.20</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.20</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>fix(ci): prevent auto-release race condition causing stale appcast versions by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4043677388" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/101" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/101/hovercard" href="https://github.com/jellydn/oak/pull/101">#101</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.19...v0.5.20"><tt>v0.5.19...v0.5.20</tt></a></p>
+  ]]></description>
+  <pubDate>Mon, 09 Mar 2026 14:01:00 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.20/Oak-0.5.20.dmg"
+             sparkle:version="5020"
+             sparkle:shortVersionString="0.5.20"
+             sparkle:edSignature="gJh2ARU6X86XgDkPBNFoDRdZSgyQ4irJ59WZLS8OINbsVxWMgmjwlxOXB2xGxAJBMZ+W1dax5NIG1IxQ9ZTTAA=="
+             length="8994261"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.19</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.19</link>
   <sparkle:version>5019</sparkle:version>
@@ -55,27 +76,6 @@
              sparkle:shortVersionString="0.5.17"
              sparkle:edSignature="Cy89pQxoPP2yByXWwIBsiD9pzWEuSdGnacj8a0k4TrnwHkC7Kly6FwM1yS6YO/EKOucTKrVtVlishY2RvI5jAA=="
              length="8992796"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.16</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.16</link>
-  <sparkle:version>5016</sparkle:version>
-  <sparkle:shortVersionString>0.5.16</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.16</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>feat: Add VoiceOver and accessibility support to NotchCompanionView by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3955235856" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/89" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/89/hovercard" href="https://github.com/jellydn/oak/pull/89">#89</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.15...v0.5.16"><tt>v0.5.15...v0.5.16</tt></a></p>
-  ]]></description>
-  <pubDate>Wed, 18 Feb 2026 02:23:59 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.16/Oak-0.5.16.dmg"
-             sparkle:version="5016"
-             sparkle:shortVersionString="0.5.16"
-             sparkle:edSignature="MLae48SVJE4Wyq/az6n4QYptwp0yJu99Y82f6zH78dNNPeMOvAHq4iqApu6v+hACFWMO9WQjkEX+ywc6IB4eDg=="
-             length="8920230"
              type="application/octet-stream" />
 </item>
   </channel>
