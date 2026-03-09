@@ -9,6 +9,10 @@ permissions:
   contents: write
   actions: write
 
+concurrency:
+  group: auto-release
+  cancel-in-progress: false
+
 jobs:
   auto-release:
     runs-on: macos-15
@@ -42,8 +46,12 @@ jobs:
         if: steps.check_tag.outputs.skip != 'true'
         id: version
         run: |
-          # Get the latest tag that matches v*
-          latest_tag="$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || echo 'v0.0.0')"
+          # Get the globally latest semver tag — includes tags not reachable from HEAD
+          # (e.g. created by a concurrent run) so parallel merges don't collide.
+          latest_tag="$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)"
+          if [[ -z "$latest_tag" ]]; then
+            latest_tag="v0.0.0"
+          fi
           echo "Latest tag: $latest_tag"
           
           # Extract version components
@@ -82,6 +90,17 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Oak/project.yml
           git diff --staged --quiet || git commit -m "chore: bump version to $NEW_TAG [skip ci]"
+          # Rebase onto the current remote main so the push is always fast-forward.
+          # -X ours ensures our version bump wins if project.yml was also changed by
+          # a concurrent run that already pushed a bump commit.
+          git pull --rebase -X ours origin main || { git rebase --abort || true; exit 1; }
+          # After the rebase, the tag may already exist (e.g. created by another run).
+          # If so, skip creating it again and exit successfully to keep this step idempotent.
+          if git tag | grep -q "^${NEW_TAG}$"; then
+            echo "Tag ${NEW_TAG} already exists after rebase; skipping tag creation and push."
+            exit 0
+          fi
+          # Create the tag on the final rebased HEAD
           git tag -a "$NEW_TAG" -m "Auto-release $NEW_TAG"
           git push origin main "$NEW_TAG"
 
