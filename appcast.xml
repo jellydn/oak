@@ -7,6 +7,32 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.19</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.19</link>
+  <sparkle:version>5019</sparkle:version>
+  <sparkle:shortVersionString>0.5.19</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.19</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>chore(deps): update actions/upload-artifact action to v7 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4040877672" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/96" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/96/hovercard" href="https://github.com/jellydn/oak/pull/96">#96</a></li>
+              <li>chore(deps): update actions/github-script action to v8 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4040877610" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/95" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/95/hovercard" href="https://github.com/jellydn/oak/pull/95">#95</a></li>
+              <li>chore(deps): update actions/configure-pages action to v5 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4037314609" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/93" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/93/hovercard" href="https://github.com/jellydn/oak/pull/93">#93</a></li>
+              <li>chore(deps): update actions/checkout action to v6 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4037314560" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/92" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/92/hovercard" href="https://github.com/jellydn/oak/pull/92">#92</a></li>
+              <li>chore(deps): update actions/upload-pages-artifact action to v4 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4041035040" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/97" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/97/hovercard" href="https://github.com/jellydn/oak/pull/97">#97</a></li>
+              <li>Pause ambient audio when session is paused by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4041035711" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/99" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/99/hovercard" href="https://github.com/jellydn/oak/pull/99">#99</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.17...v0.5.19"><tt>v0.5.17...v0.5.19</tt></a></p>
+  ]]></description>
+  <pubDate>Mon, 09 Mar 2026 06:17:30 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.19/Oak-0.5.19.dmg"
+             sparkle:version="5019"
+             sparkle:shortVersionString="0.5.19"
+             sparkle:edSignature="1hKd8ZVJbKIC+D3jFx7G7QG9an3OmTNkV+kHIHwM37gVYKX8QhUrUgK4EFrQbIEDUC8GoV7ar+BTKmlDW0O8AA=="
+             length="8993826"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.17</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.17</link>
   <sparkle:version>5017</sparkle:version>
@@ -50,27 +76,6 @@
              sparkle:shortVersionString="0.5.16"
              sparkle:edSignature="MLae48SVJE4Wyq/az6n4QYptwp0yJu99Y82f6zH78dNNPeMOvAHq4iqApu6v+hACFWMO9WQjkEX+ywc6IB4eDg=="
              length="8920230"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.15</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.15</link>
-  <sparkle:version>5015</sparkle:version>
-  <sparkle:shortVersionString>0.5.15</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.15</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>feat: Add auto-start next interval with audio persistence by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="3945853534" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/86" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/86/hovercard" href="https://github.com/jellydn/oak/pull/86">#86</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.14...v0.5.15"><tt>v0.5.14...v0.5.15</tt></a></p>
-  ]]></description>
-  <pubDate>Mon, 16 Feb 2026 16:40:48 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.15/Oak-0.5.15.dmg"
-             sparkle:version="5015"
-             sparkle:shortVersionString="0.5.15"
-             sparkle:edSignature="pmXKNcu4ZjXmFhlCRPlGoOJTeMLOeCrWQWph3V09Gwzl9A4l2H2SG0lpCNuCknsgpA+dOposIrNeyi+FxvxjDQ=="
-             length="8889244"
              type="application/octet-stream" />
 </item>
   </channel>
