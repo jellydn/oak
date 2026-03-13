@@ -7,6 +7,23 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.21</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.21</link>
+  <sparkle:version>5021</sparkle:version>
+  <sparkle:shortVersionString>0.5.21</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.21</h2>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.20...v0.5.21"><tt>v0.5.20...v0.5.21</tt></a></p>
+  ]]></description>
+  <pubDate>Fri, 13 Mar 2026 09:54:03 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.21/Oak-0.5.21.dmg"
+             sparkle:version="5021"
+             sparkle:shortVersionString="0.5.21"
+             sparkle:edSignature="lm9a6G18AQPb9TkKGKsy4ImBdhbDBd8maxv52pYysrPhK8Y0mYNY2zo3GDOX8ClzCp7VHHFQZu4/kUZiC5q1Bg=="
+             length="8999686"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.20</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.20</link>
   <sparkle:version>5020</sparkle:version>
@@ -51,31 +68,6 @@
              sparkle:shortVersionString="0.5.19"
              sparkle:edSignature="1hKd8ZVJbKIC+D3jFx7G7QG9an3OmTNkV+kHIHwM37gVYKX8QhUrUgK4EFrQbIEDUC8GoV7ar+BTKmlDW0O8AA=="
              length="8993826"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.17</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.17</link>
-  <sparkle:version>5017</sparkle:version>
-  <sparkle:shortVersionString>0.5.17</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.17</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>Add renovate.json by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4007146401" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/91" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/91/hovercard" href="https://github.com/jellydn/oak/pull/91">#91</a></li>
-              </ul>
-              <h2>New Contributors</h2>
-              <ul>
-              <li><a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] made their first contribution in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4007146401" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/91" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/91/hovercard" href="https://github.com/jellydn/oak/pull/91">#91</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.16...v0.5.17"><tt>v0.5.16...v0.5.17</tt></a></p>
-  ]]></description>
-  <pubDate>Sat, 07 Mar 2026 04:30:35 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.17/Oak-0.5.17.dmg"
-             sparkle:version="5017"
-             sparkle:shortVersionString="0.5.17"
-             sparkle:edSignature="Cy89pQxoPP2yByXWwIBsiD9pzWEuSdGnacj8a0k4TrnwHkC7Kly6FwM1yS6YO/EKOucTKrVtVlishY2RvI5jAA=="
-             length="8992796"
              type="application/octet-stream" />
 </item>
   </channel>
