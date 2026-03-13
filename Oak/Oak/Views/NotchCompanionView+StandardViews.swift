@@ -135,24 +135,91 @@ internal extension NotchCompanionView {
     var sessionView: some View {
         HStack(spacing: 6) {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
-            if displayMode == .circleRing {
-                countdownDisplay(
-                    mode: displayMode,
-                    size: expandedRingSize,
-                    fontSize: 14,
-                    showSessionType: true
-                )
-            } else {
-                VStack(alignment: .leading, spacing: 2) {
-                    countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
-                    Text(viewModel.currentSessionType)
-                        .font(.system(size: 8, weight: .medium))
-                        .foregroundColor(.white.opacity(0.52))
+            // Show countdown display based on session state
+            if viewModel.canPause || viewModel.canResume {
+                // Active session: show countdown with session type
+                if displayMode == .circleRing {
+                    countdownDisplay(
+                        mode: displayMode,
+                        size: expandedRingSize,
+                        fontSize: 14,
+                        showSessionType: true
+                    )
+                } else {
+                    VStack(alignment: .leading, spacing: 2) {
+                        countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
+                        Text(viewModel.currentSessionType)
+                            .font(.system(size: 8, weight: .medium))
+                            .foregroundColor(.white.opacity(0.52))
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
+                    .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
-                .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
+            } else if viewModel.canStartNext {
+                // Session complete, waiting for next: show next session info
+                if viewModel.autoStartCountdown > 0 {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 4) {
+                            Text("\(viewModel.autoStartCountdown)")
+                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                                .foregroundColor(.blue.opacity(0.95))
+                            Text("starting...")
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundColor(.white.opacity(0.62))
+                        }
+                        Text("Next: \(viewModel.currentSessionType)")
+                            .font(.system(size: 8, weight: .medium))
+                            .foregroundColor(.white.opacity(0.52))
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(
+                        "Auto-starting \(viewModel.currentSessionType) in \(viewModel.autoStartCountdown) seconds"
+                    )
+                    .accessibilityIdentifier("autoStartCountdown")
+                } else {
+                    if displayMode == .circleRing {
+                        countdownDisplay(
+                            mode: displayMode,
+                            size: expandedRingSize,
+                            fontSize: 14,
+                            showSessionType: true
+                        )
+                    } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
+                            Text(viewModel.currentSessionType)
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundColor(.white.opacity(0.52))
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
+                        .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
+                    }
+                }
+            } else {
+                // Session complete, no next: show completed session info
+                if displayMode == .circleRing {
+                    countdownDisplay(
+                        mode: displayMode,
+                        size: expandedRingSize,
+                        fontSize: 14,
+                        showSessionType: true
+                    )
+                } else {
+                    VStack(alignment: .leading, spacing: 2) {
+                        countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
+                        Text(viewModel.currentSessionType)
+                            .font(.system(size: 8, weight: .medium))
+                            .foregroundColor(.white.opacity(0.52))
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
+                    .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
+                }
             }
+
+            // Control buttons
             if viewModel.canPause {
                 Button(
                     action: { viewModel.pauseSession() },
@@ -184,46 +251,6 @@ internal extension NotchCompanionView {
                 .accessibilityLabel("Resume session")
                 .accessibilityIdentifier("resumeButton")
             } else if viewModel.canStartNext {
-                if viewModel.autoStartCountdown > 0 {
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(spacing: 4) {
-                            Text("\(viewModel.autoStartCountdown)")
-                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                                .foregroundColor(.blue.opacity(0.95))
-                            Text("starting...")
-                                .font(.system(size: 8, weight: .medium))
-                                .foregroundColor(.white.opacity(0.62))
-                        }
-                        Text("Next: \(viewModel.currentSessionType)")
-                            .font(.system(size: 8, weight: .medium))
-                            .foregroundColor(.white.opacity(0.52))
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel(
-                        "Auto-starting \(viewModel.currentSessionType) in \(viewModel.autoStartCountdown) seconds"
-                    )
-                    .accessibilityIdentifier("autoStartCountdown")
-                } else {
-                    let displayMode = viewModel.presetSettings.countdownDisplayMode
-                    if displayMode == .circleRing {
-                        countdownDisplay(
-                            mode: displayMode,
-                            size: expandedRingSize,
-                            fontSize: 14,
-                            showSessionType: true
-                        )
-                    } else {
-                        VStack(alignment: .leading, spacing: 2) {
-                            countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
-                            Text(viewModel.currentSessionType)
-                                .font(.system(size: 8, weight: .medium))
-                                .foregroundColor(.white.opacity(0.52))
-                        }
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
-                        .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
-                    }
-                }
                 Button(
                     action: { viewModel.startNextSession() },
                     label: {
