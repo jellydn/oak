@@ -7,6 +7,28 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.22</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.22</link>
+  <sparkle:version>5022</sparkle:version>
+  <sparkle:shortVersionString>0.5.22</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.22</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>feat: Add AudioManager test coverage via AudioEngineProtocol abstraction by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4046070464" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/103" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/103/hovercard" href="https://github.com/jellydn/oak/pull/103">#103</a></li>
+              <li>test: Add NotchCompanionView UI behavior tests by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4046069456" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/102" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/102/hovercard" href="https://github.com/jellydn/oak/pull/102">#102</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.21...v0.5.22"><tt>v0.5.21...v0.5.22</tt></a></p>
+  ]]></description>
+  <pubDate>Sat, 14 Mar 2026 08:03:23 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.22/Oak-0.5.22.dmg"
+             sparkle:version="5022"
+             sparkle:shortVersionString="0.5.22"
+             sparkle:edSignature="3O2gBSGJSlpXf64SmaMncP23r2mlSduR5mUGcCYeVmrAS9kpsbsZjWdSHlZ2mSDbF2AmBXjbF3EfL9t6QcvcDw=="
+             length="8984686"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.21</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.21</link>
   <sparkle:version>5021</sparkle:version>
@@ -42,32 +64,6 @@
              sparkle:shortVersionString="0.5.20"
              sparkle:edSignature="gJh2ARU6X86XgDkPBNFoDRdZSgyQ4irJ59WZLS8OINbsVxWMgmjwlxOXB2xGxAJBMZ+W1dax5NIG1IxQ9ZTTAA=="
              length="8994261"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.19</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.19</link>
-  <sparkle:version>5019</sparkle:version>
-  <sparkle:shortVersionString>0.5.19</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.19</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>chore(deps): update actions/upload-artifact action to v7 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4040877672" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/96" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/96/hovercard" href="https://github.com/jellydn/oak/pull/96">#96</a></li>
-              <li>chore(deps): update actions/github-script action to v8 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4040877610" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/95" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/95/hovercard" href="https://github.com/jellydn/oak/pull/95">#95</a></li>
-              <li>chore(deps): update actions/configure-pages action to v5 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4037314609" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/93" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/93/hovercard" href="https://github.com/jellydn/oak/pull/93">#93</a></li>
-              <li>chore(deps): update actions/checkout action to v6 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4037314560" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/92" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/92/hovercard" href="https://github.com/jellydn/oak/pull/92">#92</a></li>
-              <li>chore(deps): update actions/upload-pages-artifact action to v4 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4041035040" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/97" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/97/hovercard" href="https://github.com/jellydn/oak/pull/97">#97</a></li>
-              <li>Pause ambient audio when session is paused by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4041035711" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/99" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/99/hovercard" href="https://github.com/jellydn/oak/pull/99">#99</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.17...v0.5.19"><tt>v0.5.17...v0.5.19</tt></a></p>
-  ]]></description>
-  <pubDate>Mon, 09 Mar 2026 06:17:30 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.19/Oak-0.5.19.dmg"
-             sparkle:version="5019"
-             sparkle:shortVersionString="0.5.19"
-             sparkle:edSignature="1hKd8ZVJbKIC+D3jFx7G7QG9an3OmTNkV+kHIHwM37gVYKX8QhUrUgK4EFrQbIEDUC8GoV7ar+BTKmlDW0O8AA=="
-             length="8993826"
              type="application/octet-stream" />
 </item>
   </channel>
