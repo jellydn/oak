@@ -164,4 +164,45 @@ internal final class NSScreenNotchTests: XCTestCase {
             )
         }
     }
+
+    func testHasNotchedScreenMatchesScreens() {
+        // The cached value should match iterating screens directly
+        let cachedResult = NSScreen.hasNotchedScreen
+        let computedResult = NSScreen.screens.contains { $0.hasNotch }
+
+        XCTAssertEqual(
+            cachedResult,
+            computedResult,
+            "Cached hasNotchedScreen should match direct screen iteration result"
+        )
+    }
+
+    func testHasNotchedScreenCacheUpdatesAfterScreenParametersChange() {
+        // Trigger a screen parameters change and verify the cache is consistent
+        let initialResult = NSScreen.hasNotchedScreen
+
+        NotificationCenter.default.post(
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+
+        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+
+        let updatedResult = NSScreen.hasNotchedScreen
+        let computedResult = NSScreen.screens.contains { $0.hasNotch }
+
+        // After cache rebuild, result should still match direct computation
+        XCTAssertEqual(
+            updatedResult,
+            computedResult,
+            "Cached hasNotchedScreen should remain consistent after screen change"
+        )
+
+        // Value should not change when no screens actually changed
+        XCTAssertEqual(
+            initialResult,
+            updatedResult,
+            "hasNotchedScreen should be stable when screen configuration has not changed"
+        )
+    }
 }

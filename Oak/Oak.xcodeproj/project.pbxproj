@@ -58,6 +58,12 @@
 		BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451C36F9BC7A6103BF32362C /* OakApp.swift */; };
 		C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */; };
 		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
+		CC1122334455667788990CC1 /* AudioEngineProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1122334455667788990FF1 /* AudioEngineProtocol.swift */; };
+		CC1122334455667788990CC2 /* AudioManager+SoundGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1122334455667788990FF2 /* AudioManager+SoundGeneration.swift */; };
+		CC1122334455667788990CC3 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1122334455667788990FF3 /* NoiseGenerator.swift */; };
+		CC1122334455667788990CC4 /* SessionCompletionSoundPlaying.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1122334455667788990FF4 /* SessionCompletionSoundPlaying.swift */; };
+		CC1122334455667788990CC5 /* SettingsMenuView+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1122334455667788990FF5 /* SettingsMenuView+Helpers.swift */; };
+		CC1122334455667788990CC6 /* TimerAccuracyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1122334455667788990FF6 /* TimerAccuracyTests.swift */; };
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
 		D9BC1320EE869D9AD7FE40AE /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770CCC886CF6A5E903159704 /* SparkleUpdater.swift */; };
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
@@ -101,6 +107,12 @@
 		22F9A4FB15C8C324972DB6D6 /* NotchWindowControllerTests+NotchWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchWindowControllerTests+NotchWindow.swift"; sourceTree = "<group>"; };
 		23364F4B016E445E5657BF63 /* SettingsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuView.swift; sourceTree = "<group>"; };
 		23F2FC6738FCAE0999D42A11 /* SessionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionModels.swift; sourceTree = "<group>"; };
+		FF1122334455667788990FF1 /* AudioEngineProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineProtocol.swift; sourceTree = "<group>"; };
+		FF1122334455667788990FF2 /* AudioManager+SoundGeneration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioManager+SoundGeneration.swift"; sourceTree = "<group>"; };
+		FF1122334455667788990FF3 /* NoiseGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseGenerator.swift; sourceTree = "<group>"; };
+		FF1122334455667788990FF4 /* SessionCompletionSoundPlaying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCompletionSoundPlaying.swift; sourceTree = "<group>"; };
+		FF1122334455667788990FF5 /* SettingsMenuView+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsMenuView+Helpers.swift"; sourceTree = "<group>"; };
+		FF1122334455667788990FF6 /* TimerAccuracyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerAccuracyTests.swift; sourceTree = "<group>"; };
 		26934C0C6B7C8A90F9D57916 /* US002Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US002Tests.swift; sourceTree = "<group>"; };
 		309530434B76C0BB37A8FA0D /* NotchVisualStyle+Factory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchVisualStyle+Factory.swift"; sourceTree = "<group>"; };
 		309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppcastVersionParserTests.swift; sourceTree = "<group>"; };
@@ -168,6 +180,7 @@
 				164FAFB05B901C05BD1479BF /* NotchLayout.swift */,
 				1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */,
 				23F2FC6738FCAE0999D42A11 /* SessionModels.swift */,
+				FF1122334455667788990FF4 /* SessionCompletionSoundPlaying.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -244,6 +257,7 @@
 				131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */,
+				FF1122334455667788990FF6 /* TimerAccuracyTests.swift */,
 				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
 				26934C0C6B7C8A90F9D57916 /* US002Tests.swift */,
 				85C93F37E0AC4AA71C304FDD /* US003Tests.swift */,
@@ -271,6 +285,7 @@
 				2248B235C4F98DAE862335B3 /* NotificationSettingsView.swift */,
 				D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */,
 				23364F4B016E445E5657BF63 /* SettingsMenuView.swift */,
+				FF1122334455667788990FF5 /* SettingsMenuView+Helpers.swift */,
 				D9E56FB534D3736A6E1C03BD /* SupportSectionView.swift */,
 				C9239254E9493D78E223CE6D /* TransientPopover.swift */,
 				630A26F2F361CCE214543440 /* UpdateSettingsView.swift */,
@@ -290,6 +305,9 @@
 			isa = PBXGroup;
 			children = (
 				C348F7E99471145836A04408 /* AudioManager.swift */,
+				FF1122334455667788990FF2 /* AudioManager+SoundGeneration.swift */,
+				FF1122334455667788990FF1 /* AudioEngineProtocol.swift */,
+				FF1122334455667788990FF3 /* NoiseGenerator.swift */,
 				98D555E4182E199E8EC8D0B3 /* NotificationService.swift */,
 				1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */,
 				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
@@ -410,6 +428,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */,
+				CC1122334455667788990CC2 /* AudioManager+SoundGeneration.swift in Sources */,
+				CC1122334455667788990CC1 /* AudioEngineProtocol.swift in Sources */,
+				CC1122334455667788990CC3 /* NoiseGenerator.swift in Sources */,
 				B5C9AD5FC22FACC36FAA5620 /* AudioMenuView.swift in Sources */,
 				B51EEBF3FF0DC4E28F414828 /* AudioTrack.swift in Sources */,
 				39B659A9DA438E70743E07F9 /* CircularProgressRing.swift in Sources */,
@@ -433,8 +454,10 @@
 				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
 				C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */,
+				CC1122334455667788990CC4 /* SessionCompletionSoundPlaying.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */,
+				CC1122334455667788990CC5 /* SettingsMenuView+Helpers.swift in Sources */,
 				D9BC1320EE869D9AD7FE40AE /* SparkleUpdater.swift in Sources */,
 				91F4096D77B5684A1251EE01 /* SupportSectionView.swift in Sources */,
 				11949A6E7635E4BC247D1A97 /* TransientPopover.swift in Sources */,
@@ -464,6 +487,7 @@
 				F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */,
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
 				088CE53BA008F2E0ED7225E3 /* SparkleUpdaterTests.swift in Sources */,
+				CC1122334455667788990CC6 /* TimerAccuracyTests.swift in Sources */,
 				1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */,
 				DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */,
 				B54A841D1308C18C226BF1C0 /* US003Tests.swift in Sources */,
