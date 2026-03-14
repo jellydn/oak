@@ -3,6 +3,51 @@ import Combine
 import Foundation
 import os
 
+// MARK: - AudioEngineProtocol
+
+internal protocol AudioEngineProtocol {
+    var isRunning: Bool { get }
+    var outputChannelCount: AVAudioChannelCount { get }
+    var outputSampleRate: Double { get }
+    func setMixerVolume(_ volume: Float)
+    func attachAndConnect(_ node: AVAudioNode)
+    func detach(_ node: AVAudioNode)
+    func prepare()
+    func start() throws
+    func stop()
+    func pause()
+}
+
+// MARK: - AudioEngineAdapter
+
+internal final class AudioEngineAdapter: AudioEngineProtocol {
+    private let engine = AVAudioEngine()
+
+    var isRunning: Bool { engine.isRunning }
+    var outputChannelCount: AVAudioChannelCount { engine.outputNode.outputFormat(forBus: 0).channelCount }
+    var outputSampleRate: Double { engine.outputNode.outputFormat(forBus: 0).sampleRate }
+
+    func setMixerVolume(_ volume: Float) {
+        engine.mainMixerNode.outputVolume = volume
+    }
+
+    func attachAndConnect(_ node: AVAudioNode) {
+        engine.attach(node)
+        engine.connect(node, to: engine.mainMixerNode, format: nil)
+    }
+
+    func detach(_ node: AVAudioNode) {
+        engine.detach(node)
+    }
+
+    func prepare() { engine.prepare() }
+    func start() throws { try engine.start() }
+    func stop() { engine.stop() }
+    func pause() { engine.pause() }
+}
+
+// MARK: - AudioManager
+
 @MainActor
 internal class AudioManager: ObservableObject {
     @Published var selectedTrack: AudioTrack = .none
@@ -15,9 +60,14 @@ internal class AudioManager: ObservableObject {
     @Published var isPlaying: Bool = false
 
     private var audioPlayer: AVAudioPlayer?
-    private var audioEngine: AVAudioEngine?
+    private var audioEngine: (any AudioEngineProtocol)?
     private var audioNodes: [AVAudioNode] = []
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
+    private let audioEngineFactory: () -> any AudioEngineProtocol
+
+    init(audioEngineFactory: @escaping () -> any AudioEngineProtocol = { AudioEngineAdapter() }) {
+        self.audioEngineFactory = audioEngineFactory
+    }
 
     func play(track: AudioTrack) {
         guard track != .none else {
@@ -90,10 +140,7 @@ internal class AudioManager: ObservableObject {
 
     private func updateAudioEngineVolume() {
         audioPlayer?.volume = Float(volume)
-
-        if let mainMixerNode = audioEngine?.mainMixerNode {
-            mainMixerNode.outputVolume = Float(volume)
-        }
+        audioEngine?.setMixerVolume(Float(volume))
     }
 
     func setVolume(_ newVolume: Double) {
@@ -150,22 +197,18 @@ internal class AudioManager: ObservableObject {
         let generator = NoiseGenerator()
         guard let sourceNode = createSourceNode(for: track, generator: generator) else { return }
 
-        let engine = audioEngine ?? AVAudioEngine()
+        let engine = audioEngine ?? audioEngineFactory()
         let isNewEngine = audioEngine == nil
 
-        let mainMixer = engine.mainMixerNode
-        mainMixer.outputVolume = Float(volume)
-        let outputFormat = engine.outputNode.outputFormat(forBus: 0)
-
-        guard outputFormat.channelCount > 0, outputFormat.sampleRate > 0 else {
+        engine.setMixerVolume(Float(volume))
+        guard engine.outputChannelCount > 0, engine.outputSampleRate > 0 else {
             logger.error("Audio output format unavailable; skipping playback start")
             isPlaying = false
             selectedTrack = .none
             return
         }
 
-        engine.attach(sourceNode)
-        engine.connect(sourceNode, to: mainMixer, format: nil)
+        engine.attachAndConnect(sourceNode)
         audioNodes.append(sourceNode)
 
         audioEngine = engine
@@ -265,7 +308,11 @@ internal class AudioManager: ObservableObject {
     }
 }
 
-private final class NoiseGenerator: @unchecked Sendable {
+/// Generates procedural ambient noise samples for each audio track.
+/// Marked `@unchecked Sendable` because instances are created inside `AVAudioSourceNode`
+/// render callbacks (audio thread), but each instance is owned exclusively by its render
+/// callback—there is no cross-thread sharing of state.
+internal final class NoiseGenerator: @unchecked Sendable {
     private var brownNoiseLast: Float = 0
     private var rainSeed: Float = 0
 
