@@ -252,4 +252,23 @@ internal struct SettingsMenuView: View {
     private var hasNotchedScreen: Bool {
         NSScreen.hasNotchedScreen
     }
+
+    private var displayTargetBinding: Binding<DisplayTarget> {
+        Binding(
+            get: { selectedDisplayTarget },
+            set: { selectedDisplayTarget = $0 }
+        )
+    }
+
+    private var countdownDisplayModeBinding: Binding<CountdownDisplayMode> {
+        Binding(
+            get: { selectedCountdownDisplayMode },
+            set: { newValue in
+                selectedCountdownDisplayMode = newValue
+                DispatchQueue.main.async {
+                    presetSettings.setCountdownDisplayMode(newValue)
+                }
+            }
+        )
+    }
 }

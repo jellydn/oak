@@ -24,25 +24,6 @@ internal extension SettingsMenuView {
         )
     }
 
-    var displayTargetBinding: Binding<DisplayTarget> {
-        Binding(
-            get: { selectedDisplayTarget },
-            set: { selectedDisplayTarget = $0 }
-        )
-    }
-
-    var countdownDisplayModeBinding: Binding<CountdownDisplayMode> {
-        Binding(
-            get: { selectedCountdownDisplayMode },
-            set: { newValue in
-                selectedCountdownDisplayMode = newValue
-                DispatchQueue.main.async {
-                    presetSettings.setCountdownDisplayMode(newValue)
-                }
-            }
-        )
-    }
-
     var roundsBeforeLongBreakBinding: Binding<Int> {
         Binding(
             get: { presetSettings.roundsBeforeLongBreak },
