@@ -19,7 +19,7 @@ internal class AudioManager: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var audioEngine: (any AudioEngineProtocol)?
     private var audioNodes: [AVAudioNode] = []
-    private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
+    internal let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
     private let audioEngineFactory: () -> any AudioEngineProtocol
 
     init(audioEngineFactory: @escaping () -> any AudioEngineProtocol = { AudioEngineAdapter() }) {
@@ -143,46 +143,6 @@ internal class AudioManager: ObservableObject {
         }
 
         return nil
-    }
-
-    private func generateAmbientSound(for track: AudioTrack) {
-        audioPlayer?.stop()
-        audioPlayer = nil
-
-        detachSourceNodes()
-
-        let generator = NoiseGenerator()
-        guard let sourceNode = createSourceNode(for: track, generator: generator) else { return }
-
-        let engine = audioEngine ?? audioEngineFactory()
-        let isNewEngine = audioEngine == nil
-
-        engine.setMixerVolume(Float(volume))
-        guard engine.outputChannelCount > 0, engine.outputSampleRate > 0 else {
-            logger.error("Audio output format unavailable; skipping playback start")
-            isPlaying = false
-            selectedTrack = .none
-            return
-        }
-
-        engine.attachAndConnect(sourceNode)
-        audioNodes.append(sourceNode)
-
-        audioEngine = engine
-
-        if isNewEngine {
-            engine.prepare()
-        }
-
-        do {
-            if !engine.isRunning {
-                try engine.start()
-            }
-            isPlaying = true
-            selectedTrack = track
-        } catch {
-            logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")
-        }
     }
 
     deinit {
