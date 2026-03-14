@@ -7,6 +7,28 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.23</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.23</link>
+  <sparkle:version>5023</sparkle:version>
+  <sparkle:shortVersionString>0.5.23</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.23</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>feat: Add AudioManager test coverage via AudioEngineProtocol abstraction by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4046070464" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/103" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/103/hovercard" href="https://github.com/jellydn/oak/pull/103">#103</a></li>
+              <li>test: Add NotchCompanionView UI behavior tests by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4046069456" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/102" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/102/hovercard" href="https://github.com/jellydn/oak/pull/102">#102</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.21...v0.5.23"><tt>v0.5.21...v0.5.23</tt></a></p>
+  ]]></description>
+  <pubDate>Sat, 14 Mar 2026 08:04:37 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.23/Oak-0.5.23.dmg"
+             sparkle:version="5023"
+             sparkle:shortVersionString="0.5.23"
+             sparkle:edSignature="hp81++CCWMyTnRXEV3yvIIQQS9b7NZFh+0fWO5v1RL8iDt1EsdFVEUst1TFB6SiRMn4IBrHYctoz1cVyEHLADA=="
+             length="8986811"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.22</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.22</link>
   <sparkle:version>5022</sparkle:version>
@@ -43,27 +65,6 @@
              sparkle:shortVersionString="0.5.21"
              sparkle:edSignature="lm9a6G18AQPb9TkKGKsy4ImBdhbDBd8maxv52pYysrPhK8Y0mYNY2zo3GDOX8ClzCp7VHHFQZu4/kUZiC5q1Bg=="
              length="8999686"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.20</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.20</link>
-  <sparkle:version>5020</sparkle:version>
-  <sparkle:shortVersionString>0.5.20</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.20</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>fix(ci): prevent auto-release race condition causing stale appcast versions by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4043677388" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/101" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/101/hovercard" href="https://github.com/jellydn/oak/pull/101">#101</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.19...v0.5.20"><tt>v0.5.19...v0.5.20</tt></a></p>
-  ]]></description>
-  <pubDate>Mon, 09 Mar 2026 14:01:00 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.20/Oak-0.5.20.dmg"
-             sparkle:version="5020"
-             sparkle:shortVersionString="0.5.20"
-             sparkle:edSignature="gJh2ARU6X86XgDkPBNFoDRdZSgyQ4irJ59WZLS8OINbsVxWMgmjwlxOXB2xGxAJBMZ+W1dax5NIG1IxQ9ZTTAA=="
-             length="8994261"
              type="application/octet-stream" />
 </item>
   </channel>
