@@ -31,17 +31,19 @@ internal class FocusSessionViewModel: ObservableObject {
     private var presetSettingsCancellable: AnyCancellable?
     private var lastPlayingAudioTrack: AudioTrack = .none
     private var wasAutoStarted: Bool = false
-    let audioManager = AudioManager()
+    let audioManager: AudioManager
     let progressManager: ProgressManager
     let notificationService: any SessionCompletionNotifying
     let completionSoundPlayer: any SessionCompletionSoundPlaying
 
     init(
         presetSettings: PresetSettingsStore,
+        audioManager: AudioManager? = nil,
         progressManager: ProgressManager? = nil,
         notificationService: any SessionCompletionNotifying,
         completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil
     ) {
+        self.audioManager = audioManager ?? AudioManager()
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
         self.notificationService = notificationService
@@ -304,10 +306,8 @@ internal extension FocusSessionViewModel {
 
         notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
 
-        if audioManager.isPlaying {
-            lastPlayingAudioTrack = audioManager.selectedTrack
-        } else {
-            lastPlayingAudioTrack = .none
+        if isWorkSession || audioManager.isPlaying {
+            lastPlayingAudioTrack = audioManager.isPlaying ? audioManager.selectedTrack : .none
         }
 
         audioManager.stop()
