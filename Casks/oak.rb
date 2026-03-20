@@ -1,6 +1,6 @@
 cask "oak" do
-  version "0.5.24"
-  sha256 "035ccb38864d38396666fe48a1fc4597cd5cf010b1c766f1315882c0a22fe674"
+  version "0.5.25"
+  sha256 "27a5d7158dbbaf6be7c40013ed16f1b7b34e76402acbb7f8b3c11cfe9d76735a"
 
   url "https://github.com/jellydn/oak/releases/download/v#{version}/Oak-#{version}.dmg"
   name "Oak"

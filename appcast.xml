@@ -7,6 +7,23 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.25</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.25</link>
+  <sparkle:version>5025</sparkle:version>
+  <sparkle:shortVersionString>0.5.25</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.25</h2>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.24...v0.5.25"><tt>v0.5.24...v0.5.25</tt></a></p>
+  ]]></description>
+  <pubDate>Fri, 20 Mar 2026 09:27:07 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.25/Oak-0.5.25.dmg"
+             sparkle:version="5025"
+             sparkle:shortVersionString="0.5.25"
+             sparkle:edSignature="TS7b4hCWK5SiQoRd5bRAWXUCB71VCDvfYGnH4aDVKbZZnT9HEYhXWLLp8lGx/BiH2XpCVNkodbnriQZkD36IAg=="
+             length="8983843"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.24</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.24</link>
   <sparkle:version>5024</sparkle:version>
@@ -43,28 +60,6 @@
              sparkle:shortVersionString="0.5.23"
              sparkle:edSignature="hp81++CCWMyTnRXEV3yvIIQQS9b7NZFh+0fWO5v1RL8iDt1EsdFVEUst1TFB6SiRMn4IBrHYctoz1cVyEHLADA=="
              length="8986811"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.22</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.22</link>
-  <sparkle:version>5022</sparkle:version>
-  <sparkle:shortVersionString>0.5.22</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.22</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>feat: Add AudioManager test coverage via AudioEngineProtocol abstraction by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4046070464" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/103" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/103/hovercard" href="https://github.com/jellydn/oak/pull/103">#103</a></li>
-              <li>test: Add NotchCompanionView UI behavior tests by @Copilot in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4046069456" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/102" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/102/hovercard" href="https://github.com/jellydn/oak/pull/102">#102</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.21...v0.5.22"><tt>v0.5.21...v0.5.22</tt></a></p>
-  ]]></description>
-  <pubDate>Sat, 14 Mar 2026 08:03:23 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.22/Oak-0.5.22.dmg"
-             sparkle:version="5022"
-             sparkle:shortVersionString="0.5.22"
-             sparkle:edSignature="3O2gBSGJSlpXf64SmaMncP23r2mlSduR5mUGcCYeVmrAS9kpsbsZjWdSHlZ2mSDbF2AmBXjbF3EfL9t6QcvcDw=="
-             length="8984686"
              type="application/octet-stream" />
 </item>
   </channel>
