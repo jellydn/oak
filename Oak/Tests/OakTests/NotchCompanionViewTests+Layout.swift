@@ -20,40 +20,8 @@ internal extension NotchCompanionViewTests {
         XCTAssertFalse(view.showSettingsMenu, "showSettingsMenu should default to false")
     }
 
-    func testAudioMenuPopoverFlagCanBeSetTrue() {
-        let view = makeView()
-        view.showAudioMenu = true
-        XCTAssertTrue(view.showAudioMenu, "showAudioMenu flag should be true after being set")
-    }
-
-    func testProgressMenuPopoverFlagCanBeSetTrue() {
-        let view = makeView()
-        view.showProgressMenu = true
-        XCTAssertTrue(view.showProgressMenu, "showProgressMenu flag should be true after being set")
-    }
-
-    func testSettingsMenuPopoverFlagCanBeSetTrue() {
-        let view = makeView()
-        view.showSettingsMenu = true
-        XCTAssertTrue(view.showSettingsMenu, "showSettingsMenu flag should be true after being set")
-    }
-
-    func testAllPopoverFlagsAreIndependent() {
-        let view = makeView()
-        view.showAudioMenu = true
-        view.showProgressMenu = true
-        view.showSettingsMenu = true
-        XCTAssertTrue(view.showAudioMenu, "Audio menu flag should be independent")
-        XCTAssertTrue(view.showProgressMenu, "Progress menu flag should be independent")
-        XCTAssertTrue(view.showSettingsMenu, "Settings menu flag should be independent")
-    }
-
-    func testPopoverFlagCanBeResetToFalse() {
-        let view = makeView()
-        view.showAudioMenu = true
-        view.showAudioMenu = false
-        XCTAssertFalse(view.showAudioMenu, "showAudioMenu should be resettable to false")
-    }
+    // NOTE: @State properties cannot be tested outside SwiftUI's rendering pipeline.
+    // Setting @State on a struct outside a View body is a no-op — SwiftUI manages the storage.
 
     // MARK: - Preset Selection
 
