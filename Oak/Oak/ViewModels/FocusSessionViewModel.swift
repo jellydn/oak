@@ -304,8 +304,10 @@ internal extension FocusSessionViewModel {
 
         notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
 
-        if audioManager.isPlaying && audioManager.selectedTrack != .none {
+        if audioManager.isPlaying {
             lastPlayingAudioTrack = audioManager.selectedTrack
+        } else {
+            lastPlayingAudioTrack = .none
         }
 
         audioManager.stop()
