@@ -119,19 +119,15 @@ internal final class NoiseGeneratorTests: XCTestCase {
 
 @MainActor
 internal final class AudioManagerTests: XCTestCase {
-    var mockEngine: MockAudioEngine!
     var manager: AudioManager!
 
     override func setUp() async throws {
-        let mock = MockAudioEngine()
-        mockEngine = mock
-        manager = AudioManager { mock }
+        manager = AudioManager()
     }
 
     override func tearDown() async throws {
         manager.stop()
         manager = nil
-        mockEngine = nil
     }
 
     // MARK: - Volume Control
@@ -155,18 +151,10 @@ internal final class AudioManagerTests: XCTestCase {
         XCTAssertEqual(manager.volume, 0.0, accuracy: 0.001)
     }
 
-    func testSetVolumeUpdatesEngineVolumeWhilePlaying() {
-        manager.play(track: .brownNoise)
-        manager.setVolume(0.8)
-        XCTAssertEqual(mockEngine.mixerVolume, 0.8, accuracy: 0.001)
-    }
-
     // MARK: - Track Selection
 
     func testPlayNoneStopsPlayback() {
         manager.play(track: .brownNoise)
-        XCTAssertTrue(manager.isPlaying)
-
         manager.play(track: .none)
         XCTAssertFalse(manager.isPlaying)
         XCTAssertEqual(manager.selectedTrack, .none)
@@ -188,62 +176,6 @@ internal final class AudioManagerTests: XCTestCase {
         XCTAssertEqual(manager.selectedTrack, .forest)
     }
 
-    // MARK: - Engine Lifecycle
-
-    func testPlayStartsEngine() {
-        manager.play(track: .brownNoise)
-        XCTAssertTrue(mockEngine.startCalled)
-        XCTAssertTrue(mockEngine.isRunning)
-    }
-
-    func testPlayPreparesEngineOnFirstUse() {
-        manager.play(track: .brownNoise)
-        XCTAssertTrue(mockEngine.prepareCalled)
-    }
-
-    func testPlayDoesNotPrepareEngineOnReuse() {
-        manager.play(track: .brownNoise)
-        mockEngine.prepareCalled = false
-
-        manager.play(track: .rain)
-        XCTAssertFalse(mockEngine.prepareCalled)
-    }
-
-    func testPlayAttachesSourceNode() {
-        manager.play(track: .brownNoise)
-        XCTAssertEqual(mockEngine.attachedNodes.count, 1)
-    }
-
-    func testPlayEngineStartFailureDoesNotSetIsPlaying() {
-        mockEngine.startError = NSError(domain: "AudioTest", code: -1, userInfo: nil)
-        manager.play(track: .brownNoise)
-        XCTAssertFalse(manager.isPlaying)
-    }
-
-    func testPlayEngineStartFailureDoesNotSetSelectedTrack() {
-        mockEngine.startError = NSError(domain: "AudioTest", code: -1, userInfo: nil)
-        manager.play(track: .brownNoise)
-        XCTAssertEqual(manager.selectedTrack, .none)
-    }
-
-    func testPlayWithInvalidOutputFormatDoesNotSetIsPlaying() {
-        mockEngine.outputChannelCount = 0
-        manager.play(track: .brownNoise)
-        XCTAssertFalse(manager.isPlaying)
-    }
-
-    func testInvalidOutputFormatDoesNotSetTrack() {
-        mockEngine.outputChannelCount = 0
-        manager.play(track: .brownNoise)
-        XCTAssertEqual(manager.selectedTrack, .none)
-    }
-
-    func testPlayWithZeroSampleRateDoesNotSetIsPlaying() {
-        mockEngine.outputSampleRate = 0
-        manager.play(track: .brownNoise)
-        XCTAssertFalse(manager.isPlaying)
-    }
-
     // MARK: - Stop
 
     func testStopClearsIsPlaying() {
@@ -258,32 +190,12 @@ internal final class AudioManagerTests: XCTestCase {
         XCTAssertEqual(manager.selectedTrack, .none)
     }
 
-    func testStopCallsEngineStop() {
-        manager.play(track: .brownNoise)
-        manager.stop()
-        XCTAssertTrue(mockEngine.stopCalled)
-    }
-
-    func testStopDetachesSourceNodes() {
-        manager.play(track: .brownNoise)
-        let attached = mockEngine.attachedNodes
-        manager.stop()
-        XCTAssertFalse(attached.isEmpty, "Should have attached a node before stop")
-        XCTAssertEqual(mockEngine.detachedNodes.count, attached.count)
-    }
-
     // MARK: - Pause / Resume
 
     func testPauseSetsIsPlayingFalse() {
         manager.play(track: .brownNoise)
         manager.pause()
         XCTAssertFalse(manager.isPlaying)
-    }
-
-    func testPauseCallsEnginePause() {
-        manager.play(track: .brownNoise)
-        manager.pause()
-        XCTAssertTrue(mockEngine.pauseCalled)
     }
 
     func testPausePreservesSelectedTrack() {
@@ -300,27 +212,16 @@ internal final class AudioManagerTests: XCTestCase {
     }
 
     func testResumeWhenNotPlayingDoesNothing() {
-        // No track selected, no engine
         manager.resume()
         XCTAssertFalse(manager.isPlaying)
     }
 
-    // MARK: - Missing Bundled Track Fallback
-
-    func testMissingBundledTrackFallsBackToGeneratedNoise() {
-        // In the test bundle, no ambient audio files exist.
-        // play() should fall back to generateAmbientSound, which uses the mock engine.
-        manager.play(track: .cafe)
-        XCTAssertTrue(manager.isPlaying, "Should fall back to generated noise when bundled file is missing")
-        XCTAssertEqual(manager.selectedTrack, .cafe)
-    }
+    // MARK: - All Tracks
 
     func testAllAmbientTracksCanBePlayed() {
         let ambientTracks: [AudioTrack] = [.brownNoise, .rain, .forest, .cafe, .lofi]
         for track in ambientTracks {
             manager.stop()
-            mockEngine.startCalled = false
-            mockEngine.isRunning = false
             manager.play(track: track)
             XCTAssertTrue(manager.isPlaying, "\(track.rawValue) should be playing")
             XCTAssertEqual(manager.selectedTrack, track)

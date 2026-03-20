@@ -18,6 +18,7 @@ internal final class AudioPersistenceTests: XCTestCase {
         presetSettings = PresetSettingsStore(userDefaults: userDefaults)
         viewModel = FocusSessionViewModel(
             presetSettings: presetSettings,
+            audioManager: MockAudioManager(),
             notificationService: NotificationService()
         )
     }
