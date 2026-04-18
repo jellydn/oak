@@ -6,7 +6,7 @@ attributes:
 packages:
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
-    from: 2.6.4
+    from: 2.9.1
 targets:
   Oak:
     type: application
