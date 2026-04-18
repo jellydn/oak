@@ -30,6 +30,11 @@ internal extension NSScreen {
     var hasNotch: Bool {
         safeAreaInsets.top > 0
     }
+
+    /// Returns whether any connected screen has a notch, using a cached result.
+    @MainActor static var hasNotchedScreen: Bool {
+        NSScreenUUIDCache.shared.hasNotchedScreen
+    }
 }
 
 @MainActor
@@ -38,6 +43,7 @@ internal final class NSScreenUUIDCache {
 
     private var cache: [String: NSScreen] = [:]
     private var observer: Any?
+    private(set) var hasNotchedScreen: Bool = false
 
     private init() {
         rebuildCache()
@@ -62,14 +68,19 @@ internal final class NSScreenUUIDCache {
 
     private func rebuildCache() {
         var newCache: [String: NSScreen] = [:]
+        var notchedFound = false
 
         for screen in NSScreen.screens {
             if let uuid = screen.displayUUID {
                 newCache[uuid] = screen
             }
+            if screen.hasNotch {
+                notchedFound = true
+            }
         }
 
         cache = newCache
+        hasNotchedScreen = notchedFound
     }
 
     func screen(forUUID uuid: String) -> NSScreen? {

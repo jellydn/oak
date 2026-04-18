@@ -1,16 +1,5 @@
-import AppKit
 import Combine
-import SwiftUI
-
-internal protocol SessionCompletionSoundPlaying {
-    func playCompletionSound()
-}
-
-internal struct SystemSessionCompletionSoundPlayer: SessionCompletionSoundPlaying {
-    func playCompletionSound() {
-        NSSound.beep()
-    }
-}
+import Foundation
 
 @MainActor
 internal class FocusSessionViewModel: ObservableObject {
@@ -26,8 +15,12 @@ internal class FocusSessionViewModel: ObservableObject {
     private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
     private var isLongBreak: Bool = false
-    private var sessionStartSeconds: Int = 0
     private var sessionEndDate: Date?
+    private var sessionStartSeconds: Int = 0
+    // Date-based tracking for accurate focus duration (excludes paused time)
+    private var sessionActualStartDate: Date?
+    private var pauseStartDate: Date?
+    private var accumulatedPauseSeconds: Int = 0
     private var presetSettingsCancellable: AnyCancellable?
     private var lastPlayingAudioTrack: AudioTrack = .none
     private var wasAutoStarted: Bool = false
@@ -52,6 +45,12 @@ internal class FocusSessionViewModel: ObservableObject {
             self?.objectWillChange.send()
         }
     }
+
+    func cleanup() {
+        resetSession()
+    }
+
+    // MARK: - Derived State
 
     var canStart: Bool {
         if case .idle = sessionState { return true }
@@ -159,10 +158,6 @@ internal class FocusSessionViewModel: ObservableObject {
         progressManager.dailyStats.streakDays
     }
 
-    func cleanup() {
-        resetSession()
-    }
-
     deinit {
         timer?.invalidate()
         autoStartTimer?.invalidate()
@@ -192,6 +187,9 @@ internal extension FocusSessionViewModel {
         isLongBreak = false
         sessionStartSeconds = currentRemainingSeconds
         completedRounds = 0
+        sessionActualStartDate = Date()
+        accumulatedPauseSeconds = 0
+        pauseStartDate = nil
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
     }
@@ -200,11 +198,16 @@ internal extension FocusSessionViewModel {
         timer?.invalidate()
         timer = nil
         sessionEndDate = nil
+        pauseStartDate = Date()
         audioManager.pause()
         sessionState = .paused(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
     }
 
     func resumeSession() {
+        if let pauseStart = pauseStartDate {
+            accumulatedPauseSeconds += Int(Date().timeIntervalSince(pauseStart))
+            pauseStartDate = nil
+        }
         audioManager.resume()
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
@@ -228,6 +231,9 @@ internal extension FocusSessionViewModel {
         if isWorkSession {
             currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
             isLongBreak = false
+            sessionActualStartDate = Date()
+            accumulatedPauseSeconds = 0
+            pauseStartDate = nil
         } else {
             if completedRounds >= roundsBeforeLongBreak {
                 currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
@@ -236,6 +242,7 @@ internal extension FocusSessionViewModel {
                 currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
                 isLongBreak = false
             }
+            sessionActualStartDate = nil
         }
 
         sessionStartSeconds = currentRemainingSeconds
@@ -258,6 +265,9 @@ internal extension FocusSessionViewModel {
         isLongBreak = false
         sessionStartSeconds = 0
         sessionEndDate = nil
+        sessionActualStartDate = nil
+        pauseStartDate = nil
+        accumulatedPauseSeconds = 0
         isSessionComplete = false
         completedRounds = 0
         autoStartCountdown = 0
@@ -267,33 +277,9 @@ internal extension FocusSessionViewModel {
         sessionState = .idle
     }
 
-    private func startTimer() {
-        timer?.invalidate()
-        sessionEndDate = Date().addingTimeInterval(TimeInterval(currentRemainingSeconds))
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tick()
-            }
-        }
-    }
-
-    private func tick() {
-        guard let sessionEndDate else {
-            completeSession()
-            return
-        }
-        currentRemainingSeconds = max(0, Int(ceil(sessionEndDate.timeIntervalSinceNow)))
-
-        if currentRemainingSeconds <= 0 {
-            completeSession()
-        } else {
-            sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
-        }
-    }
-
     func completeSession() {
         if isWorkSession {
-            let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
+            let durationMinutes = actualFocusDurationMinutes()
             if durationMinutes > 0 {
                 progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
             }
@@ -324,6 +310,9 @@ internal extension FocusSessionViewModel {
         timer?.invalidate()
         timer = nil
         sessionEndDate = nil
+        sessionActualStartDate = nil
+        accumulatedPauseSeconds = 0
+        pauseStartDate = nil
         sessionState = .completed(isWorkSession: isWorkSession)
 
         isSessionComplete = true
@@ -335,6 +324,30 @@ internal extension FocusSessionViewModel {
             if presetSettings.autoStartNextInterval {
                 startAutoStartCountdown()
             }
+        }
+    }
+
+    private func startTimer() {
+        timer?.invalidate()
+        sessionEndDate = Date().addingTimeInterval(TimeInterval(currentRemainingSeconds))
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.tick()
+            }
+        }
+    }
+
+    private func tick() {
+        guard let sessionEndDate else {
+            completeSession()
+            return
+        }
+        currentRemainingSeconds = max(0, Int(ceil(sessionEndDate.timeIntervalSinceNow)))
+
+        if currentRemainingSeconds <= 0 {
+            completeSession()
+        } else {
+            sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         }
     }
 
@@ -358,5 +371,19 @@ internal extension FocusSessionViewModel {
                 startNextSession(isAutoStart: true)
             }
         }
+    }
+
+    /// Returns the actual number of focus minutes elapsed, excluding time spent paused.
+    ///
+    /// When a `sessionActualStartDate` is available (set at the start of every work session),
+    /// this uses `Date().timeIntervalSince(startDate)` minus any accumulated pause seconds to
+    /// give a precise, drift-free measurement. When no start date is recorded (e.g., for break
+    /// sessions that do not track focus time), it falls back to integer seconds arithmetic.
+    private func actualFocusDurationMinutes() -> Int {
+        if let startDate = sessionActualStartDate {
+            let elapsed = max(0, Int(Date().timeIntervalSince(startDate)) - accumulatedPauseSeconds)
+            return elapsed / 60
+        }
+        return (sessionStartSeconds - currentRemainingSeconds) / 60
     }
 }
