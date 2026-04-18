@@ -125,6 +125,10 @@ internal class NotchWindowController: NSWindowController {
         viewModel.cleanup()
     }
 
+    func checkDayChange() {
+        viewModel.progressManager.checkDayChange()
+    }
+
     @objc private func screenConfigurationChanged() {
         requestFrameUpdate(for: lastExpandedState, forceReposition: true)
     }

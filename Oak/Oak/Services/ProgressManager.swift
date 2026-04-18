@@ -7,13 +7,41 @@ internal class ProgressManager: ObservableObject {
     private let userDefaults: UserDefaults
     private let progressKey = "progressHistory"
     private let retentionDays = 90
+    private var lastLoadedDate: Date = Calendar.current.startOfDay(for: Date())
+    private var dayCheckTimer: Timer?
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         loadProgress()
+        startDayCheckTimer()
+    }
+
+    deinit {
+        dayCheckTimer?.invalidate()
+    }
+
+    private func startDayCheckTimer() {
+        dayCheckTimer?.invalidate()
+        dayCheckTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.checkDayChange()
+            }
+        }
+    }
+
+    @discardableResult
+    func checkDayChange() -> Bool {
+        let today = Calendar.current.startOfDay(for: Date())
+        if !Calendar.current.isDate(lastLoadedDate, inSameDayAs: today) {
+            lastLoadedDate = today
+            loadProgress()
+            return true
+        }
+        return false
     }
 
     func recordSessionCompletion(durationMinutes: Int) {
+        let didChangeDay = checkDayChange()
         var records = loadRecords()
         let today = Calendar.current.startOfDay(for: Date())
 
@@ -27,7 +55,10 @@ internal class ProgressManager: ObservableObject {
 
         records.sort { $0.date > $1.date }
         saveRecords(pruneOldRecords(records))
-        loadProgress()
+
+        if !didChangeDay {
+            loadProgress()
+        }
     }
 
     private func loadRecords() -> [ProgressData] {
@@ -55,6 +86,7 @@ internal class ProgressManager: ObservableObject {
     private func loadProgress() {
         let records = loadRecords()
         let today = Calendar.current.startOfDay(for: Date())
+        lastLoadedDate = today
 
         let todayRecord = records.first { Calendar.current.isDate($0.date, inSameDayAs: today) }
         let todayFocusMinutes = todayRecord?.focusMinutes ?? 0

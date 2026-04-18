@@ -57,6 +57,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidBecomeActive(_: Notification) {
         Task { @MainActor in
             await notificationService.refreshAuthorizationStatus()
+            notchWindowController?.checkDayChange()
         }
     }
 }
