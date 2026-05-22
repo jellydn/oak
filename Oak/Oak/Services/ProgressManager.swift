@@ -2,7 +2,12 @@ import Foundation
 
 @MainActor
 internal class ProgressManager: ObservableObject {
-    @Published var dailyStats = DailyStats(todayFocusMinutes: 0, todayCompletedSessions: 0, streakDays: 0)
+    @Published var dailyStats = DailyStats(
+        todayFocusMinutes: 0,
+        todayCompletedSessions: 0,
+        streakDays: 0,
+        todaySessions: []
+    )
 
     private let userDefaults: UserDefaults
     private let progressKey = "progressHistory"
@@ -40,16 +45,36 @@ internal class ProgressManager: ObservableObject {
         return false
     }
 
-    func recordSessionCompletion(durationMinutes: Int) {
+    func recordSessionCompletion(
+        durationMinutes: Int,
+        type: SessionType = .work,
+        startTime: Date = Date(),
+        endTime: Date = Date()
+    ) {
         let didChangeDay = checkDayChange()
         var records = loadRecords()
         let today = Calendar.current.startOfDay(for: Date())
+        let newSession = SessionRecord(
+            type: type,
+            startTime: startTime,
+            endTime: endTime,
+            durationMinutes: durationMinutes
+        )
 
         if let index = records.firstIndex(where: { Calendar.current.isDate($0.date, inSameDayAs: today) }) {
             records[index].focusMinutes += durationMinutes
-            records[index].completedSessions += 1
+            if type == .work {
+                records[index].completedSessions += 1
+            }
+            records[index].sessions.append(newSession)
         } else {
-            let newRecord = ProgressData(date: today, focusMinutes: durationMinutes, completedSessions: 1)
+            let completedSessions = type == .work ? 1 : 0
+            let newRecord = ProgressData(
+                date: today,
+                focusMinutes: durationMinutes,
+                completedSessions: completedSessions,
+                sessions: [newSession]
+            )
             records.append(newRecord)
         }
 
@@ -92,11 +117,13 @@ internal class ProgressManager: ObservableObject {
         let todayFocusMinutes = todayRecord?.focusMinutes ?? 0
         let todayCompletedSessions = todayRecord?.completedSessions ?? 0
         let streakDays = calculateStreak(records: records)
+        let todaySessions = todayRecord?.sessions ?? []
 
         dailyStats = DailyStats(
             todayFocusMinutes: todayFocusMinutes,
             todayCompletedSessions: todayCompletedSessions,
-            streakDays: streakDays
+            streakDays: streakDays,
+            todaySessions: todaySessions
         )
     }
 

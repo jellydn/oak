@@ -4,7 +4,7 @@ import AVFoundation
 @MainActor
 internal final class MockAudioManager: AudioManager {
     init() {
-        super.init(audioEngineFactory: { MockTestAudioEngine() })
+        super.init { MockTestAudioEngine() }
     }
 
     override func play(track: AudioTrack) {
