@@ -113,6 +113,41 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(statsAfter.streakDays, statsBefore.streakDays, "Streak should persist")
     }
 
+    func testSessionCompletionUsesDurationWhenStartTimeOmitted() throws {
+        let endTime = Date()
+
+        progressManager.recordSessionCompletion(durationMinutes: 25, endTime: endTime)
+
+        let session = try XCTUnwrap(progressManager.dailyStats.todaySessions.first)
+        XCTAssertEqual(session.durationMinutes, 25)
+        XCTAssertEqual(session.endTime.timeIntervalSince(endTime), 0, accuracy: 0.001)
+        XCTAssertEqual(session.startTime.timeIntervalSince(endTime), -1500, accuracy: 0.001)
+    }
+
+    func testTodaySessionsAreSortedNewestFirst() {
+        let now = Date()
+        let olderStart = now.addingTimeInterval(-3600)
+        let newerStart = now.addingTimeInterval(-900)
+
+        progressManager.recordSessionCompletion(
+            durationMinutes: 25,
+            startTime: olderStart,
+            endTime: olderStart.addingTimeInterval(1500)
+        )
+        progressManager.recordSessionCompletion(
+            durationMinutes: 10,
+            type: .shortBreak,
+            startTime: newerStart,
+            endTime: newerStart.addingTimeInterval(600)
+        )
+
+        let sessions = progressManager.dailyStats.todaySessions
+        XCTAssertEqual(sessions.count, 2)
+        XCTAssertGreaterThan(sessions[0].startTime, sessions[1].startTime)
+        XCTAssertEqual(sessions[0].type, .shortBreak)
+        XCTAssertEqual(sessions[1].type, .work)
+    }
+
     func testMultipleDaysDataStored() throws {
         // Record sessions on multiple days
         let manager1 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))

@@ -68,7 +68,7 @@ internal struct ProgressMenuView: View {
                     .padding(.vertical, 8)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Timeline")
+                    Text(String(localized: "Timeline", comment: "Progress menu timeline section title"))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -76,7 +76,7 @@ internal struct ProgressMenuView: View {
 
                     ScrollView {
                         VStack(spacing: 12) {
-                            ForEach(viewModel.todaySessions.sorted { $0.startTime > $1.startTime }) { session in
+                            ForEach(viewModel.todaySessions) { session in
                                 HStack(spacing: 12) {
                                     Circle()
                                         .fill(colorForSessionType(session.type))
@@ -125,15 +125,16 @@ internal struct ProgressMenuView: View {
 
     private func titleForSessionType(_ type: SessionType) -> String {
         switch type {
-        case .work: "Focus"
-        case .shortBreak: "Short Break"
-        case .longBreak: "Long Break"
+        case .work:
+            String(localized: "Focus", comment: "Timeline label for a focus session")
+        case .shortBreak:
+            String(localized: "Short Break", comment: "Timeline label for a short break session")
+        case .longBreak:
+            String(localized: "Long Break", comment: "Timeline label for a long break session")
         }
     }
 
     private func timeRangeString(start: Date, end: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return "\(formatter.string(from: start)) - \(formatter.string(from: end))"
+        "\(start.formatted(date: .omitted, time: .shortened)) - \(end.formatted(date: .omitted, time: .shortened))"
     }
 }

@@ -48,15 +48,18 @@ internal class ProgressManager: ObservableObject {
     func recordSessionCompletion(
         durationMinutes: Int,
         type: SessionType = .work,
-        startTime: Date = Date(),
+        startTime: Date? = nil,
         endTime: Date = Date()
     ) {
+        let resolvedStartTime = startTime ?? endTime.addingTimeInterval(TimeInterval(-durationMinutes * 60))
+        guard durationMinutes > 0, resolvedStartTime <= endTime else { return }
+
         let didChangeDay = checkDayChange()
         var records = loadRecords()
         let today = Calendar.current.startOfDay(for: Date())
         let newSession = SessionRecord(
             type: type,
-            startTime: startTime,
+            startTime: resolvedStartTime,
             endTime: endTime,
             durationMinutes: durationMinutes
         )
@@ -116,7 +119,7 @@ internal class ProgressManager: ObservableObject {
         let todayFocusMinutes = todayRecord?.focusMinutes ?? 0
         let todayCompletedSessions = todayRecord?.completedSessions ?? 0
         let streakDays = calculateStreak(records: records)
-        let todaySessions = todayRecord?.sessions ?? []
+        let todaySessions = (todayRecord?.sessions ?? []).sorted { $0.startTime > $1.startTime }
 
         dailyStats = DailyStats(
             todayFocusMinutes: todayFocusMinutes,
