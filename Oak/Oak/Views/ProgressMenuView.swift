@@ -63,8 +63,77 @@ internal struct ProgressMenuView: View {
             }
             .padding(.horizontal, 8)
 
-            Spacer()
+            if !viewModel.todaySessions.isEmpty {
+                Divider()
+                    .padding(.vertical, 8)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Timeline")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.todaySessions.sorted { $0.startTime > $1.startTime }) { session in
+                                HStack(spacing: 12) {
+                                    Circle()
+                                        .fill(colorForSessionType(session.type))
+                                        .frame(width: 8, height: 8)
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(titleForSessionType(session.type))
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        Text(timeRangeString(start: session.startTime, end: session.endTime))
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    }
+
+                                    Spacer()
+
+                                    Text("\(session.durationMinutes)m")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.secondary.opacity(0.1))
+                                .cornerRadius(8)
+                            }
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.bottom, 8)
+                    }
+                    .frame(maxHeight: 200)
+                }
+            } else {
+                Spacer()
+            }
         }
         .padding()
+    }
+
+    private func colorForSessionType(_ type: SessionType) -> Color {
+        switch type {
+        case .work: return .blue
+        case .shortBreak: return .green
+        case .longBreak: return .orange
+        }
+    }
+
+    private func titleForSessionType(_ type: SessionType) -> String {
+        switch type {
+        case .work: return "Focus"
+        case .shortBreak: return "Short Break"
+        case .longBreak: return "Long Break"
+        }
+    }
+
+    private func timeRangeString(start: Date, end: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return "\(formatter.string(from: start)) - \(formatter.string(from: end))"
     }
 }

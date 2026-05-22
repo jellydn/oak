@@ -28,6 +28,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private var isLongBreak: Bool = false
     private var sessionStartSeconds: Int = 0
     private var sessionEndDate: Date?
+    private var currentSessionStartTime: Date?
     private var presetSettingsCancellable: AnyCancellable?
     private var lastPlayingAudioTrack: AudioTrack = .none
     private var wasAutoStarted: Bool = false
@@ -159,6 +160,10 @@ internal class FocusSessionViewModel: ObservableObject {
         progressManager.dailyStats.streakDays
     }
 
+    var todaySessions: [SessionRecord] {
+        progressManager.dailyStats.todaySessions
+    }
+
     func cleanup() {
         resetSession()
     }
@@ -191,6 +196,7 @@ internal extension FocusSessionViewModel {
         isWorkSession = true
         isLongBreak = false
         sessionStartSeconds = currentRemainingSeconds
+        currentSessionStartTime = Date()
         completedRounds = 0
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
@@ -239,6 +245,7 @@ internal extension FocusSessionViewModel {
         }
 
         sessionStartSeconds = currentRemainingSeconds
+        currentSessionStartTime = Date()
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
 
         if isWorkSession && lastPlayingAudioTrack != .none {
@@ -258,6 +265,7 @@ internal extension FocusSessionViewModel {
         isLongBreak = false
         sessionStartSeconds = 0
         sessionEndDate = nil
+        currentSessionStartTime = nil
         isSessionComplete = false
         completedRounds = 0
         autoStartCountdown = 0
@@ -292,16 +300,25 @@ internal extension FocusSessionViewModel {
     }
 
     func completeSession() {
+        let sessionType: SessionType
         if isWorkSession {
-            let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
-            if durationMinutes > 0 {
-                progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
-            }
+            sessionType = .work
             completedRounds += 1
         } else {
+            sessionType = isLongBreak ? .longBreak : .shortBreak
             if isLongBreak {
                 completedRounds = 0
             }
+        }
+
+        let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
+        if durationMinutes > 0, let startTime = currentSessionStartTime {
+            progressManager.recordSessionCompletion(
+                durationMinutes: durationMinutes,
+                type: sessionType,
+                startTime: startTime,
+                endTime: Date()
+            )
         }
 
         notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
