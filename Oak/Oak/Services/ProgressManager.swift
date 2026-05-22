@@ -143,7 +143,7 @@ internal class ProgressManager: ObservableObject {
                 if record.completedSessions > 0 {
                     streak = 1
                 } else {
-                    break
+                    continue
                 }
             } else if daysDifference == 1 {
                 if record.completedSessions > 0 {

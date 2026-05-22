@@ -148,6 +148,39 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(sessions[1].type, .work)
     }
 
+    func testBreakOnlyTodayDoesNotResetPriorStreak() throws {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = try XCTUnwrap(calendar.date(byAdding: .day, value: -1, to: today))
+        let yesterdayStart = yesterday.addingTimeInterval(9 * 60 * 60)
+        let records = [
+            ProgressData(
+                date: yesterday,
+                focusMinutes: 25,
+                completedSessions: 1,
+                sessions: [
+                    SessionRecord(
+                        type: .work,
+                        startTime: yesterdayStart,
+                        endTime: yesterdayStart.addingTimeInterval(25 * 60),
+                        durationMinutes: 25
+                    )
+                ]
+            )
+        ]
+        let defaults = try XCTUnwrap(testUserDefaults)
+        let encodedRecords = try JSONEncoder().encode(records)
+        defaults.set(encodedRecords, forKey: "progressHistory")
+
+        let manager = ProgressManager(userDefaults: defaults)
+        XCTAssertEqual(manager.dailyStats.streakDays, 1)
+
+        manager.recordSessionCompletion(durationMinutes: 5, type: .shortBreak)
+
+        XCTAssertEqual(manager.dailyStats.todayCompletedSessions, 0)
+        XCTAssertEqual(manager.dailyStats.streakDays, 1)
+    }
+
     func testMultipleDaysDataStored() throws {
         // Record sessions on multiple days
         let manager1 = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
