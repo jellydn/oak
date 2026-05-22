@@ -12,7 +12,7 @@ internal struct SessionRecord: Codable, Identifiable, Equatable {
     let startTime: Date
     let endTime: Date
     let durationMinutes: Int
-    
+
     init(id: UUID = UUID(), type: SessionType, startTime: Date, endTime: Date, durationMinutes: Int) {
         self.id = id
         self.type = type
@@ -30,7 +30,7 @@ internal struct ProgressData: Codable, Identifiable {
     var sessions: [SessionRecord]
 
     init(date: Date = Date(), focusMinutes: Int = 0, completedSessions: Int = 0, sessions: [SessionRecord] = []) {
-        self.id = UUID()
+        id = UUID()
         self.date = date
         self.focusMinutes = focusMinutes
         self.completedSessions = completedSessions
@@ -43,11 +43,11 @@ internal struct ProgressData: Codable, Identifiable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
-        self.date = try container.decode(Date.self, forKey: .date)
-        self.focusMinutes = try container.decode(Int.self, forKey: .focusMinutes)
-        self.completedSessions = try container.decode(Int.self, forKey: .completedSessions)
-        self.sessions = try container.decodeIfPresent([SessionRecord].self, forKey: .sessions) ?? []
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        date = try container.decode(Date.self, forKey: .date)
+        focusMinutes = try container.decode(Int.self, forKey: .focusMinutes)
+        completedSessions = try container.decode(Int.self, forKey: .completedSessions)
+        sessions = try container.decodeIfPresent([SessionRecord].self, forKey: .sessions) ?? []
     }
 }
 

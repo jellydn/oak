@@ -117,17 +117,17 @@ internal struct ProgressMenuView: View {
 
     private func colorForSessionType(_ type: SessionType) -> Color {
         switch type {
-        case .work: return .blue
-        case .shortBreak: return .green
-        case .longBreak: return .orange
+        case .work: .blue
+        case .shortBreak: .green
+        case .longBreak: .orange
         }
     }
 
     private func titleForSessionType(_ type: SessionType) -> String {
         switch type {
-        case .work: return "Focus"
-        case .shortBreak: return "Short Break"
-        case .longBreak: return "Long Break"
+        case .work: "Focus"
+        case .shortBreak: "Short Break"
+        case .longBreak: "Long Break"
         }
     }
 

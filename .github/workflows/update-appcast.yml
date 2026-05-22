@@ -77,11 +77,11 @@ jobs:
             echo "$RELEASE_NOTES_HTML"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-          
+
           # Get the DMG download URL
           DMG_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/Oak-${VERSION}.dmg"
           echo "dmg_url=$DMG_URL" >> "$GITHUB_OUTPUT"
-          
+
           # Get release date in RFC 2822 format
           if [[ -z "$RELEASE_DATE_ISO" ]]; then
             RELEASE_DATE_ISO="$(date -u "+%Y-%m-%dT%H:%M:%SZ")"
@@ -110,13 +110,13 @@ jobs:
             echo "DMG not available yet, retrying in 10 seconds..."
             sleep 10
           done
-          
+
           # Verify the file exists and has content
           if [[ ! -s /tmp/Oak.dmg ]]; then
             echo "Error: Downloaded file is empty"
             exit 1
           fi
-          
+
           # Get file size in bytes
           FILE_SIZE=$(stat -f%z /tmp/Oak.dmg)
           echo "file_size=$FILE_SIZE" >> "$GITHUB_OUTPUT"
@@ -124,7 +124,7 @@ jobs:
           # Calculate SHA256 for Homebrew cask update
           SHA256=$(shasum -a 256 /tmp/Oak.dmg | awk '{print $1}')
           echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
-          
+
       - name: Sign DMG with Sparkle EdDSA key
         id: sign
         env:
@@ -175,7 +175,7 @@ jobs:
                        type="application/octet-stream" />
           </item>
           EOF
-          
+
           # Replace variables in the template
           sed -i '' "s/\${VERSION}/$VERSION/g" /tmp/new_item.xml
           sed -i '' "s/\${SPARKLE_VERSION}/$SPARKLE_VERSION/g" /tmp/new_item.xml
@@ -200,7 +200,7 @@ jobs:
             }
           ' /tmp/new_item.xml > /tmp/new_item.with_notes.xml
           mv /tmp/new_item.with_notes.xml /tmp/new_item.xml
-          
+
           # Remove any existing item for the same version so retries stay idempotent
           perl -0777 -pe "s#\\s*<item>.*?<sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>.*?</item>\\s*##sg" \
             appcast.xml > /tmp/appcast.without_current.xml
@@ -215,20 +215,20 @@ jobs:
             }
             { print }
           ' /tmp/appcast.without_current.xml > /tmp/appcast.xml.new
-          
+
           # Retain only the most recent 3 items
           awk '
             BEGIN { max_items = 3; item_count = 0; in_item = 0 }
             /<item>/ { in_item = 1; item_count++ }
             in_item == 0 || item_count <= max_items { print }
-            /<\/item>/ { 
+            /<\/item>/ {
               if (item_count > max_items) { in_item = 0; next }
               in_item = 0
             }
           ' /tmp/appcast.xml.new > /tmp/appcast.xml.trimmed
-          
+
           mv /tmp/appcast.xml.trimmed appcast.xml
-          
+
           # Show the updated appcast
           echo "Updated appcast.xml:"
           cat appcast.xml
@@ -248,14 +248,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           git add appcast.xml Casks/oak.rb
-          
+
           # Check if there are changes to commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-          
+
           git commit -m "chore: update appcast and Homebrew cask for v${{ steps.release.outputs.version }} [skip ci]"
           git push origin main

@@ -1,0 +1,19 @@
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "builtin"
+hooks = [
+    { id = "trailing-whitespace" },
+    { id = "end-of-file-fixer" },
+    { id = "check-added-large-files", args = ["--maxkb=500"] },
+    { id = "check-merge-conflict" },
+    { id = "check-yaml" },
+    { id = "check-json" },
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+    { id = "swiftformat", name = "swiftformat", entry = "swiftformat .", language = "system", files = '\.swift$', pass_filenames = false },
+    { id = "swiftlint", name = "swiftlint", entry = "swiftlint lint --strict", language = "system", files = '\.swift$', pass_filenames = false },
+]
