@@ -62,17 +62,16 @@ internal class ProgressManager: ObservableObject {
         )
 
         if let index = records.firstIndex(where: { Calendar.current.isDate($0.date, inSameDayAs: today) }) {
-            records[index].focusMinutes += durationMinutes
             if type == .work {
+                records[index].focusMinutes += durationMinutes
                 records[index].completedSessions += 1
             }
             records[index].sessions.append(newSession)
         } else {
-            let completedSessions = type == .work ? 1 : 0
             let newRecord = ProgressData(
                 date: today,
-                focusMinutes: durationMinutes,
-                completedSessions: completedSessions,
+                focusMinutes: type == .work ? durationMinutes : 0,
+                completedSessions: type == .work ? 1 : 0,
                 sessions: [newSession]
             )
             records.append(newRecord)
