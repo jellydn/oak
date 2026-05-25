@@ -5,6 +5,7 @@
 ### None
 
 Oak has **zero** cloud dependencies. The app operates entirely offline with no:
+
 - Account creation
 - Cloud sync
 - API calls
@@ -29,12 +30,12 @@ This is by design per the MVP constraints (FR-14).
 
 ### macOS System Services
 
-| Service | Usage |
-|---------|-------|
-| **UserNotifications** | Local notifications for session completion |
-| **AVFoundation** | Audio playback and generation |
-| **CoreGraphics** | Display identification (`CGMainDisplayID`) |
-| **NSScreen** | Screen detection, notch detection, window positioning |
+| Service               | Usage                                                 |
+| --------------------- | ----------------------------------------------------- |
+| **UserNotifications** | Local notifications for session completion            |
+| **AVFoundation**      | Audio playback and generation                         |
+| **CoreGraphics**      | Display identification (`CGMainDisplayID`)            |
+| **NSScreen**          | Screen detection, notch detection, window positioning |
 
 ## Notifications
 

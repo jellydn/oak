@@ -17,6 +17,7 @@ brew install --cask oak
 ## Automatic Updates
 
 The cask formula is automatically updated when:
+
 - A new GitHub Release is published
 - A version tag (e.g., `v0.4.2`) is pushed to the repository
 

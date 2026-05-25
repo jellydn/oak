@@ -94,12 +94,14 @@ idle → running → paused → running → completed → (auto-start) → runni
 ## SwiftUI View Patterns
 
 ### View Composition
+
 - Extract sub-views as `private var someView: some View` properties within the main view
 - Use separate files for complex extensions: `NotchCompanionView+Controls.swift`
 - Popover-based sub-menus: Audio, Progress, Settings
 - `ZStack` for overlay content (confetti animation on top of notch)
 
 ### Visual Design
+
 - `RoundedRectangle(cornerRadius:style: .continuous)` for notch shape
 - `LinearGradient` with custom colors per visual style
 - `spring(response:dampingFraction:)` animation for state transitions
@@ -107,6 +109,7 @@ idle → running → paused → running → completed → (auto-start) → runni
 - Confetti animation on work session completion
 
 ### State-Driven UI
+
 ```swift
 @State private var showAudioMenu = false
 @State private var showConfetti = false

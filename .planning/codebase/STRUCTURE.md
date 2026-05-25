@@ -28,7 +28,7 @@ Oak/
 ### `Oak/Oak/Models/` — Data Models & Enums
 
 | File | Key Types | Purpose |
-|------|-----------|---------|
+| --- | --- | --- |
 | `SessionModels.swift` | `SessionState`, `Preset`, `DisplayTarget` | Session FSM enum, preset configuration, display routing |
 | `ProgressData.swift` | `SessionType`, `SessionRecord`, `ProgressData`, `DailyStats` | Persistence models for session history |
 | `AudioTrack.swift` | `AudioTrack` | Ambient sound track enum with metadata |
@@ -38,7 +38,7 @@ Oak/
 ### `Oak/Oak/Views/` — SwiftUI Views & Window
 
 | File | Key Types | Purpose |
-|------|-----------|---------|
+| --- | --- | --- |
 | `NotchCompanionView.swift` | `NotchCompanionView` | Root notch UI, orchestrates all sub-views |
 | `NotchCompanionView+Controls.swift` | Extension | Control buttons (audio, progress, settings, expand) |
 | `NotchCompanionView+StandardViews.swift` | Extension | Compact/start views for standard (non-notch) display |
@@ -59,13 +59,13 @@ Oak/
 ### `Oak/Oak/ViewModels/` — ViewModels
 
 | File | Key Types | Purpose |
-|------|-----------|---------|
+| --- | --- | --- |
 | `FocusSessionViewModel.swift` | `FocusSessionViewModel` | Single ViewModel: timer, state machine, preset, progress, audio control |
 
 ### `Oak/Oak/Services/` — Business Logic
 
 | File | Key Types | Purpose |
-|------|-----------|---------|
+| --- | --- | --- |
 | `AudioManager.swift` | `AudioManager`, `AudioEngineAdapter`, `AudioEngineProtocol`, `NoiseGenerator` | Audio playback, bundled tracks, procedural noise generation |
 | `NotificationService.swift` | `NotificationService`, `SessionCompletionNotifying` | Notification permission, session completion alerts |
 | `ProgressManager.swift` | `ProgressManager` | Session history persistence, streak calculation |
@@ -75,22 +75,22 @@ Oak/
 ### `Oak/Oak/Extensions/` — Swift Extensions
 
 | File | Key Types | Purpose |
-|------|-----------|---------|
+| --- | --- | --- |
 | `NSScreen+UUID.swift` | Extension on `NSScreen`, `NSScreenUUIDCache` | Screen lookup by UUID, display ID management |
 | `NSScreen+DisplayTarget.swift` | Extension on `NSScreen` | Screen selection by `DisplayTarget`, notch detection |
 
 ### `Oak/Oak/Resources/` — Assets
 
-| Path | Contents |
-|------|----------|
-| `Sounds/ambient_rain.m4a` | Rain ambient track |
-| `Sounds/ambient_forest.m4a` | Forest ambient track |
-| `Sounds/ambient_cafe.m4a` | Cafe ambient track |
-| `Sounds/ambient_brown_noise.m4a` | Brown noise ambient track |
-| `Sounds/ambient_lofi.m4a` | Lo-Fi ambient track |
-| `Sounds/README.md` | Sound attribution |
-| `Assets.xcassets/` | App icon, asset catalog |
-| `Assets.xcassets/AppIcon.appiconset/` | App icon set |
+| Path                                  | Contents                  |
+| ------------------------------------- | ------------------------- |
+| `Sounds/ambient_rain.m4a`             | Rain ambient track        |
+| `Sounds/ambient_forest.m4a`           | Forest ambient track      |
+| `Sounds/ambient_cafe.m4a`             | Cafe ambient track        |
+| `Sounds/ambient_brown_noise.m4a`      | Brown noise ambient track |
+| `Sounds/ambient_lofi.m4a`             | Lo-Fi ambient track       |
+| `Sounds/README.md`                    | Sound attribution         |
+| `Assets.xcassets/`                    | App icon, asset catalog   |
+| `Assets.xcassets/AppIcon.appiconset/` | App icon set              |
 
 ## Naming Conventions
 
@@ -102,12 +102,12 @@ Oak/
 
 ## Configuration Files
 
-| Path | Purpose |
-|------|---------|
-| `project.yml` | XcodeGen project definition |
-| `.swiftlint.yml` | Lint rules |
-| `.swiftformat` | Format rules |
-| `justfile` | Task automation |
-| `.github/workflows/` | CI/CD pipelines |
-| `appcast.xml` | Sparkle update feed |
-| `Casks/oak.rb` | Homebrew cask definition |
+| Path                 | Purpose                     |
+| -------------------- | --------------------------- |
+| `project.yml`        | XcodeGen project definition |
+| `.swiftlint.yml`     | Lint rules                  |
+| `.swiftformat`       | Format rules                |
+| `justfile`           | Task automation             |
+| `.github/workflows/` | CI/CD pipelines             |
+| `appcast.xml`        | Sparkle update feed         |
+| `Casks/oak.rb`       | Homebrew cask definition    |

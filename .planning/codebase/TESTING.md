@@ -124,7 +124,7 @@ internal final class MockAudioEngine: AudioEngineProtocol {
 ### Test Class Hierarchy
 
 | Pattern | Example | When Used |
-|---------|---------|-----------|
+| --- | --- | --- |
 | User story tests | `US001Tests`, `US002Tests` | Acceptance criteria from PRD |
 | Feature tests | `LongBreakTests`, `AutoStartNextIntervalTests` | Cross-cutting feature behavior |
 | Component tests | `AudioManagerTests`, `NotchWindowControllerTests` | Single class/module |
@@ -133,16 +133,19 @@ internal final class MockAudioEngine: AudioEngineProtocol {
 ## Test Coverage Areas
 
 ### Session State Machine
+
 - State transitions: idle → running → paused → completed → idle
 - Timer accuracy (1s intervals)
 - Remaining time preservation across pause/resume
 
 ### Preset Configuration
+
 - Both presets (short/long) work correctly
 - Configurable durations via `PresetSettingsStore`
 - Long break trigger at 4 rounds (configurable)
 
 ### Audio System
+
 - All 5 ambient tracks play correctly
 - Volume clamping (0.0–1.0)
 - Pause/resume preserves track selection
@@ -151,18 +154,21 @@ internal final class MockAudioEngine: AudioEngineProtocol {
 - Rain noise seed wrapping after 700K+ iterations
 
 ### Progress Tracking
+
 - Session recording with correct start/end times
 - Streak calculation across days
 - Data persistence across view model re-creation
 - 90-day pruning
 
 ### Window Management
+
 - Screen positioning on main/notched display
 - Expand/collapse states
 - Always-on-top behavior
 - Screen configuration changes
 
 ### Notification
+
 - Permission request flow
 - Completion notification content
 - Sound playing configuration

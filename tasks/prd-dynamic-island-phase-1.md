@@ -2,8 +2,7 @@
 
 ## 1. Introduction/Overview
 
-Oak currently provides a notch-based focus companion UI, but it does not yet feel like a Dynamic Island-style surface.
-This phase adds Dynamic Island-like behavior and polish while keeping the implementation simple (KISS): top-notch placement on the main monitor, smooth expansion/collapse interactions, and consistent motion behavior.
+Oak currently provides a notch-based focus companion UI, but it does not yet feel like a Dynamic Island-style surface. This phase adds Dynamic Island-like behavior and polish while keeping the implementation simple (KISS): top-notch placement on the main monitor, smooth expansion/collapse interactions, and consistent motion behavior.
 
 ## 2. Goals
 
@@ -15,9 +14,11 @@ This phase adds Dynamic Island-like behavior and polish while keeping the implem
 ## 3. User Stories
 
 ### US-001: Main-Monitor Top Anchor by Default
+
 **Description:** As a user, I want Oak to appear on my main monitor at the top center so the notch UI always opens where I expect.
 
 **Acceptance Criteria:**
+
 - [ ] Window defaults to `NSScreen.main` when available.
 - [ ] Window frame is anchored to top-center of selected screen using absolute screen coordinates.
 - [ ] On screen parameter changes, window repositions without requiring expand/collapse state change.
@@ -25,9 +26,11 @@ This phase adds Dynamic Island-like behavior and polish while keeping the implem
 - [ ] `just lint` passes.
 
 ### US-002: Hover-to-Expand Interaction
+
 **Description:** As a user, I want the notch UI to expand when I hover so I can quickly access content without clicking.
 
 **Acceptance Criteria:**
+
 - [ ] Hovering over collapsed notch enters expanded state.
 - [ ] Expansion starts within defined response threshold (e.g., <=150ms after hover intent).
 - [ ] Repeated hover events while already expanded do not cause duplicate/stacked transitions.
@@ -36,9 +39,11 @@ This phase adds Dynamic Island-like behavior and polish while keeping the implem
 - [ ] Verify in browser using dev-browser skill (N/A for macOS; verify directly in running app).
 
 ### US-003: Idle Auto-Collapse
+
 **Description:** As a user, I want the notch UI to collapse automatically after inactivity so it stays unobtrusive.
 
 **Acceptance Criteria:**
+
 - [ ] Expanded state collapses after configurable idle timeout for phase 1 default (fixed value in code).
 - [ ] User interaction inside expanded content resets idle timer.
 - [ ] Collapse timer is canceled/cleaned up when window/controller is deinitialized.
@@ -47,9 +52,11 @@ This phase adds Dynamic Island-like behavior and polish while keeping the implem
 - [ ] Verify in browser using dev-browser skill (N/A for macOS; verify directly in running app).
 
 ### US-004: Motion Consistency and Stability
+
 **Description:** As a user, I want transitions to feel smooth and consistent so the UI feels intentional rather than jumpy.
 
 **Acceptance Criteria:**
+
 - [ ] Expand/collapse uses one consistent animation profile (duration + easing).
 - [ ] Position remains top-anchored during width changes.
 - [ ] No visible flicker or frame jumping during rapid hover in/out cycles.
