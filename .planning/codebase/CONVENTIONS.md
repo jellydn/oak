@@ -1,144 +1,165 @@
-# Coding Conventions
+# CONVENTIONS.md — Code Conventions & Patterns
 
-**Analysis Date:** 2026-03-14
+## Swift & SwiftUI Conventions
 
-## Naming Patterns
+### Access Control
 
-**Files:**
-- PascalCase for all type definitions: `FocusSessionViewModel.swift`, `NotchCompanionView.swift`
-- Extensions use `+` separator: `NotchCompanionView+StandardViews.swift`, `NSScreen+DisplayTarget.swift`
-- Test files use `Tests` suffix: `NotchCompanionViewTests.swift`, `AudioManagerTests.swift`
+- **Explicit `internal`** keyword on all declarations (enforced by `explicit_top_level_acl`)
+- Prefer `private` for state, `private(set)` for read-only published properties
+- Use `fileprivate` for view extraction within the same file
 
-**Functions:**
-- camelCase for functions: `startSession()`, `updateProgress()`
-- Boolean prefixes: `is*`, `has*`, `should*`: `isWorkSession`, `canStart`
+### Naming
 
-**Variables:**
-- camelCase: `sessionState`, `remainingTime`
-- Private properties use underscore for disambiguation when needed
+- **Types**: PascalCase (`FocusSessionViewModel`, `NotchCompanionView`)
+- **Functions/Vars**: camelCase (`startSession()`, `displayTime`, `canStart`)
+- **Constants**: lowerCamelCase for instance, PascalCase for static (`let horizontalPadding`)
+- **Booleans**: `is`/`has`/`should` prefix (`isWorkSession`, `canStart`, `shouldUseLongBreak`)
+- **Protocols**: `*ing` suffix for capability protocols (`SessionCompletionNotifying`, `SessionCompletionSoundPlaying`)
+- **Enums**: Singular PascalCase for enum name, lowerCamelCase for cases (`SessionState.idle`, `Preset.short`)
 
-**Types:**
-- PascalCase for types: `FocusSessionViewModel`, `SessionState`
-- Protocols use *ing suffix for capabilities: `SessionCompletionNotifying`
-- Enums with associated values for FSM: `SessionState.idle, .running, .paused`
+### Imports
 
-## Code Style
+- **Order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → @testable import Oak
+- **Grouping**: `testable-bottom` (testable imports last in test files)
+- No blank lines between imports
+- One blank line between import block and type definitions
+- Unused imports removed (analyzer rule: `unused_import`)
 
-**Formatting:**
-- SwiftFormat for automatic formatting
-- Key settings:
-  - Indent: 4 spaces
-  - Line length: 120 (warn), 150 (error)
-  - Trailing newline: required
-  - Function body: warn at 50 lines, error at 100
-  - File length: warn at 500 lines, error at 1000
+### Formatting
 
-**Linting:**
-- SwiftLint with custom rules
-- Key rules:
-  - `explicit_top_level_acl`: Require explicit `internal` keyword
-  - `testable_bottom`: Testable imports last
-  - `custom_print`: Warn on print() statements
-  - `explicit_init`: Explicit self.init
-  - `first_where`: Replace `first { }` with `first(where:)`
-  - `modifier_order`: SwiftUI modifier order
+- **Indent**: 4 spaces
+- **Line length**: 120 warning, 150 error
+- **Wrapping**: `before-first` for arguments, parameters, collections
+- **Closing paren**: balanced
+- **Trailing commas**: enabled
+- **Semicolons**: never
 
-## Import Organization
+## State Management Patterns
 
-**Order:**
-1. Foundation
-2. Combine
-3. SwiftUI/AppKit
-4. Apple frameworks
-5. @testable import Oak (test files only)
+### Session State Machine (FSM)
 
-**No blank lines** between import groups
+```
+idle → running → paused → running → completed → (auto-start) → running
+                   ↓                              ↓
+                running                        idle (if not auto-start)
+```
 
-**Path Aliases:**
-- None used (standard SPM module structure)
+- Implemented as `SessionState` enum with associated values
+- State transitions validated via computed properties (`canStart`, `canPause`, `canResume`)
+- Use `if case` pattern matching for state inspection
+
+### Published Properties
+
+- `@Published` for all observable state that drives UI
+- `private(set)` on published properties that shouldn't be mutated externally
+- Computed properties for derived state (`displayTime`, `progressPercentage`)
+
+### Combine Bindings
+
+- `.sink` on `@Published` properties for reactive behavior
+- Store cancellables as private `AnyCancellable?`
+- `[weak self]` in all sink closures
+- Used for: display target changes, always-on-top toggles, preset settings propagation
 
 ## Error Handling
 
-**Patterns:**
-- Guard clauses for early returns
-- Result types for async operations
-- Optional binding with `guard let` or `if let`
-- fatalError only for unreachable states
-- No force unwrapping in production code
+- **No throwing errors in ViewModels** — guard/early return pattern preferred
+- **Logging**: `os.log` (`Logger`) for production, SwiftLint warns on `print()`
+- **Optional handling**: `guard let` / `if let` over forced unwrapping
+- **No `try!`** in production code (test code may use `try! XCTUnwrap`)
 
-## Logging
+## Memory Management
 
-**Framework:** os.log (production), print() (debug)
+- `[weak self]` in ALL escaping closures:
+  - Timer callbacks
+  - Combine `.sink`
+  - `DispatchQueue.main.async`
+  - NotificationCenter observers
+- `invalidate()` timers in `deinit`
+- Wrap timer callbacks: `Task { @MainActor in self?.tick() }`
+- Clean up Combine subscriptions via `.cancel()` in `deinit`
 
-**Patterns:**
-- Use `os.log` for production logging
-- `print()` allowed in debug but triggers SwiftLint warning
-- No logging frameworks (use system logging)
+## View Update Safety (Critical Pattern)
 
-## Comments
-
-**When to Comment:**
-- Public APIs use `///` documentation comments
-- Complex business logic gets brief explanations
-- Non-obvious decisions explained inline
-- No TODO/FIXME in production (tracked separately)
-
-**JSDoc/TSDoc:**
-- `///` for public API documentation
-- `//` for inline comments
-- `MARK:` for code organization
-
-## Function Design
-
-**Size:** Prefer functions under 20 lines
-
-**Parameters:**
-- Parameter labels in Swift style
-- Closures at end of parameter list
-- @escaping for closure parameters
-
-**Return Values:**
-- Result<Success, Error> for failable operations
-- Optional for nullable returns
-- Tuple returns for multiple related values
-
-## Module Design
-
-**Exports:**
-- No barrel files (standard SPM structure)
-- Internal access by default
-- Public for ViewModels and protocols used in tests
-
-**Access Control:**
-- Explicit `internal` keyword required (SwiftLint rule)
-- `private` for implementation details
-- `private(set)` for read-only published properties
-
-## SwiftUI Specific
-
-**@MainActor:**
-- Required on all ViewModels
-- Required on all ObservableObject with @Published
-- Ensures UI updates on main thread
-
-**State Management:**
-- @Published for observable properties
-- @State for local view state
-- @Binding for child view communication
-- @Environment for dependency injection
-
-**View Updates:**
-- Use async dispatch in onChange to avoid publishing from view update
 ```swift
-// ❌ Wrong - publishes from view update
+// ❌ WRONG — publishes from view update
 .onChange(of: value) { newValue in viewModel.update(newValue) }
 
-// ✅ Correct - async dispatch
+// ✅ CORRECT — async dispatch
 .onChange(of: value) { newValue in
     DispatchQueue.main.async { viewModel.update(newValue) }
 }
 ```
 
----
+## SwiftUI View Patterns
 
-*Convention analysis: 2026-03-14*
+### View Composition
+
+- Extract sub-views as `private var someView: some View` properties within the main view
+- Use separate files for complex extensions: `NotchCompanionView+Controls.swift`
+- Popover-based sub-menus: Audio, Progress, Settings
+- `ZStack` for overlay content (confetti animation on top of notch)
+
+### Visual Design
+
+- `RoundedRectangle(cornerRadius:style: .continuous)` for notch shape
+- `LinearGradient` with custom colors per visual style
+- `spring(response:dampingFraction:)` animation for state transitions
+- `scaleEffect` for completion bounce animation
+- Confetti animation on work session completion
+
+### State-Driven UI
+
+```swift
+@State private var showAudioMenu = false
+@State private var showConfetti = false
+
+// Triggers
+.onChange(of: viewModel.isSessionComplete) { isComplete in ... }
+```
+
+## Protocol-Oriented Design
+
+```swift
+// Production protocol
+internal protocol AudioEngineProtocol {
+    var isRunning: Bool { get }
+    func setMixerVolume(_ volume: Float)
+    func start() throws
+    func stop()
+}
+
+// Production implementation
+internal final class AudioEngineAdapter: AudioEngineProtocol { ... }
+
+// Mock implementation (test)
+internal final class MockAudioEngine: AudioEngineProtocol { ... }
+```
+
+- Use `any Protocol` syntax for protocol type-erasure
+- Factory closures enable DI for testing (`audioEngineFactory`, `currentDate`)
+
+## File Organization
+
+- **Models**: ≤ 1 major type per file
+- **Views**: 1 view per file (with fileprivate helper views allowed)
+- **Extensions**: One file per extended type per aspect
+- **Services**: 1 class per file
+- **Test files**: Mirror source structure with `Tests` suffix
+
+## Build Verification Sequence
+
+Per ADR-0002, the required verification sequence:
+
+1. `just format` (or `just format-check`)
+2. `swiftlint lint --strict --no-cache` (or `just lint`)
+3. `just test`
+
+## MVP Constraints (Do Not Violate)
+
+- Presets: only `25/5` and `50/10` (configurable durations in `PresetSettingsStore`)
+- Notch-only UI — no menu bar icon, no dock icon
+- No global keyboard shortcuts
+- Auto-start next interval: default OFF
+- Built-in audio only
+- No cloud sync

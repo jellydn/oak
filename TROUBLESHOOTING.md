@@ -6,8 +6,7 @@ This guide helps you resolve common issues when running Oak on macOS.
 
 When you first try to open Oak, you may see this error:
 
-> **"Oak" Not Opened**
-> Apple could not verify "Oak" is free of malware that may harm your Mac or compromise your privacy.
+> **"Oak" Not Opened** Apple could not verify "Oak" is free of malware that may harm your Mac or compromise your privacy.
 
 ### Why does this happen?
 
@@ -24,7 +23,7 @@ Choose one of the following methods to run Oak:
 3. Open **System Settings** (or **System Preferences** on older macOS versions)
 4. Navigate to **Privacy & Security**
 5. Scroll down to the **Security** section
-6. You should see a message: *"Oak was blocked from use because it is not from an identified developer"*
+6. You should see a message: _"Oak was blocked from use because it is not from an identified developer"_
 7. Click **Open Anyway**
 8. Confirm your choice by clicking **Open** in the confirmation dialog
 
@@ -56,6 +55,7 @@ After running this command, you can open Oak normally.
 ### Why is Oak unsigned?
 
 We don't currently have an Apple Developer account, which is required to sign macOS applications. Signing requires:
+
 - An active Apple Developer Program membership ($99/year)
 - Going through Apple's notarization process
 
@@ -122,4 +122,4 @@ If you prefer to build Oak yourself to avoid Gatekeeper warnings:
 
 ---
 
-*Last updated: February 2026*
+_Last updated: February 2026_

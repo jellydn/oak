@@ -1,120 +1,145 @@
-# Codebase Concerns
+# CONCERNS.md — Technical Debt, Risks & Issues
 
-**Analysis Date:** 2026-03-14
+## Architectural Concerns
 
-## Tech Debt
+### Single ViewModel Bloat
 
-**Large Files:**
-- Issue: Several files exceed 300 lines (FocusSessionViewModel: 360, AudioManager: 355, SettingsMenuView: 334)
-- Files: `Oak/Oak/ViewModels/FocusSessionViewModel.swift`, `Oak/Oak/Services/AudioManager.swift`, `Oak/Oak/Views/SettingsMenuView.swift`
-- Impact: Harder to navigate and understand, may indicate need for refactoring
-- Fix approach: Extract smaller types, use extensions to group related functionality
+- **File**: `Oak/Oak/ViewModels/FocusSessionViewModel.swift`
+- **Issue**: The single `FocusSessionViewModel` handles timer management, state machine, audio control, preset selection, progress tracking, auto-start countdown, and session type display — all in one class (~390 lines).
+- **Risk**: As features grow, this class will become increasingly difficult to maintain and test.
+- **Suggestion**: Split into focused ViewModels (e.g., `SessionTimerViewModel`, `AudioControlsViewModel`, `ProgressViewModel`) or use a reducer-based approach.
 
-**View Extension Proliferation:**
-- Issue: NotchCompanionView has multiple extensions (StandardViews, InsideNotch, Controls)
-- Files: `Oak/Oak/Views/NotchCompanionView+*.swift`
-- Impact: Makes it harder to find view logic
-- Fix approach: Consider extracting separate view components
+### Tight Coupling Between ViewModel and Services
 
-## Known Bugs
+- **File**: `Oak/Oak/ViewModels/FocusSessionViewModel.swift`
+- **Issue**: The ViewModel directly holds references to `AudioManager`, `ProgressManager`, and `NotificationService`. While this works, it creates a broad surface area that makes unit testing harder (requires mocks for multiple services).
+- **Risk**: Adding new service dependencies increases setup complexity in tests.
+- **Suggestion**: Consider a coordinator/mediator pattern or protocol-based service locator to reduce direct coupling.
 
-**None identified** - No open issues or FIXME comments found in analysis
+### NotchWindowController Complexity
 
-## Security Considerations
+- **File**: `Oak/Oak/Views/NotchWindowController.swift`
+- **Issue**: Handles frame positioning, screen management, debounced updates, and expansion state tracking (~250 lines). The debounce mechanism (`pendingExpandedState`, `pendingForceReposition`, `isFrameUpdateScheduled`) adds complexity.
+- **Risk**: Race conditions in frame updates, especially during rapid hover in/out or screen configuration changes.
+- **Suggestion**: Consider consolidating the frame update queue into a dedicated state machine or using a reactive stream (Combine) for frame updates.
 
-**Sparkle Key:**
-- Risk: EdDSA public key embedded in project.yml
-- Files: `Oak/project.yml`
-- Current mitigation: Key is public (verification only), private key held separately
-- Recommendations: Ensure private key is properly secured in CI/CD
+## Code Quality Issues
 
-**Force Unwrapping:**
-- Risk: Potential crashes if assumptions fail
-- Files: Minimal use in codebase (SwiftLint rule checks for this)
-- Current mitigation: SwiftLint warnings on force unwrapping
-- Recommendations: Continue avoiding force unwrapping
+### Manual Retain/Release in NSScreenUUIDCache
 
-## Performance Bottlenecks
+- **File**: `Oak/Oak/Extensions/NSScreen+UUID.swift`
+- **Issue**: `NSScreenUUIDCache` uses `UnsafeMutableRawPointer` and manual `Unmanaged.passRetained`/`Unmanaged.passUnretained` for screen observation callbacks.
+- **Risk**: Memory leaks or crashes if retain/release balance is incorrect.
+- **Suggestion**: Consider using `NSWorkspace.shared.notificationCenter` with Combine for screen change observation instead of Core Graphics callbacks.
 
-**Timer Accuracy:**
-- Problem: Timer-based countdown may drift over time
-- Files: `Oak/Oak/Services/ProgressManager.swift`, `Oak/Oak/ViewModels/FocusSessionViewModel.swift`
-- Cause: Timer intervals not guaranteed to be exact
-- Improvement path: Use Date difference for actual elapsed time calculation
+### @unchecked Sendable on NoiseGenerator
 
-**Notch Detection:**
-- Problem: Screen detection queries on every layout calculation
-- Files: `Oak/Oak/Extensions/NSScreen+*.swift`
-- Cause: No caching of screen detection results
-- Improvement path: Cache notch detection result per screen session
+- **File**: `Oak/Oak/Services/AudioManager.swift`
+- **Issue**: `NoiseGenerator` is marked `@unchecked Sendable` because it's used inside `AVAudioSourceNode` render callbacks (audio thread). The comment asserts no cross-thread sharing, but there's no compile-time enforcement.
+- **Risk**: Future changes could accidentally introduce cross-thread access.
+- **Suggestion**: Add a concurrency assertion (`dispatchPrecondition`) in generate methods, or wrap in an actor.
 
-## Fragile Areas
+### print() Statements
 
-**Notch Layout Detection:**
-- Files: `Oak/Oak/Extensions/NSScreen+DisplayTarget.swift`, `Oak/Oak/Views/NotchCompanionView+InsideNotch.swift`
-- Why fragile: Relies on screen geometry heuristics that may break on future Macs
-- Safe modification: Add detection for new Mac models in extensions
-- Test coverage: Moderate - has dedicated tests but may not cover all hardware
+- **Issue**: Some `print()` calls may exist in production code. SwiftLint custom rule warns on these but doesn't block CI.
+- **Suggestion**: Audit for any remaining `print()` calls and replace with `os.log` (`Logger`).
 
-**Audio Asset Loading:**
-- Files: `Oak/Oak/Services/AudioManager.swift`
-- Why fragile: Bundled assets must exist at specific paths
-- Safe modification: Add validation script (`just check-sounds` exists)
-- Test coverage: Has AudioPersistenceTests
+## Testing Concerns
 
-## Scaling Limits
+### No Integration Tests
 
-**File Size:**
-- Current capacity: Bundled audio assets
-- Limit: App bundle size (audio files take space)
-- Scaling path: Would need external asset storage for more sounds
+- **Issue**: All tests are unit tests. There are no integration tests for:
+  - The full session lifecycle (state machine → progress persistence → notification → audio stop)
+  - Window positioning with actual `NSScreen` instances
+  - Audio playback with real audio engine
+- **Risk**: Integration bugs between components may not be caught until manual testing.
 
-**Session Storage:**
-- Current capacity: In-memory only
-- Limit: No persistent session history
-- Scaling path: Would need Core Data or file-based storage for history
+### Limited Edge Case Coverage
 
-## Dependencies at Risk
+- **Issue**: Tests cover happy paths and some edge cases (pause/resume, long break thresholds), but gaps exist:
+  - System sleep/wake during active session
+  - Rapid state transitions (start → complete → start → complete)
+  - Multiple monitor hotplug events
+  - App termination during active session
+  - Very long sessions (max 180 min) with progress persistence
 
-**Sparkle Framework:**
-- Risk: External dependency for updates
-- Impact: App won't auto-update if Sparkle breaks
-- Migration plan: Consider native App Store distribution as alternative
+### Mock Overhead
 
-## Missing Critical Features
+- **File**: `Oak/Tests/OakTests/MockAudioManager.swift`
+- **Issue**: Tests that need audio mocking must either use `MockAudioManager` (which requires special init) or `MockAudioEngine` (which requires injecting a factory). Two different mock patterns exist.
+- **Suggestion**: Standardize on a single mocking approach across all test suites.
 
-**Session History:**
-- Problem: No persistent record of completed sessions
-- Blocks: Analytics, progress tracking, session review
+## Performance Concerns
 
-**Custom Presets:**
-- Problem: Can't create custom time presets
-- Blocks: User personalization beyond 25/5 and 50/10
+### Timer Tick Every Second
 
-**Sync Across Devices:**
-- Problem: No cloud sync for settings or progress
-- Blocks: Multi-device usage
+- **File**: `Oak/Oak/ViewModels/FocusSessionViewModel.swift`
+- **Issue**: A `Timer.scheduledTimer(withTimeInterval: 1.0)` fires every second during an active session. On each tick, it creates a `Task { @MainActor in }` and reads `sessionEndDate.timeIntervalSinceNow`.
+- **Impact**: Negligible for a single session, but wasteful if multiple timers or observers are involved.
+- **Suggestion**: Consider using `DispatchSource` timer for lower overhead, or consolidate to a single app-wide timer.
 
-## Test Coverage Gaps
+### UserDefaults Read on Every Progress Load
 
-**Large File Coverage:**
-- What's not tested: Some edge cases in 300+ line files
-- Files: `Oak/Oak/ViewModels/FocusSessionViewModel.swift` (360 lines)
-- Risk: Complex state transitions may have untested paths
-- Priority: Medium - core session logic seems well covered
+- **File**: `Oak/Oak/Services/ProgressManager.swift`
+- **Issue**: `loadProgress()` decodes the entire `ProgressData` array from `UserDefaults` on every call. For 90 days of history, this is a full JSON decode of all records.
+- **Impact**: Likely negligible for small datasets (< 100 records), but could become a concern with daily use over years.
+- **Suggestion**: Consider splitting recent vs. archived records, or adding an in-memory cache.
 
-**Notch Geometry Tests:**
-- What's not tested: All possible Mac screen configurations
-- Files: `Oak/Oak/Extensions/NSScreen+*.swift`
-- Risk: May fail on unreleased hardware
-- Priority: Low - works on current hardware, easy to patch
+### Day-Check Timer Runs Every 60 Seconds
 
-**View Layout Tests:**
-- What's not tested: Visual layout correctness (no snapshot tests)
-- Files: `Oak/Oak/Views/*.swift`
-- Risk: Layout regressions may go undetected
-- Priority: Low - manual testing catches visual issues
+- **File**: `Oak/Oak/Services/ProgressManager.swift`
+- **Issue**: A `Timer` checks for day changes every 60 seconds indefinitely.
+- **Impact**: Minimal (simple date comparison), but runs even when the app is idle.
+- **Suggestion**: Use `NSCalendar` notification for day change, or only check when app becomes active.
 
----
+## Security Concerns
 
-*Concerns audit: 2026-03-14*
+### X-Protect/Quarantine Warning
+
+- **Issue**: Oak is not signed with an Apple Developer certificate. macOS may show Gatekeeper warnings on first launch.
+- **File**: `README.md` documents this as known limitation.
+- **Suggestion**: Obtain Apple Developer signing certificate for production releases.
+
+### UserDefaults Plain Text Storage
+
+- **Issue**: Session history and user preferences stored in plain text `UserDefaults` (JSON encoded).
+- **Impact**: Any app or process with sandbox access can read session data. Acceptable for a focus app, but worth noting.
+
+## Maintainability Concerns
+
+### Duplicate State in FocusSessionViewModel
+
+- **File**: `Oak/Oak/ViewModels/FocusSessionViewModel.swift`
+- **Issue**: `currentRemainingSeconds` is tracked alongside `sessionState`'s associated values. On tick, both the state's `remainingSeconds` and `currentRemainingSeconds` are updated.
+- **Risk**: Desynchronization between the two values if one code path updates only one of them.
+- **Suggestion**: Derive `currentRemainingSeconds` directly from `sessionState` in a computed property instead of maintaining a separate variable.
+
+### PresetSettingsStore Property Explosion
+
+- **File**: `Oak/Oak/Services/PresetSettingsStore.swift`
+- **Issue**: 16 `@Published` properties with corresponding `set*` methods, `Keys` enum with 14 keys, and 164 lines of code. Every new setting adds 5+ lines.
+- **Suggestion**: Consider grouping related settings into sub-types (e.g., `DisplaySettings`, `PresetSettings`, `NotificationSettings`).
+
+### Hardcoded Values
+
+- **File**: Multiple locations
+- **Issue**: Several timeout values are hardcoded (auto-start countdown: 10s from `FocusSessionViewModel.swift`, idle collapse timeout from PRD: 1.0s, confetti animation duration from `ConfettiView`)
+- **Suggestion**: Extract to named constants or configurable settings.
+
+## Dependency Risks
+
+### Sparkle Framework
+
+- **Issue**: Auto-update depends on Sparkle 2.6.4+. Version bumps could introduce breaking API changes.
+- **Mitigation**: Pinned version range in `project.yml` (`from: 2.6.4`).
+
+### macOS Version Target
+
+- **Issue**: Targeting macOS 13+ with SwiftUI features that may behave differently across minor versions (e.g., `safeAreaRegions`, `sizingOptions` availability checks at macOS 13.3).
+- **Risk**: Conditional `#available` checks needed for some APIs, increasing code complexity.
+
+## Documentation Gaps
+
+- **Limited inline docs**: Most public APIs have no documentation comments (`///`), despite the convention in `AGENTS.md`
+- **No CHANGELOG.md**: Release notes in `RELEASES.md` but no structured changelog
+- **No architecture decision records** after ADR-0002 (code quality gates from Feb 2026)

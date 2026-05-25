@@ -107,8 +107,7 @@ A frontend story is NOT complete until browser verification passes (or MCP not a
 
 After completing a user story, check if ALL stories have `passes: true` and `knownIssues` is empty (or absent).
 
-If ALL stories are complete and passing, reply with:
-<promise>COMPLETE</promise>
+If ALL stories are complete and passing, reply with: <promise>COMPLETE</promise>
 
 If there are still stories with `passes: false` OR unresolved `knownIssues`, end your response normally (another iteration will pick up the next story).
 

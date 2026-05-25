@@ -17,36 +17,44 @@ This PRD defines a KISS MVP focused on a notch-based experience with minimal set
 ## 3. User Stories
 
 ### US-001: Start a focus session from the notch companion
+
 **Description:** As a deep-work user, I want to start a session from the notch UI so that I can begin focusing without opening a full app window.
 
 **Acceptance Criteria:**
+
 - [ ] Notch companion is visible and interactive when app is running.
 - [ ] One primary action starts a 25-minute focus session.
 - [ ] Session state changes to running within 500 ms of user click.
 - [ ] Typecheck/lint passes.
 
 ### US-002: Run fixed Pomodoro presets
+
 **Description:** As a user, I want fixed presets so that I can follow a simple, repeatable routine without configuration overhead.
 
 **Acceptance Criteria:**
+
 - [ ] MVP supports only two presets: 25/5 and 50/10.
 - [ ] Users can switch preset before session start.
 - [ ] Work and break durations follow selected preset exactly.
 - [ ] Typecheck/lint passes.
 
 ### US-003: Pause and resume active sessions
+
 **Description:** As a user, I want pause/resume controls so that I can handle unavoidable interruptions without losing progress.
 
 **Acceptance Criteria:**
+
 - [ ] Active session can be paused and resumed from notch companion.
 - [ ] Remaining time is preserved exactly across pause/resume.
 - [ ] UI clearly indicates paused vs running state.
 - [ ] Typecheck/lint passes.
 
 ### US-004: Play ambient sound during sessions
+
 **Description:** As a user, I want ambient sound while focusing so that I can reduce distraction and maintain flow.
 
 **Acceptance Criteria:**
+
 - [ ] Built-in tracks available: rain, forest, cafe, brown noise, lo-fi.
 - [ ] User can select one track before or during session.
 - [ ] User can adjust volume from app controls.
@@ -54,18 +62,22 @@ This PRD defines a KISS MVP focused on a notch-based experience with minimal set
 - [ ] Typecheck/lint passes.
 
 ### US-005: Receive lightweight session-complete feedback
+
 **Description:** As a user, I want subtle completion feedback so that finishing a session feels rewarding without being disruptive.
 
 **Acceptance Criteria:**
+
 - [ ] Session completion triggers a short notch animation.
 - [ ] Completion feedback does not steal keyboard focus.
 - [ ] Next state (break or idle) is clearly shown.
 - [ ] Typecheck/lint passes.
 
 ### US-006: View minimal personal progress
+
 **Description:** As a user, I want minimal tracking so that I can stay motivated without being overwhelmed by analytics.
 
 **Acceptance Criteria:**
+
 - [ ] App stores daily focus minutes.
 - [ ] App stores daily completed work session count.
 - [ ] App computes and shows current 7-day streak.

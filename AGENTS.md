@@ -4,8 +4,7 @@
 
 Oak is a lightweight macOS focus companion app with notch-based Pomodoro-style focus sessions and ambient audio.
 
-**Stack**: Swift 5.9+, SwiftUI, AVFoundation | **Platform**: macOS 13+ (Apple Silicon)
-**Architecture**: MVVM with `@MainActor` | **Config**: XcodeGen (`project.yml`)
+**Stack**: Swift 5.9+, SwiftUI, AVFoundation | **Platform**: macOS 13+ (Apple Silicon) **Architecture**: MVVM with `@MainActor` | **Config**: XcodeGen (`project.yml`)
 
 ## Build/Test Commands
 

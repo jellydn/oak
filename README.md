@@ -12,9 +12,7 @@
 
 <div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![macOS](https://img.shields.io/badge/macOS-13+-blue.svg)]()
-[![Swift](https://img.shields.io/badge/Swift-5.9+-orange.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![macOS](https://img.shields.io/badge/macOS-13+-blue.svg)]() [![Swift](https://img.shields.io/badge/Swift-5.9+-orange.svg)]()
 
 </div>
 
@@ -32,8 +30,7 @@
 
 - macOS 13+ (Apple Silicon recommended)
 
-> [!IMPORTANT]
-> **First Launch Security Warning**
+> [!IMPORTANT] > **First Launch Security Warning**
 >
 > Oak is not yet signed with an Apple Developer certificate. macOS may show a warning that the app cannot be opened.
 >
@@ -111,9 +108,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Give a ⭐️ if this project helped you!
 
-[![kofi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd)
-[![paypal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/dunghd)
-[![buymeacoffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dunghd)
+[![kofi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd) [![paypal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/dunghd) [![buymeacoffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dunghd)
 
 ## Contributors ✨
 
