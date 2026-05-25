@@ -32,7 +32,7 @@ jobs:
         id: check_tag
         run: |
           git fetch --force --tags
-          
+
           # Check if the current commit already has a tag
           current_tags="$(git tag --points-at HEAD)"
           if [[ -n "$current_tags" ]]; then
@@ -53,21 +53,21 @@ jobs:
             latest_tag="v0.0.0"
           fi
           echo "Latest tag: $latest_tag"
-          
+
           # Extract version components
           version="${latest_tag#v}"
           IFS='.' read -r major minor patch <<< "$version"
-          
+
           # Increment patch version
           patch=$((patch + 1))
           new_version="$major.$minor.$patch"
           new_tag="v$new_version"
-          
+
           echo "New version: $new_version"
           echo "New tag: $new_tag"
 
           build_number="$((major * 1000000 + minor * 1000 + patch))"
-          
+
           echo "version=$new_version" >> "$GITHUB_OUTPUT"
           echo "tag=$new_tag" >> "$GITHUB_OUTPUT"
           echo "build_number=$build_number" >> "$GITHUB_OUTPUT"

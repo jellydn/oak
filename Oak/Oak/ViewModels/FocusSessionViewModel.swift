@@ -28,6 +28,9 @@ internal class FocusSessionViewModel: ObservableObject {
     private var isLongBreak: Bool = false
     private var sessionStartSeconds: Int = 0
     private var sessionEndDate: Date?
+    private var currentSessionStartTime: Date?
+    private let currentDate: () -> Date
+    private var roundTrackingDate: Date
     private var presetSettingsCancellable: AnyCancellable?
     private var lastPlayingAudioTrack: AudioTrack = .none
     private var wasAutoStarted: Bool = false
@@ -41,8 +44,11 @@ internal class FocusSessionViewModel: ObservableObject {
         audioManager: AudioManager? = nil,
         progressManager: ProgressManager? = nil,
         notificationService: any SessionCompletionNotifying,
-        completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil
+        completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil,
+        currentDate: @escaping () -> Date = Date.init
     ) {
+        self.currentDate = currentDate
+        roundTrackingDate = Calendar.current.startOfDay(for: currentDate())
         self.audioManager = audioManager ?? AudioManager()
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
@@ -74,7 +80,6 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var displayTime: String {
-        let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
         let minutes: Int
         let seconds: Int
 
@@ -87,7 +92,7 @@ internal class FocusSessionViewModel: ObservableObject {
             seconds = remaining % 60
         case let .completed(isWorkSession):
             if isWorkSession {
-                if completedRounds >= roundsBeforeLongBreak {
+                if shouldUseLongBreak {
                     minutes = presetSettings.longBreakDuration(for: selectedPreset) / 60
                 } else {
                     minutes = presetSettings.breakDuration(for: selectedPreset) / 60
@@ -124,25 +129,24 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var currentSessionType: String {
-        let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
         switch sessionState {
         case .idle:
-            return "Ready"
+            "Ready"
         case let .running(_, isWork), let .paused(_, isWork):
             if isWork {
-                return "Focus"
+                "Focus"
             } else {
-                return isLongBreak ? "Long Break" : "Break"
+                isLongBreak ? "Long Break" : "Break"
             }
         case let .completed(isWorkSession):
             if isWorkSession {
-                if completedRounds >= roundsBeforeLongBreak {
-                    return "Long Break"
+                if shouldUseLongBreak {
+                    "Long Break"
                 } else {
-                    return "Break"
+                    "Break"
                 }
             } else {
-                return "Focus"
+                "Focus"
             }
         }
     }
@@ -159,8 +163,33 @@ internal class FocusSessionViewModel: ObservableObject {
         progressManager.dailyStats.streakDays
     }
 
+    var todaySessions: [SessionRecord] {
+        progressManager.dailyStats.todaySessions
+    }
+
     func cleanup() {
         resetSession()
+    }
+
+    private var completedRoundsForCurrentDay: Int {
+        guard Calendar.current.isDate(roundTrackingDate, inSameDayAs: currentDate()) else {
+            return 0
+        }
+        return completedRounds
+    }
+
+    private var shouldUseLongBreak: Bool {
+        completedRoundsForCurrentDay >= presetSettings.roundsBeforeLongBreak
+    }
+
+    private func resetCompletedRoundsIfNeeded() {
+        let today = Calendar.current.startOfDay(for: currentDate())
+        guard !Calendar.current.isDate(roundTrackingDate, inSameDayAs: today) else {
+            return
+        }
+
+        roundTrackingDate = today
+        completedRounds = 0
     }
 
     deinit {
@@ -184,6 +213,7 @@ internal extension FocusSessionViewModel {
     }
 
     func startSession(using preset: Preset? = nil) {
+        resetCompletedRoundsIfNeeded()
         if let preset {
             selectedPreset = preset
         }
@@ -191,6 +221,7 @@ internal extension FocusSessionViewModel {
         isWorkSession = true
         isLongBreak = false
         sessionStartSeconds = currentRemainingSeconds
+        currentSessionStartTime = Date()
         completedRounds = 0
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
         startTimer()
@@ -211,7 +242,7 @@ internal extension FocusSessionViewModel {
     }
 
     func startNextSession(isAutoStart: Bool = false) {
-        let roundsBeforeLongBreak = presetSettings.roundsBeforeLongBreak
+        resetCompletedRoundsIfNeeded()
         guard case let .completed(completedWorkSession) = sessionState else {
             return
         }
@@ -229,7 +260,7 @@ internal extension FocusSessionViewModel {
             currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
             isLongBreak = false
         } else {
-            if completedRounds >= roundsBeforeLongBreak {
+            if shouldUseLongBreak {
                 currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
                 isLongBreak = true
             } else {
@@ -239,6 +270,7 @@ internal extension FocusSessionViewModel {
         }
 
         sessionStartSeconds = currentRemainingSeconds
+        currentSessionStartTime = Date()
         sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
 
         if isWorkSession && lastPlayingAudioTrack != .none {
@@ -258,6 +290,7 @@ internal extension FocusSessionViewModel {
         isLongBreak = false
         sessionStartSeconds = 0
         sessionEndDate = nil
+        currentSessionStartTime = nil
         isSessionComplete = false
         completedRounds = 0
         autoStartCountdown = 0
@@ -292,16 +325,26 @@ internal extension FocusSessionViewModel {
     }
 
     func completeSession() {
+        resetCompletedRoundsIfNeeded()
+        let sessionType: SessionType
         if isWorkSession {
-            let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
-            if durationMinutes > 0 {
-                progressManager.recordSessionCompletion(durationMinutes: durationMinutes)
-            }
+            sessionType = .work
             completedRounds += 1
         } else {
+            sessionType = isLongBreak ? .longBreak : .shortBreak
             if isLongBreak {
                 completedRounds = 0
             }
+        }
+
+        let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
+        if durationMinutes > 0, let startTime = currentSessionStartTime {
+            progressManager.recordSessionCompletion(
+                durationMinutes: durationMinutes,
+                type: sessionType,
+                startTime: startTime,
+                endTime: Date()
+            )
         }
 
         notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)

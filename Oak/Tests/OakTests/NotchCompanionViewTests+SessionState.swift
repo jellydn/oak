@@ -112,7 +112,7 @@ internal extension NotchCompanionViewTests {
         viewModel.startSession(using: .short)
         XCTAssertTrue(viewModel.isRunning, "Precondition: session must be running")
         viewModel.completeSession()
-        if case .completed(let isWorkSession) = viewModel.sessionState {
+        if case let .completed(isWorkSession) = viewModel.sessionState {
             XCTAssertTrue(isWorkSession, "Completing a work session should set isWorkSession=true in state")
         } else {
             XCTFail("Session state should be .completed after completeSession")

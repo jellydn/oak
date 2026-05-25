@@ -23,9 +23,17 @@ internal protocol AudioEngineProtocol {
 internal final class AudioEngineAdapter: AudioEngineProtocol {
     private let engine = AVAudioEngine()
 
-    var isRunning: Bool { engine.isRunning }
-    var outputChannelCount: AVAudioChannelCount { engine.outputNode.outputFormat(forBus: 0).channelCount }
-    var outputSampleRate: Double { engine.outputNode.outputFormat(forBus: 0).sampleRate }
+    var isRunning: Bool {
+        engine.isRunning
+    }
+
+    var outputChannelCount: AVAudioChannelCount {
+        engine.outputNode.outputFormat(forBus: 0).channelCount
+    }
+
+    var outputSampleRate: Double {
+        engine.outputNode.outputFormat(forBus: 0).sampleRate
+    }
 
     func setMixerVolume(_ volume: Float) {
         engine.mainMixerNode.outputVolume = volume
@@ -40,10 +48,21 @@ internal final class AudioEngineAdapter: AudioEngineProtocol {
         engine.detach(node)
     }
 
-    func prepare() { engine.prepare() }
-    func start() throws { try engine.start() }
-    func stop() { engine.stop() }
-    func pause() { engine.pause() }
+    func prepare() {
+        engine.prepare()
+    }
+
+    func start() throws {
+        try engine.start()
+    }
+
+    func stop() {
+        engine.stop()
+    }
+
+    func pause() {
+        engine.pause()
+    }
 }
 
 // MARK: - AudioManager

@@ -4,7 +4,7 @@ import AVFoundation
 @MainActor
 internal final class MockAudioManager: AudioManager {
     init() {
-        super.init(audioEngineFactory: { MockTestAudioEngine() })
+        super.init { MockTestAudioEngine() }
     }
 
     override func play(track: AudioTrack) {
@@ -40,7 +40,15 @@ private final class MockTestAudioEngine: AudioEngineProtocol {
     func attachAndConnect(_: AVFoundation.AVAudioNode) {}
     func detach(_: AVFoundation.AVAudioNode) {}
     func prepare() {}
-    func start() throws { isRunning = true }
-    func stop() { isRunning = false }
-    func pause() { isRunning = false }
+    func start() throws {
+        isRunning = true
+    }
+
+    func stop() {
+        isRunning = false
+    }
+
+    func pause() {
+        isRunning = false
+    }
 }

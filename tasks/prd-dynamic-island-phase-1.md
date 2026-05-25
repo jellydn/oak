@@ -2,7 +2,7 @@
 
 ## 1. Introduction/Overview
 
-Oak currently provides a notch-based focus companion UI, but it does not yet feel like a Dynamic Island-style surface.  
+Oak currently provides a notch-based focus companion UI, but it does not yet feel like a Dynamic Island-style surface.
 This phase adds Dynamic Island-like behavior and polish while keeping the implementation simple (KISS): top-notch placement on the main monitor, smooth expansion/collapse interactions, and consistent motion behavior.
 
 ## 2. Goals

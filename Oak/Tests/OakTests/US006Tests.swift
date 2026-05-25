@@ -2,6 +2,14 @@ import SwiftUI
 import XCTest
 @testable import Oak
 
+private final class TestClock {
+    var currentDate: Date
+
+    init(currentDate: Date) {
+        self.currentDate = currentDate
+    }
+}
+
 @MainActor
 internal final class US006Tests: XCTestCase {
     var progressManager: ProgressManager!
@@ -45,52 +53,62 @@ internal final class US006Tests: XCTestCase {
     }
 
     func testAppComputes7DayStreak() throws {
-        // Record sessions for 7 consecutive days
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
+        var records: [ProgressData] = []
 
-        // Simulate 7 days of completed sessions
         for dayOffset in 0 ..< 7 {
-            guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) else {
-                XCTFail("Could not create date")
-                return
-            }
-
-            // Create a new ProgressManager for each day to simulate daily records
-            let dailyManager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
-            dailyManager.recordSessionCompletion(durationMinutes: 25)
+            let date = try XCTUnwrap(calendar.date(byAdding: .day, value: -dayOffset, to: today))
+            let sessionStart = try XCTUnwrap(calendar.date(byAdding: .hour, value: 9, to: date))
+            records.append(
+                ProgressData(
+                    date: date,
+                    focusMinutes: 25,
+                    completedSessions: 1,
+                    sessions: [
+                        SessionRecord(
+                            type: .work,
+                            startTime: sessionStart,
+                            endTime: sessionStart.addingTimeInterval(25 * 60),
+                            durationMinutes: 25
+                        )
+                    ]
+                )
+            )
         }
 
-        // Verify 7-day streak is computed
-        // Note: This test is tricky because we can't easily simulate historical data
-        // Instead, we'll test the streak calculation logic directly
+        let defaults = try XCTUnwrap(testUserDefaults)
+        let encodedRecords = try JSONEncoder().encode(records)
+        defaults.set(encodedRecords, forKey: "progressHistory")
 
-        // Create fresh manager
-        let testManager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
-
-        // Record 3 sessions today
-        testManager.recordSessionCompletion(durationMinutes: 25)
-        testManager.recordSessionCompletion(durationMinutes: 25)
-        testManager.recordSessionCompletion(durationMinutes: 25)
-
-        // Should have 1-day streak (today only)
-        XCTAssertEqual(testManager.dailyStats.streakDays, 1)
+        let manager = ProgressManager(userDefaults: defaults)
+        XCTAssertEqual(manager.dailyStats.streakDays, 7)
     }
 
     func testStreakResetsOnMissedDay() throws {
-        // Create manager and record sessions
-        let manager = try ProgressManager(userDefaults: XCTUnwrap(testUserDefaults))
-        manager.recordSessionCompletion(durationMinutes: 25)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let twoDaysAgo = try XCTUnwrap(calendar.date(byAdding: .day, value: -2, to: today))
+        let records = [
+            ProgressData(
+                date: today,
+                focusMinutes: 25,
+                completedSessions: 1,
+                sessions: [makeWorkSession(on: today)]
+            ),
+            ProgressData(
+                date: twoDaysAgo,
+                focusMinutes: 25,
+                completedSessions: 1,
+                sessions: [makeWorkSession(on: twoDaysAgo)]
+            )
+        ]
+        let defaults = try XCTUnwrap(testUserDefaults)
+        let encodedRecords = try JSONEncoder().encode(records)
+        defaults.set(encodedRecords, forKey: "progressHistory")
 
+        let manager = ProgressManager(userDefaults: defaults)
         XCTAssertEqual(manager.dailyStats.streakDays, 1)
-
-        // We can't easily simulate a missed day in tests
-        // But we can verify that streak calculation only counts consecutive days
-        // The logic in calculateStreak() checks daysDifference == 1 for consecutive days
-        // and breaks if daysDifference > 1
-
-        // This is verified by code inspection
-        XCTAssertTrue(true, "Streak calculation checks for consecutive days")
     }
 
     func testDataPersistsAcrossAppRelaunch() throws {
@@ -111,6 +129,90 @@ internal final class US006Tests: XCTestCase {
         XCTAssertEqual(statsAfter.todayFocusMinutes, 50, "Focus minutes should persist")
         XCTAssertEqual(statsAfter.todayCompletedSessions, 2, "Completed sessions should persist")
         XCTAssertEqual(statsAfter.streakDays, statsBefore.streakDays, "Streak should persist")
+    }
+
+    func testSessionCompletionUsesDurationWhenStartTimeOmitted() throws {
+        let endTime = Date()
+
+        progressManager.recordSessionCompletion(durationMinutes: 25, endTime: endTime)
+
+        let session = try XCTUnwrap(progressManager.dailyStats.todaySessions.first)
+        XCTAssertEqual(session.durationMinutes, 25)
+        XCTAssertEqual(session.endTime.timeIntervalSince(endTime), 0, accuracy: 0.001)
+        XCTAssertEqual(session.startTime.timeIntervalSince(endTime), -1500, accuracy: 0.001)
+    }
+
+    func testTodaySessionsAreSortedNewestFirst() {
+        let now = Date()
+        let olderStart = now.addingTimeInterval(-3600)
+        let newerStart = now.addingTimeInterval(-900)
+
+        progressManager.recordSessionCompletion(
+            durationMinutes: 25,
+            startTime: olderStart,
+            endTime: olderStart.addingTimeInterval(1500)
+        )
+        progressManager.recordSessionCompletion(
+            durationMinutes: 10,
+            type: .shortBreak,
+            startTime: newerStart,
+            endTime: newerStart.addingTimeInterval(600)
+        )
+
+        let sessions = progressManager.dailyStats.todaySessions
+        XCTAssertEqual(sessions.count, 2)
+        XCTAssertGreaterThan(sessions[0].startTime, sessions[1].startTime)
+        XCTAssertEqual(sessions[0].type, .shortBreak)
+        XCTAssertEqual(sessions[1].type, .work)
+    }
+
+    func testBreakOnlyTodayDoesNotResetPriorStreak() throws {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = try XCTUnwrap(calendar.date(byAdding: .day, value: -1, to: today))
+        let records = [
+            ProgressData(
+                date: yesterday,
+                focusMinutes: 25,
+                completedSessions: 1,
+                sessions: [makeWorkSession(on: yesterday)]
+            )
+        ]
+        let defaults = try XCTUnwrap(testUserDefaults)
+        let encodedRecords = try JSONEncoder().encode(records)
+        defaults.set(encodedRecords, forKey: "progressHistory")
+
+        let manager = ProgressManager(userDefaults: defaults)
+        XCTAssertEqual(manager.dailyStats.streakDays, 1)
+
+        manager.recordSessionCompletion(durationMinutes: 5, type: .shortBreak)
+
+        XCTAssertEqual(manager.dailyStats.todayCompletedSessions, 0)
+        XCTAssertEqual(manager.dailyStats.streakDays, 1)
+    }
+
+    func testFirstSessionAfterDayChangeRefreshesPublishedDailyStats() throws {
+        let calendar = Calendar.current
+        let dayOne = calendar.startOfDay(for: Date())
+        let dayTwo = try XCTUnwrap(calendar.date(byAdding: .day, value: 1, to: dayOne))
+        let dayTwoStart = try XCTUnwrap(calendar.date(byAdding: .hour, value: 9, to: dayTwo))
+        let defaults = try XCTUnwrap(testUserDefaults)
+        let clock = TestClock(currentDate: dayOne)
+        let manager = ProgressManager(userDefaults: defaults) {
+            clock.currentDate
+        }
+
+        clock.currentDate = dayTwo
+        manager.recordSessionCompletion(
+            durationMinutes: 25,
+            startTime: dayTwoStart,
+            endTime: dayTwoStart.addingTimeInterval(25 * 60)
+        )
+
+        XCTAssertEqual(manager.dailyStats.todayFocusMinutes, 25)
+        XCTAssertEqual(manager.dailyStats.todayCompletedSessions, 1)
+        XCTAssertEqual(manager.dailyStats.todaySessions.count, 1)
+        XCTAssertEqual(manager.dailyStats.todaySessions.first?.startTime, dayTwoStart)
     }
 
     func testMultipleDaysDataStored() throws {
@@ -183,5 +285,15 @@ internal final class US006Tests: XCTestCase {
         XCTAssertNotNil(progressView)
 
         viewModel.cleanup()
+    }
+
+    private func makeWorkSession(on date: Date) -> SessionRecord {
+        let sessionStart = Calendar.current.date(byAdding: .hour, value: 9, to: date) ?? date
+        return SessionRecord(
+            type: .work,
+            startTime: sessionStart,
+            endTime: sessionStart.addingTimeInterval(25 * 60),
+            durationMinutes: 25
+        )
     }
 }

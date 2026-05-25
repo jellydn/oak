@@ -17,7 +17,9 @@ internal final class MockAudioEngine: AudioEngineProtocol {
     var attachedNodes: [AVAudioNode] = []
     var detachedNodes: [AVAudioNode] = []
 
-    func setMixerVolume(_ volume: Float) { mixerVolume = volume }
+    func setMixerVolume(_ volume: Float) {
+        mixerVolume = volume
+    }
 
     func attachAndConnect(_ node: AVAudioNode) {
         attachedNodes.append(node)
@@ -27,7 +29,9 @@ internal final class MockAudioEngine: AudioEngineProtocol {
         detachedNodes.append(node)
     }
 
-    func prepare() { prepareCalled = true }
+    func prepare() {
+        prepareCalled = true
+    }
 
     func start() throws {
         if let error = startError { throw error }
@@ -106,7 +110,7 @@ internal final class NoiseGeneratorTests: XCTestCase {
         let generator = NoiseGenerator()
         // maxSeed = Float.pi * 2000 ≈ 6283; step = 0.01 per call → ~628,320 calls to wrap.
         // Run past the wrap point to verify the modulo prevents unbounded growth.
-        for _ in 0 ..< 700_000 {
+        for _ in 0 ..< 700000 {
             _ = generator.generateRainNoise()
         }
         let sample = generator.generateRainNoise()
