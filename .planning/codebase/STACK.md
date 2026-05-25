@@ -9,14 +9,14 @@
 ## Platform
 
 - **OS**: macOS 13+ (Ventura minimum)
-- **Architecture**: Apple Silicon (M1+), Intel unsupported per PRD
+- **Architecture**: Apple Silicon (M1+) native; Intel not officially supported
 - **UI Framework**: SwiftUI (App lifecycle via `@main` SwiftUI `App` protocol)
 - **Window System**: AppKit (`NSPanel`, `NSWindowController`, `NSApplicationDelegate`)
 
 ## Core Frameworks
 
 | Framework | Usage |
-|-----------|-------|
+| --- | --- |
 | **SwiftUI** | All UI views, settings scene, popover support |
 | **AppKit** | Window management (`NSPanel`), application lifecycle, `NSScreen`, `NSHostingView` |
 | **AVFoundation** | Audio playback via `AVAudioPlayer` and `AVAudioEngine` |
@@ -27,9 +27,9 @@
 
 ## External Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| **Sparkle** | 2.6.4+ | Auto-update framework (appcast-based) |
+| Package     | Version | Purpose                               |
+| ----------- | ------- | ------------------------------------- |
+| **Sparkle** | 2.6.4+  | Auto-update framework (appcast-based) |
 
 Managed via XcodeGen (`project.yml`) with Swift Package Manager integration.
 
@@ -63,7 +63,7 @@ Managed via XcodeGen (`project.yml`) with Swift Package Manager integration.
 ## Configuration Files
 
 | File | Purpose |
-|------|---------|
+| --- | --- |
 | `Oak/project.yml` | XcodeGen project definition (targets, dependencies, version) |
 | `Oak/Oak/Info.plist` | App bundle metadata, launch config |
 | `Oak/Oak/Oak.entitlements` | Sandbox entitlements |
