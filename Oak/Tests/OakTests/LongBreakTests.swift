@@ -2,6 +2,14 @@ import SwiftUI
 import XCTest
 @testable import Oak
 
+private final class TestClock {
+    var currentDate: Date
+
+    init(currentDate: Date) {
+        self.currentDate = currentDate
+    }
+}
+
 @MainActor
 internal final class LongBreakTests: XCTestCase {
     var viewModel: FocusSessionViewModel!
@@ -286,5 +294,47 @@ internal final class LongBreakTests: XCTestCase {
         } else {
             XCTFail("Should be in running state")
         }
+    }
+
+    func testNewDayResetsRoundsBeforeLongBreakDecision() throws {
+        let calendar = Calendar.current
+        let dayOne = calendar.startOfDay(for: Date())
+        let dayTwo = try XCTUnwrap(calendar.date(byAdding: .day, value: 1, to: dayOne))
+        let clock = TestClock(currentDate: dayOne)
+
+        viewModel.cleanup()
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: NotificationService()
+        ) {
+            clock.currentDate
+        }
+
+        viewModel.startSession()
+        viewModel.completeSession()
+        viewModel.startNextSession()
+        viewModel.completeSession()
+
+        viewModel.startNextSession()
+        viewModel.completeSession()
+        viewModel.startNextSession()
+        viewModel.completeSession()
+
+        XCTAssertEqual(viewModel.completedRounds, 2)
+
+        clock.currentDate = dayTwo
+
+        viewModel.startNextSession()
+        viewModel.completeSession()
+        XCTAssertEqual(viewModel.currentSessionType, "Break")
+
+        viewModel.startNextSession()
+        viewModel.completeSession()
+        viewModel.startNextSession()
+        viewModel.completeSession()
+
+        XCTAssertEqual(viewModel.currentSessionType, "Break")
+        XCTAssertEqual(viewModel.displayTime, "05:00")
+        XCTAssertEqual(viewModel.completedRounds, 2)
     }
 }
