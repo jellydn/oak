@@ -1,79 +1,71 @@
-# External Integrations
+# INTEGRATIONS.md — External Integrations
 
-**Analysis Date:** 2026-03-14
+## Third-Party Services
 
-## APIs & External Services
+### None
 
-**Auto-Updates:**
-- Sparkle Framework - App auto-updates
-  - SDK/Client: Swift Package (https://github.com/sparkle-project/Sparkle)
-  - Version: 2.6.4+
-  - Config: `SPARKLE_PUBLIC_ED_KEY` in project.yml
+Oak has **zero** cloud dependencies. The app operates entirely offline with no:
+- Account creation
+- Cloud sync
+- API calls
+- Telemetry/analytics
+- Crash reporting
 
-## Data Storage
+This is by design per the MVP constraints (FR-14).
 
-**Databases:**
-- None (local-only app)
+## External Systems
 
-**File Storage:**
-- Local filesystem only - Bundled audio assets in `Oak/Oak/Resources/Sounds/`
+### Sparkle Auto-Update Framework
 
-**Caching:**
-- UserDefaults - Local preferences storage
-- PresetSettingsStore - Custom settings persistence
+- **Package**: `sparkle-project/Sparkle` 2.6.4+
+- **Purpose**: Automatic application updates
+- **Configuration**: Public EdDSA key in `SPARKLE_PUBLIC_ED_KEY` in `project.yml`
+- **Update feed**: Appcast XML at `appcast.xml` (root of repo)
+- **Behavior**:
+  - Checks for updates on launch (configurable interval)
+  - Automatic download optional (default: off)
+  - Manual check available via Settings
+- **Deployment**: CI pipeline (`release.yml`) generates appcast + Homebrew cask updates
 
-## Authentication & Identity
+### macOS System Services
 
-**Auth Provider:**
-- None required (local-only app)
+| Service | Usage |
+|---------|-------|
+| **UserNotifications** | Local notifications for session completion |
+| **AVFoundation** | Audio playback and generation |
+| **CoreGraphics** | Display identification (`CGMainDisplayID`) |
+| **NSScreen** | Screen detection, notch detection, window positioning |
 
-## Monitoring & Observability
+## Notifications
 
-**Error Tracking:**
-- None (local logs only)
+- **Framework**: `UserNotifications` (local only)
+- **Authorization**: Requested on user action from Settings view
+- **Content**:
+  - Work completion: "Focus Session Complete!" / "Great work! Time for a break."
+  - Break completion: "Break Complete!" / "Ready to focus again?"
+- **Sound**: `.default` notification sound
+- **Status**: Tracked via `@Published private(set) var isAuthorized: Bool`
 
-**Logs:**
-- `os.log` - Production logging
-- `print()` - Debug-only (SwiftLint warning enabled)
+## Audio System
 
-## CI/CD & Deployment
+- **Bundled tracks**: 5 ambient `.m4a` files in `Oak/Oak/Resources/Sounds/`
+- **Generated tracks**: Procedural noise via `AVAudioSourceNode` for all tracks (fallback)
+- **Sources**: Pixabay under Pixabay Content License (attributed in `DEVELOPMENT.md`)
 
-**Hosting:**
-- None (standalone macOS app)
+## App Store / Distribution
 
-**CI Pipeline:**
-- GitHub Actions (implied by `.changeset` directory)
-- Renovate bot for dependency updates (`renovate.json`)
+- **Distribution channel**: Homebrew cask (`Casks/oak.rb`)
+- **Signing**: Not yet Apple Developer signed (security warning noted in README)
+- **CI/CD**: GitHub Actions workflows for release, auto-release, appcast update, Pages deployment
 
-**Distribution:**
-- Homebrew Cask (Casks/ directory)
-- Direct download (implied by Sparkle integration)
-- GitHub Releases
+## No Database
 
-## Environment Configuration
+- No Core Data, SQLite, or any database system
+- All persistence via `UserDefaults` (JSON-encoded arrays)
+- 90-day retention policy with automatic pruning
 
-**Required env vars:**
-- None (build system uses project.yml settings)
+## No Authentication
 
-**Secrets:**
-- `SPARKLE_PUBLIC_ED_KEY` - EdDSA public key for update signature verification (in project.yml, not env)
-
-## Webhooks & Callbacks
-
-**Incoming:**
-- None
-
-**Outgoing:**
-- Sparkle update check (appcast URL configured in Sparkle)
-
-## System Integration
-
-**macOS APIs:**
-- NSScreen - Display detection and notch detection
-- NSUserNotification - System notifications
-- AVAudioPlayer - Audio playback
-- NSPanel/NSWindow - Notch window management
-
----
-
-*Integration audit: 2026-03-14*
+- No auth providers (OAuth, Apple ID, etc.)
+- No user accounts
+- No API keys or secrets (except Sparkle EdDSA key for appcast verification)

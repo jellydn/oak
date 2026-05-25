@@ -1,200 +1,192 @@
-# Testing Patterns
-
-**Analysis Date:** 2026-03-14
+# TESTING.md — Testing Strategy & Practices
 
 ## Test Framework
 
-**Runner:**
-- XCTest (built into Xcode)
-- Config: `project.yml` test target configuration
-
-**Assertion Library:**
-- XCTest assertions (XCTAssertTrue, XCTAssertEqual, etc.)
-
-**Run Commands:**
-```bash
-just test                          # Run all tests
-just test-class Name               # Run specific test class
-just test-method Class Method      # Run single test
-just test-verbose                  # Run with verbose output
-```
+- **Framework**: XCTest (Apple built-in)
+- **Parallelism**: Tests run on `@MainActor` (all test classes annotated)
+- **Target**: `OakTests` (bundle.unit-test in `project.yml`)
 
 ## Test File Organization
 
-**Location:**
-- Separate directory: `Oak/Tests/OakTests/`
-- Mirrors source structure but not 1:1
+Test files mirror source structure with `Tests` suffix naming:
 
-**Naming:**
-- Source file name + "Tests" suffix: `NotchCompanionView.swift` → `NotchCompanionViewTests.swift`
-- User story tests: `US001Tests.swift`, `US002Tests.swift`, etc.
-
-**Structure:**
 ```
-Oak/Tests/OakTests/
-├── NotchCompanionViewTests.swift           # Main UI tests
-├── NotchCompanionViewTests+Layout.swift    # Layout-specific tests
-├── NotchCompanionViewTests+SessionState.swift # State tests
-├── FocusSessionViewModelTests.swift        # View model tests (not visible - may be split)
-├── AudioManagerTests.swift                 # Service tests
-├── SmokeTests.swift                        # Smoke tests
-└── US*Tests.swift                          # User story tests
+Tests/OakTests/
+├── FocusSessionViewModelTests equivalents (user story based):
+│   ├── US001Tests.swift                — Start session from notch
+│   ├── US002Tests.swift                — Fixed Pomodoro presets
+│   ├── US003Tests.swift                — Pause/resume sessions
+│   ├── US004Tests.swift                — Ambient sound during sessions
+│   ├── US005Tests.swift                — Session completion feedback
+│   └── US006Tests.swift                — Personal progress tracking
+├── Service tests:
+│   ├── AudioManagerTests.swift         — Audio playback, volume, tracks
+│   ├── AudioPersistenceTests.swift     — Audio preferences persistence
+│   ├── NotificationTests.swift         — Notification permissions
+│   ├── SessionCompletionNotificationTests.swift — Completion notifications
+│   ├── SparkleUpdaterTests.swift       — Auto-update integration
+│   └── AppcastVersionParserTests.swift — Version string parsing
+├── UI/View tests:
+│   ├── NotchCompanionViewTests.swift          — Notch view rendering
+│   ├── NotchCompanionViewTests+Layout.swift   — Layout calculations
+│   ├── NotchCompanionViewTests+SessionState.swift — State-based rendering
+│   ├── NotchWindowControllerTests.swift       — Window lifecycle
+│   ├── NotchWindowControllerTests+NotchWindow.swift — Window properties
+│   ├── NotchWindowControllerTests+WindowBehavior.swift — Window behavior
+│   ├── NotchWindowControllerTests+NotchFirstUI.swift — Initial UI state
+│   ├── ConfettiViewTests.swift       — Confetti animation
+│   └── ClickOutsideModifierTests.swift — Popover dismiss behavior
+├── Feature tests:
+│   ├── LongBreakTests.swift           — Long break after 4 rounds
+│   ├── AutoStartNextIntervalTests.swift — Auto-start countdown
+│   ├── AlwaysOnTopTests.swift         — Always-on-top window setting
+│   ├── CountdownDisplayModeTests.swift — Number vs circle ring
+│   ├── AccessibilityTests.swift       — Accessibility identifiers
+│   └── NSScreenNotchTests.swift       — Notch detection
+└── Support:
+    ├── MockAudioManager.swift         — Mock audio manager for DI
+    └── SmokeTests.swift               — Basic infrastructure test
 ```
 
-## Test Structure
+## Testing Patterns
 
-**Suite Organization:**
+### Setup & Teardown
+
 ```swift
 @MainActor
-final class NotchCompanionViewTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        // Setup code
+internal final class US001Tests: XCTestCase {
+    var viewModel: FocusSessionViewModel!
+    var presetSettings: PresetSettingsStore!
+    var presetSuiteName: String!
+
+    override func setUp() async throws {
+        let suiteName = "OakTests.US001.\(UUID().uuidString)"
+        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+            throw NSError(domain: "US001Tests", code: 1)
+        }
+        userDefaults.removePersistentDomain(forName: suiteName)
+        presetSuiteName = suiteName
+        presetSettings = PresetSettingsStore(userDefaults: userDefaults)
+        viewModel = FocusSessionViewModel(
+            presetSettings: presetSettings,
+            notificationService: NotificationService()
+        )
     }
 
-    override func tearDown() {
-        // Cleanup code
-        super.tearDown()
-    }
-
-    func testExample() async throws {
-        // Given
-        // When
-        // Then
+    override func tearDown() async throws {
+        viewModel.cleanup()
+        if let presetSuiteName {
+            UserDefaults(suiteName: presetSuiteName)?
+                .removePersistentDomain(forName: presetSuiteName)
+        }
     }
 }
 ```
 
-**Patterns:**
-- **Setup:** Isolate UserDefaults with unique suite names
-- **Teardown:** Always cleanup UserDefaults and call viewModel.cleanup()
-- **Assertion:** XCTest assertions with descriptive messages
+### UserDefaults Isolation
 
-**UserDefaults Isolation:**
+- **Every test suite uses a unique `UserDefaults` suite** with `UUID().uuidString`
+- This prevents state pollution between test runs
+- Cleaned up in `tearDown()` via `removePersistentDomain(forName:)`
+
+### Mocking / DI
+
+Protocol-based mocks with manual spy tracking:
+
 ```swift
-let suiteName = "OakTests.ClassName.\(UUID().uuidString)"
-let userDefaults = UserDefaults(suiteName: suiteName)
-
-// In tearDown:
-viewModel.cleanup()
-UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
-```
-
-## Mocking
-
-**Framework:** Protocol-based manual mocking
-
-**Patterns:**
-```swift
-// Protocol for DI
-protocol SessionCompletionNotifying {
-    func notifySessionComplete()
+// Protocol
+internal protocol AudioEngineProtocol {
+    var isRunning: Bool { get }
+    func start() throws
+    func stop()
 }
 
-// Mock for testing
-class MockNotificationService: SessionCompletionNotifying {
-    var didNotify = false
-    func notifySessionComplete() { didNotify = true }
+// Mock
+internal final class MockAudioEngine: AudioEngineProtocol {
+    var isRunning: Bool = false
+    var startError: Error?
+    var startCalled = false
+    var stopCalled = false
+
+    func start() throws {
+        if let error = startError { throw error }
+        isRunning = true
+        startCalled = true
+    }
+
+    func stop() {
+        isRunning = false
+        stopCalled = true
+    }
 }
-
-// Usage in tests
-let mockService = MockNotificationService()
-let viewModel = FocusSessionViewModel(notificationService: mockService)
 ```
 
-**What to Mock:**
-- External services (Audio, Notifications)
-- System dependencies (UserDefaults)
-- Time-based operations (Timers)
+### Test Class Hierarchy
 
-**What NOT to Mock:**
-- ViewModels (test directly)
-- Models (test directly)
-- Simple View logic
+| Pattern | Example | When Used |
+|---------|---------|-----------|
+| User story tests | `US001Tests`, `US002Tests` | Acceptance criteria from PRD |
+| Feature tests | `LongBreakTests`, `AutoStartNextIntervalTests` | Cross-cutting feature behavior |
+| Component tests | `AudioManagerTests`, `NotchWindowControllerTests` | Single class/module |
+| Mock/support | `MockAudioManager` | Shared test doubles |
 
-## Fixtures and Factories
+## Test Coverage Areas
 
-**Test Data:**
-```swift
-// Create test data inline
-let testTrack = AudioTrack(name: "Test", filename: "test.mp3")
-```
+### Session State Machine
+- State transitions: idle → running → paused → completed → idle
+- Timer accuracy (1s intervals)
+- Remaining time preservation across pause/resume
 
-**Location:**
-- No separate fixtures directory
-- Test data created inline in test methods
+### Preset Configuration
+- Both presets (short/long) work correctly
+- Configurable durations via `PresetSettingsStore`
+- Long break trigger at 4 rounds (configurable)
 
-## Coverage
+### Audio System
+- All 5 ambient tracks play correctly
+- Volume clamping (0.0–1.0)
+- Pause/resume preserves track selection
+- Stop clears state
+- Noise generator output range validation (all 5 types)
+- Rain noise seed wrapping after 700K+ iterations
 
-**Requirements:** No enforced coverage target
+### Progress Tracking
+- Session recording with correct start/end times
+- Streak calculation across days
+- Data persistence across view model re-creation
+- 90-day pruning
 
-**View Coverage:**
+### Window Management
+- Screen positioning on main/notched display
+- Expand/collapse states
+- Always-on-top behavior
+- Screen configuration changes
+
+### Notification
+- Permission request flow
+- Completion notification content
+- Sound playing configuration
+
+## Test Execution
+
 ```bash
-# Use Xcode's built-in coverage
-# Product > Test > Edit Scheme > Code Coverage
+# Run all tests
+just test
+
+# Run a specific test class
+just test-class LongBreakTests
+
+# Run a specific test method
+just test-method US001Tests testPrimaryActionStarts25MinuteSession
+
+# Run with verbose output
+just test-verbose
 ```
 
-## Test Types
+## Known Test Limitations
 
-**Unit Tests:**
-- Scope: Individual ViewModels, Services, Models
-- Approach: Test state transitions and business logic
-- Framework: XCTest
-
-**Integration Tests:**
-- Scope: View + ViewModel interactions
-- Approach: User story tests (US001, US002, etc.)
-- Framework: XCTest
-
-**E2E Tests:**
-- Framework: Smoke tests
-- Approach: Basic workflow validation
-- File: `SmokeTests.swift`
-
-## Common Patterns
-
-**Async Testing:**
-```swift
-func testAsyncOperation() async throws {
-    // Given
-    let viewModel = FocusSessionViewModel()
-
-    // When
-    await viewModel.startSession()
-
-    // Then
-    XCTAssertEqual(viewModel.state, .running)
-}
-```
-
-**Error Testing:**
-```swift
-func testErrorHandling() {
-    // Given
-    let invalidInput = -1
-
-    // When/Then
-    XCTAssertThrowsError(try subject.validate(invalidInput))
-}
-```
-
-**State Transition Testing:**
-```swift
-func testSessionStateTransitions() async throws {
-    // Idle → Running
-    await viewModel.startSession()
-    XCTAssertEqual(viewModel.state, .running)
-
-    // Running → Paused
-    await viewModel.pauseSession()
-    XCTAssertEqual(viewModel.state, .paused)
-
-    // Paused → Idle
-    await viewModel.cancelSession()
-    XCTAssertEqual(viewModel.state, .idle)
-}
-```
-
----
-
-*Testing analysis: 2026-03-14*
+- Tests cannot verify actual audio output (no audio hardware mocking)
+- Window positioning tests use mocked screen objects
+- Timer-based tests rely on direct `completeSession()` calls rather than waiting for real time
+- No UI snapshot or integration tests exist (unit test only)
+- Sparkle updater tests require careful mock setup to avoid network calls
