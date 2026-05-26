@@ -133,7 +133,7 @@ jobs:
 
       - name: Trigger release metadata update workflow
         if: steps.check_tag.outputs.skip != 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({
