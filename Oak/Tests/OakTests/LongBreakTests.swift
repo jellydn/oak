@@ -102,8 +102,8 @@ internal final class LongBreakTests: XCTestCase {
             XCTAssertEqual(viewModel.completedRounds, round)
 
             viewModel.startNextSession()
-            if case let .running(remaining, isWork) = viewModel.sessionState {
-                XCTAssertFalse(isWork)
+            if case let .running(remaining, kind) = viewModel.sessionState {
+                XCTAssertNotEqual(kind, .work)
                 XCTAssertEqual(
                     remaining,
                     presetSettings.breakDuration(for: .short)
@@ -126,8 +126,8 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.startNextSession()
         XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        if case let .running(remaining, isWork) = viewModel.sessionState {
-            XCTAssertFalse(isWork)
+        if case let .running(remaining, kind) = viewModel.sessionState {
+            XCTAssertNotEqual(kind, .work)
             XCTAssertEqual(
                 remaining,
                 presetSettings.longBreakDuration(for: .short)
@@ -230,8 +230,8 @@ internal final class LongBreakTests: XCTestCase {
         viewModel.startNextSession()
         XCTAssertEqual(viewModel.currentSessionType, "Long Break")
 
-        if case let .running(remaining, isWork) = viewModel.sessionState {
-            XCTAssertFalse(isWork)
+        if case let .running(remaining, kind) = viewModel.sessionState {
+            XCTAssertNotEqual(kind, .work)
             XCTAssertEqual(
                 remaining,
                 presetSettings.longBreakDuration(for: .long)
@@ -288,8 +288,8 @@ internal final class LongBreakTests: XCTestCase {
 
         viewModel.startNextSession()
 
-        if case let .running(remaining, isWork) = viewModel.sessionState {
-            XCTAssertFalse(isWork)
+        if case let .running(remaining, kind) = viewModel.sessionState {
+            XCTAssertNotEqual(kind, .work)
             XCTAssertEqual(remaining, 30 * 60)
         } else {
             XCTFail("Should be in running state")

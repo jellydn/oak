@@ -90,8 +90,8 @@ internal class FocusSessionViewModel: ObservableObject {
         case let .running(remaining, _), let .paused(remaining, _):
             minutes = remaining / 60
             seconds = remaining % 60
-        case let .completed(isWorkSession):
-            if isWorkSession {
+        case let .completed(kind):
+            if kind == .work {
                 if shouldUseLongBreak {
                     minutes = presetSettings.longBreakDuration(for: selectedPreset) / 60
                 } else {
@@ -132,14 +132,14 @@ internal class FocusSessionViewModel: ObservableObject {
         switch sessionState {
         case .idle:
             "Ready"
-        case let .running(_, isWork), let .paused(_, isWork):
-            if isWork {
-                "Focus"
-            } else {
-                isLongBreak ? "Long Break" : "Break"
+        case let .running(_, kind), let .paused(_, kind):
+            switch kind {
+            case .work: "Focus"
+            case .shortBreak: "Break"
+            case .longBreak: "Long Break"
             }
-        case let .completed(isWorkSession):
-            if isWorkSession {
+        case let .completed(kind):
+            if kind == .work {
                 if shouldUseLongBreak {
                     "Long Break"
                 } else {
@@ -180,6 +180,14 @@ internal class FocusSessionViewModel: ObservableObject {
 
     private var shouldUseLongBreak: Bool {
         completedRoundsForCurrentDay >= presetSettings.roundsBeforeLongBreak
+    }
+
+    private var currentSessionKind: SessionType {
+        if isWorkSession {
+            .work
+        } else {
+            isLongBreak ? .longBreak : .shortBreak
+        }
     }
 
     private func resetCompletedRoundsIfNeeded() {
@@ -223,7 +231,7 @@ internal extension FocusSessionViewModel {
         sessionStartSeconds = currentRemainingSeconds
         currentSessionStartTime = Date()
         completedRounds = 0
-        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        sessionState = .running(remainingSeconds: currentRemainingSeconds, kind: currentSessionKind)
         startTimer()
     }
 
@@ -232,18 +240,18 @@ internal extension FocusSessionViewModel {
         timer = nil
         sessionEndDate = nil
         audioManager.pause()
-        sessionState = .paused(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        sessionState = .paused(remainingSeconds: currentRemainingSeconds, kind: currentSessionKind)
     }
 
     func resumeSession() {
         audioManager.resume()
-        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        sessionState = .running(remainingSeconds: currentRemainingSeconds, kind: currentSessionKind)
         startTimer()
     }
 
     func startNextSession(isAutoStart: Bool = false) {
         resetCompletedRoundsIfNeeded()
-        guard case let .completed(completedWorkSession) = sessionState else {
+        guard case let .completed(completedKind) = sessionState else {
             return
         }
 
@@ -254,7 +262,7 @@ internal extension FocusSessionViewModel {
         }
 
         wasAutoStarted = isAutoStart
-        isWorkSession = !completedWorkSession
+        isWorkSession = (completedKind != .work)
 
         if isWorkSession {
             currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
@@ -271,7 +279,7 @@ internal extension FocusSessionViewModel {
 
         sessionStartSeconds = currentRemainingSeconds
         currentSessionStartTime = Date()
-        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        sessionState = .running(remainingSeconds: currentRemainingSeconds, kind: currentSessionKind)
 
         if isWorkSession && lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
@@ -320,7 +328,7 @@ internal extension FocusSessionViewModel {
         if currentRemainingSeconds <= 0 {
             completeSession()
         } else {
-            sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+            sessionState = .running(remainingSeconds: currentRemainingSeconds, kind: currentSessionKind)
         }
     }
 
@@ -367,7 +375,7 @@ internal extension FocusSessionViewModel {
         timer?.invalidate()
         timer = nil
         sessionEndDate = nil
-        sessionState = .completed(isWorkSession: isWorkSession)
+        sessionState = .completed(kind: currentSessionKind)
 
         isSessionComplete = true
 

@@ -2,9 +2,9 @@ import Foundation
 
 internal enum SessionState: Equatable {
     case idle
-    case running(remainingSeconds: Int, isWorkSession: Bool)
-    case paused(remainingSeconds: Int, isWorkSession: Bool)
-    case completed(isWorkSession: Bool)
+    case running(remainingSeconds: Int, kind: SessionType)
+    case paused(remainingSeconds: Int, kind: SessionType)
+    case completed(kind: SessionType)
 }
 
 internal enum Preset: CaseIterable {

@@ -115,7 +115,7 @@ internal struct NotchCompanionView: View {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     animateCompletion = true
                 }
-                if case let .completed(isWorkSession) = viewModel.sessionState, isWorkSession {
+                if case let .completed(kind) = viewModel.sessionState, kind == .work {
                     showConfetti = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + ConfettiView.animationDuration) {
                         showConfetti = false
