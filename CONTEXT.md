@@ -100,3 +100,19 @@ Expansion is triggered by a toggle click. Auto-collapse occurs after an idle tim
 ## Always On Top
 
 A window-level behavior that keeps the notch panel above all other application windows. Configurable on/off. Default: **on**.
+
+## Session Engine
+
+The pure finite-state machine that owns Focus Session lifecycle, Round tracking, Long Break decisions, and audio-resume memory. It accepts **Session Events** and emits **Session Intents** describing the side effects the shell should perform. The Session Engine has no Foundation side effects of its own — no timers, no audio, no notifications, no persistence. See [ADR-0004](doc/adr/0004-session-engine-as-functional-core.md).
+
+## Session Event
+
+An input to the Session Engine: `start`, `pause`, `resume`, `tick`, `startNext`, `reset`. Every event carries `now: Date` so the engine is fully driven by an explicit clock.
+
+## Session Intent
+
+A side-effect command emitted by the Session Engine for the shell to execute: record a completion, stop/pause/resume audio, start the remembered audio track, notify the user, play the completion sound, flash the completion state, schedule the auto-start countdown.
+
+## Session Config
+
+The subset of preferences the Session Engine reads — Focus / Break / Long-Break durations, Rounds Before Long Break, completion-sound flags, and the auto-start flag. Snapshotted from `PresetSettingsStore` by the shell and pushed into the engine via `updateConfig(_:)`.

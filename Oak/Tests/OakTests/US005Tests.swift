@@ -42,8 +42,8 @@ internal final class US005Tests: XCTestCase {
         viewModel.startSession()
         viewModel.completeSession()
 
-        if case let .completed(isWorkSession) = viewModel.sessionState {
-            XCTAssertTrue(isWorkSession, "Should be a completed work session")
+        if case let .completed(kind) = viewModel.sessionState {
+            XCTAssertEqual(kind, .work, "Should be a completed work session")
         } else {
             XCTFail("Expected .completed state, got \(viewModel.sessionState)")
         }
