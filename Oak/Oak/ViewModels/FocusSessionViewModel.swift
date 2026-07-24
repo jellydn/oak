@@ -271,14 +271,12 @@ internal extension FocusSessionViewModel {
         if isWorkSession {
             currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
             isLongBreak = false
+        } else if shouldUseLongBreak {
+            currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
+            isLongBreak = true
         } else {
-            if shouldUseLongBreak {
-                currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
-                isLongBreak = true
-            } else {
-                currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
-                isLongBreak = false
-            }
+            currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
+            isLongBreak = false
         }
 
         sessionStartSeconds = currentRemainingSeconds

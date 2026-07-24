@@ -4,24 +4,7 @@ internal extension NotchCompanionView {
     var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {
-                Button(
-                    action: {
-                        presetSelection = presetSelection == .short ? .long : .short
-                    },
-                    label: {
-                        HStack(spacing: 2) {
-                            Text(presetLabel(for: presetSelection))
-                                .font(.system(size: 9, weight: .semibold))
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.system(size: 6, weight: .semibold))
-                        }
-                        .foregroundColor(.white.opacity(0.68))
-                    }
-                )
-                .buttonStyle(.plain)
-                .accessibilityLabel("Toggle preset: \(presetLabel(for: presetSelection))")
-                .accessibilityHint("Switches between short and long presets")
-                .accessibilityIdentifier("presetToggleButton")
+                presetToggleButton
                 Button(
                     action: { viewModel.startSession(using: presetSelection) },
                     label: {
