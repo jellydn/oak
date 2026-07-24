@@ -48,4 +48,41 @@ internal extension NotchCompanionViewTests {
             "Short and long preset labels should differ"
         )
     }
+
+    // MARK: - Compact View Preset Toggle
+
+    func testPresetLabelReflectsViewModelSettings() {
+        let view = makeView()
+        XCTAssertEqual(
+            view.presetLabel(for: .short),
+            viewModel.presetSettings.displayName(for: .short),
+            "Short preset label should match preset settings"
+        )
+        XCTAssertEqual(
+            view.presetLabel(for: .long),
+            viewModel.presetSettings.displayName(for: .long),
+            "Long preset label should match preset settings"
+        )
+    }
+
+    func testCompactViewPresetLabelMatchesDefaultSelection() {
+        let view = makeView()
+        XCTAssertEqual(view.presetSelection, .short, "Default preset should be .short")
+        let expectedLabel = viewModel.presetSettings.displayName(for: .short)
+        XCTAssertEqual(
+            view.presetLabel(for: view.presetSelection),
+            expectedLabel,
+            "Compact view preset label should match the default .short preset"
+        )
+    }
+
+    func testPresetToggleButtonIsAccessibleFromBothCompactViews() {
+        let view = makeView()
+        let toggleButton = view.presetToggleButton
+        XCTAssertNotNil(toggleButton, "presetToggleButton should exist")
+        let compactView = view.compactView
+        XCTAssertNotNil(compactView, "compactView should exist and reference presetToggleButton")
+        let leadingDisplay = view.compactLeadingDisplay
+        XCTAssertNotNil(leadingDisplay, "compactLeadingDisplay should exist and reference presetToggleButton")
+    }
 }

@@ -165,20 +165,7 @@ internal extension NotchCompanionView {
     @ViewBuilder
     private var compactLeadingDisplay: some View {
         if viewModel.canStart {
-            Button(
-                action: {
-                    presetSelection = presetSelection == .short ? .long : .short
-                },
-                label: {
-                    Text(presetLabel(for: presetSelection))
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.68))
-                }
-            )
-            .buttonStyle(.plain)
-            .accessibilityLabel("Toggle preset: \(presetLabel(for: presetSelection))")
-            .accessibilityHint("Switches between short and long presets")
-            .accessibilityIdentifier("presetToggleButton")
+            presetToggleButton
         } else if viewModel.autoStartCountdown > 0 {
             HStack(spacing: 4) {
                 Text("\(viewModel.autoStartCountdown)")

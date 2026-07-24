@@ -1,155 +1,97 @@
-# ARCHITECTURE.md — System Architecture
+# ARCHITECTURE — Oak System Architecture
 
-## Architectural Pattern
+## Pattern: MVVM with @MainActor
 
-**MVVM** (Model-View-ViewModel) with `@MainActor` constraint on all UI-facing classes.
-
-- **Models**: Pure data structs/enums (`SessionModels.swift`, `ProgressData.swift`)
-- **Views**: SwiftUI `View` structs (`NotchCompanionView.swift`, sub-views)
-- **ViewModels**: `ObservableObject` classes (`FocusSessionViewModel.swift`)
-- **Services**: Business logic managers conforming to `ObservableObject` (`AudioManager`, `ProgressManager`, `NotificationService`, `PresetSettingsStore`)
-
-## Architecture Diagram
+Oak follows **Model-View-ViewModel (MVVM)** with all UI-layer types annotated `@MainActor` for thread safety.
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│  OakApp (SwiftUI @main)                                          │
-│  └── AppDelegate (NSApplicationDelegate)                         │
-│       ├── NotchWindowController (NSWindowController)             │
-│       │    ├── NotchWindow (NSPanel)                             │
-│       │    │    └── NSHostingView ─► NotchCompanionView (SwiftUI)│
-│       │    └── FocusSessionViewModel                             │
-│       ├── PresetSettingsStore                                    │
-│       ├── NotificationService                                    │
-│       └── SparkleUpdater                                         │
-│                                                                  │
-│  Settings Scene (SwiftUI Settings)                               │
-│   └── SettingsMenuView                                           │
-│        ├── PresetSettingsStore (shared)                          │
-│        ├── NotificationService (shared)                          │
-│        └── SparkleUpdater (shared)                               │
-└──────────────────────────────────────────────────────────────────┘
-
-Services (singletons shared via AppDelegate):
-┌──────────────┬───────────────────┬─────────────────┬──────────────┐
-│ AudioManager │ ProgressManager   │ PresetSettings │ Notification │
-│ (Observable) │ (Observable)      │ Store          │ Service      │
-│              │                   │ (Observable)   │ (Observable) │
-│ AVFoundation │ UserDefaults      │ UserDefaults   │ UserNotif.   │
-└──────────────┴───────────────────┴─────────────────┴──────────────┘
+┌─────────────────────────────────────────┐
+│                  Views                   │
+│  NotchCompanionView, SettingsMenuView,  │
+│  AudioMenuView, ProgressMenuView, etc.  │
+│         @ObservedObject / @State         │
+└──────────────┬──────────────────────────┘
+               │  binds to
+┌──────────────▼──────────────────────────┐
+│              ViewModels                  │
+│     FocusSessionViewModel (central)      │
+│   @Published state, session lifecycle    │
+└──────┬──────────────────┬───────────────┘
+       │                  │
+       │  owns            │  reads/writes
+┌──────▼──────┐    ┌──────▼──────────────┐
+│  Services   │    │  PresetSettingsStore │
+│             │    │  (ObservableObject)   │
+│ AudioManager│    │  UserDefaults-backed │
+│ ProgressMgr │    └─────────────────────┘
+│ Notification│
+│ Sparkle     │
+└──────┬──────┘
+       │
+┌──────▼──────────────────────────────────┐
+│              Models                      │
+│  SessionState (enum FSM), Preset (enum),│
+│  AudioTrack (enum), ProgressData, etc.  │
+└─────────────────────────────────────────┘
 ```
 
-## Layers
+## Entry Points
 
-### 1. App Entry Point
+| File | Role |
+| --- | --- |
+| `OakApp.swift` | SwiftUI `@main App` entry point, creates `AppDelegate` |
+| `AppDelegate` (in `OakApp.swift`) | `NSApplicationDelegate`, creates `FocusSessionViewModel` + `NotchWindowController` |
+| `NotchWindowController.swift` | Manages `NSPanel` window lifecycle (show, hide, position, always-on-top) |
 
-- **OakApp.swift**: `@main` SwiftUI `App` with `@NSApplicationDelegateAdaptor`
-- **AppDelegate**: Creates notch window, initializes services, manages lifecycle
-- Sets activation policy to `.accessory` (no dock icon, no menu bar)
+## Key Abstractions
 
-### 2. View Layer (SwiftUI)
+### Session State Machine
 
-- **NotchCompanionView**: Root notch UI, handles expand/collapse, delegates to sub-views
-- **Sub-views**: `AudioMenuView`, `ProgressMenuView`, `SettingsMenuView`, `ConfettiView`, `CircularProgressRing`
-- **Composition**: Extracted as fileprivate/extensions (`NotchCompanionView+Controls`, `NotchCompanionView+StandardViews`, `NotchCompanionView+InsideNotch`)
-
-### 3. ViewModel Layer
-
-- **FocusSessionViewModel**: Single ViewModel managing:
-  - Session state machine (`SessionState` enum: idle → running → paused → completed)
-  - Timer management (1-second `Timer` with `sessionEndDate` reference)
-  - Preset selection
-  - Auto-start countdown
-  - Round tracking for long breaks
-  - Session type strings ("Focus", "Break", "Long Break")
-
-### 4. Service Layer
-
-| Service | Responsibility | Pattern |
-| --- | --- | --- |
-| **AudioManager** | Play/stop/pause/resume bundled or generated audio | Protocol-based (`AudioEngineProtocol`), factory injection |
-| **ProgressManager** | Record/load/prune session history, calculate streaks | JSON in `UserDefaults`, 90-day retention |
-| **PresetSettingsStore** | Read/write all user-configurable settings | Clustered `@Published` properties, `UserDefaults` backing |
-| **NotificationService** | Request permission, send local notifications | Protocol-based (`SessionCompletionNotifying`) |
-| **SparkleUpdater** | Check/download/install app updates | SPUUpdaterDelegate, ObservableObject |
-
-### 5. Window Layer (AppKit)
-
-- **NotchWindowController**: Manages window lifecycle, frame positioning, screen bindings
-- **NotchWindow (NSPanel)**: Borderless, non-activating panel with `canJoinAllSpaces`
-- **Layout**: Top-center of target screen, below notch or inside notch depending on config
-
-## Design Patterns
-
-### Dependency Injection
-
-- Constructor injection for all ViewModels and Services
-- Factory closures for testability (e.g., `audioEngineFactory`, `currentDate`)
-- Protocol-based mocks (`AudioEngineProtocol`, `SessionCompletionNotifying`, `SessionCompletionSoundPlaying`)
-
-### State Management
-
-- **State machine**: `SessionState` enum with associated values (FSM for session lifecycle)
-- **Published properties**: `@Published var sessionState` drives UI updates
-- **Computed properties**: Derived state like `displayTime`, `canStart`, `canPause`, `isRunning`
-- **Combine bindings**: `.sink` on settings changes to update window position
-
-### Protocol-Oriented Design
+`SessionState` enum with associated values drives all UI:
 
 ```
-AudioEngineProtocol        → AudioEngineAdapter (production), MockAudioEngine (test)
-SessionCompletionNotifying → NotificationService (production), MockNotificationService (test)
-SessionCompletionSoundPlaying → SystemSessionCompletionSoundPlayer (production), MockSessionCompletionSoundPlayer (test)
+idle → running(remaining, isWork) → paused(remaining, isWork) → running → completed(isWork) → idle
+                                                                       ↓
+                                                              (auto-start countdown)
 ```
+
+### Protocol-Based DI
+
+ViewModels accept protocols, not concrete types:
+
+- `FocusSessionViewModel` takes `any SessionCompletionNotifying` and `any SessionCompletionSoundPlaying`
+- `AudioManager` takes `AudioEngineProtocol` for testability
+- `MockAudioManager`, `MockAudioEngine`, `MockNotificationService` in tests
+
+### Combine Reactivity
+
+- All services/ViewModels are `ObservableObject` with `@Published` properties
+- Views use `@ObservedObject` to subscribe
+- `PresetSettingsStore.objectWillChange` forwarded to `FocusSessionViewModel.objectWillChange` for cascading updates
 
 ## Data Flow
 
-### Session Start Flow
+1. User taps "Start" → `NotchCompanionView` calls `viewModel.startSession(using:)`
+2. ViewModel configures timer, sets `@Published sessionState = .running(...)`
+3. SwiftUI re-renders views observing `sessionState`
+4. On tick → `tick()` updates `currentRemainingSeconds`, publishes updated state
+5. Session completes → `completeSession()` records progress, sends notification, plays sound, updates state to `.completed`
+6. If auto-start enabled → 10s countdown → `startNextSession(isAutoStart: true)`
 
-```
-User taps play →
-  NotchCompanionView → FocusSessionViewModel.startSession()
-    → Updates sessionState to .running
-    → Creates Timer with 1s interval
-    → Tick updates remaining seconds via sessionEndDate
-    → UI reacts to @Published sessionState changes
-```
+## Window Management
 
-### Session Complete Flow
+- `NotchWindowController` creates a borderless `NSPanel` positioned at the top-center of the target display
+- Two display modes: **inside notch** (fills notch area) vs **below notch** (standard position)
+- `NotchVisualStyle.make(isInsideNotch:)` adapts colors, opacities, corner radius
+- Always-on-top controlled via `NSWindow.Level.floating` when enabled, `.statusBar` otherwise
+- Window persists across all Spaces and screens (`.canJoinAllSpaces`, `.stationary`) — does not auto-hide
 
-```
-Timer tick reaches 0 →
-  FocusSessionViewModel.completeSession()
-    → ProgressManager.recordSessionCompletion() (persist to UserDefaults)
-    → NotificationService.sendSessionCompletionNotification() (local push)
-    → AudioManager.stop()
-    → Play completion sound (NSSound.beep or system sound)
-    → Update sessionState to .completed(isWorkSession:)
-    → Show confetti animation (ConfettiView)
-    → If autoStartNextInterval: start 10s countdown → auto-start next session
-```
+## Layer Boundaries
 
-### Window Positioning Flow
-
-```
-PresetSettingsStore.displayTarget changes →
-  Combine .sink in NotchWindowController
-    → requestFrameUpdate(forceReposition: true)
-    → NSScreen resolution via screen(for:preferredDisplayID:)
-    → Frame computed (top-center, width based on expanded state)
-    → NSWindow.setFrame()
-```
-
-## Concurrency Model
-
-- **`@MainActor`** on all `ObservableObject` classes and their methods
-- Timer callbacks wrap in `Task { @MainActor in ... }` to ensure main-thread delivery
-- `[weak self]` in all escaping closures (timers, Combine sinks, notification callbacks)
-- `NoiseGenerator` marked `@unchecked Sendable` (used exclusively on audio thread, no cross-thread sharing)
-
-## Key Design Constraints
-
-- **Notch-only UI**: No menu bar icon, no dock icon (`.accessory` activation policy)
-- **No global shortcuts**: MVP constraint
-- **Offline-first**: Zero cloud dependencies
-- **Single ViewModel**: `FocusSessionViewModel` handles all session logic (not broken into multiple ViewModels)
+| Layer | Contains | Depends On |
+| --- | --- | --- |
+| Views | SwiftUI `View` structs | ViewModels, `@State`, `@ObservedObject` |
+| ViewModels | `FocusSessionViewModel` | Services, `PresetSettingsStore`, Models |
+| Services | `AudioManager`, `ProgressManager`, `NotificationService`, `SparkleUpdater` | System APIs, `UserDefaults` |
+| Models | Enums, structs, protocols | Foundation |
+| Extensions | `NSScreen+*`, `NotchVisualStyle` | AppKit, SwiftUI |

@@ -1,165 +1,100 @@
-# CONVENTIONS.md — Code Conventions & Patterns
+# CONVENTIONS — Oak Code Conventions
 
-## Swift & SwiftUI Conventions
+> Primary reference: `AGENTS.md` — the authoritative source for coding standards.
 
-### Access Control
+## Formatting
 
-- **Explicit `internal`** keyword on all declarations (enforced by `explicit_top_level_acl`)
-- Prefer `private` for state, `private(set)` for read-only published properties
-- Use `fileprivate` for view extraction within the same file
+| Rule             | Specification              |
+| ---------------- | -------------------------- |
+| Indent           | 4 spaces                   |
+| Line length      | Warn 120, Error 150        |
+| File length      | Warn 500 lines, Error 1000 |
+| Function body    | Warn 50 lines, Error 100   |
+| Trailing newline | Required                   |
+| Documentation    | `///` for public APIs      |
 
-### Naming
+## Module Structure
 
-- **Types**: PascalCase (`FocusSessionViewModel`, `NotchCompanionView`)
-- **Functions/Vars**: camelCase (`startSession()`, `displayTime`, `canStart`)
-- **Constants**: lowerCamelCase for instance, PascalCase for static (`let horizontalPadding`)
-- **Booleans**: `is`/`has`/`should` prefix (`isWorkSession`, `canStart`, `shouldUseLongBreak`)
-- **Protocols**: `*ing` suffix for capability protocols (`SessionCompletionNotifying`, `SessionCompletionSoundPlaying`)
-- **Enums**: Singular PascalCase for enum name, lowerCamelCase for cases (`SessionState.idle`, `Preset.short`)
+**Imports order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → `@testable import Oak`
 
-### Imports
-
-- **Order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → @testable import Oak
-- **Grouping**: `testable-bottom` (testable imports last in test files)
 - No blank lines between imports
-- One blank line between import block and type definitions
-- Unused imports removed (analyzer rule: `unused_import`)
+- One blank line between types
+- `testable-bottom` grouping (testable imports last)
+- Remove unused imports (analyzer rule: `unused_import`)
 
-### Formatting
+## Naming
 
-- **Indent**: 4 spaces
-- **Line length**: 120 warning, 150 error
-- **Wrapping**: `before-first` for arguments, parameters, collections
-- **Closing paren**: balanced
-- **Trailing commas**: enabled
-- **Semicolons**: never
+| Category | Convention | Example |
+| --- | --- | --- |
+| Types | PascalCase | `FocusSessionViewModel`, `SessionState` |
+| Functions/Vars | camelCase | `startSession(using:)`, `displayTime` |
+| Constants (instance) | lowerCamelCase | `controlSize`, `contentSpacing` |
+| Constants (static) | PascalCase | `PresetSettingsStore.minWorkMinutes` |
+| Booleans | is/has/should prefix | `isWorkSession`, `canStart`, `shouldUseLongBreak` |
+| Access | Explicit `internal` | `internal struct NotchCompanionView` |
+| Protocols (capability) | `*ing` suffix | `SessionCompletionNotifying`, `SessionCompletionSoundPlaying` |
+| Protocols (infrastructure) | `*Protocol` suffix | `AudioEngineProtocol` |
 
-## State Management Patterns
+## State Management
 
-### Session State Machine (FSM)
+- **`SessionState` enum with associated values** for the session FSM
+- Use `if case` for state checks (e.g., `if case .idle = sessionState`)
+- Computed properties for derived state (`displayTime`, `progressPercentage`, `canPause`)
+- `@Published private(set)` for read-only published state
+- `private` for internal state not published to views
 
-```
-idle → running → paused → running → completed → (auto-start) → running
-                   ↓                              ↓
-                running                        idle (if not auto-start)
-```
+## SwiftUI Patterns
 
-- Implemented as `SessionState` enum with associated values
-- State transitions validated via computed properties (`canStart`, `canPause`, `canResume`)
-- Use `if case` pattern matching for state inspection
+- `@MainActor` on all ViewModels and UI classes (CRITICAL for `ObservableObject`)
+- Extract views as computed properties (`var audioButton: some View`, `var compactView: some View`)
+- Use `any Protocol` for type-erasure in DI
+- `.buttonStyle(.plain)` on all custom-styled buttons
+- Accessibility identifiers on all interactive elements
 
-### Published Properties
+## Memory & Concurrency
 
-- `@Published` for all observable state that drives UI
-- `private(set)` on published properties that shouldn't be mutated externally
-- Computed properties for derived state (`displayTime`, `progressPercentage`)
-
-### Combine Bindings
-
-- `.sink` on `@Published` properties for reactive behavior
-- Store cancellables as private `AnyCancellable?`
-- `[weak self]` in all sink closures
-- Used for: display target changes, always-on-top toggles, preset settings propagation
-
-## Error Handling
-
-- **No throwing errors in ViewModels** — guard/early return pattern preferred
-- **Logging**: `os.log` (`Logger`) for production, SwiftLint warns on `print()`
-- **Optional handling**: `guard let` / `if let` over forced unwrapping
-- **No `try!`** in production code (test code may use `try! XCTUnwrap`)
-
-## Memory Management
-
-- `[weak self]` in ALL escaping closures:
-  - Timer callbacks
-  - Combine `.sink`
-  - `DispatchQueue.main.async`
-  - NotificationCenter observers
-- `invalidate()` timers in `deinit`
+- `[weak self]` in **all** escaping closures (verified: all 13 instances in codebase)
+- Always `invalidate()` timers in `deinit` (verified: all 5 `deinit` methods)
 - Wrap timer callbacks: `Task { @MainActor in self?.tick() }`
-- Clean up Combine subscriptions via `.cancel()` in `deinit`
+- `AnyCancellable` for Combine subscriptions
+- `@MainActor` on 59 declarations across the codebase (all UI/service types)
 
-## View Update Safety (Critical Pattern)
+## View Update Safety (CRITICAL)
 
 ```swift
-// ❌ WRONG — publishes from view update
+// ❌ Wrong — publishes from view update synchronously
 .onChange(of: value) { newValue in viewModel.update(newValue) }
 
-// ✅ CORRECT — async dispatch
+// ✅ Correct — async dispatch
 .onChange(of: value) { newValue in
     DispatchQueue.main.async { viewModel.update(newValue) }
 }
 ```
 
-## SwiftUI View Patterns
+## Error Handling
 
-### View Composition
+- Prefer `guard` / early returns over nested `if` statements
+- Use `os.log` for production logging (SwiftLint warns on `print()`)
+- `fatalError` only in required-but-unimplemented initializers (1 instance in `NotchWindowController.init(coder:)`)
 
-- Extract sub-views as `private var someView: some View` properties within the main view
-- Use separate files for complex extensions: `NotchCompanionView+Controls.swift`
-- Popover-based sub-menus: Audio, Progress, Settings
-- `ZStack` for overlay content (confetti animation on top of notch)
+## SwiftLint Rules (Opt-In)
 
-### Visual Design
+`explicit_init`, `explicit_top_level_acl`, `trailing_closure`, `first_where`, `toggle_bool`, `modifier_order`, `vertical_parameter_alignment_on_call`, `closure_spacing`, `empty_count`, `sorted_first_last`, `redundant_type_annotation`, `yoda_condition`, `unneeded_parentheses_in_closure_argument`
 
-- `RoundedRectangle(cornerRadius:style: .continuous)` for notch shape
-- `LinearGradient` with custom colors per visual style
-- `spring(response:dampingFraction:)` animation for state transitions
-- `scaleEffect` for completion bounce animation
-- Confetti animation on work session completion
+**Custom rules**:
 
-### State-Driven UI
+- `no_print_statements`: warns on `print()` — use `os.log` instead
 
-```swift
-@State private var showAudioMenu = false
-@State private var showConfetti = false
+## SwiftFormat Rules
 
-// Triggers
-.onChange(of: viewModel.isSessionComplete) { isComplete in ... }
-```
+- `indent 4`, `maxwidth 120`, `wraparguments before-first`
+- `self` removal, `isEmpty` enforcement
+- Blank lines between scopes, sorted imports
+- `trailingCommas`, `redundantSelf`, `redundantReturn`
+- Disabled: `andOperator`, `redundantType`, `redundantInternal`, `redundantPublic`
 
-## Protocol-Oriented Design
+## Commit Style
 
-```swift
-// Production protocol
-internal protocol AudioEngineProtocol {
-    var isRunning: Bool { get }
-    func setMixerVolume(_ volume: Float)
-    func start() throws
-    func stop()
-}
+`type(scope): description` — Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
 
-// Production implementation
-internal final class AudioEngineAdapter: AudioEngineProtocol { ... }
-
-// Mock implementation (test)
-internal final class MockAudioEngine: AudioEngineProtocol { ... }
-```
-
-- Use `any Protocol` syntax for protocol type-erasure
-- Factory closures enable DI for testing (`audioEngineFactory`, `currentDate`)
-
-## File Organization
-
-- **Models**: ≤ 1 major type per file
-- **Views**: 1 view per file (with fileprivate helper views allowed)
-- **Extensions**: One file per extended type per aspect
-- **Services**: 1 class per file
-- **Test files**: Mirror source structure with `Tests` suffix
-
-## Build Verification Sequence
-
-Per ADR-0002, the required verification sequence:
-
-1. `just format` (or `just format-check`)
-2. `swiftlint lint --strict --no-cache` (or `just lint`)
-3. `just test`
-
-## MVP Constraints (Do Not Violate)
-
-- Presets: only `25/5` and `50/10` (configurable durations in `PresetSettingsStore`)
-- Notch-only UI — no menu bar icon, no dock icon
-- No global keyboard shortcuts
-- Auto-start next interval: default OFF
-- Built-in audio only
-- No cloud sync
+Example: `fix(ui): add preset toggle to compact non-notch view with chevron indicator`

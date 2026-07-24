@@ -2,6 +2,27 @@ import SwiftUI
 
 /// Control buttons for the notch companion view (audio, progress, settings, expand, preset selector)
 internal extension NotchCompanionView {
+    var presetToggleButton: some View {
+        Button(
+            action: {
+                presetSelection = presetSelection == .short ? .long : .short
+            },
+            label: {
+                HStack(spacing: 2) {
+                    Text(presetLabel(for: presetSelection))
+                        .font(.system(size: 9, weight: .semibold))
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 6, weight: .semibold))
+                }
+                .foregroundColor(.white.opacity(0.68))
+            }
+        )
+        .buttonStyle(.plain)
+        .accessibilityLabel("Toggle preset: \(presetLabel(for: presetSelection))")
+        .accessibilityHint("Switches between short and long presets")
+        .accessibilityIdentifier("presetToggleButton")
+    }
+
     var audioButton: some View {
         Button(
             action: { showAudioMenu.toggle() },
