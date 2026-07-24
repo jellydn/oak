@@ -10,14 +10,14 @@
 - **Workaround**: None — requires full Xcode installation
 - **File**: `.swiftlint.yml`
 
-### 2. Pre-Existing Format Issues
+### 2. Pre-Existing Format Issues — RESOLVED
 
-Two files fail `just format-check` due to `wrapIfStatementBodies` violations:
+Two files previously failed `just format-check` due to `wrapIfStatementBodies` violations:
 
-- `Oak/Oak/ViewModels/FocusSessionViewModel.swift` — 12 violations
-- `Oak/Tests/OakTests/AudioManagerTests.swift` — 2 violations
+- `Oak/Oak/ViewModels/FocusSessionViewModel.swift` — 12 violations (fixed in v0.5.34)
+- `Oak/Tests/OakTests/AudioManagerTests.swift` — 2 violations (fixed in v0.5.34)
 
-These block git commits when pre-commit hooks are enabled.
+Format-check now passes with 0 violations.
 
 ### 3. Building Requires Full Xcode
 
