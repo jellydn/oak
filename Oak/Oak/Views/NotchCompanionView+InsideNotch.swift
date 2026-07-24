@@ -170,9 +170,13 @@ internal extension NotchCompanionView {
                     presetSelection = presetSelection == .short ? .long : .short
                 },
                 label: {
-                    Text(presetLabel(for: presetSelection))
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.68))
+                    HStack(spacing: 2) {
+                        Text(presetLabel(for: presetSelection))
+                            .font(.system(size: 9, weight: .semibold))
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.system(size: 6, weight: .semibold))
+                    }
+                    .foregroundColor(.white.opacity(0.68))
                 }
             )
             .buttonStyle(.plain)
