@@ -4,10 +4,7 @@ internal extension NotchCompanionView {
     var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {
-                Text(presetLabel(for: presetSelection))
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.62))
-                    .accessibilityHidden(true)
+                presetToggleButton
                 Button(
                     action: { viewModel.startSession(using: presetSelection) },
                     label: {

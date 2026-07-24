@@ -1,86 +1,60 @@
-# STACK.md — Oak Technology Stack
+# STACK — Oak Technology Stack
 
 ## Language & Runtime
 
-- **Language**: Swift 5.9+ (conforms to Swift 6 concurrency model via `@MainActor` annotations)
-- **Runtime**: Native macOS app, compiled via Xcode with Apple Silicon target
-- **Swift version config**: `--swiftversion 6.2` in `.swiftformat`
+- **Language**: Swift 5.9+ (targeting Swift 6.2 in `.swiftformat`)
+- **Platform**: macOS 13+ (Ventura minimum deployment target)
+- **Architecture**: Apple Silicon (arm64), Intel (x86_64) supported
 
-## Platform
+## UI Framework
 
-- **OS**: macOS 13+ (Ventura minimum)
-- **Architecture**: Apple Silicon (M1+) native; Intel not officially supported
-- **UI Framework**: SwiftUI (App lifecycle via `@main` SwiftUI `App` protocol)
-- **Window System**: AppKit (`NSPanel`, `NSWindowController`, `NSApplicationDelegate`)
+- **SwiftUI** — All views are SwiftUI-based (`NotchCompanionView`, `SettingsMenuView`, `AudioMenuView`, etc.)
+- **AppKit** — Used for window management (`NotchWindowController` using `NSPanel`), `NSSound.beep()`, `NSApplication.shared`
+- **Combine** — Reactive state propagation (`@Published`, `ObservableObject`, `AnyCancellable`)
 
-## Core Frameworks
+## Key Frameworks
 
-| Framework | Usage |
-| --- | --- |
-| **SwiftUI** | All UI views, settings scene, popover support |
-| **AppKit** | Window management (`NSPanel`), application lifecycle, `NSScreen`, `NSHostingView` |
-| **AVFoundation** | Audio playback via `AVAudioPlayer` and `AVAudioEngine` |
-| **Combine** | Reactive bindings (`@Published`, `.sink`, `AnyCancellable`) |
-| **UserNotifications** | Session completion notifications |
-| **CoreGraphics** | Display ID management (`CGDirectDisplayID`) |
-| **os** | Structured logging (`Logger`) |
-
-## External Dependencies
-
-| Package     | Version | Purpose                               |
-| ----------- | ------- | ------------------------------------- |
-| **Sparkle** | 2.6.4+  | Auto-update framework (appcast-based) |
-
-Managed via XcodeGen (`project.yml`) with Swift Package Manager integration.
+| Framework           | Usage                                                                    |
+| ------------------- | ------------------------------------------------------------------------ |
+| `AVFoundation`      | Audio playback engine (`AudioEngineAdapter`, `AudioEngineProtocol`)      |
+| `CoreGraphics`      | Display IDs (`CGDirectDisplayID`, `CGMainDisplayID`) for notch detection |
+| `UserNotifications` | Local notification delivery (`NotificationService`)                      |
 
 ## Build System
 
-- **Project generation**: XcodeGen (`project.yml`)
-- **Build tool**: `xcodebuild` CLI via `just` recipes
-- **Task runner**: `just` (see `justfile`)
-- **Xcode version**: 17.0 (specified in `project.yml`)
+- **XcodeGen** (`project.yml`) — Project file generation from declarative spec
+- **xcodebuild** — Build and test via `just build`, `just test`
+- **just** — Task runner (`justfile`) for build, test, lint, format, dev workflows
 
-## Code Quality Tooling
+## Dependencies
 
-### Linting — SwiftLint
-
-- Config: `.swiftlint.yml`
-- Mode: `--strict` (all violations treated as errors)
-- Opt-in rules include: `explicit_init`, `explicit_top_level_acl`, `trailing_closure`, `first_where`, `toggle_bool`, `modifier_order`, `vertical_parameter_alignment_on_call`, `closure_spacing`, `empty_count`, `sorted_first_last`, `redundant_type_annotation`, `yoda_condition`, `unneeded_parentheses_in_closure_argument`
-- Analyzer rules: `explicit_self`, `unused_import`
-- Disabled: `todo`, `trailing_whitespace`
-- Custom rule: `no_print_statements` (warns on `print()`)
-
-### Formatting — SwiftFormat
-
-- Config: `.swiftformat`
-- Indent: 4 spaces
-- Max width: 120
-- Wrapping: `before-first` for arguments, parameters, collections
-- Self: `remove`
-- Imports: `testable-bottom` grouping
+| Dependency | Version | Purpose |
+| --- | --- | --- |
+| [Sparkle](https://sparkle-project.org/) | ~2.9 | Automatic app updates (`SparkleUpdater`, `SPUUpdaterDelegate`) |
+| SwiftLint | — | Linting (`.swiftlint.yml`) |
+| SwiftFormat | — | Code formatting (`.swiftformat`) |
 
 ## Configuration Files
 
 | File | Purpose |
 | --- | --- |
-| `Oak/project.yml` | XcodeGen project definition (targets, dependencies, version) |
-| `Oak/Oak/Info.plist` | App bundle metadata, launch config |
-| `Oak/Oak/Oak.entitlements` | Sandbox entitlements |
-| `.swiftlint.yml` | Lint rules and exclusions |
-| `.swiftformat` | Formatting rules |
-| `justfile` | Task automation recipes |
-| `Oak/Oak.xcodeproj/xcshareddata/xcschemes/Oak.xcscheme` | Xcode scheme (test targets, build config) |
+| `project.yml` | XcodeGen project spec (targets, settings, plist keys) |
+| `Oak/Oak/Info.plist` | App bundle metadata |
+| `Oak/Oak/Oak.entitlements` | App sandbox & capabilities |
+| `.swiftlint.yml` | Lint rules (opt-in rules, line length 120/150, file length 500/1000) |
+| `.swiftformat` | Format rules (indent 4, maxwidth 120, wrap before-first) |
+| `justfile` | Task definitions (build, test, lint, format, dev, release) |
+| `prek.toml` | Pre-commit hook configuration |
+| `renovate.json` | Dependency update automation |
 
-## Versioning
+## Bundled Assets
 
-- **Marketing version**: From latest `git` tag matching `v*` (e.g., `0.5.29`)
-- **Build number**: Git commit count via `git rev-list --count HEAD`
-- **Bundle identifier**: `com.productsway.oak.app`
+- **Ambient sounds** (`.m4a`): `ambient_forest.m4a`, `ambient_cafe.m4a`, `ambient_brown_noise.m4a`, `ambient_lofi.m4a`, `ambient_rain.m4a`
+- **App icon**: `Assets.xcassets/AppIcon.appiconset/`
+- **Noise generation**: Programmatic fallback via `NoiseGenerator` when bundled files unavailable
 
-## Persistence
+## CI/CD
 
-- **Storage**: `UserDefaults` (no Core Data, no SQLite)
-- **Purpose**: Session history (`ProgressData`), preset settings (`PresetSettingsStore`), audio track preferences
-- **Retention**: 90-day window for session records
-- **Format**: JSON-encoded `ProgressData` array under key `progressHistory`
+- **GitHub Actions**: `.github/workflows/ci.yml` (CI), `release.yml` (release), `update-appcast.yml` (Sparkle appcast), `deploy-pages.yml` (docs site), `auto-release.yml`
+- **Homebrew Cask**: `Casks/oak.rb` for distribution
+- **Release assets**: `scripts/release/build-release-assets.sh`
