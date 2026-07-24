@@ -60,22 +60,30 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var canStart: Bool {
-        if case .idle = sessionState { return true }
+        if case .idle = sessionState {
+            return true
+        }
         return false
     }
 
     var canStartNext: Bool {
-        if case .completed = sessionState { return true }
+        if case .completed = sessionState {
+            return true
+        }
         return false
     }
 
     var canPause: Bool {
-        if case .running = sessionState { return true }
+        if case .running = sessionState {
+            return true
+        }
         return false
     }
 
     var canResume: Bool {
-        if case .paused = sessionState { return true }
+        if case .paused = sessionState {
+            return true
+        }
         return false
     }
 
@@ -119,12 +127,16 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var isPaused: Bool {
-        if case .paused = sessionState { return true }
+        if case .paused = sessionState {
+            return true
+        }
         return false
     }
 
     var isRunning: Bool {
-        if case .running = sessionState { return true }
+        if case .running = sessionState {
+            return true
+        }
         return false
     }
 

@@ -34,7 +34,9 @@ internal final class MockAudioEngine: AudioEngineProtocol {
     }
 
     func start() throws {
-        if let error = startError { throw error }
+        if let error = startError {
+            throw error
+        }
         isRunning = true
         startCalled = true
     }
