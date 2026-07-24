@@ -1,72 +1,56 @@
-# INTEGRATIONS.md — External Integrations
+# INTEGRATIONS — Oak External Integrations
 
-## Third-Party Services
+## External Services
 
-### None
+Oak is a **local-first macOS app** with minimal external dependencies. No cloud sync, no remote APIs, no databases.
 
-Oak has **zero** cloud dependencies. The app operates entirely offline with no:
+| Service | Purpose | Details |
+| --- | --- | --- |
+| [Sparkle](https://sparkle-project.org/) | App updates | Check for new versions, download, and install updates. Configured via `SparkleUpdater.swift` using `SPUUpdaterDelegate`. Appcast hosted at `appcast.xml`. |
+| GitHub Releases | Distribution | Release assets built via `scripts/release/build-release-assets.sh`, published to GitHub Releases, referenced by Sparkle appcast |
+| Homebrew | Distribution | `Casks/oak.rb` — Homebrew cask formula for `brew install` |
+| GitHub Pages | Documentation | Static docs site at `docs/index.html` deployed via `deploy-pages.yml` |
 
-- Account creation
-- Cloud sync
-- API calls
-- Telemetry/analytics
-- Crash reporting
+## System Integrations
 
-This is by design per the MVP constraints (FR-14).
+| Integration | File | Purpose |
+| --- | --- | --- |
+| User Notifications | `NotificationService.swift` | Local notifications on session/break completion via `UNUserNotificationCenter` |
+| NSSound | `FocusSessionViewModel.swift` | System beep for session completion (`NSSound.beep()`) |
+| NSScreen | `NSScreen+UUID.swift`, `NSScreen+DisplayTarget.swift` | Display detection, notch detection, screen identification |
+| AVFoundation | `AudioManager.swift` | Audio playback for ambient sounds, noise generation |
 
-## External Systems
+## Protocol Contracts
 
-### Sparkle Auto-Update Framework
+```swift
+// DI for session completion notifications
+internal protocol SessionCompletionNotifying {
+    func sendSessionCompletionNotification(isWorkSession: Bool)
+}
 
-- **Package**: `sparkle-project/Sparkle` 2.6.4+
-- **Purpose**: Automatic application updates
-- **Configuration**: Public EdDSA key in `SPARKLE_PUBLIC_ED_KEY` in `project.yml`
-- **Update feed**: Appcast XML at `appcast.xml` (root of repo)
-- **Behavior**:
-  - Checks for updates on launch (configurable interval)
-  - Automatic download optional (default: off)
-  - Manual check available via Settings
-- **Deployment**: CI pipeline (`release.yml`) generates appcast + Homebrew cask updates
+// DI for completion sound
+internal protocol SessionCompletionSoundPlaying {
+    func playCompletionSound()
+}
 
-### macOS System Services
+// DI for audio engine (testability)
+internal protocol AudioEngineProtocol {
+    var isRunning: Bool { get }
+    func setMixerVolume(_ volume: Float)
+    func attachAndConnect(_ node: AVAudioNode)
+    func detach(_ node: AVAudioNode)
+    func prepare()
+    func start() throws
+    func stop()
+    func pause()
+}
+```
 
-| Service               | Usage                                                 |
-| --------------------- | ----------------------------------------------------- |
-| **UserNotifications** | Local notifications for session completion            |
-| **AVFoundation**      | Audio playback and generation                         |
-| **CoreGraphics**      | Display identification (`CGMainDisplayID`)            |
-| **NSScreen**          | Screen detection, notch detection, window positioning |
+## No Integrations
 
-## Notifications
-
-- **Framework**: `UserNotifications` (local only)
-- **Authorization**: Requested on user action from Settings view
-- **Content**:
-  - Work completion: "Focus Session Complete!" / "Great work! Time for a break."
-  - Break completion: "Break Complete!" / "Ready to focus again?"
-- **Sound**: `.default` notification sound
-- **Status**: Tracked via `@Published private(set) var isAuthorized: Bool`
-
-## Audio System
-
-- **Bundled tracks**: 5 ambient `.m4a` files in `Oak/Oak/Resources/Sounds/`
-- **Generated tracks**: Procedural noise via `AVAudioSourceNode` for all tracks (fallback)
-- **Sources**: Pixabay under Pixabay Content License (attributed in `DEVELOPMENT.md`)
-
-## App Store / Distribution
-
-- **Distribution channel**: Homebrew cask (`Casks/oak.rb`)
-- **Signing**: Not yet Apple Developer signed (security warning noted in README)
-- **CI/CD**: GitHub Actions workflows for release, auto-release, appcast update, Pages deployment
-
-## No Database
-
-- No Core Data, SQLite, or any database system
-- All persistence via `UserDefaults` (JSON-encoded arrays)
-- 90-day retention policy with automatic pruning
-
-## No Authentication
-
-- No auth providers (OAuth, Apple ID, etc.)
-- No user accounts
-- No API keys or secrets (except Sparkle EdDSA key for appcast verification)
+- ❌ No analytics / telemetry
+- ❌ No cloud sync or backend API
+- ❌ No third-party authentication
+- ❌ No payment processing
+- ❌ No crash reporting service
+- ❌ No remote config / feature flags
