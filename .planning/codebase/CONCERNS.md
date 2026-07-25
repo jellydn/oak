@@ -1,70 +1,45 @@
-# CONCERNS — Oak Technical Concerns
+# CONCERNS.md — Technical Debt & Areas of Concern
 
-## Known Issues
+## File Size & Complexity
 
-### 1. SwiftLint Crashes Without Full Xcode
+| Concern | Severity | Detail |
+| --- | --- | --- |
+| **FocusSessionViewModel.swift (415 lines)** | Medium | Largest file in the codebase. Handles session FSM, timer management, auto-start countdown, audio coordination, progress recording, and notification triggering. Could benefit from extraction of timer/countdown logic into a separate service. |
+| **AudioManager.swift (374 lines)** | Low | Mixes bundled audio playback, procedural noise generation, and audio engine lifecycle. `NoiseGenerator` is in the same file. |
+| **SettingsMenuView.swift (334 lines)** | Low | Comprehensive settings view with many sections. Already well-structured with separate sub-views but remains a large file. |
 
-`SourceKittenFramework/library_wrapper.swift:58: Fatal error: Loading sourcekitdInProc.framework failed`
+## Architectural Observations
 
-- **Impact**: Lint checks fail in CI or dev environments without full Xcode
-- **Workaround**: None — requires full Xcode installation
-- **File**: `.swiftlint.yml`
+| Concern | Severity | Detail |
+| --- | --- | --- |
+| **Single ViewModel** | Low | Only `FocusSessionViewModel` exists in `ViewModels/`. As features grow, extracting specialized ViewModels (e.g., `SettingsViewModel`, `ProgressViewModel`) would improve separation. |
+| **NoiseGenerator on Audio Thread** | Low | `NoiseGenerator` is marked `@unchecked Sendable` and runs on the audio render thread. State mutation is careful but the `@unchecked` Sendable conformance bypasses compiler safety checks. |
+| **Timer callbacks use Task { @MainActor }** | Info | This is the established pattern but adds an extra async hop per tick. Consider using `Timer.publish(every:on:in:)` with Combine for direct main-thread delivery. |
 
-### 2. Pre-Existing Format Issues — RESOLVED
+## Testing
 
-Two files previously failed `just format-check` due to `wrapIfStatementBodies` violations:
+| Concern | Severity | Detail |
+| --- | --- | --- |
+| **Some test files are thin** | Low | `ConfettiViewTests.swift` (16 lines), `ClickOutsideModifierTests.swift` (23 lines), and `SmokeTests.swift` (7 lines) have minimal test coverage. Other previously-thin files (`SparkleUpdaterTests` at 85 lines, `AppcastVersionParserTests` at 86 lines, `NSScreenNotchTests` at 167 lines) have been filled out. |
+| **No UI/integration tests** | Low | All tests are unit tests. No automated UI testing for notch positioning, window behavior, or visual states. |
 
-- `Oak/Oak/ViewModels/FocusSessionViewModel.swift` — 12 violations (fixed in v0.5.34)
-- `Oak/Tests/OakTests/AudioManagerTests.swift` — 2 violations (fixed in v0.5.34)
+## Code Style
 
-Format-check now passes with 0 violations.
+| Concern | Detail |
+| --- | --- |
+| Pre-existing format issues were resolved in a prior commit (`docs: mark pre-existing format issues as resolved in CONCERNS.md`). No known format violations remain. | — |
 
-### 3. Building Requires Full Xcode
+## Potential Improvements
 
-`xcodebuild` (used by all `just` commands: build, test, check, etc.) requires a full Xcode installation. Command Line Tools are insufficient.
+1. **Extract timer service**: Move timer/countdown logic from `FocusSessionViewModel` into a dedicated `SessionTimerService` to reduce ViewModel size.
+2. **Extract NoiseGenerator**: Move `NoiseGenerator` to its own file under `Services/`.
+3. **Add UI snapshot tests**: Use SwiftUI previews or snapshot testing for notch layout variants (inside-notch, below-notch, collapsed, expanded).
+4. **Consider `Timer.publish`**: Replace `Timer.scheduledTimer` with Combine's `Timer.publish` for direct main-thread timer delivery.
+5. **Expand remaining thin test files**: Add meaningful assertions to `ConfettiViewTests` (16 lines), `ClickOutsideModifierTests` (23 lines), and `SmokeTests` (7 lines).
 
-- **Impact**: Cannot build, test, or typecheck from terminal environments with only Command Line Tools
-- **Workaround**: Open in Xcode IDE and build from there
+## None Detected
 
-## Code Quality
-
-### Positive
-
-- ✅ All 13 `weak self` usages are correctly applied in escaping closures
-- ✅ All 5 `deinit` methods properly invalidate timers
-- ✅ `@MainActor` consistently applied across 59 UI/service declarations
-- ✅ Protocol-based DI enables clean test mocking
-- ✅ UserDefaults isolated per test with unique suite names
-- ✅ No `print()` statements found (logged via `os.log` or removed)
-- ✅ No TODO, FIXME, HACK, or XXX comments in source code
-- ✅ `fatalError` only in 1 standard location (`init(coder:)` in `NotchWindowController`)
-
-### Watch Points
-
-- **Single large ViewModel**: `FocusSessionViewModel.swift` at 417 lines is the most complex file. Could benefit from extraction of session completion logic or auto-start countdown into separate types.
-- **View extensions**: `NotchCompanionView` has 3 extension files (`+Controls`, `+StandardViews`, `+InsideNotch`) plus the main view file. Monitor for further fragmentation.
-- **PresetSettingsStore**: 16 `@Published` properties with 311 lines — consider grouping related settings into sub-types if this grows further.
-
-## Security
-
-- App is sandboxed (`Oak.entitlements`)
-- No network requests except Sparkle updates (HTTPS appcast)
-- No user data collection or telemetry
-- UserDefaults for local-only storage — no PII or secrets stored
-
-## Performance
-
-- Ambient audio uses `AVAudioEngine` with standby for smooth playback
-- Noise generation (`NoiseGenerator`) is computationally light (per-sample math)
-- Timer-based countdown at 1s intervals — low overhead
-- No known memory leaks (all Combine subscriptions properly managed with `AnyCancellable` + `deinit`)
-
-## MVP Constraints (Enforced)
-
-| Constraint                             | Status |
-| -------------------------------------- | ------ |
-| Presets: 25/5 and 50/10 (configurable) | ✅     |
-| Notch-only UI, no menu bar fallback    | ✅     |
-| No global keyboard shortcuts           | ✅     |
-| Auto-start next: OFF by default        | ✅     |
-| Built-in audio only, no cloud sync     | ✅     |
+- **Security vulnerabilities**: No known security issues. App is sandbox-eligible with only `network.client` entitlement.
+- **Performance regressions**: No identified performance issues.
+- **Memory leaks**: Timer and Combine cleanup patterns appear correct with `invalidate()` and `cancel()` in `deinit`.
+- **Breakage risk**: No fragile areas identified beyond the single large ViewModel file.
