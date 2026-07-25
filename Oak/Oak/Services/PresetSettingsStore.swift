@@ -4,12 +4,7 @@ import SwiftUI
 
 @MainActor
 internal final class PresetSettingsStore: ObservableObject {
-    static let minWorkMinutes = 1
-    static let maxWorkMinutes = 180
-    static let minBreakMinutes = 1
-    static let maxBreakMinutes = 90
-    static let minRoundsBeforeLongBreak = 2
-    static let maxRoundsBeforeLongBreak = 12
+    // MARK: - Published properties (public API unchanged)
 
     @Published private(set) var shortWorkMinutes: Int
     @Published private(set) var shortBreakMinutes: Int
@@ -30,152 +25,200 @@ internal final class PresetSettingsStore: ObservableObject {
 
     private let userDefaults: UserDefaults
 
-    private enum Keys {
-        static let shortWorkMinutes = "preset.short.workMinutes"
-        static let shortBreakMinutes = "preset.short.breakMinutes"
-        static let shortLongBreakMinutes = "preset.short.longBreakMinutes"
-        static let longWorkMinutes = "preset.long.workMinutes"
-        static let longBreakMinutes = "preset.long.breakMinutes"
-        static let longLongBreakMinutes = "preset.long.longBreakMinutes"
-        static let roundsBeforeLongBreak = "session.roundsBeforeLongBreak"
-        static let displayTarget = "display.target"
-        static let mainDisplayID = "display.main.id"
-        static let notchedDisplayID = "display.notched.id"
-        static let playSoundOnSessionCompletion = "session.completion.playSound"
-        static let playSoundOnBreakCompletion = "session.completion.playSound.break"
-        static let countdownDisplayMode = "countdown.displayMode"
-        static let alwaysOnTop = "window.alwaysOnTop"
-        static let showBelowNotch = "window.showBelowNotch"
-        static let autoStartNextInterval = "session.autoStartNextInterval"
-    }
+    // MARK: - Static validation constants (delegated)
+
+    static let minWorkMinutes = SessionDurationConfig.minWorkMinutes
+    static let maxWorkMinutes = SessionDurationConfig.maxWorkMinutes
+    static let minBreakMinutes = SessionDurationConfig.minBreakMinutes
+    static let maxBreakMinutes = SessionDurationConfig.maxBreakMinutes
+    static let minRoundsBeforeLongBreak = SessionDurationConfig.minRoundsBeforeLongBreak
+    static let maxRoundsBeforeLongBreak = SessionDurationConfig.maxRoundsBeforeLongBreak
+
+    // MARK: - Init
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
 
-        let defaults: [String: Any] = [
-            Keys.shortWorkMinutes: Preset.short.defaultWorkMinutes,
-            Keys.shortBreakMinutes: Preset.short.defaultBreakMinutes,
-            Keys.shortLongBreakMinutes: Preset.short.defaultLongBreakMinutes,
-            Keys.longWorkMinutes: Preset.long.defaultWorkMinutes,
-            Keys.longBreakMinutes: Preset.long.defaultBreakMinutes,
-            Keys.longLongBreakMinutes: Preset.long.defaultLongBreakMinutes,
-            Keys.roundsBeforeLongBreak: 4,
-            Keys.displayTarget: DisplayTarget.mainDisplay.rawValue,
-            Keys.playSoundOnSessionCompletion: true,
-            Keys.playSoundOnBreakCompletion: true,
-            Keys.countdownDisplayMode: CountdownDisplayMode.number.rawValue,
-            Keys.alwaysOnTop: true,
-            Keys.showBelowNotch: false,
-            Keys.autoStartNextInterval: false
-        ]
-        userDefaults.register(defaults: defaults)
+        SessionDurationConfig.registerDefaults(in: userDefaults)
+        DisplayConfig.registerDefaults(in: userDefaults)
+        BehaviorConfig.registerDefaults(in: userDefaults)
 
-        shortWorkMinutes = Self.validatedWorkMinutes(userDefaults.integer(forKey: Keys.shortWorkMinutes))
-        shortBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.shortBreakMinutes))
-        shortLongBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.shortLongBreakMinutes))
-        longWorkMinutes = Self.validatedWorkMinutes(userDefaults.integer(forKey: Keys.longWorkMinutes))
-        longBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.longBreakMinutes))
-        longLongBreakMinutes = Self.validatedBreakMinutes(userDefaults.integer(forKey: Keys.longLongBreakMinutes))
-        roundsBeforeLongBreak = Self.validatedRoundsBeforeLongBreak(
-            userDefaults.integer(forKey: Keys.roundsBeforeLongBreak)
-        )
-        let rawDisplayTarget = userDefaults.string(forKey: Keys.displayTarget) ?? DisplayTarget.mainDisplay.rawValue
-        displayTarget = DisplayTarget(rawValue: rawDisplayTarget) ?? .mainDisplay
-        mainDisplayID = (userDefaults.object(forKey: Keys.mainDisplayID) as? NSNumber)?.uint32Value
-        notchedDisplayID = (userDefaults.object(forKey: Keys.notchedDisplayID) as? NSNumber)?.uint32Value
-        playSoundOnSessionCompletion = userDefaults.bool(forKey: Keys.playSoundOnSessionCompletion)
-        playSoundOnBreakCompletion = userDefaults.bool(forKey: Keys.playSoundOnBreakCompletion)
-        let rawCountdownMode = userDefaults.string(forKey: Keys.countdownDisplayMode)
-            ?? CountdownDisplayMode.number.rawValue
-        countdownDisplayMode = CountdownDisplayMode(rawValue: rawCountdownMode) ?? .number
-        alwaysOnTop = userDefaults.bool(forKey: Keys.alwaysOnTop)
-        showBelowNotch = userDefaults.bool(forKey: Keys.showBelowNotch)
-        autoStartNextInterval = userDefaults.bool(forKey: Keys.autoStartNextInterval)
+        let duration = SessionDurationConfig.read(from: userDefaults)
+        shortWorkMinutes = duration.shortWork
+        shortBreakMinutes = duration.shortBreak
+        shortLongBreakMinutes = duration.shortLongBreak
+        longWorkMinutes = duration.longWork
+        longBreakMinutes = duration.longBreak
+        longLongBreakMinutes = duration.longLongBreak
+        roundsBeforeLongBreak = duration.roundsBeforeLong
+
+        let display = DisplayConfig.read(from: userDefaults)
+        displayTarget = display.target
+        mainDisplayID = display.mainID
+        notchedDisplayID = display.notchedID
+        countdownDisplayMode = display.countdownMode
+        alwaysOnTop = display.isAlwaysOnTop
+        showBelowNotch = display.isBelowNotch
+
+        let behavior = BehaviorConfig.read(from: userDefaults)
+        playSoundOnSessionCompletion = behavior.playSoundOnSession
+        playSoundOnBreakCompletion = behavior.playSoundOnBreak
+        autoStartNextInterval = behavior.autoStartNext
+
         ensureDisplayIDsInitialized()
     }
 
+    // MARK: - Convenience (delegated to SessionDurationConfig)
+
     func workDuration(for preset: Preset) -> Int {
-        workMinutes(for: preset) * 60
+        currentDuration().workDuration(for: preset)
     }
 
     func breakDuration(for preset: Preset) -> Int {
-        breakMinutes(for: preset) * 60
+        currentDuration().breakDuration(for: preset)
     }
 
     func longBreakDuration(for preset: Preset) -> Int {
-        longBreakMinutes(for: preset) * 60
+        currentDuration().longBreakDuration(for: preset)
     }
 
     func displayName(for preset: Preset) -> String {
-        "\(workMinutes(for: preset))/\(breakMinutes(for: preset))"
+        currentDuration().displayName(for: preset)
     }
 
     func workMinutes(for preset: Preset) -> Int {
-        switch preset {
-        case .short: shortWorkMinutes
-        case .long: longWorkMinutes
-        }
+        currentDuration().workMinutes(for: preset)
     }
 
     func breakMinutes(for preset: Preset) -> Int {
-        switch preset {
-        case .short: shortBreakMinutes
-        case .long: longBreakMinutes
-        }
+        currentDuration().breakMinutes(for: preset)
     }
 
     func longBreakMinutes(for preset: Preset) -> Int {
-        switch preset {
-        case .short: shortLongBreakMinutes
-        case .long: longLongBreakMinutes
-        }
+        currentDuration().longBreakMinutes(for: preset)
     }
 
-    func setWorkMinutes(_ minutes: Int, for preset: Preset) {
-        let value = Self.validatedWorkMinutes(minutes)
+    // MARK: - Set work/break/long-break (delegated)
 
+    func setWorkMinutes(_ minutes: Int, for preset: Preset) {
+        let value = SessionDurationConfig.validatedWork(minutes)
+        SessionDurationConfig.saveWorkMinutes(value, for: preset, to: userDefaults)
         switch preset {
-        case .short:
-            shortWorkMinutes = value
-            userDefaults.set(value, forKey: Keys.shortWorkMinutes)
-        case .long:
-            longWorkMinutes = value
-            userDefaults.set(value, forKey: Keys.longWorkMinutes)
+        case .short: shortWorkMinutes = value
+        case .long: longWorkMinutes = value
         }
     }
 
     func setBreakMinutes(_ minutes: Int, for preset: Preset) {
-        let value = Self.validatedBreakMinutes(minutes)
-
+        let value = SessionDurationConfig.validatedBreak(minutes)
+        SessionDurationConfig.saveBreakMinutes(value, for: preset, to: userDefaults)
         switch preset {
-        case .short:
-            shortBreakMinutes = value
-            userDefaults.set(value, forKey: Keys.shortBreakMinutes)
-        case .long:
-            longBreakMinutes = value
-            userDefaults.set(value, forKey: Keys.longBreakMinutes)
+        case .short: shortBreakMinutes = value
+        case .long: longBreakMinutes = value
         }
     }
 
     func setLongBreakMinutes(_ minutes: Int, for preset: Preset) {
-        let value = Self.validatedBreakMinutes(minutes)
-
+        let value = SessionDurationConfig.validatedBreak(minutes)
+        SessionDurationConfig.saveLongBreakMinutes(value, for: preset, to: userDefaults)
         switch preset {
-        case .short:
-            shortLongBreakMinutes = value
-            userDefaults.set(value, forKey: Keys.shortLongBreakMinutes)
-        case .long:
-            longLongBreakMinutes = value
-            userDefaults.set(value, forKey: Keys.longLongBreakMinutes)
+        case .short: shortLongBreakMinutes = value
+        case .long: longLongBreakMinutes = value
         }
     }
 
     func setRoundsBeforeLongBreak(_ rounds: Int) {
-        let value = Self.validatedRoundsBeforeLongBreak(rounds)
+        let value = SessionDurationConfig.validatedRounds(rounds)
         guard roundsBeforeLongBreak != value else { return }
         roundsBeforeLongBreak = value
-        userDefaults.set(value, forKey: Keys.roundsBeforeLongBreak)
+        SessionDurationConfig.saveRoundsBeforeLongBreak(value, to: userDefaults)
     }
+
+    // MARK: - Display setters (delegated)
+
+    func setCountdownDisplayMode(_ mode: CountdownDisplayMode) {
+        guard countdownDisplayMode != mode else { return }
+        countdownDisplayMode = mode
+        DisplayConfig.saveCountdownMode(mode, to: userDefaults)
+    }
+
+    func setAlwaysOnTop(_ value: Bool) {
+        guard alwaysOnTop != value else { return }
+        alwaysOnTop = value
+        DisplayConfig.saveAlwaysOnTop(value, to: userDefaults)
+    }
+
+    func setShowBelowNotch(_ value: Bool) {
+        guard showBelowNotch != value else { return }
+        showBelowNotch = value
+        DisplayConfig.saveShowBelowNotch(value, to: userDefaults)
+    }
+
+    func setDisplayTarget(_ target: DisplayTarget) {
+        setDisplayTarget(target, screenID: nil)
+    }
+
+    func setDisplayTarget(_ target: DisplayTarget, screenID: CGDirectDisplayID?) {
+        ensureDisplayIDsInitialized()
+        let normalizedID = screenID.map { UInt32($0) }
+        var didChangeStoredID = false
+
+        switch target {
+        case .mainDisplay:
+            if let normalizedID, mainDisplayID != normalizedID {
+                mainDisplayID = normalizedID
+                didChangeStoredID = true
+                DisplayConfig.saveMainDisplayID(normalizedID, to: userDefaults)
+            }
+        case .notchedDisplay:
+            if let normalizedID, notchedDisplayID != normalizedID {
+                notchedDisplayID = normalizedID
+                didChangeStoredID = true
+                DisplayConfig.saveNotchedDisplayID(normalizedID, to: userDefaults)
+            }
+        }
+
+        if displayTarget != target {
+            displayTarget = target
+            DisplayConfig.saveDisplayTarget(target, to: userDefaults)
+            return
+        }
+
+        if didChangeStoredID {
+            displayTarget = target
+        }
+    }
+
+    func preferredDisplayID(for target: DisplayTarget) -> CGDirectDisplayID? {
+        ensureDisplayIDsInitialized()
+        return DisplayConfig.preferredDisplayID(
+            for: target,
+            mainDisplayID: mainDisplayID,
+            notchedDisplayID: notchedDisplayID
+        )
+    }
+
+    // MARK: - Behavior setters (delegated)
+
+    func setPlaySoundOnSessionCompletion(_ value: Bool) {
+        guard playSoundOnSessionCompletion != value else { return }
+        playSoundOnSessionCompletion = value
+        BehaviorConfig.savePlaySoundOnSession(value, to: userDefaults)
+    }
+
+    func setPlaySoundOnBreakCompletion(_ value: Bool) {
+        guard playSoundOnBreakCompletion != value else { return }
+        playSoundOnBreakCompletion = value
+        BehaviorConfig.savePlaySoundOnBreak(value, to: userDefaults)
+    }
+
+    func setAutoStartNextInterval(_ value: Bool) {
+        guard autoStartNextInterval != value else { return }
+        autoStartNextInterval = value
+        BehaviorConfig.saveAutoStartNext(value, to: userDefaults)
+    }
+
+    // MARK: - Reset
 
     func resetToDefault() {
         setWorkMinutes(Preset.short.defaultWorkMinutes, for: .short)
@@ -194,118 +237,25 @@ internal final class PresetSettingsStore: ObservableObject {
         setAutoStartNextInterval(false)
     }
 
-    func setPlaySoundOnSessionCompletion(_ value: Bool) {
-        guard playSoundOnSessionCompletion != value else { return }
-        playSoundOnSessionCompletion = value
-        userDefaults.set(value, forKey: Keys.playSoundOnSessionCompletion)
-    }
+    // MARK: - Private helpers
 
-    func setPlaySoundOnBreakCompletion(_ value: Bool) {
-        guard playSoundOnBreakCompletion != value else { return }
-        playSoundOnBreakCompletion = value
-        userDefaults.set(value, forKey: Keys.playSoundOnBreakCompletion)
-    }
-
-    func setCountdownDisplayMode(_ mode: CountdownDisplayMode) {
-        guard countdownDisplayMode != mode else { return }
-        countdownDisplayMode = mode
-        userDefaults.set(mode.rawValue, forKey: Keys.countdownDisplayMode)
-    }
-
-    func setAlwaysOnTop(_ value: Bool) {
-        guard alwaysOnTop != value else { return }
-        alwaysOnTop = value
-        userDefaults.set(value, forKey: Keys.alwaysOnTop)
-    }
-
-    func setShowBelowNotch(_ value: Bool) {
-        guard showBelowNotch != value else { return }
-        showBelowNotch = value
-        userDefaults.set(value, forKey: Keys.showBelowNotch)
-    }
-
-    func setAutoStartNextInterval(_ value: Bool) {
-        guard autoStartNextInterval != value else { return }
-        autoStartNextInterval = value
-        userDefaults.set(value, forKey: Keys.autoStartNextInterval)
-    }
-
-    func setDisplayTarget(_ target: DisplayTarget) {
-        setDisplayTarget(target, screenID: nil)
-    }
-
-    func setDisplayTarget(_ target: DisplayTarget, screenID: CGDirectDisplayID?) {
-        ensureDisplayIDsInitialized()
-        let normalizedID = screenID.map { UInt32($0) }
-        var didChangeStoredID = false
-
-        switch target {
-        case .mainDisplay:
-            if let normalizedID, mainDisplayID != normalizedID {
-                mainDisplayID = normalizedID
-                didChangeStoredID = true
-                userDefaults.set(normalizedID, forKey: Keys.mainDisplayID)
-            }
-        case .notchedDisplay:
-            if let normalizedID, notchedDisplayID != normalizedID {
-                notchedDisplayID = normalizedID
-                didChangeStoredID = true
-                userDefaults.set(normalizedID, forKey: Keys.notchedDisplayID)
-            }
-        }
-
-        if displayTarget != target {
-            displayTarget = target
-            userDefaults.set(target.rawValue, forKey: Keys.displayTarget)
-            return
-        }
-
-        if didChangeStoredID {
-            // Re-emit to notify subscribers that target screen mapping changed.
-            displayTarget = target
-        }
-    }
-
-    func preferredDisplayID(for target: DisplayTarget) -> CGDirectDisplayID? {
-        ensureDisplayIDsInitialized()
-        switch target {
-        case .mainDisplay:
-            return mainDisplayID.map { CGDirectDisplayID($0) }
-        case .notchedDisplay:
-            return notchedDisplayID.map { CGDirectDisplayID($0) }
-        }
+    private func currentDuration() -> SessionDurationConfig {
+        SessionDurationConfig(
+            shortWork: shortWorkMinutes,
+            shortBreak: shortBreakMinutes,
+            shortLongBreak: shortLongBreakMinutes,
+            longWork: longWorkMinutes,
+            longBreak: longBreakMinutes,
+            longLongBreak: longLongBreakMinutes,
+            roundsBeforeLong: roundsBeforeLongBreak
+        )
     }
 
     private func ensureDisplayIDsInitialized() {
-        let allDisplayIDs = NSScreen.screens.compactMap { NSScreen.displayID(for: $0) }
-        guard !allDisplayIDs.isEmpty else { return }
-
-        let primaryID = CGMainDisplayID()
-        let resolvedPrimaryID = allDisplayIDs.first { $0 == primaryID } ?? allDisplayIDs[0]
-
-        if mainDisplayID == nil {
-            let value = UInt32(resolvedPrimaryID)
-            mainDisplayID = value
-            userDefaults.set(value, forKey: Keys.mainDisplayID)
-        }
-
-        if notchedDisplayID == nil {
-            let secondaryID = allDisplayIDs.first { $0 != resolvedPrimaryID } ?? resolvedPrimaryID
-            let value = UInt32(secondaryID)
-            notchedDisplayID = value
-            userDefaults.set(value, forKey: Keys.notchedDisplayID)
-        }
-    }
-
-    private static func validatedWorkMinutes(_ value: Int) -> Int {
-        max(minWorkMinutes, min(maxWorkMinutes, value))
-    }
-
-    private static func validatedBreakMinutes(_ value: Int) -> Int {
-        max(minBreakMinutes, min(maxBreakMinutes, value))
-    }
-
-    private static func validatedRoundsBeforeLongBreak(_ value: Int) -> Int {
-        max(minRoundsBeforeLongBreak, min(maxRoundsBeforeLongBreak, value))
+        DisplayConfig.ensureDisplayIDsInitialized(
+            mainDisplayID: &mainDisplayID,
+            notchedDisplayID: &notchedDisplayID,
+            userDefaults: userDefaults
+        )
     }
 }
