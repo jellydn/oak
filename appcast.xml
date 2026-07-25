@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.37</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.37</link>
+  <sparkle:version>5037</sparkle:version>
+  <sparkle:shortVersionString>0.5.37</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.37</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>fix: address codebase concerns - extract NoiseGenerator, expand thin tests by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4973751407" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/129" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/129/hovercard" href="https://github.com/jellydn/oak/pull/129">#129</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.36...v0.5.37"><tt>v0.5.36...v0.5.37</tt></a></p>
+  ]]></description>
+  <pubDate>Sat, 25 Jul 2026 16:24:16 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.37/Oak-0.5.37.dmg"
+             sparkle:version="5037"
+             sparkle:shortVersionString="0.5.37"
+             sparkle:edSignature="5fOTN3pJS5RmWbC6zu8PPnrLgmZdQ6jdBz/SlMz9f8t0vblqf2YpUzQ8rnPpVmki1WnhJao7nGAhGubuHJg4Cg=="
+             length="9026929"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.36</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.36</link>
   <sparkle:version>5036</sparkle:version>
@@ -42,34 +63,6 @@
              sparkle:shortVersionString="0.5.35"
              sparkle:edSignature="l8K6ebn09kXC8UVVi2b04u0PlE+JIbA6b+Na7szjKkOaAoZnY8fibkylp/NhgLnxHDEbBjADHNnVvE+KuoQeBQ=="
              length="9018528"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.33</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.33</link>
-  <sparkle:version>5033</sparkle:version>
-  <sparkle:shortVersionString>0.5.33</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.33</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>chore(deps): update dependency macos to v26 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4447605560" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/112" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/112/hovercard" href="https://github.com/jellydn/oak/pull/112">#112</a></li>
-              <li>chore(deps): update dependency sparkle to v2.9.2 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4276671057" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/111" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/111/hovercard" href="https://github.com/jellydn/oak/pull/111">#111</a></li>
-              <li>chore(deps): update actions/upload-pages-artifact action to v5 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4257796964" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/110" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/110/hovercard" href="https://github.com/jellydn/oak/pull/110">#110</a></li>
-              <li>chore(deps): update actions/github-script action to v9 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4235741079" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/108" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/108/hovercard" href="https://github.com/jellydn/oak/pull/108">#108</a></li>
-              <li>chore(deps): update actions/configure-pages action to v6 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4155085403" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/107" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/107/hovercard" href="https://github.com/jellydn/oak/pull/107">#107</a></li>
-              <li>chore(deps): update actions/deploy-pages action to v5 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4138307262" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/106" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/106/hovercard" href="https://github.com/jellydn/oak/pull/106">#106</a></li>
-              <li>chore(deps): update actions/checkout action to v7 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4695135174" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/126" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/126/hovercard" href="https://github.com/jellydn/oak/pull/126">#126</a></li>
-              <li>chore(deps): update dependency sparkle to v2.9.4 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4610425740" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/125" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/125/hovercard" href="https://github.com/jellydn/oak/pull/125">#125</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.31...v0.5.33"><tt>v0.5.31...v0.5.33</tt></a></p>
-  ]]></description>
-  <pubDate>Mon, 20 Jul 2026 13:50:57 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.33/Oak-0.5.33.dmg"
-             sparkle:version="5033"
-             sparkle:shortVersionString="0.5.33"
-             sparkle:edSignature="8xMEUbGsZUKF2jdAwEt0bybysdycOmTL1kVotnI3vjW8aj5h7goXqtIgPosW9jYa29kpiVWawGn2f0sn9TNzBA=="
-             length="9016993"
              type="application/octet-stream" />
 </item>
   </channel>
