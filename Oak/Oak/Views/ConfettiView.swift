@@ -25,15 +25,7 @@ internal struct ConfettiView: View {
             }
         }
         .onAppear {
-            particles = (0 ..< count).map { index in
-                ConfettiParticle(
-                    id: index,
-                    targetX: CGFloat.random(in: -150 ... 150),
-                    targetY: CGFloat.random(in: -100 ... 200),
-                    rotation: Double.random(in: 0 ... 360),
-                    color: ConfettiPiece.colors[index % ConfettiPiece.colors.count]
-                )
-            }
+            particles = ConfettiParticle.generate(count: count)
 
             withAnimation(.easeOut(duration: ConfettiView.animationDuration)) {
                 animating = true
@@ -42,15 +34,28 @@ internal struct ConfettiView: View {
     }
 }
 
-private struct ConfettiParticle: Identifiable {
+internal struct ConfettiParticle: Identifiable {
     let id: Int
     let targetX: CGFloat
     let targetY: CGFloat
     let rotation: Double
     let color: Color
+
+    static func generate(count: Int) -> [ConfettiParticle] {
+        guard count > 0 else { return [] }
+        return (0 ..< count).map { index in
+            ConfettiParticle(
+                id: index,
+                targetX: CGFloat.random(in: -150 ... 150),
+                targetY: CGFloat.random(in: -100 ... 200),
+                rotation: Double.random(in: 0 ... 360),
+                color: ConfettiPiece.colors[index % ConfettiPiece.colors.count]
+            )
+        }
+    }
 }
 
-private struct ConfettiPiece: View {
+internal struct ConfettiPiece: View {
     static let colors: [Color] = [
         .green, .blue, .orange, .pink, .purple, .yellow, .red
     ]
