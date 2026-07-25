@@ -73,6 +73,7 @@
 		ED83D72FEA74BD4FB1A307DE /* AudioManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */; };
 		F1267A7C11F901A5AE9D6EDF /* NotchVisualStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCAC7004FB57BBA5CEBB9B3 /* NotchVisualStyle.swift */; };
 		F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */; };
+		F51DE81C4543A035DA93A6F7 /* SessionTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F2F3DEA012EE98A549BC02 /* SessionTimerService.swift */; };
 		F7D47435500BDC1F9A6E1B5A /* US005Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732AEE30E8FEC2D900C8224A /* US005Tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -99,6 +100,7 @@
 		1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetSettingsStore.swift; sourceTree = "<group>"; };
 		14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiViewTests.swift; sourceTree = "<group>"; };
 		164FAFB05B901C05BD1479BF /* NotchLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchLayout.swift; sourceTree = "<group>"; };
+		18F2F3DEA012EE98A549BC02 /* SessionTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimerService.swift; sourceTree = "<group>"; };
 		1B9D70365997A0BB1C917839 /* ambient_cafe.m4a */ = {isa = PBXFileReference; path = ambient_cafe.m4a; sourceTree = "<group>"; };
 		1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressData.swift; sourceTree = "<group>"; };
 		1E53FB903AF7AF6B4DE091AD /* AccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTests.swift; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 				98D555E4182E199E8EC8D0B3 /* NotificationService.swift */,
 				1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */,
 				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
+				18F2F3DEA012EE98A549BC02 /* SessionTimerService.swift */,
 				770CCC886CF6A5E903159704 /* SparkleUpdater.swift */,
 			);
 			path = Services;
@@ -449,6 +452,7 @@
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
 				C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
+				F51DE81C4543A035DA93A6F7 /* SessionTimerService.swift in Sources */,
 				716599FCD65FC35919E253E8 /* SettingsMenuView.swift in Sources */,
 				D9BC1320EE869D9AD7FE40AE /* SparkleUpdater.swift in Sources */,
 				91F4096D77B5684A1251EE01 /* SupportSectionView.swift in Sources */,
@@ -643,14 +647,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5032;
+				CURRENT_PROJECT_VERSION = 5035;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.32;
+				MARKETING_VERSION = 0.5.35;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -679,14 +683,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5032;
+				CURRENT_PROJECT_VERSION = 5035;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.32;
+				MARKETING_VERSION = 0.5.35;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
