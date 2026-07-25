@@ -21,23 +21,20 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published private(set) var autoStartCountdown: Int = 0
 
     let presetSettings: PresetSettingsStore
-    private var timer: Timer?
-    private var autoStartTimer: Timer?
-    private var currentRemainingSeconds: Int = 0
     private var isWorkSession: Bool = true
     private var isLongBreak: Bool = false
-    private var sessionStartSeconds: Int = 0
-    private var sessionEndDate: Date?
     private var currentSessionStartTime: Date?
     private let currentDate: () -> Date
     private var roundTrackingDate: Date
     private var presetSettingsCancellable: AnyCancellable?
+    private var timerServiceCancellables = Set<AnyCancellable>()
     private var lastPlayingAudioTrack: AudioTrack = .none
     private var wasAutoStarted: Bool = false
     let audioManager: AudioManager
     let progressManager: ProgressManager
     let notificationService: any SessionCompletionNotifying
     let completionSoundPlayer: any SessionCompletionSoundPlaying
+    let timerService: SessionTimerService
 
     init(
         presetSettings: PresetSettingsStore,
@@ -45,6 +42,7 @@ internal class FocusSessionViewModel: ObservableObject {
         progressManager: ProgressManager? = nil,
         notificationService: any SessionCompletionNotifying,
         completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil,
+        timerService: SessionTimerService? = nil,
         currentDate: @escaping () -> Date = Date.init
     ) {
         self.currentDate = currentDate
@@ -54,9 +52,11 @@ internal class FocusSessionViewModel: ObservableObject {
         self.progressManager = progressManager ?? ProgressManager()
         self.notificationService = notificationService
         self.completionSoundPlayer = completionSoundPlayer ?? SystemSessionCompletionSoundPlayer()
+        self.timerService = timerService ?? SessionTimerService()
         presetSettingsCancellable = presetSettings.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
+        setupTimerServiceBindings()
     }
 
     var canStart: Bool {
@@ -119,8 +119,9 @@ internal class FocusSessionViewModel: ObservableObject {
         case .idle:
             return 0.0
         case let .running(remaining, _), let .paused(remaining, _):
-            guard sessionStartSeconds > 0 else { return 0.0 }
-            return Double(sessionStartSeconds - remaining) / Double(sessionStartSeconds)
+            let duration = timerService.sessionDuration
+            guard duration > 0 else { return 0.0 }
+            return Double(duration - remaining) / Double(duration)
         case .completed:
             return 0.0
         }
@@ -204,10 +205,41 @@ internal class FocusSessionViewModel: ObservableObject {
         completedRounds = 0
     }
 
+    private func setupTimerServiceBindings() {
+        timerService.$remainingSeconds
+            .sink { [weak self] remaining in
+                guard let self, case .running = self.sessionState, remaining > 0 else { return }
+                sessionState = .running(remainingSeconds: remaining, isWorkSession: isWorkSession)
+            }
+            .store(in: &timerServiceCancellables)
+
+        timerService.$autoStartCountdown
+            .sink { [weak self] count in
+                self?.autoStartCountdown = count
+            }
+            .store(in: &timerServiceCancellables)
+
+        timerService.timerFinished
+            .sink { [weak self] in
+                self?.completeSession()
+            }
+            .store(in: &timerServiceCancellables)
+
+        timerService.autoStartFinished
+            .sink { [weak self] in
+                guard let self, case .completed = self.sessionState else { return }
+                startNextSession(isAutoStart: true)
+            }
+            .store(in: &timerServiceCancellables)
+    }
+
     deinit {
-        timer?.invalidate()
-        autoStartTimer?.invalidate()
+        let service = timerService
+        Task { @MainActor in
+            service.stop()
+        }
         presetSettingsCancellable?.cancel()
+        timerServiceCancellables.removeAll()
         let manager = audioManager
         Task { @MainActor in
             manager.stop()
@@ -229,28 +261,25 @@ internal extension FocusSessionViewModel {
         if let preset {
             selectedPreset = preset
         }
-        currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
+        let seconds = presetSettings.workDuration(for: selectedPreset)
         isWorkSession = true
         isLongBreak = false
-        sessionStartSeconds = currentRemainingSeconds
         currentSessionStartTime = Date()
         completedRounds = 0
-        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
-        startTimer()
+        sessionState = .running(remainingSeconds: seconds, isWorkSession: isWorkSession)
+        timerService.start(seconds: seconds)
     }
 
     func pauseSession() {
-        timer?.invalidate()
-        timer = nil
-        sessionEndDate = nil
+        timerService.pause()
         audioManager.pause()
-        sessionState = .paused(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        sessionState = .paused(remainingSeconds: timerService.remainingSeconds, isWorkSession: isWorkSession)
     }
 
     func resumeSession() {
         audioManager.resume()
-        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
-        startTimer()
+        sessionState = .running(remainingSeconds: timerService.remainingSeconds, isWorkSession: isWorkSession)
+        timerService.resume()
     }
 
     func startNextSession(isAutoStart: Bool = false) {
@@ -259,79 +288,44 @@ internal extension FocusSessionViewModel {
             return
         }
 
-        if autoStartCountdown > 0 {
-            autoStartTimer?.invalidate()
-            autoStartTimer = nil
-            autoStartCountdown = 0
-        }
+        timerService.cancelAutoStartCountdown()
 
         wasAutoStarted = isAutoStart
         isWorkSession = !completedWorkSession
 
+        let seconds: Int
         if isWorkSession {
-            currentRemainingSeconds = presetSettings.workDuration(for: selectedPreset)
+            seconds = presetSettings.workDuration(for: selectedPreset)
             isLongBreak = false
         } else if shouldUseLongBreak {
-            currentRemainingSeconds = presetSettings.longBreakDuration(for: selectedPreset)
+            seconds = presetSettings.longBreakDuration(for: selectedPreset)
             isLongBreak = true
         } else {
-            currentRemainingSeconds = presetSettings.breakDuration(for: selectedPreset)
+            seconds = presetSettings.breakDuration(for: selectedPreset)
             isLongBreak = false
         }
 
-        sessionStartSeconds = currentRemainingSeconds
         currentSessionStartTime = Date()
-        sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
+        sessionState = .running(remainingSeconds: seconds, isWorkSession: isWorkSession)
 
         if isWorkSession && lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
         }
 
-        startTimer()
+        timerService.start(seconds: seconds)
     }
 
     func resetSession() {
-        timer?.invalidate()
-        timer = nil
-        autoStartTimer?.invalidate()
-        autoStartTimer = nil
-        currentRemainingSeconds = 0
+        timerService.stop()
         isWorkSession = true
         isLongBreak = false
-        sessionStartSeconds = 0
-        sessionEndDate = nil
         currentSessionStartTime = nil
         isSessionComplete = false
         completedRounds = 0
-        autoStartCountdown = 0
         lastPlayingAudioTrack = .none
         wasAutoStarted = false
         audioManager.stop()
         sessionState = .idle
-    }
-
-    private func startTimer() {
-        timer?.invalidate()
-        sessionEndDate = Date().addingTimeInterval(TimeInterval(currentRemainingSeconds))
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tick()
-            }
-        }
-    }
-
-    private func tick() {
-        guard let sessionEndDate else {
-            completeSession()
-            return
-        }
-        currentRemainingSeconds = max(0, Int(ceil(sessionEndDate.timeIntervalSinceNow)))
-
-        if currentRemainingSeconds <= 0 {
-            completeSession()
-        } else {
-            sessionState = .running(remainingSeconds: currentRemainingSeconds, isWorkSession: isWorkSession)
-        }
     }
 
     func completeSession() {
@@ -347,7 +341,8 @@ internal extension FocusSessionViewModel {
             }
         }
 
-        let durationMinutes = (sessionStartSeconds - currentRemainingSeconds) / 60
+        let remaining = timerService.remainingSeconds
+        let durationMinutes = (timerService.sessionDuration - remaining) / 60
         if durationMinutes > 0, let startTime = currentSessionStartTime {
             progressManager.recordSessionCompletion(
                 durationMinutes: durationMinutes,
@@ -374,9 +369,6 @@ internal extension FocusSessionViewModel {
             completionSoundPlayer.playCompletionSound()
         }
 
-        timer?.invalidate()
-        timer = nil
-        sessionEndDate = nil
         sessionState = .completed(isWorkSession: isWorkSession)
 
         isSessionComplete = true
@@ -386,29 +378,7 @@ internal extension FocusSessionViewModel {
             isSessionComplete = false
 
             if presetSettings.autoStartNextInterval {
-                startAutoStartCountdown()
-            }
-        }
-    }
-
-    private func startAutoStartCountdown() {
-        autoStartCountdown = 10
-        autoStartTimer?.invalidate()
-        autoStartTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tickAutoStartCountdown()
-            }
-        }
-    }
-
-    private func tickAutoStartCountdown() {
-        autoStartCountdown -= 1
-        if autoStartCountdown <= 0 {
-            autoStartTimer?.invalidate()
-            autoStartTimer = nil
-            autoStartCountdown = 0
-            if case .completed = sessionState {
-                startNextSession(isAutoStart: true)
+                timerService.startAutoStartCountdown()
             }
         }
     }

@@ -163,7 +163,7 @@ internal extension NotchCompanionView {
     }
 
     @ViewBuilder
-    private var compactLeadingDisplay: some View {
+    var compactLeadingDisplay: some View {
         if viewModel.canStart {
             presetToggleButton
         } else if viewModel.autoStartCountdown > 0 {
