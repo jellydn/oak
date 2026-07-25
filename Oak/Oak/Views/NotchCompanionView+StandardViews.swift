@@ -1,6 +1,8 @@
 import SwiftUI
 
-internal extension NotchCompanionView {
+// MARK: - Standard (Non-Notch) Views
+
+extension NotchCompanionView {
     var compactView: some View {
         HStack(spacing: contentSpacing) {
             if viewModel.canStart {
@@ -132,9 +134,7 @@ internal extension NotchCompanionView {
     var sessionView: some View {
         HStack(spacing: 6) {
             let displayMode = viewModel.presetSettings.countdownDisplayMode
-            // Show countdown display based on session state
             if viewModel.canPause || viewModel.canResume {
-                // Active session: show countdown with session type
                 if displayMode == .circleRing {
                     countdownDisplay(
                         mode: displayMode,
@@ -154,7 +154,6 @@ internal extension NotchCompanionView {
                     .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
                 }
             } else if viewModel.canStartNext {
-                // Session complete, waiting for next: show next session info
                 if viewModel.autoStartCountdown > 0 {
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 4) {
@@ -195,7 +194,6 @@ internal extension NotchCompanionView {
                     }
                 }
             } else {
-                // Session complete, no next: show completed session info
                 if displayMode == .circleRing {
                     countdownDisplay(
                         mode: displayMode,
@@ -216,7 +214,6 @@ internal extension NotchCompanionView {
                 }
             }
 
-            // Control buttons
             if viewModel.canPause {
                 Button(
                     action: { viewModel.pauseSession() },
