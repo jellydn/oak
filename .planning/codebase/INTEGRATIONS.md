@@ -1,56 +1,44 @@
-# INTEGRATIONS — Oak External Integrations
+# INTEGRATIONS.md — External Services & APIs
 
-## External Services
+## Sparkle Update Framework
 
-Oak is a **local-first macOS app** with minimal external dependencies. No cloud sync, no remote APIs, no databases.
+- **Service**: [Sparkle 2](https://sparkle-project.org/) (self-hosted)
+- **Purpose**: In-app update distribution
+- **Files**: `Oak/Oak/Services/SparkleUpdater.swift`
+- **Configuration**:
+  - Public Ed25519 key: `IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=` (in `project.yml`)
+  - Feed URL: `https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml` (in `Info.plist`)
+  - Update check interval: 86,400 seconds (24 hours)
+  - `SUEnableAutomaticChecks: true`
+- **Protocols**: `SPUUpdaterDelegate`
+- **Network entitlement**: `com.apple.security.network.client` (required for Sparkle feed fetching)
 
-| Service | Purpose | Details |
-| --- | --- | --- |
-| [Sparkle](https://sparkle-project.org/) | App updates | Check for new versions, download, and install updates. Configured via `SparkleUpdater.swift` using `SPUUpdaterDelegate`. Appcast hosted at `appcast.xml`. |
-| GitHub Releases | Distribution | Release assets built via `scripts/release/build-release-assets.sh`, published to GitHub Releases, referenced by Sparkle appcast |
-| Homebrew | Distribution | `Casks/oak.rb` — Homebrew cask formula for `brew install` |
-| GitHub Pages | Documentation | Static docs site at `docs/index.html` deployed via `deploy-pages.yml` |
+## UserNotifications Framework
 
-## System Integrations
+- **Service**: Apple `UserNotifications` (system-level, local)
+- **Purpose**: Local notification delivery for session completions
+- **Files**: `Oak/Oak/Services/NotificationService.swift`
+- **Authorization**: Requests `.alert` + `.sound` authorization; status is refreshed on app activation
+- **Deep link**: Uses `x-apple.systempreferences:` URLs to open Notification Settings when denied
+- **Protocol**: `SessionCompletionNotifying`
 
-| Integration | File | Purpose |
-| --- | --- | --- |
-| User Notifications | `NotificationService.swift` | Local notifications on session/break completion via `UNUserNotificationCenter` |
-| NSSound | `FocusSessionViewModel.swift` | System beep for session completion (`NSSound.beep()`) |
-| NSScreen | `NSScreen+UUID.swift`, `NSScreen+DisplayTarget.swift` | Display detection, notch detection, screen identification |
-| AVFoundation | `AudioManager.swift` | Audio playback for ambient sounds, noise generation |
+## UserDefaults
 
-## Protocol Contracts
+- **Service**: Apple `UserDefaults` (system-level, local)
+- **Purpose**: Persistent settings storage
+- **Files**: `Oak/Oak/Services/PresetSettingsStore.swift`, `Oak/Oak/Services/ProgressManager.swift`
+- **Keys**: Prefixed with `preset.`, `display.`, `session.`, `window.`, `countdown.` domains
+- **Default registration**: `userDefaults.register(defaults:)` for all keys
+- **Validation**: Clamped value ranges for work/break minutes and rounds
 
-```swift
-// DI for session completion notifications
-internal protocol SessionCompletionNotifying {
-    func sendSessionCompletionNotification(isWorkSession: Bool)
-}
+## GitHub (CI/CD & Distribution)
 
-// DI for completion sound
-internal protocol SessionCompletionSoundPlaying {
-    func playCompletionSound()
-}
+- **CI**: GitHub Actions on `macos-26` runners (`.github/workflows/ci.yml`)
+  - Lint: `swiftlint lint --strict`
+  - Build & Test: `xcodebuild` with `CODE_SIGNING_ALLOWED=NO`
+- **Release**: Automated appcast + Homebrew cask updates (`.github/workflows/release.yml`)
+- **Homebrew Cask**: `Casks/oak.rb` for `brew install` distribution
 
-// DI for audio engine (testability)
-internal protocol AudioEngineProtocol {
-    var isRunning: Bool { get }
-    func setMixerVolume(_ volume: Float)
-    func attachAndConnect(_ node: AVAudioNode)
-    func detach(_ node: AVAudioNode)
-    func prepare()
-    func start() throws
-    func stop()
-    func pause()
-}
-```
+## No External Backend
 
-## No Integrations
-
-- ❌ No analytics / telemetry
-- ❌ No cloud sync or backend API
-- ❌ No third-party authentication
-- ❌ No payment processing
-- ❌ No crash reporting service
-- ❌ No remote config / feature flags
+Oak is a fully local macOS app with no cloud backend, no user accounts, no analytics, and no telemetry. All data stays on-device in `UserDefaults`.

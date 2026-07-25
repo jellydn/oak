@@ -2,6 +2,8 @@ import SwiftUI
 import XCTest
 @testable import Oak
 
+internal typealias ProgressManager = Oak.ProgressManager
+
 private final class TestClock {
     var currentDate: Date
 

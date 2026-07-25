@@ -47,6 +47,7 @@
 		98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */; };
 		A241F12DFE716A2C633FC7D0 /* MockAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B03DC457EAE4AA55E72345 /* MockAudioManager.swift */; };
 		A5A710E1728BFAC40AF7ED47 /* AppcastVersionParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309AA6D939B204C7F18AB1DA /* AppcastVersionParserTests.swift */; };
+		AA147F5BF27D31120148E1D1 /* NoiseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF023F144789D230C0B954F /* NoiseGenerator.swift */; };
 		AB81CEE35347ABEB708B4B80 /* US006Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E445602CAD3F9843BA531B /* US006Tests.swift */; };
 		AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3327FE9112DF5E06C056AEF /* NotchWindowControllerTests.swift */; };
 		ADE41CB716798207A29851E9 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F287A617D7BF92425C7BD22A /* ConfettiView.swift */; };
@@ -119,6 +120,7 @@
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
 		5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManagerTests.swift; sourceTree = "<group>"; };
+		5DF023F144789D230C0B954F /* NoiseGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseGenerator.swift; sourceTree = "<group>"; };
 		5E581D2529EA9F9B22AEB5DE /* NotchCompanionView+StandardViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionView+StandardViews.swift"; sourceTree = "<group>"; };
 		630A26F2F361CCE214543440 /* UpdateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSettingsView.swift; sourceTree = "<group>"; };
 		63539C12247302E14148BE07 /* ambient_lofi.m4a */ = {isa = PBXFileReference; path = ambient_lofi.m4a; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 			isa = PBXGroup;
 			children = (
 				C348F7E99471145836A04408 /* AudioManager.swift */,
+				5DF023F144789D230C0B954F /* NoiseGenerator.swift */,
 				98D555E4182E199E8EC8D0B3 /* NotificationService.swift */,
 				1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */,
 				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
@@ -433,6 +436,7 @@
 				2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */,
 				5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */,
 				67136E958CB86E30F7443B8B /* NSScreen+UUID.swift in Sources */,
+				AA147F5BF27D31120148E1D1 /* NoiseGenerator.swift in Sources */,
 				4A698BFDAA1F8E649D836ACF /* NotchCompanionView+Controls.swift in Sources */,
 				29EFC7CC8DBCDE421107C0E6 /* NotchCompanionView+InsideNotch.swift in Sources */,
 				B961DAB61BE6B064D46152D3 /* NotchCompanionView+StandardViews.swift in Sources */,
@@ -643,14 +647,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5032;
+				CURRENT_PROJECT_VERSION = 5035;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.32;
+				MARKETING_VERSION = 0.5.35;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";
@@ -679,14 +683,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5032;
+				CURRENT_PROJECT_VERSION = 5035;
 				INFOPLIST_FILE = Oak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.5.32;
+				MARKETING_VERSION = 0.5.35;
 				PRODUCT_BUNDLE_IDENTIFIER = com.productsway.oak.app;
 				SDKROOT = macosx;
 				SPARKLE_PUBLIC_ED_KEY = "IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=";

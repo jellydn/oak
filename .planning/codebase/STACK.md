@@ -1,60 +1,71 @@
-# STACK — Oak Technology Stack
+# STACK.md — Technology Stack
 
 ## Language & Runtime
 
-- **Language**: Swift 5.9+ (targeting Swift 6.2 in `.swiftformat`)
-- **Platform**: macOS 13+ (Ventura minimum deployment target)
-- **Architecture**: Apple Silicon (arm64), Intel (x86_64) supported
+| Layer | Technology | Version |
+| --- | --- | --- |
+| Language | Swift | 5.9+ |
+| Platform | macOS | 13.0+ (Apple Silicon preferred) |
+| Xcode | Xcode 16+ (`project.yml` references xcodeVersion 17.0) |
 
 ## UI Framework
 
-- **SwiftUI** — All views are SwiftUI-based (`NotchCompanionView`, `SettingsMenuView`, `AudioMenuView`, etc.)
-- **AppKit** — Used for window management (`NotchWindowController` using `NSPanel`), `NSSound.beep()`, `NSApplication.shared`
-- **Combine** — Reactive state propagation (`@Published`, `ObservableObject`, `AnyCancellable`)
+| Component       | Technology                                                      |
+| --------------- | --------------------------------------------------------------- |
+| UI Framework    | SwiftUI                                                         |
+| AppKit Bridging | `NSViewRepresentable`, `NSHostingView`, `NSPanel`               |
+| Window Type     | `NSPanel` with `.borderless` + `.nonactivatingPanel` style mask |
+| Notch Detection | `NSScreen.safeAreaInsets.top` for physical notch detection      |
 
-## Key Frameworks
+## Core Frameworks
 
-| Framework           | Usage                                                                    |
-| ------------------- | ------------------------------------------------------------------------ |
-| `AVFoundation`      | Audio playback engine (`AudioEngineAdapter`, `AudioEngineProtocol`)      |
-| `CoreGraphics`      | Display IDs (`CGDirectDisplayID`, `CGMainDisplayID`) for notch detection |
-| `UserNotifications` | Local notification delivery (`NotificationService`)                      |
+| Framework | Usage |
+| --- | --- |
+| **Combine** | Reactive bindings (`@Published`, `AnyCancellable`, `.sink`) |
+| **AVFoundation** | Audio playback (bundled `.m4a` files + procedural noise generation via `AVAudioSourceNode`) |
+| **UserNotifications** | Local notification delivery for session completion |
+| **AppKit** | Window management, `NSScreen` extensions, `NSSound.beep()` |
+| **CoreGraphics** | Display ID resolution (`CGMainDisplayID()`) |
+| **Foundation** | `Timer`, `UserDefaults`, `os.Logger` |
+
+## Third-Party Dependencies
+
+| Package | Version | Usage |
+| --- | --- | --- |
+| [Sparkle](https://github.com/sparkle-project/Sparkle) | 2.9.4 | In-app update checking and distribution (`SPUUpdaterDelegate`) |
 
 ## Build System
 
-- **XcodeGen** (`project.yml`) — Project file generation from declarative spec
-- **xcodebuild** — Build and test via `just build`, `just test`
-- **just** — Task runner (`justfile`) for build, test, lint, format, dev workflows
+| Tool | Purpose |
+| --- | --- |
+| [XcodeGen](https://github.com/yonaskolb/XcodeGen) | Project generation from `project.yml` |
+| [just](https://github.com/casey/just) | Task runner (`just build`, `just test`, `just lint`) |
+| xcodebuild | CI builds (GitHub Actions on `macos-26` runners) |
 
-## Dependencies
+## Code Quality
 
-| Dependency | Version | Purpose |
-| --- | --- | --- |
-| [Sparkle](https://sparkle-project.org/) | ~2.9 | Automatic app updates (`SparkleUpdater`, `SPUUpdaterDelegate`) |
-| SwiftLint | — | Linting (`.swiftlint.yml`) |
-| SwiftFormat | — | Code formatting (`.swiftformat`) |
+| Tool | Configuration |
+| --- | --- |
+| SwiftLint | `.swiftlint.yml` (opt-in rules: `explicit_init`, `trailing_closure`, `empty_count`, etc.) |
+| SwiftFormat | `.swiftformat` (indent: 4, maxwidth: 120, `wraparguments before-first`) |
 
 ## Configuration Files
 
 | File | Purpose |
 | --- | --- |
-| `project.yml` | XcodeGen project spec (targets, settings, plist keys) |
-| `Oak/Oak/Info.plist` | App bundle metadata |
-| `Oak/Oak/Oak.entitlements` | App sandbox & capabilities |
-| `.swiftlint.yml` | Lint rules (opt-in rules, line length 120/150, file length 500/1000) |
-| `.swiftformat` | Format rules (indent 4, maxwidth 120, wrap before-first) |
-| `justfile` | Task definitions (build, test, lint, format, dev, release) |
-| `prek.toml` | Pre-commit hook configuration |
-| `renovate.json` | Dependency update automation |
-
-## Bundled Assets
-
-- **Ambient sounds** (`.m4a`): `ambient_forest.m4a`, `ambient_cafe.m4a`, `ambient_brown_noise.m4a`, `ambient_lofi.m4a`, `ambient_rain.m4a`
-- **App icon**: `Assets.xcassets/AppIcon.appiconset/`
-- **Noise generation**: Programmatic fallback via `NoiseGenerator` when bundled files unavailable
+| `Oak/project.yml` | XcodeGen project definition (targets, dependencies, build settings) |
+| `Oak/Oak/Info.plist` | App metadata, Sparkle feed URL, `LSUIElement = true` |
+| `Oak/Oak/Oak.entitlements` | `com.apple.security.network.client` (outbound networking for Sparkle) |
+| `justfile` | Task automation commands |
+| `.swiftlint.yml` | Lint rule configuration |
+| `.swiftformat` | Formatter rule configuration |
+| `appcast.xml` | Sparkle appcast for update distribution |
 
 ## CI/CD
 
-- **GitHub Actions**: `.github/workflows/ci.yml` (CI), `release.yml` (release), `update-appcast.yml` (Sparkle appcast), `deploy-pages.yml` (docs site), `auto-release.yml`
-- **Homebrew Cask**: `Casks/oak.rb` for distribution
-- **Release assets**: `scripts/release/build-release-assets.sh`
+| Provider | Platform | File |
+| --- | --- | --- |
+| GitHub Actions | `macos-26` runner | `.github/workflows/ci.yml` |
+| Lint | `swiftlint lint --strict` | CI job |
+| Build & Test | `xcodebuild build` + `xcodebuild test` (unsigned, no code signing) | CI job |
+| Release | Sparkle appcast update + Homebrew cask | `.github/workflows/release.yml` |
