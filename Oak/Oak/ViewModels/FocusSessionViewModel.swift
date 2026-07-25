@@ -60,31 +60,19 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var canStart: Bool {
-        if case .idle = sessionState {
-            return true
-        }
-        return false
+        SessionStateMachine.isIdle(sessionState)
     }
 
     var canStartNext: Bool {
-        if case .completed = sessionState {
-            return true
-        }
-        return false
+        SessionStateMachine.isCompleted(sessionState)
     }
 
     var canPause: Bool {
-        if case .running = sessionState {
-            return true
-        }
-        return false
+        SessionStateMachine.isRunning(sessionState)
     }
 
     var canResume: Bool {
-        if case .paused = sessionState {
-            return true
-        }
-        return false
+        SessionStateMachine.isPaused(sessionState)
     }
 
     var displayTime: String {
@@ -128,17 +116,11 @@ internal class FocusSessionViewModel: ObservableObject {
     }
 
     var isPaused: Bool {
-        if case .paused = sessionState {
-            return true
-        }
-        return false
+        SessionStateMachine.isPaused(sessionState)
     }
 
     var isRunning: Bool {
-        if case .running = sessionState {
-            return true
-        }
-        return false
+        SessionStateMachine.isRunning(sessionState)
     }
 
     var currentSessionType: String {
@@ -208,8 +190,10 @@ internal class FocusSessionViewModel: ObservableObject {
     private func setupTimerServiceBindings() {
         timerService.$remainingSeconds
             .sink { [weak self] remaining in
-                guard let self, case .running = self.sessionState, remaining > 0 else { return }
-                sessionState = .running(remainingSeconds: remaining, isWorkSession: isWorkSession)
+                guard let self,
+                      let newState = SessionStateMachine.tick(remainingSeconds: remaining, from: sessionState),
+                      remaining > 0 else { return }
+                sessionState = newState
             }
             .store(in: &timerServiceCancellables)
 
@@ -227,7 +211,7 @@ internal class FocusSessionViewModel: ObservableObject {
 
         timerService.autoStartFinished
             .sink { [weak self] in
-                guard let self, case .completed = self.sessionState else { return }
+                guard let self, SessionStateMachine.isCompleted(self.sessionState) else { return }
                 startNextSession(isAutoStart: true)
             }
             .store(in: &timerServiceCancellables)
@@ -266,25 +250,29 @@ internal extension FocusSessionViewModel {
         isLongBreak = false
         currentSessionStartTime = Date()
         completedRounds = 0
-        sessionState = .running(remainingSeconds: seconds, isWorkSession: isWorkSession)
+        sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: isWorkSession)
         timerService.start(seconds: seconds)
     }
 
     func pauseSession() {
+        guard let newState = SessionStateMachine.pause(from: sessionState) else { return }
         timerService.pause()
         audioManager.pause()
-        sessionState = .paused(remainingSeconds: timerService.remainingSeconds, isWorkSession: isWorkSession)
+        sessionState = newState
     }
 
     func resumeSession() {
+        guard let newState = SessionStateMachine.resume(from: sessionState) else { return }
         audioManager.resume()
-        sessionState = .running(remainingSeconds: timerService.remainingSeconds, isWorkSession: isWorkSession)
+        sessionState = newState
         timerService.resume()
     }
 
     func startNextSession(isAutoStart: Bool = false) {
         resetCompletedRoundsIfNeeded()
-        guard case let .completed(completedWorkSession) = sessionState else {
+        guard let completedWorkSession = SessionStateMachine.isWorkSession(in: sessionState),
+              SessionStateMachine.isCompleted(sessionState)
+        else {
             return
         }
 
@@ -306,7 +294,7 @@ internal extension FocusSessionViewModel {
         }
 
         currentSessionStartTime = Date()
-        sessionState = .running(remainingSeconds: seconds, isWorkSession: isWorkSession)
+        sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: isWorkSession)
 
         if isWorkSession && lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
@@ -325,7 +313,7 @@ internal extension FocusSessionViewModel {
         lastPlayingAudioTrack = .none
         wasAutoStarted = false
         audioManager.stop()
-        sessionState = .idle
+        sessionState = SessionStateMachine.reset()
     }
 
     func completeSession() {
@@ -369,7 +357,7 @@ internal extension FocusSessionViewModel {
             completionSoundPlayer.playCompletionSound()
         }
 
-        sessionState = .completed(isWorkSession: isWorkSession)
+        sessionState = SessionStateMachine.complete(from: sessionState) ?? .completed(isWorkSession: isWorkSession)
 
         isSessionComplete = true
 
