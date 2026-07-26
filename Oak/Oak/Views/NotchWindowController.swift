@@ -11,10 +11,11 @@ internal class NotchWindowController: NSWindowController {
     private var pendingExpandedState: Bool?
     private var pendingForceReposition = false
     private var pendingTargetOverride: DisplayTarget?
-    private let viewModel: FocusSessionViewModel
+    internal private(set) var viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
     private let notificationService: NotificationService
     private let sparkleUpdater: SparkleUpdater
+    private let keyboardShortcutService: KeyboardShortcutService
     private var displayTargetCancellable: AnyCancellable?
     private var alwaysOnTopCancellable: AnyCancellable?
     private var showBelowNotchCancellable: AnyCancellable?
@@ -22,11 +23,13 @@ internal class NotchWindowController: NSWindowController {
     init(
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
-        sparkleUpdater: SparkleUpdater
+        sparkleUpdater: SparkleUpdater,
+        keyboardShortcutService: KeyboardShortcutService = KeyboardShortcutService()
     ) {
         self.presetSettings = presetSettings
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
+        self.keyboardShortcutService = keyboardShortcutService
         viewModel = FocusSessionViewModel(
             presetSettings: presetSettings,
             notificationService: notificationService
@@ -61,7 +64,8 @@ internal class NotchWindowController: NSWindowController {
         let contentView = NotchCompanionView(
             viewModel: viewModel,
             notificationService: notificationService,
-            sparkleUpdater: sparkleUpdater
+            sparkleUpdater: sparkleUpdater,
+            keyboardShortcutService: keyboardShortcutService
         ) { [weak self] expanded in
             self?.handleExpansionChange(expanded)
         }

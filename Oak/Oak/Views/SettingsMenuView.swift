@@ -5,19 +5,24 @@ internal struct SettingsMenuView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
     @ObservedObject var notificationService: NotificationService
     @ObservedObject var sparkleUpdater: SparkleUpdater
+    @ObservedObject var keyboardShortcutService: KeyboardShortcutService
     @State private var selectedDisplayTarget: DisplayTarget
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
+    @State private var localKeyboardConfig: KeyboardShortcutConfig
 
     init(
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
-        sparkleUpdater: SparkleUpdater
+        sparkleUpdater: SparkleUpdater,
+        keyboardShortcutService: KeyboardShortcutService = KeyboardShortcutService()
     ) {
         self.presetSettings = presetSettings
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
+        self.keyboardShortcutService = keyboardShortcutService
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
         _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
+        _localKeyboardConfig = State(initialValue: keyboardShortcutService.currentConfig)
     }
 
     public var body: some View {
@@ -57,6 +62,10 @@ internal struct SettingsMenuView: View {
                     presetSettings: presetSettings,
                     notificationService: notificationService
                 )
+            }
+
+            section(title: "Keyboard") {
+                keyboardSettingsSection
             }
 
             section(title: "Updates") {
@@ -265,5 +274,68 @@ private extension SettingsMenuView {
         let cycleRange = "\(PresetSettingsStore.minRoundsBeforeLongBreak)"
             + "-\(PresetSettingsStore.maxRoundsBeforeLongBreak)"
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min, Long cycle \(cycleRange) sessions"
+    }
+
+    // MARK: - Keyboard Settings
+
+    var keyboardSettingsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle(
+                "Enable keyboard shortcuts",
+                isOn: Binding(
+                    get: { localKeyboardConfig.enabled },
+                    set: { newValue in
+                        var updated = localKeyboardConfig
+                        updated.enabled = newValue
+                        localKeyboardConfig = updated
+                        keyboardShortcutService.updateConfig(updated)
+                    }
+                )
+            )
+            .font(.caption)
+            .help("Space to start/pause, Escape to reset. Works when Oak is active.")
+
+            if localKeyboardConfig.enabled {
+                VStack(alignment: .leading, spacing: 4) {
+                    let toggleShortcut = localKeyboardConfig.shortcuts[.toggleSession]
+                        ?? KeyboardShortcutAction.toggleSession.defaultKey
+                    shortcutRow(action: .toggleSession, shortcut: toggleShortcut)
+                    let resetShortcut = localKeyboardConfig.shortcuts[.resetSession]
+                        ?? KeyboardShortcutAction.resetSession.defaultKey
+                    shortcutRow(action: .resetSession, shortcut: resetShortcut)
+                }
+                .padding(.leading, 16)
+
+                Toggle(
+                    "Enable global hotkeys",
+                    isOn: Binding(
+                        get: { localKeyboardConfig.globalHotkeysEnabled },
+                        set: { newValue in
+                            var updated = localKeyboardConfig
+                            updated.globalHotkeysEnabled = newValue
+                            localKeyboardConfig = updated
+                            keyboardShortcutService.updateConfig(updated)
+                        }
+                    )
+                )
+                .font(.caption)
+                .help("Requires Accessibility permission in System Settings.")
+            }
+        }
+    }
+
+    private func shortcutRow(action: KeyboardShortcutAction, shortcut: KeyEquivalent) -> some View {
+        HStack(spacing: 8) {
+            Text(shortcut.displayString)
+                .font(.caption.monospaced())
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.secondary.opacity(0.1))
+                .cornerRadius(4)
+            Text(action.displayName)
+                .font(.caption)
+            Spacer()
+        }
     }
 }
