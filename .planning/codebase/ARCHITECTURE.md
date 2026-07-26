@@ -1,144 +1,119 @@
-# ARCHITECTURE.md — System Design & Patterns
+# Architecture
 
-## Pattern: MVVM with Protocol-Based DI
+## Pattern: MVVM with @MainActor
 
-Oak follows the **Model-View-ViewModel** pattern with protocol-based dependency injection.
+Oak follows **Model-View-ViewModel** (MVVM) architecture with all observable state pinned to `@MainActor`:
 
 ```
-┌─────────────────────────────────────────┐
-│  OakApp.swift (Entry Point)             │
-│  ┌─────────────────────────────────────┐│
-│  │ AppDelegate (NSApplicationDelegate) ││
-│  │  • Creates NotchWindowController    ││
-│  │  • Creates PresetSettingsStore      ││
-│  │  • Creates NotificationService      ││
-│  │  • Creates SparkleUpdater           ││
-│  └──────────────┬──────────────────────┘│
-└─────────────────┼───────────────────────┘
-                  │
-     ┌────────────▼─────────────┐
-     │  NotchWindowController   │  NSPanel wrapper
-     │  (NSWindowController)    │  • Frame management
-     │                          │  • Display target binding
-     │  Creates:                │  • Screen change observer
-     │  • FocusSessionViewModel │
-     │  • NotchCompanionView    │
-     └────────────┬─────────────┘
-                  │
-     ┌────────────▼─────────────┐
-     │  NotchCompanionView      │  SwiftUI View
-     │  @ObservedObject:        │  • Collapsed/Expanded states
-     │    viewModel              │  • Inside-notch layout variant
-     │    notificationService    │  • Popovers (audio, progress, settings)
-     │    sparkleUpdater         │  • Completion animations (confetti)
-     └────────────┬─────────────┘
-                  │
-     ┌────────────▼─────────────┐
-     │  FocusSessionViewModel   │  @MainActor ObservableObject
-     │                          │  • Session FSM (idle→running→paused→completed)
-     │  Dependencies:           │  • Timer management
-     │  • PresetSettingsStore   │  • Auto-start countdown
-     │  • AudioManager          │  • Progress tracking delegation
-     │  • ProgressManager       │  • Notification & sound triggers
-     │  • NotificationService   │
-     │  • completionSoundPlayer │
-     └──────────────────────────┘
+┌─────────────────────┐
+│   Views (SwiftUI)    │  ← user interaction, layout, rendering
+├─────────────────────┤
+│  ViewModels          │  ← @MainActor, ObservableObject, @Published state
+├─────────────────────┤
+│  Services            │  ← business logic, audio, timers, persistence
+├─────────────────────┤
+│  Models              │  ← Codable structs, enums, value types
+└─────────────────────┘
 ```
+
+## Layer Responsibilities
+
+### Models (`Models/`)
+
+Pure data types — all value types or enums, no business logic:
+
+- `SessionModels.swift` — `SessionState` (FSM enum), `Preset` enum, `SessionType`
+- `ProgressData.swift` — `ProgressData`, `SessionRecord`, `DailyStats`
+- `AudioTrack.swift` — ambient audio track enum
+- `NotchLayout.swift` — layout constants
+- `CountdownDisplayMode.swift` — display mode enum
+
+### Services (`Services/`)
+
+Business logic and system integration — reference types (`class`):
+
+- **`FocusSessionViewModel`** — session lifecycle orchestrator (start/pause/resume/complete/reset)
+- **`AudioManager`** — AVAudioPlayer management, track switching, volume
+- **`ProgressManager`** — session history persistence in UserDefaults, daily stats, streaks
+- **`SessionTimerService`** — Timer-based countdown and auto-start countdown
+- **`PresetSettingsStore`** — all user preferences (durations, display, behavior)
+- **`NotificationService`** — UserNotifications authorization and delivery
+- **`SparkleUpdater`** — SPUStandardUpdaterController wrapper
+- **`KeyboardShortcutService`** — NSEvent local/global keyboard monitoring
+- Configuration services: `SessionDurationConfig`, `DisplayConfig`, `BehaviorConfig`
+- Utility: `NoiseGenerator`
+
+### Views (`Views/`)
+
+SwiftUI views — stateless rendering, `@ObservedObject` bindings to ViewModels:
+
+- `NotchCompanionView` — main notch UI (compact + expanded states)
+- `NotchWindowController` — NSWindowController managing NSPanel lifecycle
+- `SettingsMenuView` — settings panel (presets, display, audio, keyboard, data, updates)
+- Supporting views: `AudioMenuView`, `ProgressMenuView`, `PresetEditorView`, `CircularProgressRing`, `ConfettiView`, etc.
+
+### ViewModels (`ViewModels/`)
+
+- `FocusSessionViewModel` — the single ViewModel bridging all services to views
 
 ## Data Flow
 
 ```
-UserDefaults ←→ PresetSettingsStore ←→ FocusSessionViewModel ←→ NotchCompanionView
-                     ↕ (published properties)              ↕ (display data)
-UserDefaults ←→ ProgressManager ←→ FocusSessionViewModel ←→ ProgressMenuView
-                     ↕
-AVAudioEngine ←→ AudioManager ←→ FocusSessionViewModel
+User Action (click/keypress)
+  → View calls ViewModel method (e.g., startSession())
+    → ViewModel updates @Published state
+      → View re-renders via SwiftUI observation
+
+Timer tick (Timer/Task)
+  → Service publishes new state
+    → ViewModel subscriber receives update
+      → @Published property changes
+        → View re-renders
 ```
 
-## FSM: Session State Machine
+## State Machine
+
+`SessionState` is a finite state machine implemented as an enum with associated values:
 
 ```
-     ┌──────────┐
-     │   IDLE   │──── startSession() ────┐
-     └──────────┘                        │
-          ▲                              ▼
-          │                       ┌──────────┐
-          │ resetSession()        │ RUNNING  │
-          │                       └─────┬────┘
-          │                    pauseSession()│
-          │                              ▼
-          │                       ┌──────────┐
-          │                       │  PAUSED  │
-          │                       └─────┬────┘
-          │                   resumeSession()│
-          │                              ▼
-          │                       ┌──────────┐
-          │           tick() → 0  │ RUNNING  │
-          │           (auto)      └─────┬────┘
-          │                             │ completeSession()
-          │                             ▼
-          │                      ┌───────────┐
-          └────── resetSession() │ COMPLETED │
-                                 └───────────┘
-                                       │
-                          startNextSession() (manual or auto-start)
-                                       │
-                                       ▼
-                                 ┌──────────┐
-                                 │ RUNNING  │ (next interval)
-                                 └──────────┘
+idle → running(seconds, isWork) → paused(seconds, isWork) → running(...)
+                                                    → reset → idle
+running → completed(isWork) → startNext → running(...)
+                           → reset → idle
 ```
 
-## Key Abstractions
+`SessionStateMachine` (introduced in #133) consolidates all state queries and transitions:
 
-### Protocol-Based DI
-
-```swift
-// Session completion notification
-internal protocol SessionCompletionNotifying { ... }
-// Completion sound
-internal protocol SessionCompletionSoundPlaying { ... }
-// Audio engine (for testability)
-internal protocol AudioEngineProtocol { ... }
-```
-
-### @MainActor Enforcement
-
-All `ObservableObject` classes, ViewModels, and window controllers are annotated `@MainActor`:
-
-- `FocusSessionViewModel`
-- `AudioManager`
-- `NotificationService`
-- `PresetSettingsStore`
-- `ProgressManager`
-- `SparkleUpdater`
-- `NotchWindowController`
-
-### Published State
-
-State flows through `@Published` properties:
-
-- `sessionState: SessionState` — FSM state with associated values
-- `selectedPreset: Preset` — short (25/5) or long (50/10)
-- `isSessionComplete: Bool` — triggers confetti & animations
-- `autoStartCountdown: Int` — 10-second countdown for auto-start
-- `completedRounds: Int` — tracks rounds before long break trigger
+- `isIdle()`, `isRunning()`, `isPaused()`, `isCompleted()`
+- `start()`, `pause()`, `resume()`, `complete()`, `reset()`, `tick()`
 
 ## Entry Points
 
-| Entry | File | Role |
-| --- | --- | --- |
-| `@main` | `Oak/OakApp.swift` | SwiftUI App lifecycle |
-| `AppDelegate` | `Oak/OakApp.swift` | NSApplicationDelegate, window creation |
-| `NotchWindowController` | `Oak/Oak/Views/NotchWindowController.swift` | Window lifecycle, frame management |
+1. **`OakApp.swift`** — `@main` App struct + `AppDelegate` (NSApplicationDelegate)
+   - `applicationDidFinishLaunching` — creates `NotchWindowController`, sets `activationPolicy(.accessory)`
+2. **`NotchWindowController.swift`** — owns `NSPanel`, hosts `NotchCompanionView` via `NSHostingView`
 
-## Window Architecture
+## Dependency Injection
 
-`NotchWindow` is an `NSPanel` with:
+Services use protocol-based DI with optional default parameters:
 
-- `.borderless` + `.nonactivatingPanel` style mask
-- `.canJoinAllSpaces` + `.stationary` collection behavior
-- `level`: `.statusBar` (always on top) or `.floating` (normal)
-- Transparent background, no shadow
-- Dynamic width: collapsed (compact) vs expanded (full controls)
-- Y-position calculated based on notch presence and `showBelowNotch` setting
+```swift
+init(
+    audioManager: AudioManager? = nil,
+    progressManager: ProgressManager? = nil,
+    notificationService: any SessionCompletionNotifying,
+    ...
+)
+```
+
+Tests inject protocol-based mocks (`MockAudioManager`, `MockNotificationService`) and isolated `UserDefaults` suites.
+
+## Key Abstractions
+
+| Abstraction                     | Type     | Purpose                                            |
+| ------------------------------- | -------- | -------------------------------------------------- |
+| `SessionCompletionNotifying`    | protocol | Decouple notification delivery from ViewModel      |
+| `SessionCompletionSoundPlaying` | protocol | Decouple sound playback (beep) from ViewModel      |
+| `SessionTimerServicing`         | protocol | Decouple timer implementation from ViewModel       |
+| `WindowPositioning`             | enum     | Consolidate frame math and Y-position calculations |
+| `SessionStateMachine`           | enum     | Pure state transition logic                        |

@@ -1,157 +1,104 @@
-# CONVENTIONS.md — Coding Standards & Patterns
+# Coding Conventions
 
-## Formatting
+## Swift Style
 
-| Rule             | Value                          |
-| ---------------- | ------------------------------ |
-| Indentation      | 4 spaces                       |
-| Line length      | 120 (warn), 150 (error)        |
-| File length      | 500 lines (warn), 1000 (error) |
-| Function body    | 50 lines (warn)                |
-| Trailing newline | Required                       |
-| Documentation    | `///` for public/internal APIs |
+### Access Control
 
-## Naming
+- Explicit `internal` keyword on all declarations (enforced by SwiftLint `explicit_top_level_acl`)
+- `private` for encapsulated state, `private(set)` for read-only published properties
+- `public` only where needed (rare — mostly testable internals)
 
-| Element | Convention | Example |
-| --- | --- | --- |
-| Types | PascalCase | `FocusSessionViewModel` |
-| Functions/Vars | camelCase | `startSession()`, `displayTime` |
-| Constants (instance) | lowerCamelCase | `horizontalPadding` |
-| Constants (static) | PascalCase | `minWorkMinutes` |
-| Booleans | `is`/`has`/`should`/`can` prefix | `isWorkSession`, `canStart`, `shouldUseLongBreak` |
-| Protocols (capability) | `*ing` suffix | `SessionCompletionNotifying` |
-| Protocols (role) | `*Protocol` suffix | `AudioEngineProtocol` |
-| UserDefaults keys | dot-notation strings | `"preset.short.workMinutes"` |
+### Naming
 
-## Access Control
+- **Types**: PascalCase (`FocusSessionViewModel`, `SessionState`)
+- **Functions/Variables**: camelCase (`startSession`, `displayTime`)
+- **Constants**: lowerCamelCase for instances, PascalCase for statics
+- **Booleans**: `is`/`has`/`should` prefix (`isWorkSession`, `canStart`, `shouldUseLongBreak`)
+- **Protocols**: `*ing` suffix for capabilities (`SessionCompletionNotifying`, `SessionCompletionSoundPlaying`)
 
-- `internal` keyword is **explicit** on ALL declarations (SwiftLint `explicit_top_level_acl`)
-- `private` for internal state, `private(set)` for read-only published
-- `private enum Keys` with static strings for UserDefaults keys
+### Imports
 
-## Imports
-
-```swift
-// Order: Foundation → Combine → SwiftUI/AppKit → Apple frameworks
-import Foundation
-import Combine
-import SwiftUI
-import AVFoundation
-```
-
-- No blank lines between imports
-- One blank line between types
+- **Order**: Foundation → Combine → SwiftUI/AppKit → Apple frameworks → `@testable import Oak`
+- **Grouping**: `testable-bottom` (testable imports last)
+- No blank lines between imports, one blank line between types
 - Remove unused imports (analyzer rule)
 
-## ViewModel & ObservableObject Patterns
+### Formatting
 
-```swift
-@MainActor
-internal class FocusSessionViewModel: ObservableObject {
-    @Published var sessionState: SessionState = .idle
-    @Published var selectedPreset: Preset = .short
-    @Published private(set) var completedRounds: Int = 0
+- **Indent**: 4 spaces
+- **Line length**: 120 (warn), 150 (error)
+- **Trailing newline**: Required
+- **Documentation**: `///` for public/internal APIs
+- **File length**: Warn at 500 lines, error at 1000
+- **Function body**: Warn at 50 lines
 
-    // Protocol-based DI
-    let audioManager: AudioManager
-    let notificationService: any SessionCompletionNotifying
-    let completionSoundPlayer: any SessionCompletionSoundPlaying
+### SwiftLint Opt-in Rules
 
-    init(
-        presetSettings: PresetSettingsStore,
-        audioManager: AudioManager? = nil,
-        notificationService: any SessionCompletionNotifying,
-        completionSoundPlayer: (any SessionCompletionSoundPlaying)? = nil,
-        currentDate: @escaping () -> Date = Date.init
-    ) { ... }
-}
-```
+`explicit_init`, `explicit_top_level_acl`, `trailing_closure`, `first_where`, `toggle_bool`, `modifier_order`, `vertical_parameter_alignment_on_call`, `closure_spacing`, `empty_count`, `sorted_first_last`, `redundant_type_annotation`, `yoda_condition`, `unneeded_parentheses_in_closure_argument`
 
-- Always `@MainActor` on `ObservableObject` classes
-- Use `any Protocol` for type-erased DI
-- Provide default parameter values for optional dependencies
-- Forward `objectWillChange` from child stores via Combine
+### SwiftFormat
 
-## State Machine Pattern
+- 4-space indent, 120 max width, `wraparguments before-first`
+- `self` removal, `isEmpty` enforcement
+- Blank lines between scopes, sorted imports
 
-```swift
-// Enum with associated values for FSM
-internal enum SessionState: Equatable {
-    case idle
-    case running(remainingSeconds: Int, isWorkSession: Bool)
-    case paused(remainingSeconds: Int, isWorkSession: Bool)
-    case completed(isWorkSession: Bool)
-}
+## Architecture Conventions
 
-// State checks via if case
-if case .idle = sessionState { ... }
-if case let .running(remaining, isWork) = sessionState { ... }
-```
+### @MainActor
 
-## Error Handling & Logging
+- All `ObservableObject` classes must be `@MainActor` or use `@MainActor`-annotated methods
+- All ViewModels must be `@MainActor`
+- Services that don't need UI isolation can omit `@MainActor` if they dispatch properly
+- **CRITICAL**: Keep `@MainActor` on `ObservableObject` with `@Published`
 
-- `os.Logger` for production logging (subsystem: `com.productsway.oak.app`)
-- No `print()` statements (SwiftLint warns)
-- `guard` early returns preferred over nested `if`
-- `Result` for async operations
-- `do/catch` with logged errors for audio operations
+### State Management
 
-## Memory & Concurrency
+- Enums with associated values for FSMs (`SessionState`)
+- `if case` for state checks
+- Computed properties for derived state (`displayTime`, `canPause`, `progressPercentage`)
 
-```swift
-// [weak self] in ALL escaping closures
-timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-    Task { @MainActor in
-        self?.tick()
-    }
-}
-
-// Always invalidate() timers in deinit
-deinit {
-    timer?.invalidate()
-    autoStartTimer?.invalidate()
-}
-```
+### Memory & Concurrency
 
 - `[weak self]` in all escaping closures
-- `Timer.invalidate()` in `deinit`
-- `Task { @MainActor in ... }` to return to main actor
-- `AnyCancellable` for Combine subscriptions, cancelled on deinit
+- Always `invalidate()` timers in `deinit`
+- Wrap timer callbacks: `Task { @MainActor in self?.tick() }`
+- Use `AnyCancellable` for Combine subscriptions
+- Cancel subscriptions in `deinit`
 
-## View Update Safety
+### View Update Safety
 
 ```swift
-// ❌ Wrong - publishes from view update synchronously
+// ❌ Wrong — publishes from view update
 .onChange(of: value) { newValue in viewModel.update(newValue) }
 
-// ✅ Correct - async dispatch
+// ✅ Correct — async dispatch
 .onChange(of: value) { newValue in
     DispatchQueue.main.async { viewModel.update(newValue) }
 }
 ```
 
-## Dependency Injection
+### Error Handling
 
-Protocol-based DI is used throughout:
+- Use `Result` for async operations
+- Prefer `guard`/early returns over nested `if`
+- **Logging**: `os.log` for production, `print()` only for debug (SwiftLint warns on `print()`)
 
-- `SessionCompletionNotifying` — notification delivery (mocked in tests)
-- `SessionCompletionSoundPlaying` — completion sound (mocked in tests)
-- `AudioEngineProtocol` — audio engine (mocked in tests)
+### Dependency Injection
 
-Default implementations provided via init parameters for production use.
+- Protocol-based mocks for testing
+- Optional parameters with defaults for production code:
+  ```swift
+  init(audioManager: AudioManager? = nil, ...)
+  ```
+- Use `any Protocol` syntax for type-erasure
 
-## UserDefaults
+## Testing Conventions
 
-- Keys stored in `private enum Keys { static let ... }`
-- `userDefaults.register(defaults:)` for all keys at init
-- Validated getters with clamped ranges (`validatedWorkMinutes`, `validatedBreakMinutes`)
-- Guard against no-op writes: `guard currentValue != newValue else { return }`
+- `@MainActor` on test classes
+- `@testable import Oak` for internal access
+- Isolate `UserDefaults` with unique suite names
+- Always `cleanup()` and remove persistent domains in `tearDown()`
 
-## SwiftUI View Conventions
+## Commit Style
 
-- Extract subviews as `private var someView: some View` computed properties
-- Use `@ObservedObject` for injected dependencies
-- `@State` for local UI state only
-- Popover-based menus (audio, progress, settings)
-- Completion animations: `.spring(response: 0.3, dampingFraction: 0.7)`
+`type(scope): description` — types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
