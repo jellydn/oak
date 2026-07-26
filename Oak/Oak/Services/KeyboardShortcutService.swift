@@ -177,7 +177,8 @@ internal final class KeyboardShortcutService: ObservableObject {
     }
 
     private func handleGlobalKeyEvent(_ event: NSEvent) {
-        guard let vm = viewModel else { return } for (action, keyEquiv) in config.shortcuts {
+        guard let vm = viewModel else { return }
+        for (action, keyEquiv) in config.shortcuts {
             guard eventMatchesEquiv(event, keyEquiv) else { continue }
             Task { @MainActor in
                 performAction(action, viewModel: vm)
