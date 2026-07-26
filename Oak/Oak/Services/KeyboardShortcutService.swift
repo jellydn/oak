@@ -80,7 +80,7 @@ internal struct KeyboardShortcutConfig: Codable, Equatable {
     var shortcuts: [KeyboardShortcutAction: KeyEquivalent]
 
     static let `default` = KeyboardShortcutConfig(
-        enabled: false,
+        enabled: true,
         globalHotkeysEnabled: false,
         shortcuts: [
             .toggleSession: KeyboardShortcutAction.toggleSession.defaultKey,
@@ -155,20 +155,14 @@ internal final class KeyboardShortcutService: ObservableObject {
     // MARK: - Private
 
     private func startLocalMonitor() {
-        // Temporarily disabled — local event monitor is suspected of
-        // causing UI freezes during expand/collapse operations.
-        // Perf investigation: the monitor intercepts EVERY keyDown on
-        // the main thread, including AppKit-internal layout events.
-        /*
-         guard localEventMonitor == nil else { return }
-         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-             guard let self else { return event }
-             if handleKeyEvent(event) {
-                 return nil
-             }
-             return event
-         }
-         */
+        guard localEventMonitor == nil else { return }
+        localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else { return event }
+            if handleKeyEvent(event) {
+                return nil
+            }
+            return event
+        }
     }
 
     private func startGlobalMonitor() {
