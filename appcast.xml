@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.42</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.42</link>
+  <sparkle:version>5042</sparkle:version>
+  <sparkle:shortVersionString>0.5.42</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.42</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>feat: add keyboard shortcuts for timer controls by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4980126962" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/142" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/142/hovercard" href="https://github.com/jellydn/oak/pull/142">#142</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.41...v0.5.42"><tt>v0.5.41...v0.5.42</tt></a></p>
+  ]]></description>
+  <pubDate>Sun, 26 Jul 2026 21:43:29 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.42/Oak-0.5.42.dmg"
+             sparkle:version="5042"
+             sparkle:shortVersionString="0.5.42"
+             sparkle:edSignature="zJHjWU1Oa0v7KBbhYMfIHurYnxxd8FA6IG5Isq0ZYnwxW825eUvQQIqeo6xL4gXXXRG7+0Mk5O2S+/W/b1AUBQ=="
+             length="9081474"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.41</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.41</link>
   <sparkle:version>5041</sparkle:version>
@@ -49,27 +70,6 @@
              sparkle:shortVersionString="0.5.40"
              sparkle:edSignature="8h5OK7NELe3NzMGTeOlvvuBjVC+0ToHER5wxuA5fehnFfAIcyWmnq21iUlgnbsDShs6p7tTJEDzJHVVehUOdBA=="
              length="9024912"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.37</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.37</link>
-  <sparkle:version>5037</sparkle:version>
-  <sparkle:shortVersionString>0.5.37</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.37</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>fix: address codebase concerns - extract NoiseGenerator, expand thin tests by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4973751407" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/129" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/129/hovercard" href="https://github.com/jellydn/oak/pull/129">#129</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.36...v0.5.37"><tt>v0.5.36...v0.5.37</tt></a></p>
-  ]]></description>
-  <pubDate>Sat, 25 Jul 2026 16:24:16 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.37/Oak-0.5.37.dmg"
-             sparkle:version="5037"
-             sparkle:shortVersionString="0.5.37"
-             sparkle:edSignature="5fOTN3pJS5RmWbC6zu8PPnrLgmZdQ6jdBz/SlMz9f8t0vblqf2YpUzQ8rnPpVmki1WnhJao7nGAhGubuHJg4Cg=="
-             length="9026929"
              type="application/octet-stream" />
 </item>
   </channel>
