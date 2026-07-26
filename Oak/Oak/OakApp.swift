@@ -10,7 +10,8 @@ internal struct OakApp: App {
             SettingsMenuView(
                 presetSettings: appDelegate.presetSettings,
                 notificationService: appDelegate.notificationService,
-                sparkleUpdater: appDelegate.sparkleUpdater
+                sparkleUpdater: appDelegate.sparkleUpdater,
+                keyboardShortcutService: appDelegate.keyboardShortcutService
             )
             .frame(width: 420)
             .padding(8)
@@ -24,6 +25,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var sparkleUpdater = SparkleUpdater()
     private(set) var notificationService = NotificationService()
     private(set) var presetSettings = PresetSettingsStore()
+    private(set) var keyboardShortcutService = KeyboardShortcutService()
 
     private var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
@@ -40,8 +42,11 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         notchWindowController = NotchWindowController(
             presetSettings: presetSettings,
             notificationService: notificationService,
-            sparkleUpdater: sparkleUpdater
+            sparkleUpdater: sparkleUpdater,
+            keyboardShortcutService: keyboardShortcutService
         )
+        keyboardShortcutService.viewModel = notchWindowController?.viewModel
+        keyboardShortcutService.load()
         notchWindowController?.window?.orderFrontRegardless()
 
         // Keep status in sync at launch; permission requests are user-initiated from Settings.
@@ -51,6 +56,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {
+        keyboardShortcutService.stop()
         notchWindowController?.cleanup()
     }
 
@@ -58,6 +64,7 @@ internal class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             await notificationService.refreshAuthorizationStatus()
             notchWindowController?.checkDayChange()
+            keyboardShortcutService.load()
         }
     }
 }

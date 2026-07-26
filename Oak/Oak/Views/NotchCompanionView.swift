@@ -5,6 +5,7 @@ internal struct NotchCompanionView: View {
     @ObservedObject var viewModel: FocusSessionViewModel
     @ObservedObject private var notificationService: NotificationService
     @ObservedObject private var sparkleUpdater: SparkleUpdater
+    @ObservedObject private var keyboardShortcutService: KeyboardShortcutService
     @State var showAudioMenu = false
     @State var showProgressMenu = false
     @State var showSettingsMenu = false
@@ -24,11 +25,13 @@ internal struct NotchCompanionView: View {
         viewModel: FocusSessionViewModel,
         notificationService: NotificationService,
         sparkleUpdater: SparkleUpdater,
+        keyboardShortcutService: KeyboardShortcutService = KeyboardShortcutService(),
         onExpansionChanged: @escaping (Bool) -> Void = { _ in }
     ) {
         self.viewModel = viewModel
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
+        self.keyboardShortcutService = keyboardShortcutService
         self.onExpansionChanged = onExpansionChanged
     }
 
@@ -147,7 +150,8 @@ internal struct NotchCompanionView: View {
             SettingsMenuView(
                 presetSettings: viewModel.presetSettings,
                 notificationService: notificationService,
-                sparkleUpdater: sparkleUpdater
+                sparkleUpdater: sparkleUpdater,
+                keyboardShortcutService: keyboardShortcutService
             )
             .frame(width: 340)
             .dismissOnClickOutside { [self] in
