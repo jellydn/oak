@@ -40,8 +40,16 @@ internal struct SettingsMenuView: View {
             section(title: "Session Presets") {
                 autoStartNextIntervalToggle
                 longBreakCycleEditor
-                presetEditor(title: presetSettings.displayName(for: .short), preset: .short)
-                presetEditor(title: presetSettings.displayName(for: .long), preset: .long)
+                PresetEditorView(
+                    presetSettings: presetSettings,
+                    title: presetSettings.displayName(for: .short),
+                    preset: .short
+                )
+                PresetEditorView(
+                    presetSettings: presetSettings,
+                    title: presetSettings.displayName(for: .long),
+                    preset: .long
+                )
             }
 
             section(title: "Notifications") {
@@ -110,58 +118,6 @@ internal struct SettingsMenuView: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.primary)
             content()
-        }
-    }
-
-    private func presetEditor(title: String, preset: Preset) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium))
-
-            HStack(spacing: 8) {
-                Text("Focus")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(width: 40, alignment: .leading)
-
-                Stepper(
-                    value: workMinutesBinding(for: preset),
-                    in: PresetSettingsStore.minWorkMinutes ... PresetSettingsStore.maxWorkMinutes
-                ) {
-                    Text("\(presetSettings.workMinutes(for: preset)) min")
-                        .font(.caption)
-                }
-            }
-
-            HStack(spacing: 8) {
-                Text("Break")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(width: 40, alignment: .leading)
-
-                Stepper(
-                    value: breakMinutesBinding(for: preset),
-                    in: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
-                ) {
-                    Text("\(presetSettings.breakMinutes(for: preset)) min")
-                        .font(.caption)
-                }
-            }
-
-            HStack(spacing: 8) {
-                Text("Long")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(width: 40, alignment: .leading)
-
-                Stepper(
-                    value: longBreakMinutesBinding(for: preset),
-                    in: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
-                ) {
-                    Text("\(presetSettings.longBreakMinutes(for: preset)) min")
-                        .font(.caption)
-                }
-            }
         }
     }
 
@@ -255,27 +211,6 @@ internal struct SettingsMenuView: View {
 }
 
 private extension SettingsMenuView {
-    func workMinutesBinding(for preset: Preset) -> Binding<Int> {
-        Binding(
-            get: { presetSettings.workMinutes(for: preset) },
-            set: { presetSettings.setWorkMinutes($0, for: preset) }
-        )
-    }
-
-    func breakMinutesBinding(for preset: Preset) -> Binding<Int> {
-        Binding(
-            get: { presetSettings.breakMinutes(for: preset) },
-            set: { presetSettings.setBreakMinutes($0, for: preset) }
-        )
-    }
-
-    func longBreakMinutesBinding(for preset: Preset) -> Binding<Int> {
-        Binding(
-            get: { presetSettings.longBreakMinutes(for: preset) },
-            set: { presetSettings.setLongBreakMinutes($0, for: preset) }
-        )
-    }
-
     var displayTargetBinding: Binding<DisplayTarget> {
         Binding(
             get: { selectedDisplayTarget },
