@@ -91,6 +91,26 @@ Oak requires a MacBook with a notch (14" or 16" MacBook Pro from 2021 or later).
 2. Try restarting Oak
 3. Check that no other apps are using the notch area
 
+### Keyboard shortcuts not working
+
+Oak supports keyboard shortcuts (Space to start/pause, Escape to reset). If they're not responding:
+
+1. Check that shortcuts are enabled — open Settings (gear icon), scroll to **Keyboard**, and ensure "Enable keyboard shortcuts" is toggled on
+2. Make sure Oak is the active application — local shortcuts only work when Oak is in focus
+3. If you enabled "Global hotkeys" in Settings, you'll need to grant Accessibility permission:
+   - Open **System Settings** → **Privacy & Security** → **Accessibility**
+   - Add Oak to the list and enable the toggle
+   - Restart Oak after granting permission
+
+### Export/Import not working
+
+Oak lets you export your progress as JSON or CSV, or import from a backup:
+
+1. Export and import are available in Settings under the **Data** section
+2. If the buttons are disabled, ensure you're running Oak with at least one completed session
+3. Export opens a save dialog — choose a location you have write permission to
+4. Import only accepts `.json` files previously exported by Oak
+
 ### Settings not persisting
 
 Oak stores settings locally using UserDefaults. If settings aren't saving:

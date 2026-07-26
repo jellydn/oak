@@ -8,10 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Keyboard shortcuts for timer control — Space to start/pause/resume, Escape to reset. Configurable in Settings with optional global hotkeys (#142)
+- Progress data export/import — Export session history as JSON or CSV, import from backup files. Data section in Settings with NSSavePanel/NSOpenPanel (#141)
 - Domain glossary (`CONTEXT.md`) — formal definitions for Session State, Preset, Round, Display Target, and other core terms
 - Codebase map documents in `.planning/codebase/` — STACK.md, ARCHITECTURE.md, STRUCTURE.md, CONVENTIONS.md, TESTING.md, INTEGRATIONS.md, CONCERNS.md
 - ADR-0003 — decision record for the glossary and codebase map approach
 - `.prettierrc` — markdown formatting defaults
+
+### Changed
+
+- Refactored internal architecture — extracted SessionStateMachine, SessionTimerService, WindowPositioning, PresetEditorView; split PresetSettingsStore into domain configs; merged NotchCompanionView extensions
 
 ## [0.5.30] - 2026-05-25
 
