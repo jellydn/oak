@@ -132,33 +132,6 @@ internal struct NotchCompanionView: View {
                 }
             }
         }
-        .popover(isPresented: $showAudioMenu) {
-            AudioMenuView(audioManager: viewModel.audioManager)
-                .frame(width: 200)
-                .dismissOnClickOutside { [self] in
-                    showAudioMenu = false
-                }
-        }
-        .popover(isPresented: $showProgressMenu) {
-            ProgressMenuView(viewModel: viewModel)
-                .frame(width: 200)
-                .dismissOnClickOutside { [self] in
-                    showProgressMenu = false
-                }
-        }
-        .popover(isPresented: $showSettingsMenu) {
-            SettingsMenuView(
-                presetSettings: viewModel.presetSettings,
-                notificationService: notificationService,
-                sparkleUpdater: sparkleUpdater,
-                keyboardShortcutService: keyboardShortcutService,
-                progressManager: viewModel.progressManager
-            )
-            .frame(width: 340)
-            .dismissOnClickOutside { [self] in
-                showSettingsMenu = false
-            }
-        }
     }
 }
 
@@ -209,6 +182,13 @@ extension NotchCompanionView {
         .accessibilityLabel(viewModel.audioManager.isPlaying ? "Audio playing" : "Audio")
         .accessibilityHint("Opens audio menu to select ambient sounds")
         .accessibilityIdentifier("audioButton")
+        .popover(isPresented: $showAudioMenu) {
+            AudioMenuView(audioManager: viewModel.audioManager)
+                .frame(width: 200)
+                .dismissOnClickOutside { [self] in
+                    showAudioMenu = false
+                }
+        }
     }
 
     var progressButton: some View {
@@ -244,6 +224,13 @@ extension NotchCompanionView {
         )
         .accessibilityHint("Opens progress menu to view session history")
         .accessibilityIdentifier("progressButton")
+        .popover(isPresented: $showProgressMenu) {
+            ProgressMenuView(viewModel: viewModel)
+                .frame(width: 200)
+                .dismissOnClickOutside { [self] in
+                    showProgressMenu = false
+                }
+        }
     }
 
     var settingsButton: some View {
@@ -266,6 +253,19 @@ extension NotchCompanionView {
         .accessibilityLabel("Settings")
         .accessibilityHint("Opens settings menu")
         .accessibilityIdentifier("settingsButton")
+        .popover(isPresented: $showSettingsMenu) {
+            SettingsMenuView(
+                presetSettings: viewModel.presetSettings,
+                notificationService: notificationService,
+                sparkleUpdater: sparkleUpdater,
+                keyboardShortcutService: keyboardShortcutService,
+                progressManager: viewModel.progressManager
+            )
+            .frame(width: 340)
+            .dismissOnClickOutside { [self] in
+                showSettingsMenu = false
+            }
+        }
     }
 
     var expandToggleButton: some View {
