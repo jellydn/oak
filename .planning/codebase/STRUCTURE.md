@@ -1,124 +1,147 @@
-# Directory Structure
+# Codebase Structure
+
+**Analysis Date:** 2026-07-26
+
+## Directory Layout
 
 ```
-Oak/
-├── Oak/                          # Main application target
-│   ├── OakApp.swift              # @main entry point + AppDelegate
-│   ├── Info.plist                # App metadata, LSUIElement, Sparkle config
-│   ├── Oak.entitlements          # Network client entitlement
-│   │
-│   ├── Models/                   # Data models (value types, enums)
-│   │   ├── SessionModels.swift   # SessionState (FSM), Preset, SessionType
-│   │   ├── ProgressData.swift    # ProgressData, SessionRecord, DailyStats
-│   │   ├── AudioTrack.swift      # Ambient audio track enum
-│   │   ├── NotchLayout.swift     # Layout constants (height, sizing)
-│   │   └── CountdownDisplayMode.swift
-│   │
-│   ├── ViewModels/               # ViewModels (@MainActor, ObservableObject)
-│   │   └── FocusSessionViewModel.swift  # 373 lines — session lifecycle
-│   │
-│   ├── Views/                    # SwiftUI Views
-│   │   ├── NotchCompanionView.swift          # 351 lines — main notch UI
-│   │   ├── NotchCompanionView+StandardViews.swift  # 282 lines
-│   │   ├── NotchCompanionView+InsideNotch.swift     # 259 lines
-│   │   ├── NotchWindowController.swift      # 255 lines — NSPanel management
-│   │   ├── WindowPositioning.swift          # 90 lines — frame math
-│   │   ├── SettingsMenuView.swift           # 341 lines — settings panel
-│   │   ├── PresetEditorView.swift           # 82 lines — stepper controls
-│   │   ├── ProgressMenuView.swift           # 140 lines — daily stats
-│   │   ├── AudioMenuView.swift              # Ambient track picker
-│   │   ├── CircularProgressRing.swift       # Progress indicator
-│   │   ├── ConfettiView.swift               # Session completion effect
-│   │   ├── TransientPopover.swift           # Click-outside dismiss
-│   │   ├── NotificationSettingsView.swift   # Notification permission UI
-│   │   ├── UpdateSettingsView.swift         # Sparkle update controls
-│   │   ├── SupportSectionView.swift         # Links and support info
-│   │   ├── NotchVisualStyle.swift           # Visual theming
-│   │   └── NotchVisualStyle+Factory.swift   # Style factory
-│   │
-│   ├── Services/                 # Business logic & persistence
-│   │   ├── AudioManager.swift             # 328 lines — AVAudioPlayer
-│   │   ├── ProgressManager.swift          # 163 lines — UserDefaults persistence
-│   │   ├── PresetSettingsStore.swift      # 261 lines — all settings
-│   │   ├── SessionTimerService.swift      # 108 lines — Timer-based countdown
-│   │   ├── NotificationService.swift      # 101 lines — UserNotifications
-│   │   ├── SparkleUpdater.swift           # 219 lines — update framework
-│   │   ├── KeyboardShortcutService.swift  # 258 lines — NSEvent monitoring
-│   │   ├── NoiseGenerator.swift           # White/brown noise generator
-│   │   ├── SessionDurationConfig.swift    # 136 lines — duration settings
-│   │   ├── DisplayConfig.swift            # 108 lines — display settings
-│   │   └── BehaviorConfig.swift           # Behavior settings
-│   │
-│   ├── Extensions/               # Swift extensions
-│   │   ├── NSScreen+UUID.swift            # Display UUID tracking
-│   │   └── NSScreen+DisplayTarget.swift   # Screen matching & notch detection
-│   │
-│   └── Resources/                # Assets
-│       ├── Assets.xcassets/      # App icon
-│       └── Sounds/               # Built-in ambient audio (m4a)
-│           ├── ambient_rain.m4a
-│           ├── ambient_forest.m4a
-│           ├── ambient_cafe.m4a
-│           ├── ambient_lofi.m4a
-│           └── ambient_brown_noise.m4a
-│
-├── Tests/OakTests/               # 29 test files
-│   ├── US001Tests.swift through US006Tests.swift  # Feature-level tests
-│   ├── NotchCompanionViewTests.swift (+Layout, +SessionState)
-│   ├── NotchWindowControllerTests.swift (+NotchWindow, +WindowBehavior, +NotchFirstUI)
-│   ├── AudioManagerTests.swift, AudioPersistenceTests.swift
-│   ├── AccessibilityTests.swift
-│   ├── ConfettiViewTests.swift, ClickOutsideModifierTests.swift
-│   ├── CountdownDisplayModeTests.swift
-│   ├── AlwaysOnTopTests.swift
-│   ├── LongBreakTests.swift
-│   ├── AutoStartNextIntervalTests.swift
-│   ├── NotificationTests.swift, SessionCompletionNotificationTests.swift
-│   ├── SparkleUpdaterTests.swift, AppcastVersionParserTests.swift
-│   ├── NSScreenNotchTests.swift
-│   ├── SmokeTests.swift
-│   └── MockAudioManager.swift
-│
-├── project.yml                  # XcodeGen configuration
-├── justfile                     # Task runner
-├── .swiftlint.yml               # Lint rules
-├── .swiftformat                 # Format rules
-├── appcast.xml                  # Sparkle release feed
-├── CHANGELOG.md                 # Release history
-├── README.md                    # Project readme
-├── DEVELOPMENT.md               # Developer setup guide
-├── CONTEXT.md                   # Codebase context
-├── TROUBLESHOOTING.md           # Common issues
-├── AGENTS.md                    # AI agent guidelines
-├── RELEASES.md                  # Release notes
-├── LICENSE                      # MIT license
-│
-├── .planning/codebase/          # Codebase map (these docs)
-├── .github/workflows/           # CI/CD pipelines
-├── scripts/release/             # Release asset scripts
-├── docs/                        # GitHub Pages site
-├── Casks/                       # Homebrew cask formula
-└── tasks/                       # PRD documents
+2026-02-12-oak/
+├── Oak/                        # Xcode project root
+│   ├── Oak/                    # App target sources
+│   │   ├── Models/             # Value types, enums, FSM
+│   │   ├── Views/              # SwiftUI views + NSWindow controller
+│   │   ├── ViewModels/         # ObservableObject view models
+│   │   ├── Services/           # Domain logic, audio, persistence, updates
+│   │   ├── Extensions/         # NSScreen helpers
+│   │   ├── Resources/Sounds/   # Bundled .m4a ambient tracks
+│   │   ├── Info.plist
+│   │   └── OakApp.swift        # @main entry + AppDelegate
+│   ├── Tests/OakTests/         # Unit tests (33 files)
+│   ├── Oak.xcodeproj/          # Generated by XcodeGen (committed)
+│   └── project.yml             # XcodeGen spec
+├── .github/workflows/          # CI, release, appcast, pages workflows
+├── .changeset/                 # Pending changesets
+├── .planning/codebase/         # This codebase map (tracked)
+├── assets/                     # SVG app icons, readme header
+├── Casks/                      # Homebrew cask (oak.rb)
+├── doc/adr/                    # Architecture Decision Records
+├── docs/                       # GitHub Pages site (index.html)
+├── scripts/                    # check-ambient-sounds.sh, ralph/, release/
+├── tasks/                      # PRDs (prd-macos-focus-companion-app.md, prd-dynamic-island-phase-1.md)
+├── appcast.xml                 # Sparkle update feed
+├── justfile                    # Task runner
+├── .swiftlint.yml / .swiftformat
+├── AGENTS.md / CLAUDE.md / CONTEXT.md / DEVELOPMENT.md / TROUBLESHOOTING.md
+└── README.md / CHANGELOG.md / RELEASES.md
 ```
 
-## File Line Counts (Largest 10)
+## Directory Purposes
 
-| File                                     | Lines |
-| ---------------------------------------- | ----- |
-| `FocusSessionViewModel.swift`            | 373   |
-| `NotchCompanionView.swift`               | 351   |
-| `SettingsMenuView.swift`                 | 341   |
-| `AudioManager.swift`                     | 328   |
-| `NotchCompanionView+StandardViews.swift` | 282   |
-| `PresetSettingsStore.swift`              | 261   |
-| `NotchCompanionView+InsideNotch.swift`   | 259   |
-| `KeyboardShortcutService.swift`          | 258   |
-| `NotchWindowController.swift`            | 255   |
-| `SparkleUpdater.swift`                   | 219   |
+**`Oak/Oak/Models/`:** Pure value types and enums — no AppKit/SwiftUI dependencies (only Foundation). Defines `SessionState`, `SessionStateMachine`, `Preset`, `AudioTrack`, `ProgressData`, `NotchLayout`, `CountdownDisplayMode`, `DisplayTarget`.
+
+**`Oak/Oak/Views/`:** SwiftUI views + the `NSWindowController`/`NSPanel` host. Key files: `NotchCompanionView.swift` (root view) + `NotchCompanionView+StandardViews.swift` / `NotchCompanionView+InsideNotch.swift` (view extraction), `NotchWindowController.swift` (window host), `WindowPositioning.swift` (frame math), `NotchVisualStyle.swift` + `NotchVisualStyle+Factory.swift`, menu views (`AudioMenuView`, `ProgressMenuView`, `SettingsMenuView`, `PresetEditorView`, `NotificationSettingsView`, `UpdateSettingsView`, `SupportSectionView`), `CircularProgressRing`, `ConfettiView`, `TransientPopover`.
+
+**`Oak/Oak/ViewModels/`:** Single file `FocusSessionViewModel.swift` — session orchestration + derived display state.
+
+**`Oak/Oak/Services/`:** Domain logic. `SessionTimerService`, `AudioManager` + `AudioEngineAdapter`, `NoiseGenerator`, `ProgressManager`, `PresetSettingsStore` + three `*Config` helpers, `NotificationService`, `SparkleUpdater` + `AppcastVersionParser`, `KeyboardShortcutService`.
+
+**`Oak/Oak/Extensions/`:** `NSScreen+DisplayTarget.swift` (resolve `NSScreen` by `DisplayTarget`/preferred ID), `NSScreen+UUID.swift` (display ID extraction).
+
+**`Oak/Oak/Resources/Sounds/`:** Five bundled `.m4a` ambient tracks (`ambient_{rain,forest,cafe,brown_noise,lofi}.m4a`). Validated by `scripts/check-ambient-sounds.sh`.
+
+**`Oak/Tests/OakTests/`:** 33 XCTest files mirroring source concerns. Mix of user-story suites (`US001`–`US006`) and feature suites (`AudioManagerTests`, `LongBreakTests`, `AutoStartNextIntervalTests`, `SessionCompletionNotificationTests`, `NotchWindowControllerTests*`, `AccessibilityTests`, etc.).
+
+## Key File Locations
+
+**Entry Points:**
+
+- `Oak/Oak/OakApp.swift`: `@main OakApp` + `AppDelegate`
+- `Oak/Oak/Views/NotchWindowController.swift`: `NotchWindowController` + `NotchWindow` (borderless `NSPanel`)
+
+**Configuration:**
+
+- `Oak/project.yml`: XcodeGen spec (target deps, Sparkle package, build settings, bundle id)
+- `Oak/Oak/Info.plist`: `LSUIElement`, Sparkle keys (`SUFeedURL`, `SUPublicEDKey`, `SUScheduledCheckInterval`)
+- `justfile`: build/test/lint/format recipes; version derivation from git tags
+- `.swiftlint.yml`, `.swiftformat`: style enforcement
+
+**Core Logic:**
+
+- `Oak/Oak/Models/SessionModels.swift`: `SessionState` FSM + `SessionStateMachine` transitions + `Preset`/`DisplayTarget`
+- `Oak/Oak/ViewModels/FocusSessionViewModel.swift`: session control, completion, auto-start, derived state
+- `Oak/Oak/Services/SessionTimerService.swift`: drift-free countdown timer + auto-start countdown
+- `Oak/Oak/Services/AudioManager.swift`: bundled-track + procedural-noise playback
+- `Oak/Oak/Services/ProgressManager.swift`: daily stats, streaks, 90-day retention, export/import
+- `Oak/Oak/Services/PresetSettingsStore.swift`: settings façade delegating to `SessionDurationConfig`/`DisplayConfig`/`BehaviorConfig`
+
+**Testing:**
+
+- `Oak/Tests/OakTests/`: all tests
+- `Oak/Tests/OakTests/MockAudioManager.swift`: shared mock pattern reference
+- `Oak/Tests/OakTests/SmokeTests.swift`: type-existence + default-value smoke checks
 
 ## Naming Conventions
 
-- **Files**: PascalCase, mirroring primary type name
-- **Extensions**: `TypeName+Feature.swift` (e.g., `NotchCompanionView+Controls.swift`)
-- **Tests**: `{Feature}Tests.swift` or `{Feature}Tests+{Aspect}.swift`
-- **Directories**: Models, Views, ViewModels, Services, Extensions, Resources
+**Files:**
+
+- PascalCase type name: `FocusSessionViewModel.swift`, `NotchCompanionView.swift`
+- View extraction: `<View>+<Aspect>.swift` — `NotchCompanionView+StandardViews.swift`, `NotchCompanionView+InsideNotch.swift`, `NotchVisualStyle+Factory.swift`
+- Test files: `<Subject>Tests.swift` (e.g. `AudioManagerTests.swift`) or `US00xTests.swift` (user-story suites); split suites: `NotchWindowControllerTests+<Aspect>.swift`
+- Config helpers: `<Domain>Config.swift` — `SessionDurationConfig.swift`, `DisplayConfig.swift`, `BehaviorConfig.swift`
+- Extensions: `<Type>+<Aspect>.swift` — `NSScreen+DisplayTarget.swift`, `NSScreen+UUID.swift`
+
+**Directories:**
+
+- PascalCase group names matching XcodeGen `sources` paths: `Models/`, `Views/`, `ViewModels/`, `Services/`, `Extensions/`, `Resources/`
+
+## Where to Add New Code
+
+**New Feature (session behavior):**
+
+- Model/FSM: `Oak/Oak/Models/`
+- ViewModel logic: extend `FocusSessionViewModel` (or extract a collaborator in `Services/`)
+- Service: `Oak/Oak/Services/` (new file, `@MainActor`, `internal`)
+- Settings persistence: add to the relevant `*Config` helper + expose on `PresetSettingsStore`
+- View: `Oak/Oak/Views/` (extract as `private var` or extension file if large)
+- Tests: `Oak/Tests/OakTests/<Feature>Tests.swift` with isolated UserDefaults suite
+
+**New ambient audio track:**
+
+- Add case to `AudioTrack` enum (`Oak/Oak/Models/AudioTrack.swift`) + `systemImageName` + `bundledFileBaseName`
+- Add `create<Node>` method in `AudioManager` + `NoiseGenerator` generator (procedural fallback)
+- Drop `ambient_<name>.m4a` into `Oak/Oak/Resources/Sounds/`
+- Update `scripts/check-ambient-sounds.sh` required list
+
+**New keyboard shortcut action:**
+
+- Add case to `KeyboardShortcutAction` (`Oak/Oak/Services/KeyboardShortcutService.swift`) + `displayName` + `defaultKey`
+- Handle in `performAction(_:viewModel:)`
+- Test in `Oak/Tests/OakTests/`
+
+**Utilities:**
+
+- Shared helpers: prefer a focused `internal enum` in the relevant domain (e.g. `WindowPositioning`, `AppcastVersionParser`) over a generic `Utils/` folder
+
+## Special Directories
+
+**`.planning/codebase/`:**
+
+- Purpose: This codebase map
+- Generated: Yes (by codemap skill)
+- Committed: Yes (not gitignored — verified with `git check-ignore`)
+
+**`Oak/Oak.xcodeproj/`:**
+
+- Purpose: Xcode project bundle
+- Generated: Yes (by XcodeGen from `Oak/project.yml`)
+- Committed: Yes (regenerate with `cd Oak && xcodegen generate` or `just dev`)
+
+**`.build/`:**
+
+- Purpose: Build artifacts / release-test archives
+- Generated: Yes
+- Committed: No (gitignored)
+
+---
+
+_Structure analysis: 2026-07-26_

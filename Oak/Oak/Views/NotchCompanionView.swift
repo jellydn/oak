@@ -5,7 +5,7 @@ internal struct NotchCompanionView: View {
     @ObservedObject var viewModel: FocusSessionViewModel
     @ObservedObject private var notificationService: NotificationService
     @ObservedObject private var sparkleUpdater: SparkleUpdater
-    @ObservedObject private var keyboardShortcutService: KeyboardShortcutService
+    private let keyboardShortcutService: KeyboardShortcutService // Passed through; not observed here
     @State var showAudioMenu = false
     @State var showProgressMenu = false
     @State var showSettingsMenu = false

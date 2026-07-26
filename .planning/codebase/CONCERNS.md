@@ -1,79 +1,145 @@
-# Technical Concerns
+# Codebase Concerns
 
-## Resolved (Recent PRs)
+**Analysis Date:** 2026-07-26
 
-| Concern | Resolution | PR |
-| --- | --- | --- |
-| Large `FocusSessionViewModel` (was 415 lines) | Extracted `SessionTimerService` (108 lines) + `SessionStateMachine` | #130, #133 |
-| `AudioManager` too large (374 lines) | Extracted `NoiseGenerator.swift` | #129 |
-| `PresetSettingsStore` monolithic | Split into `SessionDurationConfig`, `DisplayConfig`, `BehaviorConfig` | #132 |
-| Thin test files (Confetti, ClickOutside, Smoke) | Added meaningful assertions | #131 |
-| NotchCompanionView fragmented (4 files) | Merged extensions from 4→3 files | #135 |
-| Duplicated window positioning logic | Extracted `WindowPositioning` enum | #137 |
-| `SettingsMenuView` large (was ~390 lines) | Extracted `PresetEditorView` | #138 |
-| Keyboard shortcuts missing | Added `KeyboardShortcutService` — Space/Escape | #142 |
-| No progress data export | Added JSON/CSV export, JSON import | #141 |
+## Tech Debt
 
-## Active Concerns
+**`SettingsMenuView` size:**
 
-### 1. Test Suite Performance
+- Issue: 433 lines — within 100 of the SwiftLint file-length warning (500) and approaching the error (1000). Largest source file.
+- Files: `Oak/Oak/Views/SettingsMenuView.swift`
+- Impact: Harder to navigate; risk of growing past the lint warning. `PresetEditorView` was already extracted (PR #138) — further extraction (notification settings, update settings already split into separate views) is in progress but the orchestrating container is still large.
+- Fix approach: Continue extracting sections into sub-views (e.g. a `DisplaySettingsView`, `BehaviorSettingsView`) following the `PresetEditorView` pattern.
 
-- **Issue**: Full test suite times out at 600 seconds on CI; `build-and-test` checks are frequently cancelled
-- **Location**: All test files under `Tests/OakTests/`
-- **Impact**: CI feedback loop is unreliable; PRs show `UNSTABLE` merge state due to cancelled checks
-- **Recommendation**: Profile tests with Instruments, identify slowest tests, optimize or split test target
+**`FocusSessionViewModel.completeSession()` length:**
 
-### 2. Large File: NotchCompanionView (351 lines)
+- Issue: ~50 lines — at the SwiftLint `function_body_length` warning threshold (50). Mixes round tracking, progress recording, notifications, audio, sound, state transition, and auto-start scheduling.
+- Files: `Oak/Oak/ViewModels/FocusSessionViewModel.swift:319`
+- Impact: Hard to unit-test each concern in isolation; high churn risk.
+- Fix approach: Extract `recordCompletion()`, `playCompletionSoundIfNeeded()`, `scheduleAutoStartIfNeeded()` helpers.
 
-- **Location**: `Views/NotchCompanionView.swift`
-- **Concern**: Below 500-line warn threshold but contains controls, layout, completion animation, and popover handling in one struct
-- **Recommendation**: Extract popover presentation logic or completion animation into separate components
+**`FocusSessionViewModel` overall size:**
 
-### 3. Large File: AudioManager (328 lines)
+- Issue: 373 lines — second-largest non-view file. Holds session control + derived display state + audio coordination + round tracking. Type body warn threshold is 300 (already exceeded).
+- Files: `Oak/Oak/ViewModels/FocusSessionViewModel.swift`
+- Impact: Single point of mutation; many `@Published` properties and collaborators.
+- Fix approach: Consider extracting a `SessionRoundsTracker` (round counting / long-break logic) and moving derived display state into a dedicated `SessionDisplayState` value type.
 
-- **Location**: `Services/AudioManager.swift`
-- **Concern**: Still contains noise generation, track management, playback control, and volume logic after NoiseGenerator extraction
-- **Recommendation**: Consider extracting audio track management or playback strategies
+## Known Bugs
 
-### 4. Large File: SettingsMenuView (341 lines)
+No open bugs found in the codebase. No `TODO`/`FIXME`/`HACK`/`XXX` comments exist in `Oak/Oak` (verified via ripgrep — 0 matches). `CONCERNS.md` was previously updated (commit `488af4a`) to reflect resolved concerns.
 
-- **Location**: `Views/SettingsMenuView.swift`
-- **Concern**: Accumulated Display, Session Presets, Notifications, Keyboard, Data, Updates, and Support sections
-- **Recommendation**: Further extract the Display and Session Presets sections into sub-views
+## Security Considerations
 
-### 5. Silence on Import/Export Failure
+**Sparkle EdDSA key in project.yml:**
 
-- **Location**: `Views/SettingsMenuView.swift` — `exportJSON()`, `exportCSV()`, `importData()`
-- **Concern**: File I/O failures are silently swallowed (`try?`). Users get no feedback on success or failure.
-- **Recommendation**: Add NSAlert for both success and failure paths
+- Risk: `SPARKLE_PUBLIC_ED_KEY` is committed in `Oak/project.yml` — but this is a _public_ key by design (Sparkle verifies update signatures with the private key kept outside the repo). Not a secret leak.
+- Files: `Oak/project.yml`, `Oak/Oak/Info.plist`
+- Current mitigation: `SparkleUpdater.hasValidPublicEDKey` guards against placeholder `$(...)` values at runtime; CI `update-appcast.yml` signs with the private key from secrets.
+- Recommendations: None — current setup is correct for Sparkle.
 
-### 6. No Session Deduplication on Import
+**No network input validation:**
 
-- **Location**: `Services/ProgressManager.swift` — `importRecords(from:)`
-- **Concern**: Importing the same file twice creates duplicate `SessionRecord` entries (different UUIDs)
-- **Recommendation**: Deduplicate by matching `startTime` + `type` instead of blind `append(contentsOf:)`
+- Risk: `SparkleUpdater.fetchLatestFeedVersion` fetches `appcast.xml` and parses with `NSRegularExpression`. The feed is trusted (EdDSA-signed at the Sparkle layer), so parser input is attacker-controlled only if GitHub/raw.githubusercontent is compromised.
+- Files: `Oak/Oak/Services/SparkleUpdater.swift:181`, `AppcastVersionParser`
+- Current mitigation: Sparkle's signature verification is the real gate; `AppcastVersionParser` only extracts a version string for preflight logging.
+- Recommendations: None for MVP.
 
-### 7. Keyboard Shortcut Customization UI
+## Performance Bottlenecks
 
-- **Issue**: #67 requested configurable shortcut keys; current implementation shows read-only badges
-- **Location**: `Views/SettingsMenuView.swift` — keyboard section
-- **Recommendation**: Add key-recording UI to let users customize shortcut bindings
+**Procedural audio render callbacks:**
 
-### 8. Global Hotkey Permission Check
+- Problem: `NoiseGenerator` generates one sample per call inside `AVAudioSourceNode` render block, looping per-sample across the buffer (`AudioManager.fillOutputBuffer`).
+- Files: `Oak/Oak/Services/NoiseGenerator.swift`, `Oak/Oak/Services/AudioManager.swift:250-317`
+- Cause: Per-sample `Float.random(in:)` and `sin(...)` calls in the audio render thread. Correct but not optimized.
+- Improvement path: Pre-generate a noise buffer and loop it, or vectorize sample generation. Only matters if CPU profiling shows audio thread pressure — bundled `.m4a` tracks are the primary path and bypass this entirely.
 
-- **Location**: `Services/KeyboardShortcutService.swift` — `startGlobalMonitor()`
-- **Concern**: Global hotkey monitoring requires Accessibility permission; no proactive check or guidance
-- **Recommendation**: Check `AXIsProcessTrusted()` and prompt user when global hotkeys are enabled
+**`ProgressManager` loads all records on every operation:**
 
-### 9. Row-Level UI for Today's Timeline
+- Problem: `recordSessionCompletion`, `loadProgress`, `allRecords` each call `loadRecords()` which decodes the full `[ProgressData]` array from UserDefaults.
+- Files: `Oak/Oak/Services/ProgressManager.swift:92`
+- Cause: UserDefaults-backed storage with no in-memory cache beyond `dailyStats`.
+- Improvement path: Acceptable for 90-day retention (bounded). If retention grows, cache `allRecords` and invalidate on write.
 
-- **Issue**: #66 — detailed session timeline with per-session stats
-- **Location**: `Views/ProgressMenuView.swift`
-- **Recommendation**: Add expandable rows showing session type, exact duration, start/end times
+## Fragile Areas
 
-## Watch Items
+**`NotchWindowController` frame-update coalescing:**
 
-- **NotchCompanionView file growth** — currently 351 lines, approaching 500-line warn threshold
-- **Swift 6 concurrency readiness** — `@MainActor` usage is consistent but some deinit patterns access MainActor-isolated properties
-- **Test isolation** — some tests may share UserDefaults if suite names collide (UUID-based names prevent this)
-- **macOS version dependencies** — conditional `@available` checks for 13.0+ and 13.3+ features (safe area regions)
+- Files: `Oak/Oak/Views/NotchWindowController.swift:144` (`requestFrameUpdate`, `setExpanded`)
+- Why fragile: Uses `isApplyingFrameChange` / `isFrameUpdateScheduled` flags + `DispatchQueue.main.async` coalescing + `pendingExpandedState`/`pendingForceReposition`/`pendingTargetOverride` buffers. Reentrancy and ordering are subtle; a missed `setFrame` could leave the window in the wrong position after display changes.
+- Safe modification: Add a regression test in `NotchWindowControllerTests+WindowBehavior` for any change; preserve the `forceReposition` semantics.
+- Test coverage: `NotchWindowControllerTests+WindowBehavior` exists but exercises high-level behavior, not the coalescing state machine directly.
+
+**View-update safety in `NotchCompanionView`:**
+
+- Files: `Oak/Oak/Views/NotchCompanionView.swift:109`, `:116`
+- Why fragile: AGENTS.md explicitly warns against publishing from view updates (`onChange` → sync `viewModel.update`). `NotchCompanionView` uses `DispatchQueue.main.async` for `onExpansionChanged` (`:345`) — the correct pattern — but `onChange(of: viewModel.isSessionComplete)` drives `animateCompletion`/`showConfetti` directly. This is safe (local `@State` mutation) but the boundary between "safe local state" and "publishing from view update" must be maintained carefully.
+- Safe modification: Keep `@State` mutations local; never call `viewModel` mutation methods directly from `onChange`/`onAppear` — dispatch to main async.
+- Test coverage: `NotchCompanionViewTests+SessionState` covers state-driven content; no test for the animation/confetti timing.
+
+**`KeyboardShortcutService` event monitor lifecycle:**
+
+- Files: `Oak/Oak/Services/KeyboardShortcutService.swift:105`
+- Why fragile: A code comment documents that starting `NSEvent.addLocalMonitorForEvents` in `init()` (before the app launches) "corrupts the event monitor chain and freezes the UI." Monitors must start via `load()` from `applicationDidFinishLaunching`. Global monitor runs on a background thread and dispatches to `@MainActor` via `Task`.
+- Safe modification: Never call `startLocalMonitor`/`startGlobalMonitor` from `init`; always via `load()`/`stop()` pairs. Preserve `removeMonitor` in `deinit`.
+- Test coverage: `KeyboardShortcutService` config persistence is tested; event monitor behavior is not (hard to test without real events).
+
+## Scaling Limits
+
+**UserDefaults progress storage:**
+
+- Current capacity: 90-day rolling window of `ProgressData` records (one per day, each with a `[SessionRecord]`).
+- Limit: UserDefaults is loaded into memory at launch; unbounded growth would degrade launch time. 90-day retention + `pruneOldRecords` bounds this.
+- Scaling path: For multi-year history, migrate to SQLite/Core Data or a JSON file on disk. Export/import already exists (`ProgressManager.exportJSON/exportCSV/importRecords`) as a bridge.
+
+**Single-window, single-session:**
+
+- Current capacity: One focus session at a time, one notch window.
+- Limit: By design (MVP constraint — notch-only UI, no multi-window).
+- Scaling path: Not applicable within MVP scope.
+
+## Dependencies at Risk
+
+**Sparkle:**
+
+- Risk: Third-party dependency for auto-update. Pinned `from: 2.9.4` (allows minor/patch upgrades within 2.x).
+- Impact: If Sparkle breaks semver or drops macOS 13 support, auto-update breaks.
+- Migration plan: Sparkle is the de-facto macOS auto-update standard; no realistic alternative. Keep within the 2.x line; track Sparkle release notes for macOS-deployment-target changes.
+
+## Missing Critical Features
+
+None within the stated MVP scope (see `tasks/prd-macos-focus-companion-app.md` and `AGENTS.md` MVP Constraints). The `.changeset/` directory lists pending features (`detailed-session-timeline.md`, `pause-audio-on-pause.md`) — these are planned, not missing.
+
+## Test Coverage Gaps
+
+**`NotchWindowController` frame coalescing state machine:**
+
+- What's not tested: The `requestFrameUpdate`/`setExpanded` coalescing logic with `pendingExpandedState`/`pendingForceReposition`/`pendingTargetOverride` buffering and `isApplyingFrameChange` reentrancy guard.
+- Files: `Oak/Oak/Views/NotchWindowController.swift:144-218`
+- Risk: A regression could leave the window mispositioned after display changes or rapid expand/collapse.
+- Priority: Medium — high-level window behavior is tested; the coalescing internals are not.
+
+**`KeyboardShortcutService` event handling:**
+
+- What's not tested: `handleKeyEvent`/`handleGlobalKeyEvent` matching against `KeyEquivalent`, modifier-flag intersection, Escape keyCode 53 special-case, global monitor thread dispatch.
+- Files: `Oak/Oak/Services/KeyboardShortcutService.swift:177-221`
+- Risk: A regression could silently break hotkeys (toggle/reset).
+- Priority: Medium — config persistence is tested; event matching is not.
+
+**`AudioManager` real `AVAudioEngine` path:**
+
+- What's not tested: Bundled-track playback and procedural `AVAudioSourceNode` rendering use real AVFoundation. Tests inject `MockTestAudioEngine` to avoid hardware. The real `AudioEngineAdapter` is only exercised by manual run.
+- Files: `Oak/Oak/Services/AudioManager.swift`
+- Risk: A regression in `playBundledTrack`/`generateAmbientSound`/`fillOutputBuffer` would only surface at runtime.
+- Priority: Low — audio is best validated manually; the mock covers state transitions.
+
+**Animation/confetti timing in `NotchCompanionView`:**
+
+- What's not tested: The 1.5s completion reset, confetti `DispatchQueue.main.asyncAfter` lifecycle, `animateCompletion` spring animation.
+- Files: `Oak/Oak/Views/NotchCompanionView.swift:116-134`
+- Risk: Visual-only regressions; no functional impact.
+- Priority: Low.
+
+---
+
+_Concerns audit: 2026-07-26_

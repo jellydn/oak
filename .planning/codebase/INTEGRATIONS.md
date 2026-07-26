@@ -1,43 +1,105 @@
 # External Integrations
 
-## Sparkle Update Framework
+**Analysis Date:** 2026-07-26
 
-- **Package**: `sparkle-project/Sparkle` v2.9.4
-- **Purpose**: In-app software updates via appcast
-- **Integration point**: `Services/SparkleUpdater.swift` — wraps `SPUStandardUpdaterController`
-- **Public key**: EdDSA (`IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=`)
-- **Appcast URL**: `https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml`
-- **Check interval**: 86400 seconds (daily)
-- **Settings UI**: `Views/UpdateSettingsView.swift` — manual check button, auto-check toggle
+## APIs & External Services
 
-## Apple Notification Center
+**Sparkle Appcast Feed:**
 
-- **Framework**: `UserNotifications`
-- **Purpose**: Local notifications for session completion
-- **Integration point**: `Services/NotificationService.swift`
-- **Requires**: User-granted notification permission (requested from Settings)
-- **Settings UI**: `Views/NotificationSettingsView.swift` — permission request button, sound toggle
+- Service: GitHub raw content serving `appcast.xml`
+- URL: `https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml` (`Oak/Oak/Services/SparkleUpdater.swift:6`)
+- Auth: None — public feed, EdDSA signature verification via `SUPublicEDKey`
+- Purpose: Auto-update checks (daily, `SUScheduledCheckInterval: 86400`), manual "Check for Updates", version preflight comparing installed vs. feed semver
+- SDK/Client: Sparkle `SPUStandardUpdaterController` / `SPUUpdaterDelegate`
 
-## Apple System Frameworks (Direct API)
+**GitHub Releases (download host):**
 
-| Framework | Usage | Key Files |
-| --- | --- | --- |
-| **AppKit** | Window management, NSEvent monitoring, file dialogs | `NotchWindowController.swift`, `KeyboardShortcutService.swift`, `TransientPopover.swift` |
-| **AVFoundation** | Ambient audio playback | `AudioManager.swift` |
-| **CoreGraphics** | Display identification | `NSScreen+DisplayTarget.swift`, `DisplayConfig.swift` |
-| **UserDefaults** | Local persistence (progress, settings, audio prefs) | `ProgressManager.swift`, `PresetSettingsStore.swift` |
+- DMG enclosure URLs point to `https://github.com/jellydn/oak/releases/download/vX.Y.Z/Oak-X.Y.Z.dmg` (see `appcast.xml`)
+- No client SDK — Sparkle handles download + verification
 
-## Local Persistence Only
+**Homebrew Cask:**
 
-- No cloud sync, no remote database, no account system
-- All data stored in `UserDefaults`:
-  - `progressHistory` — `[ProgressData]` as JSON
-  - `keyboardShortcutConfig` — `KeyboardShortcutConfig` as JSON
-  - Various settings keys managed by `SessionDurationConfig`, `DisplayConfig`, `BehaviorConfig`
+- `Casks/oak.rb` — Homebrew formula distribution channel (manual, updated by release tooling)
 
-## No External APIs
+## Data Storage
 
-- No REST APIs called
-- No WebSocket connections
-- No third-party analytics or crash reporting
-- Network used only for Sparkle appcast fetching (outbound HTTP)
+**Databases:**
+
+- None. No database layer.
+
+**File Storage:**
+
+- Local filesystem only
+- Bundled ambient sounds: `Oak/Oak/Resources/Sounds/ambient_{rain,forest,cafe,brown_noise,lofi}.m4a` (validated by `scripts/check-ambient-sounds.sh`)
+- No user file I/O except progress data export/import (JSON/CSV via `ProgressManager.exportJSON/exportCSV/importRecords`)
+
+**Caching:**
+
+- None
+
+**Local Persistence (UserDefaults):**
+
+- `ProgressManager` — `progressHistory` key, JSON-encoded `[ProgressData]`, 90-day retention, pruned on write (`Oak/Oak/Services/ProgressManager.swift:14`)
+- `PresetSettingsStore` (via `SessionDurationConfig` / `DisplayConfig` / `BehaviorConfig`) — preset minutes, display target/IDs, countdown mode, always-on-top, show-below-notch, sound flags, auto-start flag
+- `KeyboardShortcutService` — `keyboardShortcutConfig` key, JSON-encoded `KeyboardShortcutConfig`
+- Tests isolate with unique suite names: `OakTests.<Class>.<UUID>` (`Oak/Tests/OakTests/US001Tests.swift:12`)
+
+## Authentication & Identity
+
+**Auth Provider:**
+
+- None. The app has no user accounts, no login, no network auth.
+
+## Monitoring & Observability
+
+**Error Tracking:**
+
+- None (no Sentry/Crashlytics/etc.)
+
+**Logs:**
+
+- `os.log` `Logger` with subsystem `com.productsway.oak.app`, categories: `AudioManager`, `NotificationService`, `SparkleUpdater`
+- `print()` prohibited in production by SwiftLint custom rule `no_print_statements` (warning)
+
+## CI/CD & Deployment
+
+**Hosting:**
+
+- GitHub-hosted Sparkle feed + GitHub Releases for binaries
+- GitHub Pages for docs site (`docs/index.html`, `CNAME`, `deploy-pages.yml`)
+
+**CI Pipeline:**
+
+- GitHub Actions (`.github/workflows/`):
+  - `ci.yml` — lint job (`swiftlint lint --strict`) + build-and-test job (macos-26, Xcode latest-stable, unsigned)
+  - `release.yml` — tagged release workflow
+  - `auto-release.yml` — automated release triggers
+  - `update-appcast.yml` — regenerates `appcast.xml` and signs enclosures after release
+  - `deploy-pages.yml` — deploys docs to GitHub Pages
+
+## Environment Configuration
+
+**Required env vars:**
+
+- None for runtime. CI uses `GITHUB_RUN_NUMBER` for build number.
+
+**Secrets location:**
+
+- `SPARKLE_PUBLIC_ED_KEY` build setting baked into `Oak/project.yml` (public EdDSA key, not secret)
+- Code signing secrets (if any) managed by release tooling, not in repo
+
+## Webhooks & Callbacks
+
+**Incoming:**
+
+- None
+
+**Outgoing:**
+
+- Sparkle appcast fetch (GET `appcast.xml` with cache-busting `?ts=` query)
+- Sparkle DMG download (handled by Sparkle framework)
+- No telemetry, no analytics, no outgoing webhooks
+
+---
+
+_Integration audit: 2026-07-26_

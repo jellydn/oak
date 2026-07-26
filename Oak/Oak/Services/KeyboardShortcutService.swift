@@ -80,7 +80,7 @@ internal struct KeyboardShortcutConfig: Codable, Equatable {
     var shortcuts: [KeyboardShortcutAction: KeyEquivalent]
 
     static let `default` = KeyboardShortcutConfig(
-        enabled: true,
+        enabled: false,
         globalHotkeysEnabled: false,
         shortcuts: [
             .toggleSession: KeyboardShortcutAction.toggleSession.defaultKey,
@@ -102,12 +102,10 @@ internal final class KeyboardShortcutService: ObservableObject {
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         config = Self.loadConfig(from: userDefaults)
-        if config.enabled {
-            startLocalMonitor()
-        }
-        if config.globalHotkeysEnabled {
-            startGlobalMonitor()
-        }
+        // Monitors are started later via load(), called from
+        // applicationDidFinishLaunching — after the event loop is ready.
+        // Starting NSEvent monitors in init() (before the app has launched)
+        // corrupts the event monitor chain and freezes the UI.
     }
 
     deinit {
@@ -157,14 +155,20 @@ internal final class KeyboardShortcutService: ObservableObject {
     // MARK: - Private
 
     private func startLocalMonitor() {
-        guard localEventMonitor == nil else { return }
-        localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self else { return event }
-            if handleKeyEvent(event) {
-                return nil
-            }
-            return event
-        }
+        // Temporarily disabled — local event monitor is suspected of
+        // causing UI freezes during expand/collapse operations.
+        // Perf investigation: the monitor intercepts EVERY keyDown on
+        // the main thread, including AppKit-internal layout events.
+        /*
+         guard localEventMonitor == nil else { return }
+         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+             guard let self else { return event }
+             if handleKeyEvent(event) {
+                 return nil
+             }
+             return event
+         }
+         */
     }
 
     private func startGlobalMonitor() {
