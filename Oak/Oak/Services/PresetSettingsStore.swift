@@ -252,10 +252,26 @@ internal final class PresetSettingsStore: ObservableObject {
     }
 
     private func ensureDisplayIDsInitialized() {
+        // Resolve into locals first, then publish only on actual change.
+        // Passing @Published properties directly as inout always performs a
+        // writeback through the published setter, which fires objectWillChange
+        // even when the value is unchanged. When this is called from
+        // preferredDisplayID(for:) during a SwiftUI body evaluation, that
+        // invalidates the body on every render → infinite loop → "Not Responding".
+        var resolvedMainDisplayID = mainDisplayID
+        var resolvedNotchedDisplayID = notchedDisplayID
+
         DisplayConfig.ensureDisplayIDsInitialized(
-            mainDisplayID: &mainDisplayID,
-            notchedDisplayID: &notchedDisplayID,
+            mainDisplayID: &resolvedMainDisplayID,
+            notchedDisplayID: &resolvedNotchedDisplayID,
             userDefaults: userDefaults
         )
+
+        if mainDisplayID != resolvedMainDisplayID {
+            mainDisplayID = resolvedMainDisplayID
+        }
+        if notchedDisplayID != resolvedNotchedDisplayID {
+            notchedDisplayID = resolvedNotchedDisplayID
+        }
     }
 }

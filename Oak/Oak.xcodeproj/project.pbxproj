@@ -72,6 +72,7 @@
 		DD867AD4D9ABF04F13068B20 /* US002Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26934C0C6B7C8A90F9D57916 /* US002Tests.swift */; };
 		DDBB5DE34EE0CD19E4F5DB8C /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2248B235C4F98DAE862335B3 /* NotificationSettingsView.swift */; };
 		DF1ECF04DC3D712A1F7B0C30 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D555E4182E199E8EC8D0B3 /* NotificationService.swift */; };
+		DF2B1968E6C57A06679E46B4 /* DisplayIDInitializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FAA8F73F21E099B201F0FB /* DisplayIDInitializationTests.swift */; };
 		E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */; };
 		E6257C0A0DCC82B59E1D0A43 /* KeyboardShortcutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B3AF8631A42998C419DD233 /* KeyboardShortcutService.swift */; };
 		EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */; };
@@ -144,6 +145,7 @@
 		83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongBreakTests.swift; sourceTree = "<group>"; };
 		841F3EFAB628759B783D66D3 /* AudioTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrack.swift; sourceTree = "<group>"; };
 		85C93F37E0AC4AA71C304FDD /* US003Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US003Tests.swift; sourceTree = "<group>"; };
+		85FAA8F73F21E099B201F0FB /* DisplayIDInitializationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayIDInitializationTests.swift; sourceTree = "<group>"; };
 		98D555E4182E199E8EC8D0B3 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A53A901D48495497B38B2A1E /* CountdownDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownDisplayMode.swift; sourceTree = "<group>"; };
 		A74529FF7AEFC6AB3D4B6935 /* NotchCompanionViewTests+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionViewTests+Layout.swift"; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 				0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */,
 				14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */,
 				F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */,
+				85FAA8F73F21E099B201F0FB /* DisplayIDInitializationTests.swift */,
 				83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */,
 				C1B03DC457EAE4AA55E72345 /* MockAudioManager.swift */,
 				2323FD43612DC128B03544D4 /* NotchCompanionViewTests.swift */,
@@ -498,6 +501,7 @@
 				542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */,
 				EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */,
 				EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */,
+				DF2B1968E6C57A06679E46B4 /* DisplayIDInitializationTests.swift in Sources */,
 				4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */,
 				A241F12DFE716A2C633FC7D0 /* MockAudioManager.swift in Sources */,
 				08B16A2D203D68C5D8E64806 /* NSScreenNotchTests.swift in Sources */,
