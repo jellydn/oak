@@ -1,71 +1,58 @@
-# STACK.md — Technology Stack
+# Technology Stack
 
-## Language & Runtime
+## Languages
 
-| Layer | Technology | Version |
-| --- | --- | --- |
-| Language | Swift | 5.9+ |
-| Platform | macOS | 13.0+ (Apple Silicon preferred) |
-| Xcode | Xcode 16+ (`project.yml` references xcodeVersion 17.0) |
+- **Swift 5.9+** — primary language, concurrency via `async/await`, `@MainActor`, `Task`
 
-## UI Framework
+## Runtime & Platform
 
-| Component       | Technology                                                      |
-| --------------- | --------------------------------------------------------------- |
-| UI Framework    | SwiftUI                                                         |
-| AppKit Bridging | `NSViewRepresentable`, `NSHostingView`, `NSPanel`               |
-| Window Type     | `NSPanel` with `.borderless` + `.nonactivatingPanel` style mask |
-| Notch Detection | `NSScreen.safeAreaInsets.top` for physical notch detection      |
+- **macOS 13.0+** (Ventura) — deployment target
+- **Apple Silicon** (arm64) — primary target; Intel (x86_64) supported via universal binary
+- **Xcode 17.0** — development toolchain
 
-## Core Frameworks
+## Frameworks & Libraries
+
+### Apple Frameworks
 
 | Framework | Usage |
 | --- | --- |
-| **Combine** | Reactive bindings (`@Published`, `AnyCancellable`, `.sink`) |
-| **AVFoundation** | Audio playback (bundled `.m4a` files + procedural noise generation via `AVAudioSourceNode`) |
+| **SwiftUI** | All UI components (notch companion, settings, menus, popovers) |
+| **AppKit** | Window management (`NSPanel`, `NSWindowController`), NSEvent monitoring, `NSSavePanel`/`NSOpenPanel`, `NSSound` |
+| **Combine** | `ObservableObject`, `@Published`, `AnyCancellable`, `PassthroughSubject` — reactive data flow |
+| **AVFoundation** | Ambient audio playback (`AVAudioPlayer`) |
+| **Foundation** | Codable persistence (`JSONEncoder`/`JSONDecoder`), `UserDefaults`, `Timer`, date handling |
+| **CoreGraphics** | Display ID management (`CGDirectDisplayID`) |
 | **UserNotifications** | Local notification delivery for session completion |
-| **AppKit** | Window management, `NSScreen` extensions, `NSSound.beep()` |
-| **CoreGraphics** | Display ID resolution (`CGMainDisplayID()`) |
-| **Foundation** | `Timer`, `UserDefaults`, `os.Logger` |
+| **os.log** | Structured logging (`Logger`) |
 
-## Third-Party Dependencies
+### Third-Party Dependencies
 
-| Package | Version | Usage |
+| Package | Version | Purpose |
 | --- | --- | --- |
-| [Sparkle](https://github.com/sparkle-project/Sparkle) | 2.9.4 | In-app update checking and distribution (`SPUUpdaterDelegate`) |
+| **[Sparkle](https://github.com/sparkle-project/Sparkle)** | 2.9.4 | In-app update framework (auto-update checks, release channels) |
 
-## Build System
+## Build & Tooling
 
 | Tool | Purpose |
 | --- | --- |
-| [XcodeGen](https://github.com/yonaskolb/XcodeGen) | Project generation from `project.yml` |
-| [just](https://github.com/casey/just) | Task runner (`just build`, `just test`, `just lint`) |
-| xcodebuild | CI builds (GitHub Actions on `macos-26` runners) |
+| **XcodeGen** (`project.yml`) | Project file generation — single source of truth for targets, sources, dependencies |
+| **SwiftLint** (`.swiftlint.yml`) | Static analysis — line length (120/150), function body (50/100), file length (500/1000), naming rules |
+| **SwiftFormat** (`.swiftformat`) | Code formatting — 4-space indent, 120 max width, sorted imports, `self` removal |
+| **just** (`justfile`) | Task runner — `just build`, `just test`, `just lint`, `just format`, `just dev` |
+| **GitHub Actions** (`.github/workflows/`) | CI — `ci.yml` (build+test+lint), `release.yml`, `auto-release.yml`, `update-appcast.yml`, `deploy-pages.yml` |
+| **Prettier** (`.prettierrc`) | Markdown/YAML formatting |
 
-## Code Quality
+## Configuration
 
-| Tool | Configuration |
-| --- | --- |
-| SwiftLint | `.swiftlint.yml` (opt-in rules: `explicit_init`, `trailing_closure`, `empty_count`, etc.) |
-| SwiftFormat | `.swiftformat` (indent: 4, maxwidth: 120, `wraparguments before-first`) |
+- **`project.yml`** — XcodeGen config: targets, sources, bundle ID (`com.productsway.oak.app`), version (`0.5.40`), build (`5040`)
+- **`Info.plist`** — `LSUIElement = true` (accessory app, no Dock icon), Sparkle feed URL + public EdDSA key
+- **`Oak.entitlements`** — `com.apple.security.network.client` (outbound networking for Sparkle updates)
+- **`appcast.xml`** — Sparkle appcast feed for update distribution
+- **`prek.toml`** — Additional project metadata
 
-## Configuration Files
+## App Architecture
 
-| File | Purpose |
-| --- | --- |
-| `Oak/project.yml` | XcodeGen project definition (targets, dependencies, build settings) |
-| `Oak/Oak/Info.plist` | App metadata, Sparkle feed URL, `LSUIElement = true` |
-| `Oak/Oak/Oak.entitlements` | `com.apple.security.network.client` (outbound networking for Sparkle) |
-| `justfile` | Task automation commands |
-| `.swiftlint.yml` | Lint rule configuration |
-| `.swiftformat` | Formatter rule configuration |
-| `appcast.xml` | Sparkle appcast for update distribution |
-
-## CI/CD
-
-| Provider | Platform | File |
-| --- | --- | --- |
-| GitHub Actions | `macos-26` runner | `.github/workflows/ci.yml` |
-| Lint | `swiftlint lint --strict` | CI job |
-| Build & Test | `xcodebuild build` + `xcodebuild test` (unsigned, no code signing) | CI job |
-| Release | Sparkle appcast update + Homebrew cask | `.github/workflows/release.yml` |
+- **Type**: macOS accessory app (`.accessory` activation policy, `LSUIElement`)
+- **UI Pattern**: Notch-only companion, no standard main window
+- **Bundle ID**: `com.productsway.oak.app`
+- **Current Version**: 0.5.40 (build 5040)
