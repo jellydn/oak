@@ -1,44 +1,43 @@
-# INTEGRATIONS.md — External Services & APIs
+# External Integrations
 
 ## Sparkle Update Framework
 
-- **Service**: [Sparkle 2](https://sparkle-project.org/) (self-hosted)
-- **Purpose**: In-app update distribution
-- **Files**: `Oak/Oak/Services/SparkleUpdater.swift`
-- **Configuration**:
-  - Public Ed25519 key: `IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=` (in `project.yml`)
-  - Feed URL: `https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml` (in `Info.plist`)
-  - Update check interval: 86,400 seconds (24 hours)
-  - `SUEnableAutomaticChecks: true`
-- **Protocols**: `SPUUpdaterDelegate`
-- **Network entitlement**: `com.apple.security.network.client` (required for Sparkle feed fetching)
+- **Package**: `sparkle-project/Sparkle` v2.9.4
+- **Purpose**: In-app software updates via appcast
+- **Integration point**: `Services/SparkleUpdater.swift` — wraps `SPUStandardUpdaterController`
+- **Public key**: EdDSA (`IjFqN1R6i4Dh8IZxQ42RtSEii7pUgS45+NvidSwQup0=`)
+- **Appcast URL**: `https://raw.githubusercontent.com/jellydn/oak/main/appcast.xml`
+- **Check interval**: 86400 seconds (daily)
+- **Settings UI**: `Views/UpdateSettingsView.swift` — manual check button, auto-check toggle
 
-## UserNotifications Framework
+## Apple Notification Center
 
-- **Service**: Apple `UserNotifications` (system-level, local)
-- **Purpose**: Local notification delivery for session completions
-- **Files**: `Oak/Oak/Services/NotificationService.swift`
-- **Authorization**: Requests `.alert` + `.sound` authorization; status is refreshed on app activation
-- **Deep link**: Uses `x-apple.systempreferences:` URLs to open Notification Settings when denied
-- **Protocol**: `SessionCompletionNotifying`
+- **Framework**: `UserNotifications`
+- **Purpose**: Local notifications for session completion
+- **Integration point**: `Services/NotificationService.swift`
+- **Requires**: User-granted notification permission (requested from Settings)
+- **Settings UI**: `Views/NotificationSettingsView.swift` — permission request button, sound toggle
 
-## UserDefaults
+## Apple System Frameworks (Direct API)
 
-- **Service**: Apple `UserDefaults` (system-level, local)
-- **Purpose**: Persistent settings storage
-- **Files**: `Oak/Oak/Services/PresetSettingsStore.swift`, `Oak/Oak/Services/ProgressManager.swift`
-- **Keys**: Prefixed with `preset.`, `display.`, `session.`, `window.`, `countdown.` domains
-- **Default registration**: `userDefaults.register(defaults:)` for all keys
-- **Validation**: Clamped value ranges for work/break minutes and rounds
+| Framework | Usage | Key Files |
+| --- | --- | --- |
+| **AppKit** | Window management, NSEvent monitoring, file dialogs | `NotchWindowController.swift`, `KeyboardShortcutService.swift`, `TransientPopover.swift` |
+| **AVFoundation** | Ambient audio playback | `AudioManager.swift` |
+| **CoreGraphics** | Display identification | `NSScreen+DisplayTarget.swift`, `DisplayConfig.swift` |
+| **UserDefaults** | Local persistence (progress, settings, audio prefs) | `ProgressManager.swift`, `PresetSettingsStore.swift` |
 
-## GitHub (CI/CD & Distribution)
+## Local Persistence Only
 
-- **CI**: GitHub Actions on `macos-26` runners (`.github/workflows/ci.yml`)
-  - Lint: `swiftlint lint --strict`
-  - Build & Test: `xcodebuild` with `CODE_SIGNING_ALLOWED=NO`
-- **Release**: Automated appcast + Homebrew cask updates (`.github/workflows/release.yml`)
-- **Homebrew Cask**: `Casks/oak.rb` for `brew install` distribution
+- No cloud sync, no remote database, no account system
+- All data stored in `UserDefaults`:
+  - `progressHistory` — `[ProgressData]` as JSON
+  - `keyboardShortcutConfig` — `KeyboardShortcutConfig` as JSON
+  - Various settings keys managed by `SessionDurationConfig`, `DisplayConfig`, `BehaviorConfig`
 
-## No External Backend
+## No External APIs
 
-Oak is a fully local macOS app with no cloud backend, no user accounts, no analytics, and no telemetry. All data stays on-device in `UserDefaults`.
+- No REST APIs called
+- No WebSocket connections
+- No third-party analytics or crash reporting
+- Network used only for Sparkle appcast fetching (outbound HTTP)

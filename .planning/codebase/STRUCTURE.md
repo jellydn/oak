@@ -1,125 +1,124 @@
-# STRUCTURE.md — Directory Layout & Organization
-
-## Top-Level Layout
+# Directory Structure
 
 ```
-Oak/                           # XcodeGen root (project.yml lives here)
-├── Oak/                       # Main app target sources
-│   ├── OakApp.swift          # @main entry point + AppDelegate
-│   ├── Models/               # Data models, enums, protocols
-│   ├── Views/                # SwiftUI Views + NSWindowController
-│   ├── ViewModels/           # @MainActor ObservableObject classes
-│   ├── Services/             # Business logic, audio, persistence
-│   ├── Extensions/           # NSScreen and other extensions
-│   ├── Resources/            # Assets catalog, bundled sounds
-│   ├── Info.plist            # App metadata & Sparkle config
-│   └── Oak.entitlements      # Sandbox entitlements
-├── Tests/                    # Unit test target
-│   └── OakTests/             # All test files
-├── project.yml               # XcodeGen project definition
-└── Oak.xcodeproj/            # Generated Xcode project (do not edit)
+Oak/
+├── Oak/                          # Main application target
+│   ├── OakApp.swift              # @main entry point + AppDelegate
+│   ├── Info.plist                # App metadata, LSUIElement, Sparkle config
+│   ├── Oak.entitlements          # Network client entitlement
+│   │
+│   ├── Models/                   # Data models (value types, enums)
+│   │   ├── SessionModels.swift   # SessionState (FSM), Preset, SessionType
+│   │   ├── ProgressData.swift    # ProgressData, SessionRecord, DailyStats
+│   │   ├── AudioTrack.swift      # Ambient audio track enum
+│   │   ├── NotchLayout.swift     # Layout constants (height, sizing)
+│   │   └── CountdownDisplayMode.swift
+│   │
+│   ├── ViewModels/               # ViewModels (@MainActor, ObservableObject)
+│   │   └── FocusSessionViewModel.swift  # 373 lines — session lifecycle
+│   │
+│   ├── Views/                    # SwiftUI Views
+│   │   ├── NotchCompanionView.swift          # 351 lines — main notch UI
+│   │   ├── NotchCompanionView+StandardViews.swift  # 282 lines
+│   │   ├── NotchCompanionView+InsideNotch.swift     # 259 lines
+│   │   ├── NotchWindowController.swift      # 255 lines — NSPanel management
+│   │   ├── WindowPositioning.swift          # 90 lines — frame math
+│   │   ├── SettingsMenuView.swift           # 341 lines — settings panel
+│   │   ├── PresetEditorView.swift           # 82 lines — stepper controls
+│   │   ├── ProgressMenuView.swift           # 140 lines — daily stats
+│   │   ├── AudioMenuView.swift              # Ambient track picker
+│   │   ├── CircularProgressRing.swift       # Progress indicator
+│   │   ├── ConfettiView.swift               # Session completion effect
+│   │   ├── TransientPopover.swift           # Click-outside dismiss
+│   │   ├── NotificationSettingsView.swift   # Notification permission UI
+│   │   ├── UpdateSettingsView.swift         # Sparkle update controls
+│   │   ├── SupportSectionView.swift         # Links and support info
+│   │   ├── NotchVisualStyle.swift           # Visual theming
+│   │   └── NotchVisualStyle+Factory.swift   # Style factory
+│   │
+│   ├── Services/                 # Business logic & persistence
+│   │   ├── AudioManager.swift             # 328 lines — AVAudioPlayer
+│   │   ├── ProgressManager.swift          # 163 lines — UserDefaults persistence
+│   │   ├── PresetSettingsStore.swift      # 261 lines — all settings
+│   │   ├── SessionTimerService.swift      # 108 lines — Timer-based countdown
+│   │   ├── NotificationService.swift      # 101 lines — UserNotifications
+│   │   ├── SparkleUpdater.swift           # 219 lines — update framework
+│   │   ├── KeyboardShortcutService.swift  # 258 lines — NSEvent monitoring
+│   │   ├── NoiseGenerator.swift           # White/brown noise generator
+│   │   ├── SessionDurationConfig.swift    # 136 lines — duration settings
+│   │   ├── DisplayConfig.swift            # 108 lines — display settings
+│   │   └── BehaviorConfig.swift           # Behavior settings
+│   │
+│   ├── Extensions/               # Swift extensions
+│   │   ├── NSScreen+UUID.swift            # Display UUID tracking
+│   │   └── NSScreen+DisplayTarget.swift   # Screen matching & notch detection
+│   │
+│   └── Resources/                # Assets
+│       ├── Assets.xcassets/      # App icon
+│       └── Sounds/               # Built-in ambient audio (m4a)
+│           ├── ambient_rain.m4a
+│           ├── ambient_forest.m4a
+│           ├── ambient_cafe.m4a
+│           ├── ambient_lofi.m4a
+│           └── ambient_brown_noise.m4a
+│
+├── Tests/OakTests/               # 29 test files
+│   ├── US001Tests.swift through US006Tests.swift  # Feature-level tests
+│   ├── NotchCompanionViewTests.swift (+Layout, +SessionState)
+│   ├── NotchWindowControllerTests.swift (+NotchWindow, +WindowBehavior, +NotchFirstUI)
+│   ├── AudioManagerTests.swift, AudioPersistenceTests.swift
+│   ├── AccessibilityTests.swift
+│   ├── ConfettiViewTests.swift, ClickOutsideModifierTests.swift
+│   ├── CountdownDisplayModeTests.swift
+│   ├── AlwaysOnTopTests.swift
+│   ├── LongBreakTests.swift
+│   ├── AutoStartNextIntervalTests.swift
+│   ├── NotificationTests.swift, SessionCompletionNotificationTests.swift
+│   ├── SparkleUpdaterTests.swift, AppcastVersionParserTests.swift
+│   ├── NSScreenNotchTests.swift
+│   ├── SmokeTests.swift
+│   └── MockAudioManager.swift
+│
+├── project.yml                  # XcodeGen configuration
+├── justfile                     # Task runner
+├── .swiftlint.yml               # Lint rules
+├── .swiftformat                 # Format rules
+├── appcast.xml                  # Sparkle release feed
+├── CHANGELOG.md                 # Release history
+├── README.md                    # Project readme
+├── DEVELOPMENT.md               # Developer setup guide
+├── CONTEXT.md                   # Codebase context
+├── TROUBLESHOOTING.md           # Common issues
+├── AGENTS.md                    # AI agent guidelines
+├── RELEASES.md                  # Release notes
+├── LICENSE                      # MIT license
+│
+├── .planning/codebase/          # Codebase map (these docs)
+├── .github/workflows/           # CI/CD pipelines
+├── scripts/release/             # Release asset scripts
+├── docs/                        # GitHub Pages site
+├── Casks/                       # Homebrew cask formula
+└── tasks/                       # PRD documents
 ```
 
-## Source Files by Directory
+## File Line Counts (Largest 10)
 
-### `Oak/Oak/Models/` — Data Models & Enums
-
-| File | Lines | Contents |
-| --- | --- | --- |
-| `SessionModels.swift` | 69 | `SessionState` enum (FSM), `Preset` enum, `DisplayTarget` enum |
-| `ProgressData.swift` | 59 | `SessionType`, `SessionRecord`, `DailyStats` structs (Codable) |
-| `AudioTrack.swift` | 45 | `AudioTrack` enum (rain, forest, cafe, brownNoise, lofi, none) |
-| `NotchLayout.swift` | 29 | `NotchLayout` enum (width/height constants) |
-| `CountdownDisplayMode.swift` | 15 | `CountdownDisplayMode` enum (number, circleRing) |
-
-### `Oak/Oak/Views/` — UI Layer
-
-| File | Lines | Role |
-| --- | --- | --- |
-| `NotchWindowController.swift` | 317 | Window lifecycle, frame management, screen change handling |
-| `SettingsMenuView.swift` | 334 | Settings popover (preset config, display, notifications, updates) |
-| `NotchCompanionView+StandardViews.swift` | 285 | Expanded/collapsed view layouts for non-notch displays |
-| `NotchCompanionView+InsideNotch.swift` | 257 | Layout variants for inside-physical-notch displays |
-| `NotchCompanionView+Controls.swift` | 189 | Audio/Progress/Settings buttons, timer display, session controls |
-| `NotchCompanionView.swift` | 158 | Root view composing all layouts, popovers, completion animations |
-| `ProgressMenuView.swift` | 140 | Progress & streak display popover |
-| `TransientPopover.swift` | 77 | Click-outside-to-dismiss popover modifier |
-| `NotificationSettingsView.swift` | 67 | Notification permission management in Settings |
-| `AudioMenuView.swift` | 66 | Audio track selection & volume control popover |
-| `ConfettiView.swift` | 65 | Confetti animation on work session completion |
-| `UpdateSettingsView.swift` | 41 | Sparkle update check & auto-download settings |
-| `CircularProgressRing.swift` | 39 | Circular progress indicator for countdown |
-| `NotchVisualStyle+Factory.swift` | 22 | Factory for visual style based on inside-notch state |
-| `NotchVisualStyle.swift` | 15 | Visual style constants (colors, corner radius) |
-| `SupportSectionView.swift` | 19 | Support/feedback links in Settings |
-
-### `Oak/Oak/ViewModels/` — View Models
-
-| File | Lines | Role |
-| --- | --- | --- |
-| `FocusSessionViewModel.swift` | 415 | Core session management, FSM transitions, timer, auto-start |
-
-### `Oak/Oak/Services/` — Business Logic
-
-| File                        | Lines | Role                                                    |
-| --------------------------- | ----- | ------------------------------------------------------- |
-| `AudioManager.swift`        | 374   | Audio playback (bundled + procedural), `NoiseGenerator` |
-| `PresetSettingsStore.swift` | 311   | UserDefaults-backed settings with validation            |
-| `SparkleUpdater.swift`      | 219   | Sparkle integration, `AppcastVersionParser`             |
-| `ProgressManager.swift`     | 163   | Daily stats, streaks, session recording                 |
-| `NotificationService.swift` | 101   | Local notification authorization & delivery             |
-
-### `Oak/Oak/Extensions/` — Swift Extensions
-
-| File                           | Lines | Role                                              |
-| ------------------------------ | ----- | ------------------------------------------------- |
-| `NSScreen+UUID.swift`          | 82    | Screen UUID caching, notch detection (`hasNotch`) |
-| `NSScreen+DisplayTarget.swift` | 62    | Screen resolution for display targets             |
-
-### `Oak/Tests/OakTests/` — Test Suite
-
-| File | Lines | Focus |
-| --- | --- | --- |
-| `US006Tests.swift` | ~270 | Progress tracking & streaks |
-| `LongBreakTests.swift` | ~300 | Long break logic and round tracking |
-| `US004Tests.swift` | ~190 | Audio selection, volume, display target |
-| `SessionCompletionNotificationTests.swift` | ~220 | Notification & sound on session completion |
-| `NotchWindowControllerTests+WindowBehavior.swift` | ~180 | Window expand/collapse, reposition |
-| `AudioPersistenceTests.swift` | ~245 | Audio track persistence across sessions |
-| `AutoStartNextIntervalTests.swift` | ~260 | Auto-start countdown logic |
-| `US003Tests.swift` | ~100 | Pause/resume session |
-| `US001Tests.swift` | ~75 | Notch visibility, session start |
-| `US002Tests.swift` | ~50 | Preset selection |
-| `US005Tests.swift` | ~80 | Session completion state |
-| `NotchCompanionViewTests.swift` | ~50 | View initialization |
-| `NotchCompanionViewTests+SessionState.swift` | ~110 | State transitions |
-| `NotchCompanionViewTests+Layout.swift` | ~30 | Layout tests |
-| `NotchWindowControllerTests.swift` | ~60 | Window creation |
-| `NotchWindowControllerTests+NotchWindow.swift` | ~20 | Window positioning |
-| `NotchWindowControllerTests+NotchFirstUI.swift` | ~110 | Notch-first positioning |
-| `AlwaysOnTopTests.swift` | ~100 | Always-on-top setting |
-| `CountdownDisplayModeTests.swift` | ~60 | Display mode persistence |
-| `AudioManagerTests.swift` | ~130 | Audio engine tests |
-| `NotificationTests.swift` | ~35 | Notification service |
-| `AccessibilityTests.swift` | ~30 | Accessibility |
-| `SparkleUpdaterTests.swift` | ~10 | Sparkle updater |
-| `ConfettiViewTests.swift` | ~15 | Confetti view |
-| `ClickOutsideModifierTests.swift` | ~15 | Click-outside dismiss |
-| `AppcastVersionParserTests.swift` | ~10 | Appcast version parsing |
-| `NSScreenNotchTests.swift` | ~10 | Notch detection |
-| `SmokeTests.swift` | ~5 | Sanity check |
-| `MockAudioManager.swift` | N/A | Audio manager mock |
+| File                                     | Lines |
+| ---------------------------------------- | ----- |
+| `FocusSessionViewModel.swift`            | 373   |
+| `NotchCompanionView.swift`               | 351   |
+| `SettingsMenuView.swift`                 | 341   |
+| `AudioManager.swift`                     | 328   |
+| `NotchCompanionView+StandardViews.swift` | 282   |
+| `PresetSettingsStore.swift`              | 261   |
+| `NotchCompanionView+InsideNotch.swift`   | 259   |
+| `KeyboardShortcutService.swift`          | 258   |
+| `NotchWindowController.swift`            | 255   |
+| `SparkleUpdater.swift`                   | 219   |
 
 ## Naming Conventions
 
-| Pattern         | Example                                              |
-| --------------- | ---------------------------------------------------- |
-| View files      | `NotchCompanionView.swift`, `SettingsMenuView.swift` |
-| View extensions | `NotchCompanionView+InsideNotch.swift`               |
-| ViewModel files | `FocusSessionViewModel.swift`                        |
-| Service files   | `AudioManager.swift`, `ProgressManager.swift`        |
-| Model files     | `SessionModels.swift`, `ProgressData.swift`          |
-| Extension files | `NSScreen+UUID.swift`                                |
-| Test files      | `US001Tests.swift`, `AudioManagerTests.swift`        |
-| Test extensions | `NotchWindowControllerTests+WindowBehavior.swift`    |
-| Protocol names  | `SessionCompletionNotifying`, `AudioEngineProtocol`  |
+- **Files**: PascalCase, mirroring primary type name
+- **Extensions**: `TypeName+Feature.swift` (e.g., `NotchCompanionView+Controls.swift`)
+- **Tests**: `{Feature}Tests.swift` or `{Feature}Tests+{Aspect}.swift`
+- **Directories**: Models, Views, ViewModels, Services, Extensions, Resources
