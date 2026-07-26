@@ -31,13 +31,13 @@ internal extension NotchWindowControllerTests {
 
         // Calculate all possible valid Y positions for this configuration
         let expectedYPositions = [
-            NotchWindow.calculateYPosition(
+            WindowPositioning.calculateYPosition(
                 for: activeScreen,
                 height: NotchLayout.height,
                 alwaysOnTop: false,
                 showBelowNotch: false
             ),
-            NotchWindow.calculateYPosition(
+            WindowPositioning.calculateYPosition(
                 for: activeScreen,
                 height: NotchLayout.height,
                 alwaysOnTop: false,
@@ -82,7 +82,7 @@ internal extension NotchWindowControllerTests {
         while Date() < endTime {
             if let screen = resolvedScreen {
                 // Use the shared positioning logic to calculate expected position
-                let expectedY = NotchWindow.calculateYPosition(
+                let expectedY = WindowPositioning.calculateYPosition(
                     for: screen,
                     height: NotchLayout.height,
                     alwaysOnTop: presetSettings.alwaysOnTop,

@@ -27,6 +27,7 @@
 		4590D899C3874037F87EE821 /* NotchVisualStyle+Factory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309530434B76C0BB37A8FA0D /* NotchVisualStyle+Factory.swift */; };
 		4B5B7AD41E542963653F229A /* NotchWindowControllerTests+WindowBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814659335F8FBC1EB95296FD /* NotchWindowControllerTests+WindowBehavior.swift */; };
 		4D92A0354DDAC317E9E44D17 /* LongBreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E7ADCEF210103CF3189D41 /* LongBreakTests.swift */; };
+		4D9BF99164E9F1A8F0F802DE /* WindowPositioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE52F59E069ECD05898D612 /* WindowPositioning.swift */; };
 		4EBBE83E80DF3FF02EBDAE16 /* SessionDurationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 454BAD66455AFEFEFD7EEA79 /* SessionDurationConfig.swift */; };
 		542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */; };
 		5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */; };
@@ -143,6 +144,7 @@
 		98D555E4182E199E8EC8D0B3 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A53A901D48495497B38B2A1E /* CountdownDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownDisplayMode.swift; sourceTree = "<group>"; };
 		A74529FF7AEFC6AB3D4B6935 /* NotchCompanionViewTests+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionViewTests+Layout.swift"; sourceTree = "<group>"; };
+		AAE52F59E069ECD05898D612 /* WindowPositioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowPositioning.swift; sourceTree = "<group>"; };
 		AC19349D6F25778FBE54A06F /* NSScreen+UUID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+UUID.swift"; sourceTree = "<group>"; };
 		B1EB99EC9EF014772EA562EF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdaterTests.swift; sourceTree = "<group>"; };
@@ -296,6 +298,7 @@
 				D9E56FB534D3736A6E1C03BD /* SupportSectionView.swift */,
 				C9239254E9493D78E223CE6D /* TransientPopover.swift */,
 				630A26F2F361CCE214543440 /* UpdateSettingsView.swift */,
+				AAE52F59E069ECD05898D612 /* WindowPositioning.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -470,6 +473,7 @@
 				91F4096D77B5684A1251EE01 /* SupportSectionView.swift in Sources */,
 				11949A6E7635E4BC247D1A97 /* TransientPopover.swift in Sources */,
 				1B89D6E392D0EBFBE60F788E /* UpdateSettingsView.swift in Sources */,
+				4D9BF99164E9F1A8F0F802DE /* WindowPositioning.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
