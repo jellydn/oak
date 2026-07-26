@@ -6,6 +6,7 @@ internal struct SettingsMenuView: View {
     @ObservedObject var notificationService: NotificationService
     @ObservedObject var sparkleUpdater: SparkleUpdater
     @ObservedObject var keyboardShortcutService: KeyboardShortcutService
+    var progressManager: ProgressManager?
     @State private var selectedDisplayTarget: DisplayTarget
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
     @State private var localKeyboardConfig: KeyboardShortcutConfig
@@ -14,12 +15,14 @@ internal struct SettingsMenuView: View {
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
         sparkleUpdater: SparkleUpdater,
-        keyboardShortcutService: KeyboardShortcutService = KeyboardShortcutService()
+        keyboardShortcutService: KeyboardShortcutService = KeyboardShortcutService(),
+        progressManager: ProgressManager? = nil
     ) {
         self.presetSettings = presetSettings
         self.notificationService = notificationService
         self.sparkleUpdater = sparkleUpdater
         self.keyboardShortcutService = keyboardShortcutService
+        self.progressManager = progressManager
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
         _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
         _localKeyboardConfig = State(initialValue: keyboardShortcutService.currentConfig)
@@ -66,6 +69,10 @@ internal struct SettingsMenuView: View {
 
             section(title: "Keyboard") {
                 keyboardSettingsSection
+            }
+
+            section(title: "Data") {
+                dataSection
             }
 
             section(title: "Updates") {
@@ -337,5 +344,90 @@ private extension SettingsMenuView {
                 .font(.caption)
             Spacer()
         }
+    }
+
+    // MARK: - Data Export / Import
+
+    var dataSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Back up or restore your progress data.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 8) {
+                Button("Export JSON") {
+                    exportJSON()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(progressManager == nil)
+
+                Button("Export CSV") {
+                    exportCSV()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(progressManager == nil)
+
+                Button("Import") {
+                    importData()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .disabled(progressManager == nil)
+            }
+        }
+    }
+
+    private func exportJSON() {
+        guard let manager = progressManager,
+              let data = manager.exportJSON()
+        else { return }
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "oak-progress-\(dateStamp()).json"
+        panel.allowedContentTypes = [.json]
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                try? data.write(to: url)
+            }
+        }
+    }
+
+    private func exportCSV() {
+        guard let manager = progressManager else { return }
+        let csv = manager.exportCSV()
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "oak-progress-\(dateStamp()).csv"
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                try? csv.write(to: url, atomically: true, encoding: .utf8)
+            }
+        }
+    }
+
+    private func importData() {
+        guard let manager = progressManager else { return }
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.begin { response in
+            if response == .OK, let url = panel.url, let data = try? Data(contentsOf: url) {
+                let count = manager.importRecords(from: data)
+                if count > 0 {
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "Import complete"
+                        alert.informativeText = "Imported \(count) day(s) of progress data."
+                        alert.runModal()
+                    }
+                }
+            }
+        }
+    }
+
+    private func dateStamp() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
 }

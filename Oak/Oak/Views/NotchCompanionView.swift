@@ -151,7 +151,8 @@ internal struct NotchCompanionView: View {
                 presetSettings: viewModel.presetSettings,
                 notificationService: notificationService,
                 sparkleUpdater: sparkleUpdater,
-                keyboardShortcutService: keyboardShortcutService
+                keyboardShortcutService: keyboardShortcutService,
+                progressManager: viewModel.progressManager
             )
             .frame(width: 340)
             .dismissOnClickOutside { [self] in
