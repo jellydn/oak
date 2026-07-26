@@ -11,7 +11,8 @@ internal struct OakApp: App {
                 presetSettings: appDelegate.presetSettings,
                 notificationService: appDelegate.notificationService,
                 sparkleUpdater: appDelegate.sparkleUpdater,
-                keyboardShortcutService: appDelegate.keyboardShortcutService
+                keyboardShortcutService: appDelegate.keyboardShortcutService,
+                progressManager: appDelegate.notchWindowController?.viewModel.progressManager
             )
             .frame(width: 420)
             .padding(8)

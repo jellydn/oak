@@ -160,4 +160,57 @@ internal class ProgressManager: ObservableObject {
 
         return streak
     }
+
+    // MARK: - Export / Import
+
+    var allRecords: [ProgressData] {
+        loadRecords()
+    }
+
+    func exportJSON() -> Data? {
+        let records = allRecords
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return try? encoder.encode(records)
+    }
+
+    func exportCSV() -> String {
+        let records = allRecords
+        var csv = "Date,Type,Start,End,Duration (min)\n"
+        let formatter = ISO8601DateFormatter()
+        for record in records {
+            for session in record.sessions.sorted(by: { $0.startTime > $1.startTime }) {
+                csv += "\(formatter.string(from: record.date)),"
+                    + "\(session.type.rawValue),"
+                    + "\(formatter.string(from: session.startTime)),"
+                    + "\(formatter.string(from: session.endTime)),"
+                    + "\(session.durationMinutes)\n"
+            }
+        }
+        return csv
+    }
+
+    func importRecords(from data: Data) -> Int {
+        guard let imported = try? JSONDecoder().decode([ProgressData].self, from: data),
+              !imported.isEmpty
+        else {
+            return 0
+        }
+        var existing = allRecords
+        for record in imported {
+            if let index = existing.firstIndex(where: { $0.date == record.date }) {
+                var merged = existing[index]
+                merged.focusMinutes += record.focusMinutes
+                merged.completedSessions += record.completedSessions
+                merged.sessions.append(contentsOf: record.sessions)
+                existing[index] = merged
+            } else {
+                existing.append(record)
+            }
+        }
+        existing.sort { $0.date > $1.date }
+        saveRecords(existing)
+        loadProgress()
+        return imported.count
+    }
 }
