@@ -1,6 +1,8 @@
 import SwiftUI
 
-internal extension NotchCompanionView {
+// MARK: - Inside-Notch Views
+
+extension NotchCompanionView {
     var insideNotchCompactContent: some View {
         HStack(spacing: 0) {
             compactLeadingDisplay
@@ -163,7 +165,7 @@ internal extension NotchCompanionView {
     }
 
     @ViewBuilder
-    var compactLeadingDisplay: some View {
+    internal var compactLeadingDisplay: some View {
         if viewModel.canStart {
             presetToggleButton
         } else if viewModel.autoStartCountdown > 0 {
