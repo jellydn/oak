@@ -49,8 +49,10 @@ In today's world of constant distractions, deep work has become increasingly rar
 - 🔄 **Smart breaks**: Automatic 15/20 min long breaks after 4 focus rounds
 - ▶️ **Session controls**: Start, pause, and resume your focus sessions
 - 🎵 **Ambient sounds**: Rain, forest, cafe, brown noise, and lo-fi to help you concentrate
+- ⌨️ **Keyboard shortcuts**: Press Space to start/pause/resume, Escape to reset — control sessions without touching the mouse
 - 📊 **Local tracking**: Track daily focus minutes, completed sessions, and 7-day streaks
 - 🕒 **Session timeline**: See each focus session and break from today with start/end times and durations
+- 💾 **Data export**: Export your progress as JSON or CSV, or import from a backup file
 - 🔄 **Auto-update**: Seamless updates via Sparkle framework
 
 ## Installation
