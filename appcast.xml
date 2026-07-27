@@ -7,6 +7,23 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.43</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.43</link>
+  <sparkle:version>5043</sparkle:version>
+  <sparkle:shortVersionString>0.5.43</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.43</h2>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.42...v0.5.43"><tt>v0.5.42...v0.5.43</tt></a></p>
+  ]]></description>
+  <pubDate>Mon, 27 Jul 2026 01:09:20 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.43/Oak-0.5.43.dmg"
+             sparkle:version="5043"
+             sparkle:shortVersionString="0.5.43"
+             sparkle:edSignature="926g1SQXdnVBkq/j6ZqtUDGAMGXoiZMZKO/3MyclxhU+3A3Eqfd1NiaeaPTSRcTCdV7XKehTpSkn+6Yb4nR7Dg=="
+             length="9081424"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.42</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.42</link>
   <sparkle:version>5042</sparkle:version>
@@ -49,27 +66,6 @@
              sparkle:shortVersionString="0.5.41"
              sparkle:edSignature="Z7Ig/ATyWsw/GGYNIBEo0DEQ/6iEJKBhvTCsNkNgWX4DXUEbKmRNE9UfB+A3PFvKl8J3+QoYrbcQZ/XXDgYvDg=="
              length="9028722"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.40</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.40</link>
-  <sparkle:version>5040</sparkle:version>
-  <sparkle:shortVersionString>0.5.40</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.40</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>refactor: add SessionStateMachine to eliminate state duplication by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4976842386" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/133" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/133/hovercard" href="https://github.com/jellydn/oak/pull/133">#133</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.39...v0.5.40"><tt>v0.5.39...v0.5.40</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 26 Jul 2026 09:40:32 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.40/Oak-0.5.40.dmg"
-             sparkle:version="5040"
-             sparkle:shortVersionString="0.5.40"
-             sparkle:edSignature="8h5OK7NELe3NzMGTeOlvvuBjVC+0ToHER5wxuA5fehnFfAIcyWmnq21iUlgnbsDShs6p7tTJEDzJHVVehUOdBA=="
-             length="9024912"
              type="application/octet-stream" />
 </item>
   </channel>
