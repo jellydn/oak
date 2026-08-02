@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07817102ADDA532004A9E299 /* SessionCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 985C59F06B49B761EA5A1324 /* SessionCycle.swift */; };
 		088CE53BA008F2E0ED7225E3 /* SparkleUpdaterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */; };
 		08B16A2D203D68C5D8E64806 /* NSScreenNotchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */; };
 		1186A1879415E166D9F35DBE /* NotchCompanionViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2323FD43612DC128B03544D4 /* NotchCompanionViewTests.swift */; };
@@ -32,6 +33,7 @@
 		4D9BF99164E9F1A8F0F802DE /* WindowPositioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE52F59E069ECD05898D612 /* WindowPositioning.swift */; };
 		4EBBE83E80DF3FF02EBDAE16 /* SessionDurationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 454BAD66455AFEFEFD7EEA79 /* SessionDurationConfig.swift */; };
 		542154C3442D3F88977C493D /* ClickOutsideModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E813C6E3CE44E2E0F36F640 /* ClickOutsideModifierTests.swift */; };
+		549C9C52E05194F19EB02E4C /* SessionCycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015DAE9095C32458E31C602E /* SessionCycleTests.swift */; };
 		5ACFC4E7023A7CB22C98EDD3 /* NSScreen+DisplayTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E7594FA40128ADA5F39F /* NSScreen+DisplayTarget.swift */; };
 		610C05D4C9C49C70A78B7D69 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = B1EB99EC9EF014772EA562EF /* README.md */; };
 		61F4A962C9C52E757FAE25FE /* ambient_brown_noise.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7663A82B3FFE2837587C2B2F /* ambient_brown_noise.m4a */; };
@@ -104,6 +106,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		015DAE9095C32458E31C602E /* SessionCycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCycleTests.swift; sourceTree = "<group>"; };
 		03D90651E33152E3C952CE1D /* Oak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Oak.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		047B20E550402C5D04E55B6E /* NotchCompanionView+InsideNotch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionView+InsideNotch.swift"; sourceTree = "<group>"; };
 		0679D26521D6F4E9C5774630 /* NotchCompanionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchCompanionView.swift; sourceTree = "<group>"; };
@@ -160,6 +163,7 @@
 		85C93F37E0AC4AA71C304FDD /* US003Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US003Tests.swift; sourceTree = "<group>"; };
 		85FAA8F73F21E099B201F0FB /* DisplayIDInitializationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayIDInitializationTests.swift; sourceTree = "<group>"; };
 		8E7C621CDFB0A0D1B1137478 /* AudioEngineControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineControlling.swift; sourceTree = "<group>"; };
+		985C59F06B49B761EA5A1324 /* SessionCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCycle.swift; sourceTree = "<group>"; };
 		98D555E4182E199E8EC8D0B3 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A53A901D48495497B38B2A1E /* CountdownDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownDisplayMode.swift; sourceTree = "<group>"; };
 		A74529FF7AEFC6AB3D4B6935 /* NotchCompanionViewTests+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionViewTests+Layout.swift"; sourceTree = "<group>"; };
@@ -211,6 +215,7 @@
 				A53A901D48495497B38B2A1E /* CountdownDisplayMode.swift */,
 				164FAFB05B901C05BD1479BF /* NotchLayout.swift */,
 				1CDDE42AD58F6B067B64ED90 /* ProgressData.swift */,
+				985C59F06B49B761EA5A1324 /* SessionCycle.swift */,
 				23F2FC6738FCAE0999D42A11 /* SessionModels.swift */,
 			);
 			path = Models;
@@ -294,6 +299,7 @@
 				1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */,
 				E7C2456BF177F3FF003681C9 /* ProgressStoreTests.swift */,
 				131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */,
+				015DAE9095C32458E31C602E /* SessionCycleTests.swift */,
 				DA71DF374BE14AAE57917F4E /* SessionTimerServiceTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */,
@@ -507,6 +513,7 @@
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
 				C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */,
 				EDF6F9A3021CCA4E25F84F8B /* ProgressStore.swift in Sources */,
+				07817102ADDA532004A9E299 /* SessionCycle.swift in Sources */,
 				4EBBE83E80DF3FF02EBDAE16 /* SessionDurationConfig.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				F51DE81C4543A035DA93A6F7 /* SessionTimerService.swift in Sources */,
@@ -548,6 +555,7 @@
 				25BAA3E90290CE446B9F7BFC /* NotificationTests.swift in Sources */,
 				CB2C7AF21FF6FDEB1F6D84FF /* ProgressStoreTests.swift in Sources */,
 				F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */,
+				549C9C52E05194F19EB02E4C /* SessionCycleTests.swift in Sources */,
 				3007E12D7C9341A05443402A /* SessionTimerServiceTests.swift in Sources */,
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
 				088CE53BA008F2E0ED7225E3 /* SparkleUpdaterTests.swift in Sources */,

@@ -21,11 +21,9 @@ internal class FocusSessionViewModel: ObservableObject {
     @Published private(set) var autoStartCountdown: Int = 0
 
     let presetSettings: PresetSettingsStore
-    private var isWorkSession: Bool = true
-    private var isLongBreak: Bool = false
+    private var sessionCycle: SessionCycle
     private var currentSessionStartTime: Date?
     private let currentDate: () -> Date
-    private var roundTrackingDate: Date
     private var presetSettingsCancellable: AnyCancellable?
     private var timerServiceCancellables = Set<AnyCancellable>()
     private var lastPlayingAudioTrack: AudioTrack = .none
@@ -46,7 +44,7 @@ internal class FocusSessionViewModel: ObservableObject {
         currentDate: @escaping () -> Date = Date.init
     ) {
         self.currentDate = currentDate
-        roundTrackingDate = Calendar.current.startOfDay(for: currentDate())
+        sessionCycle = SessionCycle(currentDate: currentDate())
         self.audioManager = audioManager ?? AudioManager()
         self.presetSettings = presetSettings
         self.progressManager = progressManager ?? ProgressManager()
@@ -88,7 +86,7 @@ internal class FocusSessionViewModel: ObservableObject {
             seconds = remaining % 60
         case let .completed(isWorkSession):
             if isWorkSession {
-                if shouldUseLongBreak {
+                if sessionCycle.nextBreakIsLong(roundsBeforeLongBreak: presetSettings.roundsBeforeLongBreak) {
                     minutes = presetSettings.longBreakDuration(for: selectedPreset) / 60
                 } else {
                     minutes = presetSettings.breakDuration(for: selectedPreset) / 60
@@ -131,11 +129,11 @@ internal class FocusSessionViewModel: ObservableObject {
             if isWork {
                 "Focus"
             } else {
-                isLongBreak ? "Long Break" : "Break"
+                sessionCycle.isLongBreak ? "Long Break" : "Break"
             }
         case let .completed(isWorkSession):
             if isWorkSession {
-                if shouldUseLongBreak {
+                if sessionCycle.nextBreakIsLong(roundsBeforeLongBreak: presetSettings.roundsBeforeLongBreak) {
                     "Long Break"
                 } else {
                     "Break"
@@ -164,27 +162,6 @@ internal class FocusSessionViewModel: ObservableObject {
 
     func cleanup() {
         resetSession()
-    }
-
-    private var completedRoundsForCurrentDay: Int {
-        guard Calendar.current.isDate(roundTrackingDate, inSameDayAs: currentDate()) else {
-            return 0
-        }
-        return completedRounds
-    }
-
-    private var shouldUseLongBreak: Bool {
-        completedRoundsForCurrentDay >= presetSettings.roundsBeforeLongBreak
-    }
-
-    private func resetCompletedRoundsIfNeeded() {
-        let today = Calendar.current.startOfDay(for: currentDate())
-        guard !Calendar.current.isDate(roundTrackingDate, inSameDayAs: today) else {
-            return
-        }
-
-        roundTrackingDate = today
-        completedRounds = 0
     }
 
     private func setupTimerServiceBindings() {
@@ -241,16 +218,14 @@ internal extension FocusSessionViewModel {
     }
 
     func startSession(using preset: Preset? = nil) {
-        resetCompletedRoundsIfNeeded()
         if let preset {
             selectedPreset = preset
         }
         let seconds = presetSettings.workDuration(for: selectedPreset)
-        isWorkSession = true
-        isLongBreak = false
+        sessionCycle.startWork(currentDate: currentDate())
+        completedRounds = sessionCycle.completedRounds
         currentSessionStartTime = Date()
-        completedRounds = 0
-        sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: isWorkSession)
+        sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: sessionCycle.isWorkSession)
         timerService.start(seconds: seconds)
     }
 
@@ -269,7 +244,6 @@ internal extension FocusSessionViewModel {
     }
 
     func startNextSession(isAutoStart: Bool = false) {
-        resetCompletedRoundsIfNeeded()
         guard let completedWorkSession = SessionStateMachine.isWorkSession(in: sessionState),
               SessionStateMachine.isCompleted(sessionState)
         else {
@@ -279,24 +253,23 @@ internal extension FocusSessionViewModel {
         timerService.cancelAutoStartCountdown()
 
         wasAutoStarted = isAutoStart
-        isWorkSession = !completedWorkSession
+        let interval = sessionCycle.startNext(
+            after: completedWorkSession,
+            currentDate: currentDate(),
+            configuration: .init(
+                workDuration: presetSettings.workDuration(for: selectedPreset),
+                breakDuration: presetSettings.breakDuration(for: selectedPreset),
+                longBreakDuration: presetSettings.longBreakDuration(for: selectedPreset),
+                roundsBeforeLongBreak: presetSettings.roundsBeforeLongBreak
+            )
+        )
+        completedRounds = sessionCycle.completedRounds
 
-        let seconds: Int
-        if isWorkSession {
-            seconds = presetSettings.workDuration(for: selectedPreset)
-            isLongBreak = false
-        } else if shouldUseLongBreak {
-            seconds = presetSettings.longBreakDuration(for: selectedPreset)
-            isLongBreak = true
-        } else {
-            seconds = presetSettings.breakDuration(for: selectedPreset)
-            isLongBreak = false
-        }
-
+        let seconds = interval.duration
         currentSessionStartTime = Date()
-        sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: isWorkSession)
+        sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: interval.isWorkSession)
 
-        if isWorkSession && lastPlayingAudioTrack != .none {
+        if interval.isWorkSession && lastPlayingAudioTrack != .none {
             audioManager.play(track: lastPlayingAudioTrack)
         }
 
@@ -305,11 +278,10 @@ internal extension FocusSessionViewModel {
 
     func resetSession() {
         timerService.stop()
-        isWorkSession = true
-        isLongBreak = false
+        sessionCycle.reset()
         currentSessionStartTime = nil
         isSessionComplete = false
-        completedRounds = 0
+        completedRounds = sessionCycle.completedRounds
         lastPlayingAudioTrack = .none
         wasAutoStarted = false
         audioManager.stop()
@@ -317,17 +289,8 @@ internal extension FocusSessionViewModel {
     }
 
     func completeSession() {
-        resetCompletedRoundsIfNeeded()
-        let sessionType: SessionType
-        if isWorkSession {
-            sessionType = .work
-            completedRounds += 1
-        } else {
-            sessionType = isLongBreak ? .longBreak : .shortBreak
-            if isLongBreak {
-                completedRounds = 0
-            }
-        }
+        let sessionType = sessionCycle.complete(currentDate: currentDate())
+        completedRounds = sessionCycle.completedRounds
 
         let remaining = timerService.remainingSeconds
         let durationMinutes = (timerService.sessionDuration - remaining) / 60
@@ -340,15 +303,15 @@ internal extension FocusSessionViewModel {
             )
         }
 
-        notificationService.sendSessionCompletionNotification(isWorkSession: isWorkSession)
+        notificationService.sendSessionCompletionNotification(isWorkSession: sessionCycle.isWorkSession)
 
-        if isWorkSession || audioManager.isPlaying {
+        if sessionCycle.isWorkSession || audioManager.isPlaying {
             lastPlayingAudioTrack = audioManager.isPlaying ? audioManager.selectedTrack : .none
         }
 
         audioManager.stop()
 
-        let shouldPlaySound = if isWorkSession {
+        let shouldPlaySound = if sessionCycle.isWorkSession {
             presetSettings.playSoundOnSessionCompletion
         } else {
             presetSettings.playSoundOnBreakCompletion && !wasAutoStarted
@@ -357,7 +320,8 @@ internal extension FocusSessionViewModel {
             completionSoundPlayer.playCompletionSound()
         }
 
-        sessionState = SessionStateMachine.complete(from: sessionState) ?? .completed(isWorkSession: isWorkSession)
+        sessionState = SessionStateMachine.complete(from: sessionState)
+            ?? .completed(isWorkSession: sessionCycle.isWorkSession)
 
         isSessionComplete = true
 
