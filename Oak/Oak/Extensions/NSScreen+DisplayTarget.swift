@@ -1,5 +1,6 @@
 import AppKit
 
+@MainActor
 internal extension NSScreen {
     static func displayID(for screen: NSScreen) -> CGDirectDisplayID? {
         guard let screenNumber = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else {

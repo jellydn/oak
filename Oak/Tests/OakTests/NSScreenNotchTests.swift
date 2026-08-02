@@ -107,6 +107,25 @@ internal final class NSScreenNotchTests: XCTestCase {
         }
     }
 
+    func testHasNotchCacheRefreshesAfterScreenChange() throws {
+        guard let mainScreen = NSScreen.main else {
+            throw XCTSkip("No main screen available for testing")
+        }
+
+        _ = mainScreen.hasNotch
+        NotificationCenter.default.post(
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+        RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+
+        XCTAssertEqual(
+            mainScreen.hasNotch,
+            mainScreen.safeAreaInsets.top > 0,
+            "Cached notch status should be refreshed after screen parameters change"
+        )
+    }
+
     func testNotchedScreenDetection() {
         // Find screen with actual notch
         let notchedScreen = NSScreen.screens.first { $0.hasNotch }

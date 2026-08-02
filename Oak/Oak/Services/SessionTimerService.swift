@@ -15,6 +15,9 @@ internal final class SessionTimerService: ObservableObject {
     private var timer: Timer?
     private var autoStartTimer: Timer?
     private var sessionEndDate: Date?
+    private var remainingInterval: TimeInterval = 0
+    private var autoStartEndDate: Date?
+    private static let timerInterval: TimeInterval = 0.25
 
     deinit {
         timer?.invalidate()
@@ -23,30 +26,36 @@ internal final class SessionTimerService: ObservableObject {
 
     func start(seconds: Int) {
         timer?.invalidate()
+        autoStartTimer?.invalidate()
+        autoStartTimer = nil
+        autoStartEndDate = nil
+        autoStartCountdown = 0
         sessionDuration = seconds
         remainingSeconds = seconds
-        sessionEndDate = Date().addingTimeInterval(TimeInterval(seconds))
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tick()
-            }
+        remainingInterval = TimeInterval(seconds)
+        sessionEndDate = Date().addingTimeInterval(remainingInterval)
+        timer = makeRepeatingTimer { [weak self] in
+            self?.tick()
         }
+        tick()
     }
 
     func pause() {
         timer?.invalidate()
         timer = nil
+        if let sessionEndDate {
+            remainingInterval = max(0, sessionEndDate.timeIntervalSinceNow)
+        }
         sessionEndDate = nil
     }
 
     func resume() {
         guard timer == nil else { return }
-        sessionEndDate = Date().addingTimeInterval(TimeInterval(remainingSeconds))
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tick()
-            }
+        sessionEndDate = Date().addingTimeInterval(remainingInterval)
+        timer = makeRepeatingTimer { [weak self] in
+            self?.tick()
         }
+        tick()
     }
 
     func stop() {
@@ -58,25 +67,39 @@ internal final class SessionTimerService: ObservableObject {
         autoStartCountdown = 0
         sessionDuration = 0
         sessionEndDate = nil
+        remainingInterval = 0
+        autoStartEndDate = nil
     }
 
     func startAutoStartCountdown() {
-        autoStartCountdown = 10
         autoStartTimer?.invalidate()
-        autoStartTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tickAutoStart()
-            }
+        autoStartCountdown = 10
+        autoStartEndDate = Date().addingTimeInterval(TimeInterval(autoStartCountdown))
+        autoStartTimer = makeRepeatingTimer { [weak self] in
+            self?.tickAutoStart()
         }
+        tickAutoStart()
     }
 
     func cancelAutoStartCountdown() {
         autoStartTimer?.invalidate()
         autoStartTimer = nil
+        autoStartEndDate = nil
         autoStartCountdown = 0
     }
 
     // MARK: - Private
+
+    private func makeRepeatingTimer(action: @escaping @MainActor () -> Void) -> Timer {
+        // Timer callbacks run on MainActor because every timer is installed on RunLoop.main.
+        let timer = Timer(timeInterval: Self.timerInterval, repeats: true) { _ in
+            MainActor.assumeIsolated {
+                action()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        return timer
+    }
 
     private func tick() {
         guard let sessionEndDate else {
@@ -86,22 +109,32 @@ internal final class SessionTimerService: ObservableObject {
             return
         }
 
-        remainingSeconds = max(0, Int(ceil(sessionEndDate.timeIntervalSinceNow)))
+        remainingInterval = max(0, sessionEndDate.timeIntervalSinceNow)
+        remainingSeconds = max(0, Int(ceil(remainingInterval)))
 
         if remainingSeconds <= 0 {
             timer?.invalidate()
             timer = nil
             self.sessionEndDate = nil
+            remainingInterval = 0
             timerFinished.send()
         }
     }
 
     private func tickAutoStart() {
-        autoStartCountdown -= 1
-        if autoStartCountdown <= 0 {
+        guard let autoStartEndDate else {
             autoStartTimer?.invalidate()
             autoStartTimer = nil
-            autoStartCountdown = 0
+            return
+        }
+
+        let remainingInterval = max(0, autoStartEndDate.timeIntervalSinceNow)
+        autoStartCountdown = max(0, Int(ceil(remainingInterval)))
+
+        if autoStartCountdown == 0 {
+            autoStartTimer?.invalidate()
+            autoStartTimer = nil
+            self.autoStartEndDate = nil
             autoStartFinished.send()
         }
     }
