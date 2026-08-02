@@ -9,16 +9,19 @@ internal class ProgressManager: ObservableObject {
         todaySessions: []
     )
 
-    private let userDefaults: UserDefaults
     private let currentDate: () -> Date
-    private let progressKey = "progressHistory"
+    private let progressStore: any ProgressStoring
     private let retentionDays = 90
     private var lastLoadedDate: Date
     private var dayCheckTimer: Timer?
 
-    init(userDefaults: UserDefaults = .standard, currentDate: @escaping () -> Date = Date.init) {
-        self.userDefaults = userDefaults
+    init(
+        userDefaults: UserDefaults = .standard,
+        progressStore: (any ProgressStoring)? = nil,
+        currentDate: @escaping () -> Date = Date.init
+    ) {
         self.currentDate = currentDate
+        self.progressStore = progressStore ?? UserDefaultsProgressStore(userDefaults: userDefaults)
         lastLoadedDate = Calendar.current.startOfDay(for: currentDate())
         loadProgress()
         startDayCheckTimer()
@@ -90,12 +93,7 @@ internal class ProgressManager: ObservableObject {
     }
 
     private func loadRecords() -> [ProgressData] {
-        guard let data = userDefaults.data(forKey: progressKey),
-              let records = try? JSONDecoder().decode([ProgressData].self, from: data)
-        else {
-            return []
-        }
-        return records
+        progressStore.load()
     }
 
     private func pruneOldRecords(_ records: [ProgressData]) -> [ProgressData] {
@@ -106,9 +104,7 @@ internal class ProgressManager: ObservableObject {
     }
 
     private func saveRecords(_ records: [ProgressData]) {
-        if let data = try? JSONEncoder().encode(records) {
-            userDefaults.set(data, forKey: progressKey)
-        }
+        progressStore.save(records)
     }
 
     private func loadProgress() {

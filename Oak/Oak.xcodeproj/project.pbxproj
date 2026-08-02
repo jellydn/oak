@@ -67,6 +67,7 @@
 		BC0152F64748D50B856DA0C1 /* ambient_forest.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7D93E5502BBC8DD90FD136BB /* ambient_forest.m4a */; };
 		BFCC005B04C7BBAC52A077CE /* OakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 451C36F9BC7A6103BF32362C /* OakApp.swift */; };
 		C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */; };
+		CB2C7AF21FF6FDEB1F6D84FF /* ProgressStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C2456BF177F3FF003681C9 /* ProgressStoreTests.swift */; };
 		CB30D8321F8BFB7C2708E906 /* DisplayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = C316C2930B2750A34E68538D /* DisplayConfig.swift */; };
 		CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F2FC6738FCAE0999D42A11 /* SessionModels.swift */; };
 		D01FB63BF5CAA09DBAE33DD0 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F7E99471145836A04408 /* AudioManager.swift */; };
@@ -81,6 +82,7 @@
 		EBE81F10378684B523C9D931 /* CountdownDisplayModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */; };
 		EC877E270C24B19E01A1DDE4 /* ConfettiViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E1129CEDF63355578B0485 /* ConfettiViewTests.swift */; };
 		ED83D72FEA74BD4FB1A307DE /* AudioManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */; };
+		EDF6F9A3021CCA4E25F84F8B /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D62692D6026629E6052AE6 /* ProgressStore.swift */; };
 		F1267A7C11F901A5AE9D6EDF /* NotchVisualStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCAC7004FB57BBA5CEBB9B3 /* NotchVisualStyle.swift */; };
 		F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */; };
 		F51DE81C4543A035DA93A6F7 /* SessionTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F2F3DEA012EE98A549BC02 /* SessionTimerService.swift */; };
@@ -133,6 +135,7 @@
 		451C36F9BC7A6103BF32362C /* OakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OakApp.swift; sourceTree = "<group>"; };
 		454BAD66455AFEFEFD7EEA79 /* SessionDurationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDurationConfig.swift; sourceTree = "<group>"; };
 		53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionViewModel.swift; sourceTree = "<group>"; };
+		55D62692D6026629E6052AE6 /* ProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStore.swift; sourceTree = "<group>"; };
 		5B1E09A351763DC5E48FA361 /* AudioManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManagerTests.swift; sourceTree = "<group>"; };
 		5DF023F144789D230C0B954F /* NoiseGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseGenerator.swift; sourceTree = "<group>"; };
 		5E581D2529EA9F9B22AEB5DE /* NotchCompanionView+StandardViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionView+StandardViews.swift"; sourceTree = "<group>"; };
@@ -174,6 +177,7 @@
 		DCB9EFBE035ED14BBCAAD3D9 /* NotchCompanionViewTests+SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionViewTests+SessionState.swift"; sourceTree = "<group>"; };
 		E43285E82910BB45D9CF9000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E680D8D9839B944EB6CB5723 /* NotchWindowControllerTests+NotchFirstUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchWindowControllerTests+NotchFirstUI.swift"; sourceTree = "<group>"; };
+		E7C2456BF177F3FF003681C9 /* ProgressStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStoreTests.swift; sourceTree = "<group>"; };
 		EA36A47C5BB3764BB7DAD70B /* PresetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetEditorView.swift; sourceTree = "<group>"; };
 		F287A617D7BF92425C7BD22A /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		F294622BEE001AE06968C35C /* CountdownDisplayModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownDisplayModeTests.swift; sourceTree = "<group>"; };
@@ -279,6 +283,7 @@
 				814659335F8FBC1EB95296FD /* NotchWindowControllerTests+WindowBehavior.swift */,
 				3912FED25041D62DE77347EA /* NotificationTests.swift */,
 				1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */,
+				E7C2456BF177F3FF003681C9 /* ProgressStoreTests.swift */,
 				131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */,
 				DA71DF374BE14AAE57917F4E /* SessionTimerServiceTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
@@ -339,6 +344,7 @@
 				98D555E4182E199E8EC8D0B3 /* NotificationService.swift */,
 				1387A36E301B5A6EA9BB4A85 /* PresetSettingsStore.swift */,
 				6EFD132B19656D2C6D2CA981 /* ProgressManager.swift */,
+				55D62692D6026629E6052AE6 /* ProgressStore.swift */,
 				454BAD66455AFEFEFD7EEA79 /* SessionDurationConfig.swift */,
 				18F2F3DEA012EE98A549BC02 /* SessionTimerService.swift */,
 				770CCC886CF6A5E903159704 /* SparkleUpdater.swift */,
@@ -487,6 +493,7 @@
 				16AB818C370C3132420E8C87 /* ProgressData.swift in Sources */,
 				E3BAB7635E9F5CEAABADB263 /* ProgressManager.swift in Sources */,
 				C1C2CDACE52EEF5146C83881 /* ProgressMenuView.swift in Sources */,
+				EDF6F9A3021CCA4E25F84F8B /* ProgressStore.swift in Sources */,
 				4EBBE83E80DF3FF02EBDAE16 /* SessionDurationConfig.swift in Sources */,
 				CE3A4934C57D1C203D016F96 /* SessionModels.swift in Sources */,
 				F51DE81C4543A035DA93A6F7 /* SessionTimerService.swift in Sources */,
@@ -524,6 +531,7 @@
 				4B5B7AD41E542963653F229A /* NotchWindowControllerTests+WindowBehavior.swift in Sources */,
 				AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */,
 				25BAA3E90290CE446B9F7BFC /* NotificationTests.swift in Sources */,
+				CB2C7AF21FF6FDEB1F6D84FF /* ProgressStoreTests.swift in Sources */,
 				F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */,
 				3007E12D7C9341A05443402A /* SessionTimerServiceTests.swift in Sources */,
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
