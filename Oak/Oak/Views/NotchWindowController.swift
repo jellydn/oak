@@ -7,10 +7,7 @@ internal class NotchWindowController: NSWindowController {
     private var lastExpandedState: Bool = false
     private var hasCleanedUp = false
     private var isApplyingFrameChange = false
-    private var isFrameUpdateScheduled = false
-    private var pendingExpandedState: Bool?
-    private var pendingForceReposition = false
-    private var pendingTargetOverride: DisplayTarget?
+    private let frameUpdateCoordinator = WindowFrameUpdateCoordinator()
     internal private(set) var viewModel: FocusSessionViewModel
     private let presetSettings: PresetSettingsStore
     private let notificationService: NotificationService
@@ -146,30 +143,15 @@ internal class NotchWindowController: NSWindowController {
         forceReposition: Bool = false,
         targetOverride: DisplayTarget? = nil
     ) {
-        pendingExpandedState = expanded
-        pendingForceReposition = pendingForceReposition || forceReposition
-        if let targetOverride {
-            pendingTargetOverride = targetOverride
-        }
-
-        guard !isFrameUpdateScheduled else { return }
-        isFrameUpdateScheduled = true
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            isFrameUpdateScheduled = false
-            guard let expandedState = pendingExpandedState else { return }
-            let shouldForceReposition = pendingForceReposition
-            let target = pendingTargetOverride
-
-            pendingExpandedState = nil
-            pendingForceReposition = false
-            pendingTargetOverride = nil
-
-            setExpanded(
-                expandedState,
-                forceReposition: shouldForceReposition,
-                targetOverride: target
+        frameUpdateCoordinator.request(
+            expanded: expanded,
+            forceReposition: forceReposition,
+            targetOverride: targetOverride
+        ) { [weak self] request in
+            self?.setExpanded(
+                request.expanded,
+                forceReposition: request.forceReposition,
+                targetOverride: request.targetOverride
             )
         }
     }
