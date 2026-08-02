@@ -31,7 +31,7 @@ internal final class MockAudioManager: AudioManager {
     }
 }
 
-private final class MockTestAudioEngine: AudioEngineProtocol {
+private final class MockTestAudioEngine: AudioEngineControlling {
     var isRunning: Bool = false
     var outputChannelCount: UInt32 = 2
     var outputSampleRate: Double = 44100
