@@ -7,6 +7,30 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.46</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.46</link>
+  <sparkle:version>5046</sparkle:version>
+  <sparkle:shortVersionString>0.5.46</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.46</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>refactor(progress): extract progress persistence seam by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="5043299016" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/150" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/150/hovercard" href="https://github.com/jellydn/oak/pull/150">#150</a></li>
+              <li>refactor(window): isolate frame update coordination by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="5043299245" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/151" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/151/hovercard" href="https://github.com/jellydn/oak/pull/151">#151</a></li>
+              <li>refactor(audio): isolate ambient playback lifecycle by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="5043299718" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/152" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/152/hovercard" href="https://github.com/jellydn/oak/pull/152">#152</a></li>
+              <li>refactor(session): isolate focus cycle policy by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="5043299981" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/153" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/153/hovercard" href="https://github.com/jellydn/oak/pull/153">#153</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.45...v0.5.46"><tt>v0.5.45...v0.5.46</tt></a></p>
+  ]]></description>
+  <pubDate>Sun, 02 Aug 2026 16:11:15 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.46/Oak-0.5.46.dmg"
+             sparkle:version="5046"
+             sparkle:shortVersionString="0.5.46"
+             sparkle:edSignature="43XcK9IuLlEJCqgRyZbcELQ4Zy7Mr/t2fjnSDoLXq2IrAcGDpBapuGXa640ikA/0m6XeAomOfrJy2eFBBzRuDg=="
+             length="9099203"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.45</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.45</link>
   <sparkle:version>5045</sparkle:version>
@@ -42,27 +66,6 @@
              sparkle:shortVersionString="0.5.43"
              sparkle:edSignature="926g1SQXdnVBkq/j6ZqtUDGAMGXoiZMZKO/3MyclxhU+3A3Eqfd1NiaeaPTSRcTCdV7XKehTpSkn+6Yb4nR7Dg=="
              length="9081424"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.42</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.42</link>
-  <sparkle:version>5042</sparkle:version>
-  <sparkle:shortVersionString>0.5.42</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.42</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>feat: add keyboard shortcuts for timer controls by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="4980126962" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/142" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/142/hovercard" href="https://github.com/jellydn/oak/pull/142">#142</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.41...v0.5.42"><tt>v0.5.41...v0.5.42</tt></a></p>
-  ]]></description>
-  <pubDate>Sun, 26 Jul 2026 21:43:29 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.42/Oak-0.5.42.dmg"
-             sparkle:version="5042"
-             sparkle:shortVersionString="0.5.42"
-             sparkle:edSignature="zJHjWU1Oa0v7KBbhYMfIHurYnxxd8FA6IG5Isq0ZYnwxW825eUvQQIqeo6xL4gXXXRG7+0Mk5O2S+/W/b1AUBQ=="
-             length="9081474"
              type="application/octet-stream" />
 </item>
   </channel>
