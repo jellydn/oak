@@ -186,71 +186,11 @@ internal class AudioManager: ObservableObject {
     }
 
     private func createSourceNode(for track: AudioTrack, generator: NoiseGenerator) -> AVAudioSourceNode? {
-        switch track {
-        case .none: nil
-        case .brownNoise: createBrownNoiseNode(generator: generator)
-        case .rain: createRainNode(generator: generator)
-        case .forest: createForestNode(generator: generator)
-        case .cafe: createCafeNode(generator: generator)
-        case .lofi: createLofiNode(generator: generator)
-        }
-    }
+        guard track != .none else { return nil }
 
-    private func createBrownNoiseNode(generator: NoiseGenerator) -> AVAudioSourceNode {
-        AVAudioSourceNode { _, _, _, outputBuffer in
-            Self.fillOutputBuffer(outputBuffer) {
-                generator.generateBrownNoise()
-            }
+        return AVAudioSourceNode { _, _, _, outputBuffer in
+            AudioRenderBufferFiller.fill(outputBuffer, generator: generator, track: track)
             return noErr
-        }
-    }
-
-    private func createRainNode(generator: NoiseGenerator) -> AVAudioSourceNode {
-        AVAudioSourceNode { _, _, _, outputBuffer in
-            Self.fillOutputBuffer(outputBuffer) {
-                generator.generateRainNoise()
-            }
-            return noErr
-        }
-    }
-
-    private func createForestNode(generator: NoiseGenerator) -> AVAudioSourceNode {
-        AVAudioSourceNode { _, _, _, outputBuffer in
-            Self.fillOutputBuffer(outputBuffer) {
-                generator.generateForestNoise()
-            }
-            return noErr
-        }
-    }
-
-    private func createCafeNode(generator: NoiseGenerator) -> AVAudioSourceNode {
-        AVAudioSourceNode { _, _, _, outputBuffer in
-            Self.fillOutputBuffer(outputBuffer) {
-                generator.generateCafeNoise()
-            }
-            return noErr
-        }
-    }
-
-    private func createLofiNode(generator: NoiseGenerator) -> AVAudioSourceNode {
-        AVAudioSourceNode { _, _, _, outputBuffer in
-            Self.fillOutputBuffer(outputBuffer) {
-                generator.generateLofiNoise()
-            }
-            return noErr
-        }
-    }
-
-    private static func fillOutputBuffer(_ outputBuffer: UnsafeMutablePointer<AudioBufferList>, sample: () -> Float) {
-        let bufferList = UnsafeMutableAudioBufferListPointer(outputBuffer)
-        for buffer in bufferList {
-            guard let mData = buffer.mData else { continue }
-            let frameCount = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
-            let samples = mData.assumingMemoryBound(to: Float.self)
-
-            for index in 0 ..< frameCount {
-                samples[index] = sample()
-            }
         }
     }
 
