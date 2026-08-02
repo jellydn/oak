@@ -4,7 +4,7 @@ import XCTest
 
 // MARK: - MockAudioEngine
 
-internal final class MockAudioEngine: AudioEngineProtocol {
+internal final class MockAudioEngine: AudioEngineControlling {
     var isRunning: Bool = false
     var outputChannelCount: AVAudioChannelCount = 2
     var outputSampleRate: Double = 44100
