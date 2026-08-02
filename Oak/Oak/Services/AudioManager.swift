@@ -17,13 +17,11 @@ internal class AudioManager: ObservableObject {
     @Published var isPlaying: Bool = false
 
     private var audioPlayer: AVAudioPlayer?
-    private var audioEngine: (any AudioEngineControlling)?
-    private var audioNodes: [AVAudioNode] = []
+    private let ambientPlayback: AmbientAudioPlayback
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
-    private let audioEngineFactory: () -> any AudioEngineControlling
 
     init(audioEngineFactory: @escaping () -> any AudioEngineControlling = { AudioEngineAdapter() }) {
-        self.audioEngineFactory = audioEngineFactory
+        ambientPlayback = AmbientAudioPlayback(audioEngineFactory: audioEngineFactory)
     }
 
     func play(track: AudioTrack) {
@@ -52,7 +50,7 @@ internal class AudioManager: ObservableObject {
     /// Stops both the audio player and audio engine, and sets isPlaying to false.
     func pause() {
         audioPlayer?.pause()
-        audioEngine?.pause()
+        ambientPlayback.pause()
         isPlaying = false
     }
 
@@ -65,20 +63,15 @@ internal class AudioManager: ObservableObject {
             return
         }
 
-        guard let engine = audioEngine else { return }
-
-        do {
-            try engine.start()
-            isPlaying = true
-        } catch {
-            logger.error("Failed to resume audio engine: \(error.localizedDescription, privacy: .public)")
+        guard ambientPlayback.resume() else {
+            logger.error("Failed to resume audio engine")
+            return
         }
+        isPlaying = true
     }
 
     func stop() {
-        detachSourceNodes()
-        audioEngine?.stop()
-        audioEngine = nil
+        ambientPlayback.stop()
 
         audioPlayer?.stop()
         audioPlayer = nil
@@ -87,17 +80,9 @@ internal class AudioManager: ObservableObject {
         selectedTrack = .none
     }
 
-    private func detachSourceNodes() {
-        for node in audioNodes {
-            node.removeTap(onBus: 0)
-            audioEngine?.detach(node)
-        }
-        audioNodes.removeAll()
-    }
-
     private func updateAudioEngineVolume() {
         audioPlayer?.volume = Float(volume)
-        audioEngine?.setMixerVolume(Float(volume))
+        ambientPlayback.setVolume(volume)
     }
 
     func setVolume(_ newVolume: Double) {
@@ -149,58 +134,18 @@ internal class AudioManager: ObservableObject {
         audioPlayer?.stop()
         audioPlayer = nil
 
-        detachSourceNodes()
-
-        let generator = NoiseGenerator()
-        guard let sourceNode = createSourceNode(for: track, generator: generator) else { return }
-
-        let engine = audioEngine ?? audioEngineFactory()
-        let isNewEngine = audioEngine == nil
-
-        engine.setMixerVolume(Float(volume))
-        guard engine.outputChannelCount > 0, engine.outputSampleRate > 0 else {
-            logger.error("Audio output format unavailable; skipping playback start")
+        guard ambientPlayback.play(track: track, volume: volume) else {
+            logger.error("Failed to start ambient audio")
             isPlaying = false
             selectedTrack = .none
             return
         }
 
-        engine.attachAndConnect(sourceNode)
-        audioNodes.append(sourceNode)
-
-        audioEngine = engine
-
-        if isNewEngine {
-            engine.prepare()
-        }
-
-        do {
-            if !engine.isRunning {
-                try engine.start()
-            }
-            isPlaying = true
-            selectedTrack = track
-        } catch {
-            logger.error("Failed to start audio engine: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    private func createSourceNode(for track: AudioTrack, generator: NoiseGenerator) -> AVAudioSourceNode? {
-        guard track != .none else { return nil }
-
-        return AVAudioSourceNode { _, _, _, outputBuffer in
-            AudioRenderBufferFiller.fill(outputBuffer, generator: generator, track: track)
-            return noErr
-        }
+        isPlaying = true
+        selectedTrack = track
     }
 
     deinit {
-        let engine = audioEngine
-        let nodes = audioNodes
-        let player = audioPlayer
-
-        engine?.stop()
-        nodes.forEach { $0.removeTap(onBus: 0) }
-        player?.stop()
+        audioPlayer?.stop()
     }
 }
