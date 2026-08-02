@@ -258,12 +258,10 @@ internal final class AutoStartNextIntervalTests: XCTestCase {
         var receivedValue: Int?
 
         let cancellable = viewModel.$autoStartCountdown
-            .dropFirst() // Skip initial value
+            .first { $0 > 0 }
             .sink { value in
-                if value > 0 {
-                    receivedValue = value
-                    expectation.fulfill()
-                }
+                receivedValue = value
+                expectation.fulfill()
             }
 
         viewModel.startSession()
