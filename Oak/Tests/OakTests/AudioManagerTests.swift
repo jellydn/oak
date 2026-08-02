@@ -108,6 +108,21 @@ internal final class NoiseGeneratorTests: XCTestCase {
         XCTAssertTrue(hasMagnitude, "Brown noise should produce non-zero values over time")
     }
 
+    func testSeededGeneratorsProduceTheSameSamples() {
+        let first = NoiseGenerator(seed: 42)
+        let second = NoiseGenerator(seed: 42)
+        let tracks: [AudioTrack] = [.brownNoise, .rain, .forest, .cafe, .lofi]
+
+        for track in tracks {
+            XCTAssertEqual(
+                first.generate(track),
+                second.generate(track),
+                accuracy: 0.000001,
+                "Seeded generators should produce deterministic samples for \(track.rawValue)"
+            )
+        }
+    }
+
     func testRainNoiseSeedWraps() {
         let generator = NoiseGenerator()
         // maxSeed = Float.pi * 2000 ≈ 6283; step = 0.01 per call → ~628,320 calls to wrap.
