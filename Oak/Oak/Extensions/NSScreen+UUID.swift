@@ -27,8 +27,8 @@ internal extension NSScreen {
         NSScreenUUIDCache.shared.allScreens
     }
 
-    var hasNotch: Bool {
-        safeAreaInsets.top > 0
+    @MainActor var hasNotch: Bool {
+        NSScreenUUIDCache.shared.hasNotch(for: self)
     }
 }
 
@@ -37,6 +37,7 @@ internal final class NSScreenUUIDCache {
     internal static let shared = NSScreenUUIDCache()
 
     private var cache: [String: NSScreen] = [:]
+    private var notchCache: [String: Bool] = [:]
     private var observer: Any?
 
     private init() {
@@ -56,24 +57,44 @@ internal final class NSScreenUUIDCache {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in self?.rebuildCache() }
+            // The observer is registered on the main queue, so rebuilding is MainActor-isolated.
+            MainActor.assumeIsolated {
+                self?.rebuildCache()
+            }
         }
     }
 
     private func rebuildCache() {
         var newCache: [String: NSScreen] = [:]
+        var newNotchCache: [String: Bool] = [:]
 
         for screen in NSScreen.screens {
             if let uuid = screen.displayUUID {
                 newCache[uuid] = screen
+                newNotchCache[uuid] = screen.safeAreaInsets.top > 0
             }
         }
 
         cache = newCache
+        notchCache = newNotchCache
     }
 
     func screen(forUUID uuid: String) -> NSScreen? {
         cache[uuid]
+    }
+
+    func hasNotch(for screen: NSScreen) -> Bool {
+        guard let uuid = screen.displayUUID else {
+            return screen.safeAreaInsets.top > 0
+        }
+
+        if let cachedValue = notchCache[uuid] {
+            return cachedValue
+        }
+
+        let value = screen.safeAreaInsets.top > 0
+        notchCache[uuid] = value
+        return value
     }
 
     var allScreens: [String: NSScreen] {

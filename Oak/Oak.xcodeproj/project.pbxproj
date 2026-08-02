@@ -21,6 +21,7 @@
 		29EFC7CC8DBCDE421107C0E6 /* NotchCompanionView+InsideNotch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B20E550402C5D04E55B6E /* NotchCompanionView+InsideNotch.swift */; };
 		2ADA17F3F2B2E2ECB0DC32B7 /* FocusSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53877747FE72F8926A70A9E0 /* FocusSessionViewModel.swift */; };
 		33CC64AC8D322C6C3A7F8191 /* AudioRenderBufferFiller.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B5AE40E70CA467E91B27A0 /* AudioRenderBufferFiller.swift */; };
+		3007E12D7C9341A05443402A /* SessionTimerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA71DF374BE14AAE57917F4E /* SessionTimerServiceTests.swift */; };
 		39B659A9DA438E70743E07F9 /* CircularProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */; };
 		3BB10B768F1CD0C2E7F00EB5 /* AccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E53FB903AF7AF6B4DE091AD /* AccessibilityTests.swift */; };
 		3ED5BDC623247CE16B62E99B /* ambient_rain.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B92D2B2C025E4DB8856333A0 /* ambient_rain.m4a */; };
@@ -168,6 +169,7 @@
 		D875A8103C5D96B028D6ED5C /* CircularProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressRing.swift; sourceTree = "<group>"; };
 		D924AA0A4E1BF237979F3114 /* ProgressMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressMenuView.swift; sourceTree = "<group>"; };
 		D9E56FB534D3736A6E1C03BD /* SupportSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportSectionView.swift; sourceTree = "<group>"; };
+		DA71DF374BE14AAE57917F4E /* SessionTimerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimerServiceTests.swift; sourceTree = "<group>"; };
 		DBFE863ED8125FD3D3029341 /* US004Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = US004Tests.swift; sourceTree = "<group>"; };
 		DCB9EFBE035ED14BBCAAD3D9 /* NotchCompanionViewTests+SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchCompanionViewTests+SessionState.swift"; sourceTree = "<group>"; };
 		E43285E82910BB45D9CF9000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -278,6 +280,7 @@
 				3912FED25041D62DE77347EA /* NotificationTests.swift */,
 				1049365D0D64C5E5471825BD /* NSScreenNotchTests.swift */,
 				131CDA9D17A7D22CBC67785C /* SessionCompletionNotificationTests.swift */,
+				DA71DF374BE14AAE57917F4E /* SessionTimerServiceTests.swift */,
 				0E00D04EC9E5E33BBF5D09F7 /* SmokeTests.swift */,
 				B678070C4468D7AD6171B2C2 /* SparkleUpdaterTests.swift */,
 				B74BB88C04B3824E97E3C561 /* US001Tests.swift */,
@@ -522,6 +525,7 @@
 				AC7D0BE9D2A43B9602F5FFA9 /* NotchWindowControllerTests.swift in Sources */,
 				25BAA3E90290CE446B9F7BFC /* NotificationTests.swift in Sources */,
 				F32ECEC3C32292DC1969C472 /* SessionCompletionNotificationTests.swift in Sources */,
+				3007E12D7C9341A05443402A /* SessionTimerServiceTests.swift in Sources */,
 				98EA03D50041483DEFBB6984 /* SmokeTests.swift in Sources */,
 				088CE53BA008F2E0ED7225E3 /* SparkleUpdaterTests.swift in Sources */,
 				1B420ABE27C55D4F4D474075 /* US001Tests.swift in Sources */,
