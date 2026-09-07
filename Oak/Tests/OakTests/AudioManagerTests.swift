@@ -147,10 +147,7 @@ internal final class AudioManagerTests: XCTestCase {
         customAudioDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("AudioManagerTests-\(UUID().uuidString)", isDirectory: true)
         manager = AudioManager(
-            customAudioLibrary: CustomAudioLibrary(
-                directoryURL: customAudioDirectory,
-                audioValidator: { _ in true }
-            )
+            customAudioLibrary: CustomAudioLibrary(directoryURL: customAudioDirectory) { _ in true }
         )
     }
 

@@ -56,7 +56,7 @@ internal final class CustomAudioLibraryTests: XCTestCase {
 
     func testImportRejectsInvalidAudio() throws {
         let source = try makeSource(named: "broken.mp3")
-        let library = CustomAudioLibrary(directoryURL: libraryURL, audioValidator: { _ in false })
+        let library = CustomAudioLibrary(directoryURL: libraryURL) { _ in false }
 
         XCTAssertThrowsError(try library.importAudio(from: source)) { error in
             XCTAssertEqual(error as? CustomAudioLibraryError, .invalidAudio)
@@ -84,7 +84,7 @@ internal final class CustomAudioLibraryTests: XCTestCase {
     }
 
     private func makeLibrary() -> CustomAudioLibrary {
-        CustomAudioLibrary(directoryURL: libraryURL, audioValidator: { _ in true })
+        CustomAudioLibrary(directoryURL: libraryURL) { _ in true }
     }
 
     private func makeSource(named name: String) throws -> URL {
