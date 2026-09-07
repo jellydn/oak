@@ -3,8 +3,12 @@ import Foundation
 internal struct CustomAudioAsset: Equatable, Hashable, Identifiable {
     internal let url: URL
 
+    internal init(url: URL) {
+        self.url = url.resolvingSymlinksInPath().standardizedFileURL
+    }
+
     internal var id: String {
-        url.standardizedFileURL.path
+        url.path
     }
 
     internal var name: String {
