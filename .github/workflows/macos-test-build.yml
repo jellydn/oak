@@ -72,7 +72,7 @@ jobs:
           test -d "$app_path"
           codesign --force --deep --sign - "$app_path"
           codesign --verify --deep --strict --verbose=2 "$app_path"
-          lipo -verify_arch arm64 "$app_path/Contents/MacOS/Oak"
+          lipo "$app_path/Contents/MacOS/Oak" -verify_arch arm64
 
       - name: Package app
         run: |
