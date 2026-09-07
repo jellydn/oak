@@ -62,6 +62,19 @@ just open
 just check-sounds
 ```
 
+## Test a Pull Request Build
+
+The `macOS Test Build` workflow runs for pull requests and manual workflow dispatches. It uploads an Apple Silicon
+Release build as an artifact for 7 days. Open the workflow run, download the `oak-macos-test-*` artifact, and unzip
+both the downloaded artifact and its `Oak-*.zip` file. Move `Oak.app` to Applications before testing it.
+
+The app has an ad-hoc signature but is not notarized. On first launch, Control-click `Oak.app`, select **Open**, and
+confirm the prompt. If macOS still blocks the app, use **System Settings → Privacy & Security → Open Anyway**.
+
+For personal sound verification, open Oak's sound library and import a supported audio file. Select and play the
+personal sound, restart Oak to confirm that it remains available, remove it, and confirm that built-in sounds still
+play.
+
 ## Code Quality Commands
 
 ```bash
