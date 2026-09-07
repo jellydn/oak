@@ -1,6 +1,6 @@
 import Foundation
 
-internal struct CustomAudioAsset: Equatable, Hashable, Identifiable {
+internal struct CustomAudioAsset: Equatable, Hashable, Identifiable, Sendable {
     internal let url: URL
 
     internal init(url: URL) {

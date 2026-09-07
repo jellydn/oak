@@ -76,8 +76,10 @@ internal struct AudioMenuView: View {
             do {
                 guard let sourceURL = try result.get().first else { return }
                 importError = nil
-                if let asset = audioManager.importCustomAudio(from: sourceURL) {
-                    audioManager.play(sound: .custom(asset))
+                Task {
+                    if let asset = await audioManager.importCustomAudio(from: sourceURL) {
+                        audioManager.play(sound: .custom(asset))
+                    }
                 }
             } catch {
                 importError = error.localizedDescription
@@ -138,7 +140,11 @@ internal struct AudioMenuView: View {
 
             if let removableAsset {
                 Button(
-                    action: { audioManager.removeCustomAudio(removableAsset) },
+                    action: {
+                        Task {
+                            await audioManager.removeCustomAudio(removableAsset)
+                        }
+                    },
                     label: {
                         Image(systemName: "trash")
                             .foregroundColor(.secondary)

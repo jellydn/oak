@@ -22,62 +22,74 @@ internal final class CustomAudioLibraryTests: XCTestCase {
         sourceURL = nil
     }
 
-    func testImportCopiesAudioIntoPersistentLibrary() throws {
+    func testImportCopiesAudioIntoPersistentLibrary() async throws {
         let source = try makeSource(named: "Ocean.mp3")
         let library = makeLibrary()
 
-        let imported = try library.importAudio(from: source)
-        let reloadedAssets = try makeLibrary().assets()
+        let imported = try await library.importAudio(from: source)
+        let reloadedAssets = try await makeLibrary().assets()
 
         XCTAssertEqual(imported.name, "Ocean")
         XCTAssertTrue(FileManager.default.fileExists(atPath: source.path))
         XCTAssertEqual(reloadedAssets, [imported])
     }
 
-    func testImportKeepsBothAssetsWhenNamesMatch() throws {
+    func testImportKeepsBothAssetsWhenNamesMatch() async throws {
         let source = try makeSource(named: "Ocean.mp3")
         let library = makeLibrary()
 
-        let first = try library.importAudio(from: source)
-        let second = try library.importAudio(from: source)
+        let first = try await library.importAudio(from: source)
+        let second = try await library.importAudio(from: source)
 
         XCTAssertEqual(first.name, "Ocean")
         XCTAssertEqual(second.name, "Ocean (2)")
-        XCTAssertEqual(try library.assets().count, 2)
+        let assets = try await library.assets()
+        XCTAssertEqual(assets.count, 2)
     }
 
-    func testImportRejectsUnsupportedFormat() throws {
+    func testImportRejectsUnsupportedFormat() async throws {
         let source = try makeSource(named: "notes.txt")
 
-        XCTAssertThrowsError(try makeLibrary().importAudio(from: source)) { error in
+        do {
+            _ = try await makeLibrary().importAudio(from: source)
+            XCTFail("Import should reject unsupported formats")
+        } catch {
             XCTAssertEqual(error as? CustomAudioLibraryError, .unsupportedFormat)
         }
     }
 
-    func testImportRejectsInvalidAudio() throws {
+    func testImportRejectsInvalidAudio() async throws {
         let source = try makeSource(named: "broken.mp3")
         let library = CustomAudioLibrary(directoryURL: libraryURL) { _ in false }
 
-        XCTAssertThrowsError(try library.importAudio(from: source)) { error in
+        do {
+            _ = try await library.importAudio(from: source)
+            XCTFail("Import should reject invalid audio")
+        } catch {
             XCTAssertEqual(error as? CustomAudioLibraryError, .invalidAudio)
         }
-        XCTAssertEqual(try library.assets(), [])
+        let assets = try await library.assets()
+        XCTAssertEqual(assets, [])
     }
 
-    func testRemoveDeletesManagedCopy() throws {
+    func testRemoveDeletesManagedCopy() async throws {
         let library = makeLibrary()
-        let asset = try library.importAudio(from: makeSource(named: "Ocean.mp3"))
+        let asset = try await library.importAudio(from: makeSource(named: "Ocean.mp3"))
 
-        try library.remove(asset)
+        try await library.remove(asset)
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: asset.url.path))
-        XCTAssertEqual(try library.assets(), [])
+        let assets = try await library.assets()
+        XCTAssertEqual(assets, [])
     }
 
-    func testRemoveRejectsFileOutsideLibrary() throws {
+    func testRemoveRejectsFileOutsideLibrary() async throws {
         let source = try makeSource(named: "Ocean.mp3")
 
-        XCTAssertThrowsError(try makeLibrary().remove(CustomAudioAsset(url: source))) { error in
+        do {
+            try await makeLibrary().remove(CustomAudioAsset(url: source))
+            XCTFail("Remove should reject files outside the library")
+        } catch {
             XCTAssertEqual(error as? CustomAudioLibraryError, .outsideLibrary)
         }
         XCTAssertTrue(FileManager.default.fileExists(atPath: source.path))

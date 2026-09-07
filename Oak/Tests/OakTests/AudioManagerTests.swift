@@ -204,16 +204,17 @@ internal final class AudioManagerTests: XCTestCase {
         XCTAssertEqual(manager.selectedTrack, .forest)
     }
 
-    func testImportAndRemoveCustomAudio() throws {
+    func testImportAndRemoveCustomAudio() async throws {
         let sourceURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("AudioManagerTests-source-\(UUID().uuidString).mp3")
         try Data("test audio".utf8).write(to: sourceURL)
         defer { try? FileManager.default.removeItem(at: sourceURL) }
 
-        let imported = try XCTUnwrap(manager.importCustomAudio(from: sourceURL))
+        let importResult = await manager.importCustomAudio(from: sourceURL)
+        let imported = try XCTUnwrap(importResult)
 
         XCTAssertEqual(manager.customAssets, [imported])
-        manager.removeCustomAudio(imported)
+        await manager.removeCustomAudio(imported)
         XCTAssertEqual(manager.customAssets, [])
     }
 

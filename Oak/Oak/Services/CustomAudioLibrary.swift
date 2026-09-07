@@ -9,7 +9,7 @@ internal enum CustomAudioLibraryError: LocalizedError, Equatable {
     internal var errorDescription: String? {
         switch self {
         case .unsupportedFormat:
-            "Choose an M4A, WAV, MP3, AAC, AIFF, or CAF audio file."
+            "Choose an M4A, WAV, MP3, AAC, AIFF, AIF, or CAF audio file."
         case .invalidAudio:
             "Oak could not read this audio file."
         case .outsideLibrary:
@@ -18,8 +18,8 @@ internal enum CustomAudioLibraryError: LocalizedError, Equatable {
     }
 }
 
-internal final class CustomAudioLibrary {
-    internal typealias AudioValidator = (URL) -> Bool
+internal actor CustomAudioLibrary {
+    internal typealias AudioValidator = @Sendable (URL) -> Bool
 
     private let directoryURL: URL
     private let fileManager: FileManager

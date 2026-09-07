@@ -34,7 +34,9 @@ internal class AudioManager: ObservableObject {
     ) {
         ambientPlayback = AmbientAudioPlayback(audioEngineFactory: audioEngineFactory)
         self.customAudioLibrary = customAudioLibrary
-        reloadCustomAssets()
+        Task { [weak self] in
+            await self?.reloadCustomAssets()
+        }
     }
 
     func play(track: AudioTrack) {
@@ -115,7 +117,7 @@ internal class AudioManager: ObservableObject {
     }
 
     @discardableResult
-    func importCustomAudio(from sourceURL: URL) -> CustomAudioAsset? {
+    func importCustomAudio(from sourceURL: URL) async -> CustomAudioAsset? {
         let didAccess = sourceURL.startAccessingSecurityScopedResource()
         defer {
             if didAccess {
@@ -124,8 +126,8 @@ internal class AudioManager: ObservableObject {
         }
 
         do {
-            let asset = try customAudioLibrary.importAudio(from: sourceURL)
-            reloadCustomAssets()
+            let asset = try await customAudioLibrary.importAudio(from: sourceURL)
+            await reloadCustomAssets()
             audioError = nil
             return asset
         } catch {
@@ -134,17 +136,17 @@ internal class AudioManager: ObservableObject {
         }
     }
 
-    func removeCustomAudio(_ asset: CustomAudioAsset) {
+    func removeCustomAudio(_ asset: CustomAudioAsset) async {
         do {
             if selectedSound == .custom(asset) {
                 stop()
             }
-            try customAudioLibrary.remove(asset)
-            reloadCustomAssets()
+            try await customAudioLibrary.remove(asset)
+            await reloadCustomAssets()
             audioError = nil
         } catch {
             report(error)
-            reloadCustomAssets()
+            await reloadCustomAssets()
         }
     }
 
@@ -224,13 +226,15 @@ internal class AudioManager: ObservableObject {
             let message = "Oak could not play \(asset.name). The file may be missing or invalid."
             logger.error("Custom audio failed: \(error.localizedDescription, privacy: .public)")
             handlePlaybackError(message)
-            reloadCustomAssets()
+            Task { [weak self] in
+                await self?.reloadCustomAssets()
+            }
         }
     }
 
-    private func reloadCustomAssets() {
+    private func reloadCustomAssets() async {
         do {
-            customAssets = try customAudioLibrary.assets()
+            customAssets = try await customAudioLibrary.assets()
         } catch {
             report(error)
         }
