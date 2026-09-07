@@ -32,12 +32,13 @@ internal final class CustomAudioLibrary {
     ) {
         self.fileManager = fileManager
         self.audioValidator = audioValidator
-        self.directoryURL = directoryURL ?? fileManager.urls(
+        let soundsDirectory = directoryURL ?? fileManager.urls(
             for: .applicationSupportDirectory,
             in: .userDomainMask
         )[0]
         .appendingPathComponent("Oak", isDirectory: true)
         .appendingPathComponent("Sounds", isDirectory: true)
+        self.directoryURL = soundsDirectory.resolvingSymlinksInPath().standardizedFileURL
     }
 
     internal func assets() throws -> [CustomAudioAsset] {
