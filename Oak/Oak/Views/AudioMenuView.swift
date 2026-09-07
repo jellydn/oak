@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 
 internal struct AudioMenuView: View {
     @ObservedObject var audioManager: AudioManager
-    @State private var isImporting = false
+    @Binding var isImporting: Bool
     @State private var importError: String?
 
     var body: some View {
@@ -82,9 +82,21 @@ internal struct AudioMenuView: View {
                     }
                 }
             } catch {
-                importError = error.localizedDescription
+                importError = Self.importErrorMessage(for: error)
             }
         }
+    }
+
+    internal static func importErrorMessage(for error: any Error) -> String? {
+        if error is CancellationError {
+            return nil
+        }
+
+        let cocoaError = error as NSError
+        guard cocoaError.domain != NSCocoaErrorDomain || cocoaError.code != NSUserCancelledError else {
+            return nil
+        }
+        return error.localizedDescription
     }
 
     private func soundSection<Content: View>(

@@ -8,6 +8,7 @@ internal extension NotchCompanionViewTests {
     func testShowAudioMenuDefaultsToFalse() {
         let view = makeView()
         XCTAssertFalse(view.showAudioMenu, "showAudioMenu should default to false")
+        XCTAssertFalse(view.isAudioImporterPresented, "isAudioImporterPresented should default to false")
     }
 
     func testShowProgressMenuDefaultsToFalse() {
