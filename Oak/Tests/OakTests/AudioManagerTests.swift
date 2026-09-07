@@ -141,14 +141,24 @@ internal final class NoiseGeneratorTests: XCTestCase {
 @MainActor
 internal final class AudioManagerTests: XCTestCase {
     var manager: AudioManager!
+    private var customAudioDirectory: URL!
 
     override func setUp() async throws {
-        manager = AudioManager()
+        customAudioDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("AudioManagerTests-\(UUID().uuidString)", isDirectory: true)
+        manager = AudioManager(
+            customAudioLibrary: CustomAudioLibrary(
+                directoryURL: customAudioDirectory,
+                audioValidator: { _ in true }
+            )
+        )
     }
 
     override func tearDown() async throws {
         manager.stop()
         manager = nil
+        try? FileManager.default.removeItem(at: customAudioDirectory)
+        customAudioDirectory = nil
     }
 
     // MARK: - Volume Control
@@ -195,6 +205,31 @@ internal final class AudioManagerTests: XCTestCase {
         manager.play(track: .brownNoise)
         manager.play(track: .forest)
         XCTAssertEqual(manager.selectedTrack, .forest)
+    }
+
+    func testImportAndRemoveCustomAudio() throws {
+        let sourceURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("AudioManagerTests-source-\(UUID().uuidString).mp3")
+        try Data("test audio".utf8).write(to: sourceURL)
+        defer { try? FileManager.default.removeItem(at: sourceURL) }
+
+        let imported = try XCTUnwrap(manager.importCustomAudio(from: sourceURL))
+
+        XCTAssertEqual(manager.customAssets, [imported])
+        manager.removeCustomAudio(imported)
+        XCTAssertEqual(manager.customAssets, [])
+    }
+
+    func testMissingCustomAudioShowsErrorAndStopsPlayback() {
+        let missingAsset = CustomAudioAsset(
+            url: customAudioDirectory.appendingPathComponent("Missing.mp3")
+        )
+
+        manager.play(sound: .custom(missingAsset))
+
+        XCTAssertFalse(manager.isPlaying)
+        XCTAssertTrue(manager.selectedSound.isNone)
+        XCTAssertNotNil(manager.audioError)
     }
 
     // MARK: - Stop

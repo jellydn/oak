@@ -7,7 +7,9 @@ import os
 
 @MainActor
 internal class AudioManager: ObservableObject {
-    @Published var selectedTrack: AudioTrack = .none
+    @Published var selectedSound: AudioSelection = .builtIn(.none)
+    @Published private(set) var customAssets: [CustomAudioAsset] = []
+    @Published private(set) var audioError: String?
     @Published var volume: Double = 0.5 {
         didSet {
             updateAudioEngineVolume()
@@ -16,16 +18,32 @@ internal class AudioManager: ObservableObject {
 
     @Published var isPlaying: Bool = false
 
+    var selectedTrack: AudioTrack {
+        guard case let .builtIn(track) = selectedSound else { return .none }
+        return track
+    }
+
     private var audioPlayer: AVAudioPlayer?
     private let ambientPlayback: AmbientAudioPlayback
+    private let customAudioLibrary: CustomAudioLibrary
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "AudioManager")
 
-    init(audioEngineFactory: @escaping () -> any AudioEngineControlling = { AudioEngineAdapter() }) {
+    init(
+        audioEngineFactory: @escaping () -> any AudioEngineControlling = { AudioEngineAdapter() },
+        customAudioLibrary: CustomAudioLibrary = CustomAudioLibrary()
+    ) {
         ambientPlayback = AmbientAudioPlayback(audioEngineFactory: audioEngineFactory)
+        self.customAudioLibrary = customAudioLibrary
+        reloadCustomAssets()
     }
 
     func play(track: AudioTrack) {
-        guard track != .none else {
+        play(sound: .builtIn(track))
+    }
+
+    func play(sound: AudioSelection) {
+        audioError = nil
+        guard !sound.isNone else {
             stop()
             return
         }
@@ -39,11 +57,15 @@ internal class AudioManager: ObservableObject {
             }
         #endif
 
-        if playBundledTrack(track) {
-            return
+        switch sound {
+        case let .builtIn(track):
+            if playBundledTrack(track) {
+                return
+            }
+            generateAmbientSound(for: track)
+        case let .custom(asset):
+            playCustomAsset(asset)
         }
-
-        generateAmbientSound(for: track)
     }
 
     /// Pauses all audio playback.
@@ -58,8 +80,11 @@ internal class AudioManager: ObservableObject {
     /// If an audio player exists, it resumes playing. Otherwise, starts the audio engine.
     func resume() {
         if let player = audioPlayer {
-            player.play()
-            isPlaying = true
+            if player.play() {
+                isPlaying = true
+            } else {
+                handlePlaybackError("Oak could not resume this sound.")
+            }
             return
         }
 
@@ -77,7 +102,7 @@ internal class AudioManager: ObservableObject {
         audioPlayer = nil
 
         isPlaying = false
-        selectedTrack = .none
+        selectedSound = .builtIn(.none)
     }
 
     private func updateAudioEngineVolume() {
@@ -87,6 +112,40 @@ internal class AudioManager: ObservableObject {
 
     func setVolume(_ newVolume: Double) {
         volume = max(0, min(1, newVolume))
+    }
+
+    @discardableResult
+    func importCustomAudio(from sourceURL: URL) -> CustomAudioAsset? {
+        let didAccess = sourceURL.startAccessingSecurityScopedResource()
+        defer {
+            if didAccess {
+                sourceURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        do {
+            let asset = try customAudioLibrary.importAudio(from: sourceURL)
+            reloadCustomAssets()
+            audioError = nil
+            return asset
+        } catch {
+            report(error)
+            return nil
+        }
+    }
+
+    func removeCustomAudio(_ asset: CustomAudioAsset) {
+        do {
+            if selectedSound == .custom(asset) {
+                stop()
+            }
+            try customAudioLibrary.remove(asset)
+            reloadCustomAssets()
+            audioError = nil
+        } catch {
+            report(error)
+            reloadCustomAssets()
+        }
     }
 
     private func playBundledTrack(_ track: AudioTrack) -> Bool {
@@ -106,7 +165,7 @@ internal class AudioManager: ObservableObject {
 
             audioPlayer = player
             isPlaying = true
-            selectedTrack = track
+            selectedSound = .builtIn(track)
             return true
         } catch {
             let trackName = track.rawValue
@@ -137,12 +196,56 @@ internal class AudioManager: ObservableObject {
         guard ambientPlayback.play(track: track, volume: volume) else {
             logger.error("Failed to start ambient audio")
             isPlaying = false
-            selectedTrack = .none
+            selectedSound = .builtIn(.none)
             return
         }
 
         isPlaying = true
-        selectedTrack = track
+        selectedSound = .builtIn(track)
+    }
+
+    private func playCustomAsset(_ asset: CustomAudioAsset) {
+        stop()
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: asset.url)
+            player.numberOfLoops = -1
+            player.volume = Float(volume)
+            player.prepareToPlay()
+            guard player.play() else {
+                handlePlaybackError("Oak could not play \(asset.name).")
+                return
+            }
+
+            audioPlayer = player
+            isPlaying = true
+            selectedSound = .custom(asset)
+        } catch {
+            let message = "Oak could not play \(asset.name). The file may be missing or invalid."
+            logger.error("Custom audio failed: \(error.localizedDescription, privacy: .public)")
+            handlePlaybackError(message)
+            reloadCustomAssets()
+        }
+    }
+
+    private func reloadCustomAssets() {
+        do {
+            customAssets = try customAudioLibrary.assets()
+        } catch {
+            report(error)
+        }
+    }
+
+    private func report(_ error: any Error) {
+        let message = error.localizedDescription
+        audioError = message
+        logger.error("Custom audio library error: \(message, privacy: .public)")
+    }
+
+    private func handlePlaybackError(_ message: String) {
+        stop()
+        audioError = message
+        logger.error("\(message, privacy: .public)")
     }
 
     deinit {

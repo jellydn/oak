@@ -91,7 +91,12 @@ Oak expects bundled ambient files under `Oak/Oak/Resources/Sounds` with these ba
 - `ambient_brown_noise`
 - `ambient_lofi`
 
-Supported extensions: `.m4a` (preferred), `.wav`, `.mp3`.
+Bundled tracks use `.m4a` (preferred), `.wav`, or `.mp3` files.
+
+Users can also import `.m4a`, `.wav`, `.mp3`, `.aac`, `.aiff`, `.aif`, and `.caf` files from the sound library
+in Oak's notch popover. Oak validates each file and copies it to `~/Library/Application Support/Oak/Sounds`, so
+playback remains available if the original file moves or is removed. The copied files are user-managed data and
+must not be added to the app bundle.
 
 ### 🎵 Sound Attribution
 

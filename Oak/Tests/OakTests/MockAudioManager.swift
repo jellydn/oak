@@ -8,11 +8,15 @@ internal final class MockAudioManager: AudioManager {
     }
 
     override func play(track: AudioTrack) {
-        guard track != .none else {
+        play(sound: .builtIn(track))
+    }
+
+    override func play(sound: AudioSelection) {
+        guard !sound.isNone else {
             stop()
             return
         }
-        selectedTrack = track
+        selectedSound = sound
         isPlaying = true
     }
 
@@ -21,13 +25,13 @@ internal final class MockAudioManager: AudioManager {
     }
 
     override func resume() {
-        guard selectedTrack != .none else { return }
+        guard !selectedSound.isNone else { return }
         isPlaying = true
     }
 
     override func stop() {
         isPlaying = false
-        selectedTrack = .none
+        selectedSound = .builtIn(.none)
     }
 }
 

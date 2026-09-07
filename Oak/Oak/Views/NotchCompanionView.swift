@@ -172,7 +172,7 @@ extension NotchCompanionView {
                         )
                         .frame(width: controlSize, height: controlSize)
 
-                    Image(systemName: viewModel.audioManager.selectedTrack.systemImageName)
+                    Image(systemName: viewModel.audioManager.selectedSound.systemImageName)
                         .foregroundColor(viewModel.audioManager.isPlaying ? .blue : .white.opacity(0.7))
                         .font(.system(size: 9))
                 }
@@ -184,7 +184,7 @@ extension NotchCompanionView {
         .accessibilityIdentifier("audioButton")
         .popover(isPresented: $showAudioMenu) {
             AudioMenuView(audioManager: viewModel.audioManager)
-                .frame(width: 200)
+                .frame(width: 280)
                 .dismissOnClickOutside { [self] in
                     showAudioMenu = false
                 }

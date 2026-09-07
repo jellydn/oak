@@ -41,5 +41,5 @@ internal enum AudioTrack: String, CaseIterable, Identifiable {
         }
     }
 
-    static let supportedAudioExtensions = ["m4a", "wav", "mp3"]
+    static let supportedAudioExtensions = ["m4a", "wav", "mp3", "aac", "aiff", "aif", "caf"]
 }

@@ -129,6 +129,24 @@ internal final class AudioPersistenceTests: XCTestCase {
         XCTAssertEqual(viewModel.audioManager.selectedTrack, .cafe)
     }
 
+    func testCustomAudioPersistsAcrossWorkSessions() {
+        let customSound = AudioSelection.custom(
+            CustomAudioAsset(url: URL(fileURLWithPath: "/tmp/Ocean.mp3"))
+        )
+        viewModel.startSession()
+        viewModel.audioManager.play(sound: customSound)
+
+        viewModel.completeSession()
+        viewModel.startNextSession()
+        XCTAssertFalse(viewModel.audioManager.isPlaying)
+
+        viewModel.completeSession()
+        viewModel.startNextSession()
+
+        XCTAssertTrue(viewModel.audioManager.isPlaying)
+        XCTAssertEqual(viewModel.audioManager.selectedSound, customSound)
+    }
+
     func testStoppingAudioMidSessionDoesNotResumeAutomatically() {
         viewModel.startSession()
         viewModel.audioManager.play(track: .rain)
