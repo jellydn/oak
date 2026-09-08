@@ -64,8 +64,10 @@ internal struct SettingsMenuView: View {
             await notificationService.refreshAuthorizationStatus()
         }
     }
+}
 
-    private func page<Content: View>(
+private extension SettingsMenuView {
+    func page<Content: View>(
         title: String,
         description: String,
         @ViewBuilder content: () -> Content
@@ -90,7 +92,7 @@ internal struct SettingsMenuView: View {
         .background(palette.background)
     }
 
-    private func settingsGroup<Content: View>(
+    func settingsGroup<Content: View>(
         title: String,
         systemImage: String,
         @ViewBuilder content: () -> Content
@@ -115,7 +117,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private func settingRow<Control: View>(
+    func settingRow<Control: View>(
         _ title: String,
         description: String? = nil,
         @ViewBuilder control: () -> Control
@@ -141,7 +143,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var generalPage: some View {
+    var generalPage: some View {
         page(title: "General", description: "Choose Oak's appearance and where the notch companion is shown.") {
             settingsGroup(title: "Appearance", systemImage: "paintpalette") {
                 themePicker
@@ -160,7 +162,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var sessionsPage: some View {
+    var sessionsPage: some View {
         page(title: "Sessions", description: "Set session behavior and focus or break durations.") {
             settingsGroup(title: "Session Behavior", systemImage: "arrow.triangle.2.circlepath") {
                 autoStartNextIntervalToggle
@@ -188,7 +190,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var notificationsPage: some View {
+    var notificationsPage: some View {
         page(title: "Notifications", description: "Manage session alerts and completion sounds.") {
             settingsGroup(title: "Alerts", systemImage: "bell.badge") {
                 NotificationSettingsView(
@@ -199,7 +201,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var shortcutsPage: some View {
+    var shortcutsPage: some View {
         page(title: "Shortcuts", description: "Control sessions from the keyboard.") {
             settingsGroup(title: "Keyboard", systemImage: "keyboard") {
                 KeyboardSettingsView(
@@ -210,7 +212,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var advancedPage: some View {
+    var advancedPage: some View {
         page(title: "Advanced", description: "Back up data, manage updates, and find project information.") {
             settingsGroup(title: "Data", systemImage: "externaldrive") {
                 DataSettingsView(progressManager: progressManager, theme: presetSettings.theme)
@@ -244,7 +246,7 @@ internal struct SettingsMenuView: View {
     }
 
     @ViewBuilder
-    private var applicationButtons: some View {
+    var applicationButtons: some View {
         Button("Reset to Defaults") {
             presetSettings.resetToDefault()
         }
@@ -257,7 +259,7 @@ internal struct SettingsMenuView: View {
         .help("Quit Oak")
     }
 
-    private func presetEditor(for preset: Preset) -> some View {
+    func presetEditor(for preset: Preset) -> some View {
         PresetEditorView(
             presetSettings: presetSettings,
             title: presetSettings.displayName(for: preset),
@@ -266,7 +268,7 @@ internal struct SettingsMenuView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var longBreakCycleEditor: some View {
+    var longBreakCycleEditor: some View {
         settingRow(
             "Long-break cycle",
             description: "Start a long break after this number of completed focus sessions."
@@ -280,7 +282,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var themePicker: some View {
+    var themePicker: some View {
         settingRow("Theme", description: "Changes colors and the matching light or dark control appearance.") {
             Picker(
                 "Theme",
@@ -301,7 +303,7 @@ internal struct SettingsMenuView: View {
         .accessibilityIdentifier("themePicker")
     }
 
-    private var displayTargetPicker: some View {
+    var displayTargetPicker: some View {
         settingRow("Display", description: "The screen that shows the notch companion.") {
             Picker("Display", selection: displayTargetBinding) {
                 ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
@@ -329,7 +331,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var countdownDisplayModePicker: some View {
+    var countdownDisplayModePicker: some View {
         settingRow("Countdown style", description: "Show the remaining time as digits or a progress ring.") {
             Picker("Countdown style", selection: countdownDisplayModeBinding) {
                 ForEach(CountdownDisplayMode.allCases, id: \.rawValue) { mode in
@@ -347,7 +349,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var alwaysOnTopToggle: some View {
+    var alwaysOnTopToggle: some View {
         settingRow("Always on top", description: "Keep the companion above other windows.") {
             Toggle(
                 "Always on top",
@@ -361,7 +363,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var showBelowNotchToggle: some View {
+    var showBelowNotchToggle: some View {
         settingRow("Position", description: "Place the companion below the physical notch.") {
             Toggle(
                 "Show below notch",
@@ -375,7 +377,7 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var autoStartNextIntervalToggle: some View {
+    var autoStartNextIntervalToggle: some View {
         settingRow(
             "Auto-start next interval",
             description: "Start the next focus or break interval after 10 seconds."
@@ -392,12 +394,10 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var hasNotchedScreen: Bool {
+    var hasNotchedScreen: Bool {
         NSScreen.screens.contains { $0.hasNotch }
     }
-}
 
-private extension SettingsMenuView {
     var displayTargetBinding: Binding<DisplayTarget> {
         Binding(
             get: { selectedDisplayTarget },
