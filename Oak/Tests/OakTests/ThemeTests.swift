@@ -116,7 +116,7 @@ internal final class ThemeTests: XCTestCase {
         }
     }
 
-    func testProminentSelectionColorsMeetNonTextContrast() throws {
+    internal func testProminentSelectionColorsMeetNonTextContrast() throws {
         for theme in AppTheme.allCases {
             let palette = theme.palette
 
