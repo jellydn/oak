@@ -2,18 +2,18 @@ import AppKit
 import SwiftUI
 
 internal struct SettingsMenuView: View {
-    @ObservedObject var presetSettings: PresetSettingsStore
-    @ObservedObject var notificationService: NotificationService
-    @ObservedObject var sparkleUpdater: SparkleUpdater
-    @ObservedObject var keyboardShortcutService: KeyboardShortcutService
-    var progressManager: ProgressManager?
+    @ObservedObject internal var presetSettings: PresetSettingsStore
+    @ObservedObject internal var notificationService: NotificationService
+    @ObservedObject internal var sparkleUpdater: SparkleUpdater
+    @ObservedObject internal var keyboardShortcutService: KeyboardShortcutService
+    internal var progressManager: ProgressManager?
     @State private var selectedDisplayTarget: DisplayTarget
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
-    @State private var localKeyboardConfig: KeyboardShortcutConfig
+    @State private var selectedTab = SettingsTab.general
 
     private var palette: ThemePalette { presetSettings.theme.palette }
 
-    init(
+    internal init(
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
         sparkleUpdater: SparkleUpdater,
@@ -27,85 +27,35 @@ internal struct SettingsMenuView: View {
         self.progressManager = progressManager
         _selectedDisplayTarget = State(initialValue: presetSettings.displayTarget)
         _selectedCountdownDisplayMode = State(initialValue: presetSettings.countdownDisplayMode)
-        _localKeyboardConfig = State(initialValue: keyboardShortcutService.currentConfig)
     }
 
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            headerRow
+    internal var body: some View {
+        TabView(selection: $selectedTab) {
+            generalPage
+                .tabItem { Label("General", systemImage: "gearshape") }
+                .tag(SettingsTab.general)
+                .accessibilityIdentifier("settingsTab_general")
 
-            Divider()
+            sessionsPage
+                .tabItem { Label("Sessions", systemImage: "timer") }
+                .tag(SettingsTab.sessions)
+                .accessibilityIdentifier("settingsTab_sessions")
 
-            section(title: "Display") {
-                themePicker
-                if NSScreen.screens.count > 1 {
-                    displayTargetPicker
-                }
-                countdownDisplayModePicker
-                alwaysOnTopToggle
-                if hasNotchedScreen {
-                    showBelowNotchToggle
-                }
-            }
+            notificationsPage
+                .tabItem { Label("Notifications", systemImage: "bell") }
+                .tag(SettingsTab.notifications)
+                .accessibilityIdentifier("settingsTab_notifications")
 
-            section(title: "Session Presets") {
-                autoStartNextIntervalToggle
-                longBreakCycleEditor
-                PresetEditorView(
-                    presetSettings: presetSettings,
-                    title: presetSettings.displayName(for: .short),
-                    preset: .short
-                )
-                PresetEditorView(
-                    presetSettings: presetSettings,
-                    title: presetSettings.displayName(for: .long),
-                    preset: .long
-                )
-            }
+            shortcutsPage
+                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
+                .tag(SettingsTab.shortcuts)
+                .accessibilityIdentifier("settingsTab_shortcuts")
 
-            section(title: "Notifications") {
-                NotificationSettingsView(
-                    presetSettings: presetSettings,
-                    notificationService: notificationService
-                )
-            }
-
-            section(title: "Keyboard") {
-                keyboardSettingsSection
-            }
-
-            section(title: "Data") {
-                dataSection
-            }
-
-            section(title: "Updates") {
-                UpdateSettingsView(sparkleUpdater: sparkleUpdater, theme: presetSettings.theme)
-            }
-
-            section(title: "Support") {
-                SupportSectionView(theme: presetSettings.theme)
-            }
-
-            Divider()
-
-            Text(validRangeDescription)
-                .font(.caption2)
-                .foregroundColor(palette.secondaryForeground)
-
-            HStack {
-                Button("Reset to defaults") {
-                    presetSettings.resetToDefault()
-                }
-                .buttonStyle(.link)
-
-                Spacer()
-
-                Text(currentVersion)
-                    .font(.caption)
-                    .foregroundColor(palette.secondaryForeground)
-            }
+            advancedPage
+                .tabItem { Label("Advanced", systemImage: "slider.horizontal.3") }
+                .tag(SettingsTab.advanced)
+                .accessibilityIdentifier("settingsTab_advanced")
         }
-        .padding(14)
         .foregroundColor(palette.foreground)
         .tint(palette.accent)
         .background(palette.background)
@@ -115,135 +65,331 @@ internal struct SettingsMenuView: View {
         }
     }
 
-    private var headerRow: some View {
-        HStack(alignment: .firstTextBaseline) {
+    private func page<Content: View>(
+        title: String,
+        description: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        ScrollView {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Settings")
-                    .font(.headline)
-                Text("Focus presets, display, and notifications.")
-                    .font(.caption)
+                Text(title)
+                    .font(.title2.weight(.semibold))
+                Text(description)
+                    .font(.callout)
                     .foregroundColor(palette.secondaryForeground)
-            }
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Spacer()
-
-            Button("Quit Oak") {
-                NSApplication.shared.terminate(nil)
+                VStack(alignment: .leading, spacing: 16) {
+                    content()
+                }
+                .padding(.top, 18)
             }
-            .buttonStyle(.link)
-            .help("Quit Oak")
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(20)
+        }
+        .background(palette.background)
+    }
+
+    private func settingsGroup<Content: View>(
+        title: String,
+        systemImage: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(title, systemImage: systemImage)
+                .font(.headline)
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 12) {
+                content()
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(palette.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(palette.divider, lineWidth: 1)
         }
     }
 
-    private func section(title: String, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(palette.foreground)
-            content()
+    private func settingRow<Control: View>(
+        _ title: String,
+        description: String? = nil,
+        @ViewBuilder control: () -> Control
+    ) -> some View {
+        HStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+
+                if let description {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(palette.secondaryForeground)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .layoutPriority(1)
+
+            Spacer(minLength: 12)
+
+            control()
+                .fixedSize(horizontal: true, vertical: false)
         }
+    }
+
+    private var generalPage: some View {
+        page(title: "General", description: "Choose Oak's appearance and where the notch companion is shown.") {
+            settingsGroup(title: "Appearance", systemImage: "paintpalette") {
+                themePicker
+            }
+
+            settingsGroup(title: "Display", systemImage: "display") {
+                if NSScreen.screens.count > 1 {
+                    displayTargetPicker
+                }
+                countdownDisplayModePicker
+                alwaysOnTopToggle
+                if hasNotchedScreen {
+                    showBelowNotchToggle
+                }
+            }
+        }
+    }
+
+    private var sessionsPage: some View {
+        page(title: "Sessions", description: "Set session behavior and focus or break durations.") {
+            settingsGroup(title: "Session Behavior", systemImage: "arrow.triangle.2.circlepath") {
+                autoStartNextIntervalToggle
+                longBreakCycleEditor
+            }
+
+            settingsGroup(title: "Presets", systemImage: "clock") {
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: 12) {
+                        presetEditor(for: .short)
+                        presetEditor(for: .long)
+                    }
+
+                    VStack(spacing: 12) {
+                        presetEditor(for: .short)
+                        presetEditor(for: .long)
+                    }
+                }
+
+                Text(validRangeDescription)
+                    .font(.caption)
+                    .foregroundColor(palette.secondaryForeground)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var notificationsPage: some View {
+        page(title: "Notifications", description: "Manage session alerts and completion sounds.") {
+            settingsGroup(title: "Alerts", systemImage: "bell.badge") {
+                NotificationSettingsView(
+                    presetSettings: presetSettings,
+                    notificationService: notificationService
+                )
+            }
+        }
+    }
+
+    private var shortcutsPage: some View {
+        page(title: "Shortcuts", description: "Control sessions from the keyboard.") {
+            settingsGroup(title: "Keyboard", systemImage: "keyboard") {
+                KeyboardSettingsView(
+                    keyboardShortcutService: keyboardShortcutService,
+                    theme: presetSettings.theme
+                )
+            }
+        }
+    }
+
+    private var advancedPage: some View {
+        page(title: "Advanced", description: "Back up data, manage updates, and find project information.") {
+            settingsGroup(title: "Data", systemImage: "externaldrive") {
+                DataSettingsView(progressManager: progressManager, theme: presetSettings.theme)
+            }
+
+            settingsGroup(title: "Updates", systemImage: "arrow.down.circle") {
+                UpdateSettingsView(sparkleUpdater: sparkleUpdater, theme: presetSettings.theme)
+            }
+
+            settingsGroup(title: "Support", systemImage: "heart") {
+                SupportSectionView(theme: presetSettings.theme)
+            }
+
+            settingsGroup(title: "About Oak", systemImage: "info.circle") {
+                settingRow("Version") {
+                    Text(currentVersion)
+                        .foregroundColor(palette.secondaryForeground)
+                }
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) {
+                        applicationButtons
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        applicationButtons
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var applicationButtons: some View {
+        Button("Reset to Defaults") {
+            presetSettings.resetToDefault()
+        }
+        .buttonStyle(.bordered)
+
+        Button("Quit Oak") {
+            NSApplication.shared.terminate(nil)
+        }
+        .buttonStyle(.bordered)
+        .help("Quit Oak")
+    }
+
+    private func presetEditor(for preset: Preset) -> some View {
+        PresetEditorView(
+            presetSettings: presetSettings,
+            title: presetSettings.displayName(for: preset),
+            preset: preset
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var longBreakCycleEditor: some View {
-        Stepper(
-            value: roundsBeforeLongBreakBinding,
-            in: PresetSettingsStore.minRoundsBeforeLongBreak ... PresetSettingsStore.maxRoundsBeforeLongBreak
+        settingRow(
+            "Long-break cycle",
+            description: "Start a long break after this number of completed focus sessions."
         ) {
-            Text("Long break every \(presetSettings.roundsBeforeLongBreak) focus sessions")
-                .font(.caption)
+            Stepper(
+                "\(presetSettings.roundsBeforeLongBreak) sessions",
+                value: roundsBeforeLongBreakBinding,
+                in: PresetSettingsStore.minRoundsBeforeLongBreak ... PresetSettingsStore.maxRoundsBeforeLongBreak
+            )
+            .frame(width: 130)
         }
     }
 
     private var themePicker: some View {
-        Picker(
-            "Theme",
-            selection: Binding(
-                get: { presetSettings.theme },
-                set: { presetSettings.setTheme($0) }
-            )
-        ) {
-            ForEach(AppTheme.allCases) { theme in
-                Text(theme.displayName)
-                    .tag(theme)
+        settingRow("Theme", description: "Changes colors and the matching light or dark control appearance.") {
+            Picker(
+                "Theme",
+                selection: Binding(
+                    get: { presetSettings.theme },
+                    set: { presetSettings.setTheme($0) }
+                )
+            ) {
+                ForEach(AppTheme.allCases) { theme in
+                    Text(theme.displayName)
+                        .tag(theme)
+                }
             }
+            .labelsHidden()
+            .frame(width: 210)
         }
-        .font(.caption)
         .accessibilityHint("Changes Oak colors throughout the app")
         .accessibilityIdentifier("themePicker")
     }
 
     private var displayTargetPicker: some View {
-        Picker("Display target", selection: displayTargetBinding) {
-            ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
-                Text(
-                    NSScreen.displayName(
-                        for: target,
-                        preferredDisplayID: presetSettings.preferredDisplayID(for: target)
+        settingRow("Display", description: "The screen that shows the notch companion.") {
+            Picker("Display", selection: displayTargetBinding) {
+                ForEach(DisplayTarget.allCases, id: \.rawValue) { target in
+                    Text(
+                        NSScreen.displayName(
+                            for: target,
+                            preferredDisplayID: presetSettings.preferredDisplayID(for: target)
+                        )
                     )
-                )
-                .tag(target)
+                    .tag(target)
+                }
             }
-        }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .onChange(of: selectedDisplayTarget) { newValue in
-            guard presetSettings.displayTarget != newValue else { return }
-            DispatchQueue.main.async {
-                presetSettings.setDisplayTarget(newValue)
+            .labelsHidden()
+            .frame(width: 210)
+            .onChange(of: selectedDisplayTarget) { newValue in
+                guard presetSettings.displayTarget != newValue else { return }
+                DispatchQueue.main.async {
+                    presetSettings.setDisplayTarget(newValue)
+                }
             }
-        }
-        .onChange(of: presetSettings.displayTarget) { newValue in
-            guard selectedDisplayTarget != newValue else { return }
-            selectedDisplayTarget = newValue
+            .onChange(of: presetSettings.displayTarget) { newValue in
+                guard selectedDisplayTarget != newValue else { return }
+                selectedDisplayTarget = newValue
+            }
         }
     }
 
     private var countdownDisplayModePicker: some View {
-        Picker("Countdown display mode", selection: countdownDisplayModeBinding) {
-            ForEach(CountdownDisplayMode.allCases, id: \.rawValue) { mode in
-                Text(mode.displayName)
-                    .tag(mode)
+        settingRow("Countdown style", description: "Show the remaining time as digits or a progress ring.") {
+            Picker("Countdown style", selection: countdownDisplayModeBinding) {
+                ForEach(CountdownDisplayMode.allCases, id: \.rawValue) { mode in
+                    Text(mode.displayName)
+                        .tag(mode)
+                }
             }
-        }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .onChange(of: presetSettings.countdownDisplayMode) { newValue in
-            guard selectedCountdownDisplayMode != newValue else { return }
-            selectedCountdownDisplayMode = newValue
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(width: 210)
+            .onChange(of: presetSettings.countdownDisplayMode) { newValue in
+                guard selectedCountdownDisplayMode != newValue else { return }
+                selectedCountdownDisplayMode = newValue
+            }
         }
     }
 
     private var alwaysOnTopToggle: some View {
-        Toggle(
-            "Always on top",
-            isOn: Binding(
-                get: { presetSettings.alwaysOnTop },
-                set: { presetSettings.setAlwaysOnTop($0) }
+        settingRow("Always on top", description: "Keep the companion above other windows.") {
+            Toggle(
+                "Always on top",
+                isOn: Binding(
+                    get: { presetSettings.alwaysOnTop },
+                    set: { presetSettings.setAlwaysOnTop($0) }
+                )
             )
-        )
-        .font(.caption)
+            .labelsHidden()
+            .toggleStyle(.switch)
+        }
     }
 
     private var showBelowNotchToggle: some View {
-        Toggle(
-            "Show below notch",
-            isOn: Binding(
-                get: { presetSettings.showBelowNotch },
-                set: { presetSettings.setShowBelowNotch($0) }
+        settingRow("Position", description: "Place the companion below the physical notch.") {
+            Toggle(
+                "Show below notch",
+                isOn: Binding(
+                    get: { presetSettings.showBelowNotch },
+                    set: { presetSettings.setShowBelowNotch($0) }
+                )
             )
-        )
-        .font(.caption)
+            .labelsHidden()
+            .toggleStyle(.switch)
+        }
     }
 
     private var autoStartNextIntervalToggle: some View {
-        Toggle(
-            "Auto-start next interval (10s delay)",
-            isOn: Binding(
-                get: { presetSettings.autoStartNextInterval },
-                set: { presetSettings.setAutoStartNextInterval($0) }
+        settingRow(
+            "Auto-start next interval",
+            description: "Start the next focus or break interval after 10 seconds."
+        ) {
+            Toggle(
+                "Auto-start next interval",
+                isOn: Binding(
+                    get: { presetSettings.autoStartNextInterval },
+                    set: { presetSettings.setAutoStartNextInterval($0) }
+                )
             )
-        )
-        .font(.caption)
+            .labelsHidden()
+            .toggleStyle(.switch)
+        }
     }
 
     private var hasNotchedScreen: Bool {
@@ -307,152 +453,12 @@ private extension SettingsMenuView {
             + "-\(PresetSettingsStore.maxRoundsBeforeLongBreak)"
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min, Long cycle \(cycleRange) sessions"
     }
+}
 
-    // MARK: - Keyboard Settings
-
-    var keyboardSettingsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Toggle(
-                "Enable keyboard shortcuts",
-                isOn: Binding(
-                    get: { localKeyboardConfig.enabled },
-                    set: { newValue in
-                        var updated = localKeyboardConfig
-                        updated.enabled = newValue
-                        localKeyboardConfig = updated
-                        keyboardShortcutService.updateConfig(updated)
-                    }
-                )
-            )
-            .font(.caption)
-            .help("Space to start/pause, Escape to reset. Works when Oak is active.")
-
-            if localKeyboardConfig.enabled {
-                VStack(alignment: .leading, spacing: 4) {
-                    let toggleShortcut = localKeyboardConfig.shortcuts[.toggleSession]
-                        ?? KeyboardShortcutAction.toggleSession.defaultKey
-                    shortcutRow(action: .toggleSession, shortcut: toggleShortcut)
-                    let resetShortcut = localKeyboardConfig.shortcuts[.resetSession]
-                        ?? KeyboardShortcutAction.resetSession.defaultKey
-                    shortcutRow(action: .resetSession, shortcut: resetShortcut)
-                }
-                .padding(.leading, 16)
-
-                Toggle(
-                    "Enable global hotkeys",
-                    isOn: Binding(
-                        get: { localKeyboardConfig.globalHotkeysEnabled },
-                        set: { newValue in
-                            var updated = localKeyboardConfig
-                            updated.globalHotkeysEnabled = newValue
-                            localKeyboardConfig = updated
-                            keyboardShortcutService.updateConfig(updated)
-                        }
-                    )
-                )
-                .font(.caption)
-                .help("Requires Accessibility permission in System Settings.")
-            }
-        }
-    }
-
-    private func shortcutRow(action: KeyboardShortcutAction, shortcut: KeyEquivalent) -> some View {
-        HStack(spacing: 8) {
-            Text(shortcut.displayString)
-                .font(.caption.monospaced())
-                .foregroundColor(palette.secondaryForeground)
-                .padding(.horizontal, 4)
-                .padding(.vertical, 2)
-                .background(palette.controlBackground)
-                .cornerRadius(4)
-            Text(action.displayName)
-                .font(.caption)
-            Spacer()
-        }
-    }
-
-    // MARK: - Data Export / Import
-
-    var dataSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Back up or restore your progress data.")
-                .font(.caption)
-                .foregroundColor(palette.secondaryForeground)
-
-            HStack(spacing: 8) {
-                Button("Export JSON") {
-                    exportJSON()
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .disabled(progressManager == nil)
-
-                Button("Export CSV") {
-                    exportCSV()
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .disabled(progressManager == nil)
-
-                Button("Import") {
-                    importData()
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .disabled(progressManager == nil)
-            }
-        }
-    }
-
-    private func exportJSON() {
-        guard let manager = progressManager,
-              let data = manager.exportJSON()
-        else { return }
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = "oak-progress-\(dateStamp()).json"
-        panel.allowedContentTypes = [.json]
-        panel.begin { response in
-            if response == .OK, let url = panel.url {
-                try? data.write(to: url)
-            }
-        }
-    }
-
-    private func exportCSV() {
-        guard let manager = progressManager else { return }
-        let csv = manager.exportCSV()
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = "oak-progress-\(dateStamp()).csv"
-        panel.allowedContentTypes = [.commaSeparatedText]
-        panel.begin { response in
-            if response == .OK, let url = panel.url {
-                try? csv.write(to: url, atomically: true, encoding: .utf8)
-            }
-        }
-    }
-
-    private func importData() {
-        guard let manager = progressManager else { return }
-        let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.json]
-        panel.begin { response in
-            if response == .OK, let url = panel.url, let data = try? Data(contentsOf: url) {
-                let count = manager.importRecords(from: data)
-                if count > 0 {
-                    DispatchQueue.main.async {
-                        let alert = NSAlert()
-                        alert.messageText = "Import complete"
-                        alert.informativeText = "Imported \(count) day(s) of progress data."
-                        alert.runModal()
-                    }
-                }
-            }
-        }
-    }
-
-    private func dateStamp() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
-    }
+private enum SettingsTab: Hashable {
+    case general
+    case sessions
+    case notifications
+    case shortcuts
+    case advanced
 }

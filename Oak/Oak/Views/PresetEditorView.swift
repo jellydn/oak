@@ -1,63 +1,62 @@
 import SwiftUI
 
-/// Extracted from SettingsMenuView — renders stepper controls for focus, break, and long-break
-/// minutes within a single preset.
 internal struct PresetEditorView: View {
-    @ObservedObject var presetSettings: PresetSettingsStore
-    let title: String
-    let preset: Preset
+    @ObservedObject internal var presetSettings: PresetSettingsStore
+    internal let title: String
+    internal let preset: Preset
 
     private var palette: ThemePalette { presetSettings.theme.palette }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium))
+    internal var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("\(title) preset")
+                .font(.subheadline.weight(.semibold))
 
-            HStack(spacing: 8) {
-                Text("Focus")
-                    .font(.caption)
-                    .foregroundColor(palette.secondaryForeground)
-                    .frame(width: 40, alignment: .leading)
+            Divider()
 
-                Stepper(
-                    value: workMinutesBinding,
-                    in: PresetSettingsStore.minWorkMinutes ... PresetSettingsStore.maxWorkMinutes
-                ) {
-                    Text("\(presetSettings.workMinutes(for: preset)) min")
-                        .font(.caption)
-                }
+            durationRow(
+                "Focus",
+                minutes: presetSettings.workMinutes(for: preset),
+                binding: workMinutesBinding,
+                range: PresetSettingsStore.minWorkMinutes ... PresetSettingsStore.maxWorkMinutes
+            )
+            durationRow(
+                "Short break",
+                minutes: presetSettings.breakMinutes(for: preset),
+                binding: breakMinutesBinding,
+                range: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
+            )
+            durationRow(
+                "Long break",
+                minutes: presetSettings.longBreakMinutes(for: preset),
+                binding: longBreakMinutesBinding,
+                range: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
+            )
+        }
+        .padding(12)
+        .background(palette.controlBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func durationRow(
+        _ label: String,
+        minutes: Int,
+        binding: Binding<Int>,
+        range: ClosedRange<Int>
+    ) -> some View {
+        HStack(spacing: 10) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(palette.secondaryForeground)
+
+            Spacer(minLength: 8)
+
+            Stepper(value: binding, in: range) {
+                Text("\(minutes) min")
+                    .font(.caption.monospacedDigit())
+                    .frame(minWidth: 48, alignment: .trailing)
             }
-
-            HStack(spacing: 8) {
-                Text("Break")
-                    .font(.caption)
-                    .foregroundColor(palette.secondaryForeground)
-                    .frame(width: 40, alignment: .leading)
-
-                Stepper(
-                    value: breakMinutesBinding,
-                    in: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
-                ) {
-                    Text("\(presetSettings.breakMinutes(for: preset)) min")
-                        .font(.caption)
-                }
-            }
-
-            HStack(spacing: 8) {
-                Text("Long")
-                    .font(.caption)
-                    .foregroundColor(palette.secondaryForeground)
-                    .frame(width: 40, alignment: .leading)
-
-                Stepper(
-                    value: longBreakMinutesBinding,
-                    in: PresetSettingsStore.minBreakMinutes ... PresetSettingsStore.maxBreakMinutes
-                ) {
-                    Text("\(presetSettings.longBreakMinutes(for: preset)) min")
-                        .font(.caption)
-                }
-            }
+            .fixedSize()
         }
     }
 
