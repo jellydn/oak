@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 
 internal struct SettingsMenuView: View {
+    @Environment(\.accessibilityReduceMotion) private var isReduceMotionEnabled
     @ObservedObject internal var presetSettings: PresetSettingsStore
     @ObservedObject internal var notificationService: NotificationService
     @ObservedObject internal var sparkleUpdater: SparkleUpdater
@@ -80,7 +81,7 @@ internal struct SettingsMenuView: View {
         .tint(palette.accent)
         .background(palette.background)
         .preferredColorScheme(palette.colorScheme)
-        .animation(.easeInOut(duration: 0.2), value: windowHeight)
+        .animation(isReduceMotionEnabled ? nil : .easeInOut(duration: 0.2), value: windowHeight)
         .onPreferenceChange(SettingsPageHeightPreferenceKey.self) { height in
             guard height > 0 else { return }
             pageContentHeight = ceil(height)
