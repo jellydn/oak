@@ -5,7 +5,9 @@ internal struct DataSettingsView: View {
     internal let progressManager: ProgressManager?
     internal let theme: AppTheme
 
-    private var palette: ThemePalette { theme.palette }
+    private var palette: ThemePalette {
+        theme.palette
+    }
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 10) {

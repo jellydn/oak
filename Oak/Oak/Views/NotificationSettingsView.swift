@@ -4,7 +4,9 @@ internal struct NotificationSettingsView: View {
     @ObservedObject internal var presetSettings: PresetSettingsStore
     @ObservedObject internal var notificationService: NotificationService
 
-    private var palette: ThemePalette { presetSettings.theme.palette }
+    private var palette: ThemePalette {
+        presetSettings.theme.palette
+    }
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -44,7 +46,6 @@ internal struct NotificationSettingsView: View {
         }
     }
 
-    @ViewBuilder
     private var notificationActions: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 8) {

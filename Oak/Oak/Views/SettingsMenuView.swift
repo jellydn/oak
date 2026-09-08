@@ -11,7 +11,9 @@ internal struct SettingsMenuView: View {
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
     @State private var selectedTab = SettingsTab.general
 
-    private var palette: ThemePalette { presetSettings.theme.palette }
+    private var palette: ThemePalette {
+        presetSettings.theme.palette
+    }
 
     internal init(
         presetSettings: PresetSettingsStore,
@@ -67,10 +69,10 @@ internal struct SettingsMenuView: View {
 }
 
 private extension SettingsMenuView {
-    func page<Content: View>(
+    func page(
         title: String,
         description: String,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> some View
     ) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 2) {
@@ -92,10 +94,10 @@ private extension SettingsMenuView {
         .background(palette.background)
     }
 
-    func settingsGroup<Content: View>(
+    func settingsGroup(
         title: String,
         systemImage: String,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> some View
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Label(title, systemImage: systemImage)
@@ -117,10 +119,10 @@ private extension SettingsMenuView {
         }
     }
 
-    func settingRow<Control: View>(
+    func settingRow(
         _ title: String,
         description: String? = nil,
-        @ViewBuilder control: () -> Control
+        @ViewBuilder control: () -> some View
     ) -> some View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {

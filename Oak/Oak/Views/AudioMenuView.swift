@@ -7,7 +7,9 @@ internal struct AudioMenuView: View {
     internal let theme: AppTheme
     @State private var importError: String?
 
-    private var palette: ThemePalette { theme.palette }
+    private var palette: ThemePalette {
+        theme.palette
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -106,9 +108,9 @@ internal struct AudioMenuView: View {
         return error.localizedDescription
     }
 
-    private func soundSection<Content: View>(
+    private func soundSection(
         title: String,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> some View
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title.uppercased())

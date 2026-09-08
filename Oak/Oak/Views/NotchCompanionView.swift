@@ -48,7 +48,9 @@ internal struct NotchCompanionView: View {
         NotchVisualStyle.make(theme: viewModel.presetSettings.theme, isInsideNotch: isInsideNotch)
     }
 
-    internal var palette: ThemePalette { viewModel.presetSettings.theme.palette }
+    internal var palette: ThemePalette {
+        viewModel.presetSettings.theme.palette
+    }
 
     private var isInsideNotch: Bool {
         let settings = viewModel.presetSettings
@@ -195,10 +197,10 @@ extension NotchCompanionView {
                 isImporting: $isAudioImporterPresented,
                 theme: viewModel.presetSettings.theme
             )
-                .frame(width: 280)
-                .dismissOnClickOutside(isDismissalSuppressed: $isAudioImporterPresented) { [self] in
-                    showAudioMenu = false
-                }
+            .frame(width: 280)
+            .dismissOnClickOutside(isDismissalSuppressed: $isAudioImporterPresented) { [self] in
+                showAudioMenu = false
+            }
         }
     }
 

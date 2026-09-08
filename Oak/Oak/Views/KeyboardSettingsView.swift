@@ -5,7 +5,9 @@ internal struct KeyboardSettingsView: View {
     internal let theme: AppTheme
     @State private var localConfig: KeyboardShortcutConfig
 
-    private var palette: ThemePalette { theme.palette }
+    private var palette: ThemePalette {
+        theme.palette
+    }
 
     internal init(keyboardShortcutService: KeyboardShortcutService, theme: AppTheme) {
         self.keyboardShortcutService = keyboardShortcutService

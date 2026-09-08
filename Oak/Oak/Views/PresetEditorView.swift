@@ -5,7 +5,9 @@ internal struct PresetEditorView: View {
     internal let title: String
     internal let preset: Preset
 
-    private var palette: ThemePalette { presetSettings.theme.palette }
+    private var palette: ThemePalette {
+        presetSettings.theme.palette
+    }
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 10) {

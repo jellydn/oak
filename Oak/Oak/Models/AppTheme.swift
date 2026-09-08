@@ -9,7 +9,9 @@ internal enum AppTheme: String, CaseIterable, Identifiable {
     case tokyoNight
     case tokyoNightDay
 
-    internal var id: String { rawValue }
+    internal var id: String {
+        rawValue
+    }
 
     internal var displayName: String {
         switch self {
@@ -152,10 +154,27 @@ internal struct ThemePalette {
     internal let pink: Color
     internal let yellow: Color
 
-    internal var secondaryForeground: Color { foreground.opacity(colorScheme == .light ? 0.95 : 0.72) }
-    internal var subtleForeground: Color { foreground.opacity(colorScheme == .light ? 0.92 : 0.66) }
-    internal var controlBackground: Color { foreground.opacity(0.16) }
-    internal var selectedBackground: Color { accent.opacity(0.22) }
-    internal var divider: Color { foreground.opacity(0.24) }
-    internal var confettiColors: [Color] { [success, accent, warning, pink, purple, yellow, error] }
+    internal var secondaryForeground: Color {
+        foreground.opacity(colorScheme == .light ? 0.95 : 0.72)
+    }
+
+    internal var subtleForeground: Color {
+        foreground.opacity(colorScheme == .light ? 0.92 : 0.66)
+    }
+
+    internal var controlBackground: Color {
+        foreground.opacity(0.16)
+    }
+
+    internal var selectedBackground: Color {
+        accent.opacity(0.22)
+    }
+
+    internal var divider: Color {
+        foreground.opacity(0.24)
+    }
+
+    internal var confettiColors: [Color] {
+        [success, accent, warning, pink, purple, yellow, error]
+    }
 }

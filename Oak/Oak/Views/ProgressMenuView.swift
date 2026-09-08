@@ -2,7 +2,10 @@ import SwiftUI
 
 internal struct ProgressMenuView: View {
     @ObservedObject var viewModel: FocusSessionViewModel
-    private var palette: ThemePalette { viewModel.presetSettings.theme.palette }
+    private var palette: ThemePalette {
+        viewModel.presetSettings.theme.palette
+    }
+
     private var completedSessionsText: String {
         let suffix = viewModel.todayCompletedSessions == 1 ? "" : "s"
         return "\(viewModel.todayCompletedSessions) session\(suffix)"

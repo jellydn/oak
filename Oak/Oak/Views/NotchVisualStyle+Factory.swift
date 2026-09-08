@@ -1,7 +1,7 @@
 import SwiftUI
 
 internal extension NotchVisualStyle {
-    internal static func make(theme: AppTheme, isInsideNotch: Bool) -> NotchVisualStyle {
+    static func make(theme: AppTheme, isInsideNotch: Bool) -> NotchVisualStyle {
         let palette = theme.palette
         return NotchVisualStyle(
             isInsideNotchStyle: isInsideNotch,

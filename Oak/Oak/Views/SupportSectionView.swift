@@ -3,7 +3,9 @@ import SwiftUI
 internal struct SupportSectionView: View {
     internal let theme: AppTheme
 
-    private var palette: ThemePalette { theme.palette }
+    private var palette: ThemePalette {
+        theme.palette
+    }
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 8) {
