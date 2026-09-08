@@ -56,6 +56,7 @@ This PRD defines a KISS MVP focused on a notch-based experience with minimal set
 **Acceptance Criteria:**
 
 - [ ] Built-in tracks available: rain, forest, cafe, brown noise, lo-fi.
+- [ ] User can import, select, and remove personal sounds from a local sound library.
 - [ ] User can select one track before or during session.
 - [ ] User can adjust volume from app controls.
 - [ ] Audio stops automatically when session ends.
@@ -95,6 +96,7 @@ This PRD defines a KISS MVP focused on a notch-based experience with minimal set
 - FR-7: The system must provide optional auto-start of next interval (work <-> break), default OFF in MVP.
 - FR-8: The system must not require any global keyboard shortcut in MVP.
 - FR-9: The system must include built-in ambient tracks: rain, forest, cafe, brown noise, lo-fi.
+- FR-9a: The system must let users import, select, and remove local audio files without replacing built-in tracks.
 - FR-10: The system must provide user volume control for ambient audio.
 - FR-11: The system must stop ambient audio automatically when a session ends.
 - FR-12: The system must trigger a subtle completion animation in the notch UI.
@@ -107,7 +109,7 @@ This PRD defines a KISS MVP focused on a notch-based experience with minimal set
 
 - Any distraction control in MVP (no macOS Focus mode trigger, no notification silencing controls).
 - Custom timer durations.
-- Additional or user-imported sound packs.
+- Downloadable or remotely hosted sound packs.
 - Cross-device sync.
 - Shared focus rooms or multiplayer features.
 - CLI integration.

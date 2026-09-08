@@ -7,6 +7,7 @@ internal struct NotchCompanionView: View {
     @ObservedObject private var sparkleUpdater: SparkleUpdater
     private let keyboardShortcutService: KeyboardShortcutService // Passed through; not observed here
     @State var showAudioMenu = false
+    @State var isAudioImporterPresented = false
     @State var showProgressMenu = false
     @State var showSettingsMenu = false
     @State private var animateCompletion: Bool = false
@@ -172,7 +173,7 @@ extension NotchCompanionView {
                         )
                         .frame(width: controlSize, height: controlSize)
 
-                    Image(systemName: viewModel.audioManager.selectedTrack.systemImageName)
+                    Image(systemName: viewModel.audioManager.selectedSound.systemImageName)
                         .foregroundColor(viewModel.audioManager.isPlaying ? .blue : .white.opacity(0.7))
                         .font(.system(size: 9))
                 }
@@ -183,9 +184,12 @@ extension NotchCompanionView {
         .accessibilityHint("Opens audio menu to select ambient sounds")
         .accessibilityIdentifier("audioButton")
         .popover(isPresented: $showAudioMenu) {
-            AudioMenuView(audioManager: viewModel.audioManager)
-                .frame(width: 200)
-                .dismissOnClickOutside { [self] in
+            AudioMenuView(
+                audioManager: viewModel.audioManager,
+                isImporting: $isAudioImporterPresented
+            )
+                .frame(width: 280)
+                .dismissOnClickOutside(isDismissalSuppressed: $isAudioImporterPresented) { [self] in
                     showAudioMenu = false
                 }
         }

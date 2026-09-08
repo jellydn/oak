@@ -23,6 +23,19 @@ internal final class ClickOutsideModifierTests: XCTestCase {
         XCTAssertFalse(wasCalled)
     }
 
+    func testDismissalIsDisabledWhilePresentedWindowRequiresInteraction() {
+        var isSuppressed = false
+        let binding = Binding(
+            get: { isSuppressed },
+            set: { isSuppressed = $0 }
+        )
+        let modifier = ClickOutsideModifier(isDismissalSuppressed: binding) {}
+
+        XCTAssertTrue(modifier.isDismissalEnabled)
+        isSuppressed = true
+        XCTAssertFalse(modifier.isDismissalEnabled)
+    }
+
     // MARK: - View Type Compatibility
 
     func testModifierCanBeAppliedToText() {
@@ -87,5 +100,25 @@ internal final class ClickOutsideModifierTests: XCTestCase {
             .dismissOnClickOutside {}
             .dismissOnClickOutside {}
         XCTAssertNotNil(view)
+    }
+}
+
+@MainActor
+internal final class AudioMenuViewTests: XCTestCase {
+    func testImportCancellationDoesNotShowError() {
+        XCTAssertNil(AudioMenuView.importErrorMessage(for: CancellationError()))
+
+        let cocoaCancellation = NSError(domain: NSCocoaErrorDomain, code: NSUserCancelledError)
+        XCTAssertNil(AudioMenuView.importErrorMessage(for: cocoaCancellation))
+    }
+
+    func testImportFailureShowsError() {
+        let failure = NSError(
+            domain: "AudioMenuViewTests",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "Import failed"]
+        )
+
+        XCTAssertEqual(AudioMenuView.importErrorMessage(for: failure), "Import failed")
     }
 }

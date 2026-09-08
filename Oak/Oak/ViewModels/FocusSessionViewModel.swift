@@ -26,7 +26,7 @@ internal class FocusSessionViewModel: ObservableObject {
     private let currentDate: () -> Date
     private var presetSettingsCancellable: AnyCancellable?
     private var timerServiceCancellables = Set<AnyCancellable>()
-    private var lastPlayingAudioTrack: AudioTrack = .none
+    private var lastPlayingSound: AudioSelection = .builtIn(.none)
     private var wasAutoStarted: Bool = false
     let audioManager: AudioManager
     let progressManager: ProgressManager
@@ -269,8 +269,8 @@ internal extension FocusSessionViewModel {
         currentSessionStartTime = Date()
         sessionState = SessionStateMachine.start(duration: seconds, isWorkSession: interval.isWorkSession)
 
-        if interval.isWorkSession && lastPlayingAudioTrack != .none {
-            audioManager.play(track: lastPlayingAudioTrack)
+        if interval.isWorkSession && !lastPlayingSound.isNone {
+            audioManager.play(sound: lastPlayingSound)
         }
 
         timerService.start(seconds: seconds)
@@ -282,7 +282,7 @@ internal extension FocusSessionViewModel {
         currentSessionStartTime = nil
         isSessionComplete = false
         completedRounds = sessionCycle.completedRounds
-        lastPlayingAudioTrack = .none
+        lastPlayingSound = .builtIn(.none)
         wasAutoStarted = false
         audioManager.stop()
         sessionState = SessionStateMachine.reset()
@@ -306,7 +306,7 @@ internal extension FocusSessionViewModel {
         notificationService.sendSessionCompletionNotification(isWorkSession: sessionCycle.isWorkSession)
 
         if sessionCycle.isWorkSession || audioManager.isPlaying {
-            lastPlayingAudioTrack = audioManager.isPlaying ? audioManager.selectedTrack : .none
+            lastPlayingSound = audioManager.isPlaying ? audioManager.selectedSound : .builtIn(.none)
         }
 
         audioManager.stop()

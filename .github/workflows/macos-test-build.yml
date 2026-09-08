@@ -1,0 +1,111 @@
+name: macOS Test Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: macos-test-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build test app
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Select Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Resolve build metadata
+        id: metadata
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [[ -n "$PR_NUMBER" ]]; then
+            build_label="pr-${PR_NUMBER}"
+          else
+            build_label="manual-${GITHUB_RUN_NUMBER}"
+          fi
+
+          latest_tag="$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || true)"
+          marketing_version="${latest_tag#v}"
+          if [[ -z "$marketing_version" ]]; then
+            marketing_version="0.0.0"
+          fi
+
+          short_sha="${GITHUB_SHA::7}"
+          echo "artifact_name=oak-macos-test-${build_label}-${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "archive_name=Oak-${build_label}-${short_sha}.zip" >> "$GITHUB_OUTPUT"
+          echo "marketing_version=$marketing_version" >> "$GITHUB_OUTPUT"
+
+      - name: Build Release app
+        run: |
+          xcodebuild \
+            -project Oak/Oak.xcodeproj \
+            -scheme Oak \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath /tmp/oak-test-build \
+            build \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
+            MARKETING_VERSION="${{ steps.metadata.outputs.marketing_version }}" \
+            CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Ad-hoc sign and verify app
+        run: |
+          app_path="/tmp/oak-test-build/Build/Products/Release/Oak.app"
+          test -d "$app_path"
+          codesign --force --deep --sign - "$app_path"
+          codesign --verify --deep --strict --verbose=2 "$app_path"
+          lipo "$app_path/Contents/MacOS/Oak" -verify_arch arm64
+
+      - name: Package app
+        run: |
+          ditto \
+            -c \
+            -k \
+            --sequesterRsrc \
+            --keepParent \
+            /tmp/oak-test-build/Build/Products/Release/Oak.app \
+            "/tmp/${{ steps.metadata.outputs.archive_name }}"
+
+      - name: Upload test app
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: /tmp/${{ steps.metadata.outputs.archive_name }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+      - name: Add verification instructions
+        env:
+          ARCHIVE_NAME: ${{ steps.metadata.outputs.archive_name }}
+          ARTIFACT_NAME: ${{ steps.metadata.outputs.artifact_name }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Test Oak
+
+          1. Download the **${ARTIFACT_NAME}** artifact from this run.
+          2. Unzip the downloaded artifact, then unzip **${ARCHIVE_NAME}**.
+          3. Move **Oak.app** to **Applications**.
+          4. Control-click **Oak.app**, select **Open**, and confirm the first launch.
+          5. Open Oak's sound library. Import, select, play, and remove a personal sound. Confirm that built-in sounds still play.
+
+          This build has an ad-hoc signature, but it is not notarized. Gatekeeper can require **System Settings → Privacy & Security → Open Anyway**.
+          EOF

@@ -2,10 +2,23 @@ import AppKit
 import SwiftUI
 
 internal struct ClickOutsideModifier: ViewModifier {
+    let isDismissalSuppressed: Binding<Bool>
     let action: () -> Void
     @State private var monitor: Any?
     @State private var localMonitor: Any?
     @State private var popoverWindow: NSWindow?
+
+    internal init(
+        isDismissalSuppressed: Binding<Bool> = .constant(false),
+        action: @escaping () -> Void
+    ) {
+        self.isDismissalSuppressed = isDismissalSuppressed
+        self.action = action
+    }
+
+    internal var isDismissalEnabled: Bool {
+        !isDismissalSuppressed.wrappedValue
+    }
 
     private struct WindowAccessor: NSViewRepresentable {
         @Binding var window: NSWindow?
@@ -32,7 +45,7 @@ internal struct ClickOutsideModifier: ViewModifier {
                 guard monitor == nil, localMonitor == nil else { return }
 
                 monitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { _ in
-                    guard let popoverWindow else { return }
+                    guard isDismissalEnabled, let popoverWindow else { return }
 
                     if !popoverWindow.frame.contains(NSEvent.mouseLocation) {
                         DispatchQueue.main.async {
@@ -42,7 +55,7 @@ internal struct ClickOutsideModifier: ViewModifier {
                 }
 
                 let localEventMonitor: (NSEvent) -> NSEvent = { [popoverWindow] event in
-                    guard let popoverWindow else { return event }
+                    guard isDismissalEnabled, let popoverWindow else { return event }
 
                     if event.window != popoverWindow {
                         DispatchQueue.main.async {
@@ -71,7 +84,10 @@ internal struct ClickOutsideModifier: ViewModifier {
 }
 
 internal extension View {
-    func dismissOnClickOutside(action: @escaping () -> Void) -> some View {
-        modifier(ClickOutsideModifier(action: action))
+    func dismissOnClickOutside(
+        isDismissalSuppressed: Binding<Bool> = .constant(false),
+        action: @escaping () -> Void
+    ) -> some View {
+        modifier(ClickOutsideModifier(isDismissalSuppressed: isDismissalSuppressed, action: action))
     }
 }

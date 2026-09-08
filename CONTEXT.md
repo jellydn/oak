@@ -64,9 +64,10 @@ Background sound played during focus sessions:
 
 | Term | Definition |
 | --- | --- |
-| **Track** | A named ambient sound (Rain, Forest, Cafe, Brown Noise, Lo-Fi, or None). |
+| **Track** | A named ambient sound selected for playback. |
 | **Built-in Track** | A bundled `.m4a` audio file shipped with the app. |
 | **Generated Track** | A sound generated algorithmically at runtime when no bundled file is available. |
+| **Personal Sound** | An audio file imported by the user and copied into Oak's local sound library. |
 
 ## Display Target
 

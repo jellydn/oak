@@ -48,12 +48,27 @@ In today's world of constant distractions, deep work has become increasingly rar
 - ⏱️ **Pomodoro presets**: Default `25/5` and `50/10` sessions (fully configurable)
 - 🔄 **Smart breaks**: Automatic 15/20 min long breaks after 4 focus rounds
 - ▶️ **Session controls**: Start, pause, and resume your focus sessions
-- 🎵 **Ambient sounds**: Rain, forest, cafe, brown noise, and lo-fi to help you concentrate
+- 🎵 **Sound library**: Use the built-in ambient sounds or import your own local audio files
 - ⌨️ **Keyboard shortcuts**: Press Space to start/pause/resume, Escape to reset — control sessions without touching the mouse
 - 📊 **Local tracking**: Track daily focus minutes, completed sessions, and 7-day streaks
 - 🕒 **Session timeline**: See each focus session and break from today with start/end times and durations
 - 💾 **Data export**: Export your progress as JSON or CSV, or import from a backup file
 - 🔄 **Auto-update**: Seamless updates via Sparkle framework
+
+### Finding sounds to import
+
+Check the license shown for each file before you download it. Terms can change, and Oak does not track attribution
+for imported sounds.
+
+- [Pixabay Sound Effects](https://pixabay.com/sound-effects/) — Pixabay's
+  [Content License](https://pixabay.com/service/license-summary/) permits free use without attribution. It prohibits
+  standalone resale or redistribution and warns that third-party rights can still apply.
+- [Mixkit Sound Effects](https://mixkit.co/free-sound-effects/) — Mixkit states that its free sound effects can be
+  used in personal and commercial projects without attribution. Confirm that the item uses the **Sound Effects Free
+  License** on the [Mixkit license page](https://mixkit.co/license/).
+- [Freesound](https://freesound.org/browse/) — licenses vary by file. Prefer **CC0** for the fewest restrictions.
+  **CC BY** requires creator attribution, and **CC BY-NC** also prohibits commercial use. See Freesound's
+  [license and attribution guide](https://freesound.org/help/faq/#licenses).
 
 ## Installation
 
