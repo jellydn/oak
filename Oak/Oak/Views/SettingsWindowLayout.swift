@@ -22,6 +22,16 @@ internal enum SettingsTab: String, CaseIterable, Identifiable {
         }
     }
 
+    internal var symbolName: String {
+        switch self {
+        case .general: "gearshape"
+        case .sessions: "timer"
+        case .notifications: "bell"
+        case .shortcuts: "keyboard"
+        case .advanced: "slider.horizontal.3"
+        }
+    }
+
     internal var accessibilityIdentifier: String {
         "settingsTab_\(rawValue)"
     }
@@ -88,8 +98,11 @@ internal struct SettingsSegmentedControl: NSViewRepresentable {
     }
 
     internal static func makeControl(target: AnyObject?, action: Selector?) -> NSSegmentedControl {
+        let images = SettingsTab.allCases.map { tab in
+            NSImage(systemSymbolName: tab.symbolName, accessibilityDescription: tab.title)!
+        }
         let control = NSSegmentedControl(
-            labels: SettingsTab.allCases.map(\.title),
+            images: images,
             trackingMode: .selectOne,
             target: target,
             action: action
@@ -102,6 +115,7 @@ internal struct SettingsSegmentedControl: NSViewRepresentable {
 
         for (index, tab) in SettingsTab.allCases.enumerated() {
             control.setWidth(0, forSegment: index)
+            control.setImageScaling(.scaleProportionallyDown, forSegment: index)
             control.setToolTip(tab.title, forSegment: index)
         }
         return control

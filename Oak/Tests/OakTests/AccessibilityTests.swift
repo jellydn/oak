@@ -257,6 +257,10 @@ internal final class AccessibilityTests: XCTestCase {
                 "settingsTab_advanced"
             ]
         )
+        XCTAssertEqual(
+            SettingsTab.allCases.map(\.symbolName),
+            ["gearshape", "timer", "bell", "keyboard", "slider.horizontal.3"]
+        )
         XCTAssertGreaterThanOrEqual(SettingsWindowLayout.minimumWidth, 560)
     }
 
@@ -266,7 +270,13 @@ internal final class AccessibilityTests: XCTestCase {
         XCTAssertEqual(control.segmentCount, 5)
         XCTAssertEqual(control.segmentDistribution, .fillEqually)
         XCTAssertEqual(
-            (0 ..< control.segmentCount).compactMap { control.label(forSegment: $0) },
+            (0 ..< control.segmentCount).compactMap {
+                control.image(forSegment: $0)?.accessibilityDescription
+            },
+            SettingsTab.allCases.map(\.title)
+        )
+        XCTAssertEqual(
+            (0 ..< control.segmentCount).compactMap { control.toolTip(forSegment: $0) },
             SettingsTab.allCases.map(\.title)
         )
         let minimumSegmentWidth = (SettingsWindowLayout.minimumWidth
