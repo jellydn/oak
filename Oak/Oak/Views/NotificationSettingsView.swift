@@ -4,11 +4,13 @@ internal struct NotificationSettingsView: View {
     @ObservedObject var presetSettings: PresetSettingsStore
     @ObservedObject var notificationService: NotificationService
 
+    private var palette: ThemePalette { presetSettings.theme.palette }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(notificationStatusText)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.secondaryForeground)
 
             Toggle(
                 "Play completion sound",

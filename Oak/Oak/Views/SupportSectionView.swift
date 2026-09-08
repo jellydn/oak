@@ -1,11 +1,15 @@
 import SwiftUI
 
 internal struct SupportSectionView: View {
+    var theme: AppTheme = .oak
+
+    private var palette: ThemePalette { theme.palette }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("If Oak helps you focus, consider supporting the project ⭐️")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.secondaryForeground)
 
             HStack(spacing: 12) {
                 Link("⭐ Star on GitHub", destination: URL(string: "https://github.com/jellydn/oak")!)

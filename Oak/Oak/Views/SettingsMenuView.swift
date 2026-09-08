@@ -11,6 +11,8 @@ internal struct SettingsMenuView: View {
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
     @State private var localKeyboardConfig: KeyboardShortcutConfig
 
+    private var palette: ThemePalette { presetSettings.theme.palette }
+
     init(
         presetSettings: PresetSettingsStore,
         notificationService: NotificationService,
@@ -35,6 +37,7 @@ internal struct SettingsMenuView: View {
             Divider()
 
             section(title: "Display") {
+                themePicker
                 if NSScreen.screens.count > 1 {
                     displayTargetPicker
                 }
@@ -76,18 +79,18 @@ internal struct SettingsMenuView: View {
             }
 
             section(title: "Updates") {
-                UpdateSettingsView(sparkleUpdater: sparkleUpdater)
+                UpdateSettingsView(sparkleUpdater: sparkleUpdater, theme: presetSettings.theme)
             }
 
             section(title: "Support") {
-                SupportSectionView()
+                SupportSectionView(theme: presetSettings.theme)
             }
 
             Divider()
 
             Text(validRangeDescription)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.secondaryForeground)
 
             HStack {
                 Button("Reset to defaults") {
@@ -99,10 +102,14 @@ internal struct SettingsMenuView: View {
 
                 Text(currentVersion)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
             }
         }
         .padding(14)
+        .foregroundColor(palette.foreground)
+        .tint(palette.accent)
+        .background(palette.background)
+        .preferredColorScheme(.dark)
         .task {
             await notificationService.refreshAuthorizationStatus()
         }
@@ -115,7 +122,7 @@ internal struct SettingsMenuView: View {
                     .font(.headline)
                 Text("Focus presets, display, and notifications.")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
             }
 
             Spacer()
@@ -132,7 +139,7 @@ internal struct SettingsMenuView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.primary)
+                .foregroundColor(palette.foreground)
             content()
         }
     }
@@ -145,6 +152,24 @@ internal struct SettingsMenuView: View {
             Text("Long break every \(presetSettings.roundsBeforeLongBreak) focus sessions")
                 .font(.caption)
         }
+    }
+
+    private var themePicker: some View {
+        Picker(
+            "Theme",
+            selection: Binding(
+                get: { presetSettings.theme },
+                set: { presetSettings.setTheme($0) }
+            )
+        ) {
+            ForEach(AppTheme.allCases) { theme in
+                Text(theme.displayName)
+                    .tag(theme)
+            }
+        }
+        .font(.caption)
+        .accessibilityHint("Changes Oak colors throughout the app")
+        .accessibilityIdentifier("themePicker")
     }
 
     private var displayTargetPicker: some View {
@@ -335,10 +360,10 @@ private extension SettingsMenuView {
         HStack(spacing: 8) {
             Text(shortcut.displayString)
                 .font(.caption.monospaced())
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.secondaryForeground)
                 .padding(.horizontal, 4)
                 .padding(.vertical, 2)
-                .background(Color.secondary.opacity(0.1))
+                .background(palette.controlBackground)
                 .cornerRadius(4)
             Text(action.displayName)
                 .font(.caption)
@@ -352,7 +377,7 @@ private extension SettingsMenuView {
         VStack(alignment: .leading, spacing: 8) {
             Text("Back up or restore your progress data.")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.secondaryForeground)
 
             HStack(spacing: 8) {
                 Button("Export JSON") {

@@ -15,7 +15,6 @@ internal struct OakApp: App {
                 progressManager: appDelegate.notchWindowController?.viewModel.progressManager
             )
             .frame(width: 420)
-            .padding(8)
         }
     }
 }

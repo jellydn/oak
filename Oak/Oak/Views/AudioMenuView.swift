@@ -4,7 +4,10 @@ import UniformTypeIdentifiers
 internal struct AudioMenuView: View {
     @ObservedObject var audioManager: AudioManager
     @Binding var isImporting: Bool
+    var theme: AppTheme = .oak
     @State private var importError: String?
+
+    private var palette: ThemePalette { theme.palette }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -23,7 +26,7 @@ internal struct AudioMenuView: View {
                         if audioManager.customAssets.isEmpty {
                             Text("Import audio to add a personal sound.")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(palette.secondaryForeground)
                                 .padding(.horizontal, 8)
                         } else {
                             ForEach(audioManager.customAssets) { asset in
@@ -47,27 +50,31 @@ internal struct AudioMenuView: View {
             if let error = importError ?? audioManager.audioError {
                 Text(error)
                     .font(.caption)
-                    .foregroundColor(.red)
+                    .foregroundColor(palette.error)
             }
 
             VStack(spacing: 6) {
                 HStack {
                     Image(systemName: "speaker.fill")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(palette.secondaryForeground)
                         .font(.system(size: 12))
                     Slider(value: $audioManager.volume, in: 0 ... 1)
                         .frame(height: 20)
                     Image(systemName: "speaker.wave.3.fill")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(palette.secondaryForeground)
                         .font(.system(size: 12))
                 }
                 .padding(.horizontal, 8)
                 Text("\(Int(audioManager.volume * 100))%")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
             }
         }
         .padding()
+        .foregroundColor(palette.foreground)
+        .tint(palette.accent)
+        .background(palette.background)
+        .preferredColorScheme(.dark)
         .fileImporter(
             isPresented: $isImporting,
             allowedContentTypes: [.audio],
@@ -106,7 +113,7 @@ internal struct AudioMenuView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title.uppercased())
                 .font(.caption2.weight(.semibold))
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.secondaryForeground)
                 .padding(.horizontal, 8)
             content()
         }
@@ -137,13 +144,13 @@ internal struct AudioMenuView: View {
                         Spacer()
                         if isSelected && audioManager.isPlaying {
                             Image(systemName: "speaker.wave.2.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(palette.accent)
                         }
                     }
-                    .foregroundColor(.primary)
+                    .foregroundColor(palette.foreground)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
-                    .background(isSelected ? Color.blue.opacity(0.1) : Color.clear)
+                    .background(isSelected ? palette.selectedBackground : Color.clear)
                     .cornerRadius(8)
                 }
             )
@@ -159,7 +166,7 @@ internal struct AudioMenuView: View {
                     },
                     label: {
                         Image(systemName: "trash")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(palette.secondaryForeground)
                     }
                 )
                 .buttonStyle(.plain)

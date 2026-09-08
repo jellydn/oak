@@ -2,13 +2,16 @@ import SwiftUI
 
 internal struct UpdateSettingsView: View {
     @ObservedObject var sparkleUpdater: SparkleUpdater
+    var theme: AppTheme = .oak
+
+    private var palette: ThemePalette { theme.palette }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if !sparkleUpdater.isConfigured {
                 Text("Update signing is not configured (missing SUPublicEDKey).")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
             }
 
             Toggle(

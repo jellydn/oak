@@ -7,6 +7,8 @@ internal struct PresetEditorView: View {
     let title: String
     let preset: Preset
 
+    private var palette: ThemePalette { presetSettings.theme.palette }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
@@ -15,7 +17,7 @@ internal struct PresetEditorView: View {
             HStack(spacing: 8) {
                 Text("Focus")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
                     .frame(width: 40, alignment: .leading)
 
                 Stepper(
@@ -30,7 +32,7 @@ internal struct PresetEditorView: View {
             HStack(spacing: 8) {
                 Text("Break")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
                     .frame(width: 40, alignment: .leading)
 
                 Stepper(
@@ -45,7 +47,7 @@ internal struct PresetEditorView: View {
             HStack(spacing: 8) {
                 Text("Long")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
                     .frame(width: 40, alignment: .leading)
 
                 Stepper(

@@ -53,6 +53,7 @@ In today's world of constant distractions, deep work has become increasingly rar
 - 📊 **Local tracking**: Track daily focus minutes, completed sessions, and 7-day streaks
 - 🕒 **Session timeline**: See each focus session and break from today with start/end times and durations
 - 💾 **Data export**: Export your progress as JSON or CSV, or import from a backup file
+- 🎨 **Themes**: Choose Oak, Kanagawa, Dracula, or Tokyo Night in Settings
 - 🔄 **Auto-update**: Seamless updates via Sparkle framework
 
 ### Finding sounds to import

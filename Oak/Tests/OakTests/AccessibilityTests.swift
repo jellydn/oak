@@ -190,7 +190,8 @@ internal final class AccessibilityTests: XCTestCase {
             "startNextButton",
             "countdownDisplay",
             "autoStartCountdown",
-            "presetToggleButton"
+            "presetToggleButton",
+            "themePicker"
         ]
 
         let uniqueIdentifiers = Set(identifiers)
