@@ -44,7 +44,7 @@ internal final class ThemeTests: XCTestCase {
         XCTAssertEqual(presetSettings.theme, .oak)
     }
 
-    func testNamedThemesUseDocumentedCoreColors() throws {
+    internal func testNamedThemesUseDocumentedCoreColors() throws {
         try assertColor(.kanagawa, background: 0x1F1F28, foreground: 0xDCD7BA, accent: 0x7E9CD8)
         try assertColor(.kanagawaLotus, background: 0xF2ECBC, foreground: 0x43436C, accent: 0x4D699B)
         try assertColor(.dracula, background: 0x282A36, foreground: 0xF8F8F2, accent: 0x8BE9FD)
@@ -53,7 +53,7 @@ internal final class ThemeTests: XCTestCase {
         try assertColor(.tokyoNightDay, background: 0xE1E2E7, foreground: 0x2E5857, accent: 0x006A83)
     }
 
-    func testEachSelectedThemePersists() {
+    internal func testEachSelectedThemePersists() {
         for theme in AppTheme.allCases {
             presetSettings.setTheme(theme)
 
@@ -63,7 +63,7 @@ internal final class ThemeTests: XCTestCase {
         }
     }
 
-    func testThemeColorSchemesMatchTheirVariants() {
+    internal func testThemeColorSchemesMatchTheirVariants() {
         XCTAssertEqual(
             AppTheme.allCases.filter { $0.palette.colorScheme == .light },
             [.kanagawaLotus, .alucard, .tokyoNightDay]

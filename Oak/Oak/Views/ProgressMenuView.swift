@@ -1,7 +1,7 @@
 import SwiftUI
 
 internal struct ProgressMenuView: View {
-    @ObservedObject var viewModel: FocusSessionViewModel
+    @ObservedObject internal var viewModel: FocusSessionViewModel
     private var palette: ThemePalette {
         viewModel.presetSettings.theme.palette
     }
@@ -11,7 +11,7 @@ internal struct ProgressMenuView: View {
         return "\(viewModel.todayCompletedSessions) session\(suffix)"
     }
 
-    var body: some View {
+    internal var body: some View {
         VStack(spacing: 16) {
             Text("Today's Progress")
                 .font(.headline)
