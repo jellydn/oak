@@ -124,24 +124,35 @@ private extension SettingsMenuView {
         description: String? = nil,
         @ViewBuilder control: () -> some View
     ) -> some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.body)
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: 16) {
+                settingLabel(title, description: description)
+                    .frame(minWidth: 180, maxWidth: .infinity, alignment: .leading)
 
-                if let description {
-                    Text(description)
-                        .font(.caption)
-                        .foregroundColor(palette.secondaryForeground)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                control()
+                    .frame(width: 210, alignment: .trailing)
             }
-            .layoutPriority(1)
 
-            Spacer(minLength: 12)
+            VStack(alignment: .leading, spacing: 10) {
+                settingLabel(title, description: description)
 
-            control()
-                .fixedSize(horizontal: true, vertical: false)
+                control()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    func settingLabel(_ title: String, description: String?) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.body)
+
+            if let description {
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(palette.secondaryForeground)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
