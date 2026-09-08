@@ -1,4 +1,3 @@
-import AppKit
 import SwiftUI
 
 internal enum SettingsTab: String, CaseIterable, Identifiable {
@@ -40,6 +39,8 @@ internal enum SettingsTab: String, CaseIterable, Identifiable {
 internal struct SettingsTabNavigation: View {
     @Binding internal var selectedTab: SettingsTab
     internal let theme: AppTheme
+    @FocusState private var focusedTab: SettingsTab?
+    @State private var hoveredTab: SettingsTab?
 
     private var palette: ThemePalette {
         theme.palette
@@ -51,107 +52,125 @@ internal struct SettingsTabNavigation: View {
     }
 
     internal var body: some View {
-        SettingsSegmentedControl(selectedTab: $selectedTab, theme: theme)
-            .frame(height: 28)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, SettingsWindowLayout.navigationHorizontalPadding)
-            .padding(.vertical, 12)
-            .background(palette.surface)
-            .accessibilityIdentifier("settingsTabBar")
+        HStack(spacing: SettingsWindowLayout.tabSpacing) {
+            ForEach(SettingsTab.allCases) { tab in
+                Button {
+                    selectedTab = tab
+                } label: {
+                    Image(systemName: tab.symbolName)
+                        .accessibilityHidden(true)
+                }
+                .buttonStyle(
+                    SettingsTabButtonStyle(
+                        isSelected: selectedTab == tab,
+                        isHovered: hoveredTab == tab,
+                        isFocused: focusedTab == tab,
+                        palette: palette
+                    )
+                )
+                .focused($focusedTab, equals: tab)
+                .help(tab.title)
+                .accessibilityLabel(Text(tab.title))
+                .accessibilityValue(selectedTab == tab ? "Selected" : "")
+                .accessibilityIdentifier(tab.accessibilityIdentifier)
+                .onHover { isHovered in
+                    if isHovered {
+                        hoveredTab = tab
+                    } else if hoveredTab == tab {
+                        hoveredTab = nil
+                    }
+                }
+            }
+        }
+        .padding(SettingsWindowLayout.tabContainerPadding)
+        .background(palette.controlBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .onMoveCommand(perform: moveSelection)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, SettingsWindowLayout.navigationHorizontalPadding)
+        .padding(.vertical, 12)
+        .background(palette.surface)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Settings sections")
+        .accessibilityIdentifier("settingsTabBar")
+    }
+
+    private func moveSelection(_ direction: MoveCommandDirection) {
+        guard let currentIndex = SettingsTab.allCases.firstIndex(of: focusedTab ?? selectedTab) else { return }
+        let nextIndex: Int
+        switch direction {
+        case .left:
+            nextIndex = max(currentIndex - 1, SettingsTab.allCases.startIndex)
+        case .right:
+            nextIndex = min(currentIndex + 1, SettingsTab.allCases.index(before: SettingsTab.allCases.endIndex))
+        default:
+            return
+        }
+        let nextTab = SettingsTab.allCases[nextIndex]
+        selectedTab = nextTab
+        focusedTab = nextTab
     }
 }
 
-internal struct SettingsSegmentedControl: NSViewRepresentable {
-    @Binding internal var selectedTab: SettingsTab
-    internal let theme: AppTheme
+internal struct SettingsTabButtonStyle: ButtonStyle {
+    internal let isSelected: Bool
+    internal let isHovered: Bool
+    internal let isFocused: Bool
+    internal let palette: ThemePalette
 
-    internal init(selectedTab: Binding<SettingsTab>, theme: AppTheme) {
-        _selectedTab = selectedTab
-        self.theme = theme
+    internal func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 14, weight: isSelected ? .semibold : .regular))
+            .foregroundStyle(isSelected ? palette.prominentSelectedForeground : palette.foreground)
+            .frame(maxWidth: .infinity, minHeight: SettingsWindowLayout.tabHeight)
+            .background {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(isSelected ? palette.prominentSelectedBackground : .clear)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .strokeBorder(stateOutlineColor, lineWidth: stateOutlineWidth)
+            }
+            .contentShape(Rectangle())
+            // Geometry gives press feedback without weakening icon contrast.
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
     }
 
-    internal func makeCoordinator() -> Coordinator {
-        Coordinator(parent: self)
-    }
-
-    internal func makeNSView(context: Context) -> NSSegmentedControl {
-        let control = Self.makeControl(
-            target: context.coordinator,
-            action: #selector(Coordinator.selectionChanged(_:))
-        )
-        update(control)
-        return control
-    }
-
-    internal func updateNSView(_ control: NSSegmentedControl, context: Context) {
-        context.coordinator.parent = self
-        update(control)
-    }
-
-    internal func sizeThatFits(
-        _ proposal: ProposedViewSize,
-        nsView _: NSSegmentedControl,
-        context _: Context
-    ) -> CGSize? {
-        guard let width = proposal.width else { return nil }
-        return CGSize(width: width, height: 28)
-    }
-
-    internal static func makeControl(target: AnyObject?, action: Selector?) -> NSSegmentedControl {
-        let images = SettingsTab.allCases.map { tab in
-            NSImage(systemSymbolName: tab.symbolName, accessibilityDescription: tab.title)!
+    private var stateOutlineColor: Color {
+        if isSelected {
+            return palette.prominentSelectedForeground
         }
-        let control = NSSegmentedControl(
-            images: images,
-            trackingMode: .selectOne,
-            target: target,
-            action: action
-        )
-        control.segmentDistribution = .fillEqually
-        control.segmentStyle = .rounded
-        control.setAccessibilityLabel("Settings section")
-        control.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        control.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
-        for (index, tab) in SettingsTab.allCases.enumerated() {
-            control.setWidth(0, forSegment: index)
-            control.setImageScaling(.scaleProportionallyDown, forSegment: index)
-            control.setToolTip(tab.title, forSegment: index)
-        }
-        return control
+        return palette.accent
     }
 
-    private func update(_ control: NSSegmentedControl) {
-        control.selectedSegment = SettingsTab.allCases.firstIndex(of: selectedTab) ?? 0
-        control.selectedSegmentBezelColor = NSColor(theme.palette.accent)
-    }
-
-    @MainActor
-    internal final class Coordinator: NSObject {
-        internal var parent: SettingsSegmentedControl
-
-        internal init(parent: SettingsSegmentedControl) {
-            self.parent = parent
+    private var stateOutlineWidth: CGFloat {
+        if isFocused {
+            return 2
         }
-
-        @objc internal func selectionChanged(_ control: NSSegmentedControl) {
-            guard SettingsTab.allCases.indices.contains(control.selectedSegment) else { return }
-            parent.selectedTab = SettingsTab.allCases[control.selectedSegment]
-        }
+        return isHovered ? 1 : 0
     }
 }
 
 internal enum SettingsWindowLayout {
     internal static let navigationHorizontalPadding: CGFloat = 20
-    internal static let minimumTabSegmentWidth: CGFloat = 104
-    internal static let minimumWidth = navigationHorizontalPadding * 2
-        + minimumTabSegmentWidth * CGFloat(SettingsTab.allCases.count)
+    internal static let minimumContentWidth: CGFloat = 520
+    internal static let tabSpacing: CGFloat = 4
+    internal static let tabContainerPadding: CGFloat = 3
+    internal static let tabHeight: CGFloat = 28
+    internal static let minimumWidth = navigationHorizontalPadding * 2 + minimumContentWidth
     internal static let idealWidth: CGFloat = 600
     internal static let minimumHeight: CGFloat = 360
     internal static let maximumHeight: CGFloat = 760
     internal static let fallbackScreenHeight: CGFloat = 900
     internal static let initialPageHeight: CGFloat = 500
     internal static let initialNavigationHeight: CGFloat = 52
+
+    internal static func tabItemWidth(containerWidth: CGFloat) -> CGFloat {
+        let navigationWidth = max(containerWidth - navigationHorizontalPadding * 2, 0)
+        let itemWidth = navigationWidth - tabContainerPadding * 2
+            - tabSpacing * CGFloat(SettingsTab.allCases.count - 1)
+        return max(itemWidth / CGFloat(SettingsTab.allCases.count), 0)
+    }
 
     internal static func windowHeight(
         pageContentHeight: CGFloat,

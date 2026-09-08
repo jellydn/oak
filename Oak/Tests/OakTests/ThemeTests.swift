@@ -116,6 +116,26 @@ internal final class ThemeTests: XCTestCase {
         }
     }
 
+    func testProminentSelectionColorsMeetNonTextContrast() throws {
+        for theme in AppTheme.allCases {
+            let palette = theme.palette
+
+            XCTAssertGreaterThanOrEqual(
+                try contrastRatio(
+                    palette.prominentSelectedForeground,
+                    over: palette.prominentSelectedBackground
+                ),
+                3,
+                "\(theme.displayName) prominent selection must keep its icon visible"
+            )
+            XCTAssertGreaterThanOrEqual(
+                try contrastRatio(palette.foreground, over: palette.surface),
+                4.5,
+                "\(theme.displayName) unselected navigation icons must remain readable"
+            )
+        }
+    }
+
     private func contrastRatio(_ foreground: Color, over background: Color) throws -> Double {
         let foregroundComponents = try colorComponents(foreground)
         let backgroundComponents = try colorComponents(background)

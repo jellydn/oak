@@ -170,6 +170,14 @@ internal struct ThemePalette {
         accent.opacity(0.22)
     }
 
+    internal var prominentSelectedBackground: Color {
+        accent
+    }
+
+    internal var prominentSelectedForeground: Color {
+        background
+    }
+
     internal var divider: Color {
         foreground.opacity(0.24)
     }

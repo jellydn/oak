@@ -264,28 +264,18 @@ internal final class AccessibilityTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(SettingsWindowLayout.minimumWidth, 560)
     }
 
-    internal func testSettingsTabControlUsesFiveEqualSegments() {
-        let control = SettingsSegmentedControl.makeControl(target: nil, action: nil)
-
-        XCTAssertEqual(control.segmentCount, 5)
-        XCTAssertEqual(control.segmentDistribution, .fillEqually)
+    internal func testSettingsTabNavigationDividesConstrainedWidthsEqually() {
+        XCTAssertEqual(SettingsTab.allCases.count, 5)
+        XCTAssertEqual(SettingsWindowLayout.tabItemWidth(containerWidth: 400), 67.6, accuracy: 0.001)
         XCTAssertEqual(
-            (0 ..< control.segmentCount).compactMap {
-                control.image(forSegment: $0)?.accessibilityDescription
-            },
-            SettingsTab.allCases.map(\.title)
+            SettingsWindowLayout.tabItemWidth(containerWidth: SettingsWindowLayout.minimumWidth),
+            99.6,
+            accuracy: 0.001
         )
         XCTAssertEqual(
-            (0 ..< control.segmentCount).compactMap { control.toolTip(forSegment: $0) },
-            SettingsTab.allCases.map(\.title)
+            SettingsWindowLayout.tabItemWidth(containerWidth: SettingsWindowLayout.idealWidth),
+            107.6,
+            accuracy: 0.001
         )
-        let minimumSegmentWidth = (SettingsWindowLayout.minimumWidth
-            - SettingsWindowLayout.navigationHorizontalPadding * 2)
-            / CGFloat(control.segmentCount)
-        let normalSegmentWidth = (SettingsWindowLayout.idealWidth
-            - SettingsWindowLayout.navigationHorizontalPadding * 2)
-            / CGFloat(control.segmentCount)
-        XCTAssertEqual(minimumSegmentWidth, SettingsWindowLayout.minimumTabSegmentWidth)
-        XCTAssertEqual(normalSegmentWidth, 112)
     }
 }
