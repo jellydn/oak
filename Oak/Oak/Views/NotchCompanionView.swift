@@ -178,7 +178,9 @@ extension NotchCompanionView {
                         .frame(width: controlSize, height: controlSize)
 
                     Image(systemName: viewModel.audioManager.selectedSound.systemImageName)
-                        .foregroundColor(viewModel.audioManager.isPlaying ? palette.accent : palette.secondaryForeground)
+                        .foregroundColor(
+                            viewModel.audioManager.isPlaying ? palette.accent : palette.secondaryForeground
+                        )
                         .font(.system(size: 9))
                 }
             }
