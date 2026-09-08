@@ -10,6 +10,8 @@ internal struct SettingsMenuView: View {
     @State private var selectedDisplayTarget: DisplayTarget
     @State private var selectedCountdownDisplayMode: CountdownDisplayMode
     @State private var selectedTab = SettingsTab.general
+    @State private var pageContentHeight = SettingsWindowLayout.initialPageHeight
+    @State private var navigationHeight = SettingsWindowLayout.initialNavigationHeight
 
     private var palette: ThemePalette {
         presetSettings.theme.palette
@@ -32,36 +34,61 @@ internal struct SettingsMenuView: View {
     }
 
     internal var body: some View {
-        TabView(selection: $selectedTab) {
-            generalPage
-                .tabItem { Label("General", systemImage: "gearshape") }
-                .tag(SettingsTab.general)
-                .accessibilityIdentifier("settingsTab_general")
+        let screenHeight = (NSApp.keyWindow?.screen ?? NSScreen.main)?.visibleFrame.height
+            ?? SettingsWindowLayout.fallbackScreenHeight
+        let windowHeight = SettingsWindowLayout.windowHeight(
+            pageContentHeight: pageContentHeight,
+            navigationHeight: navigationHeight,
+            screenHeight: screenHeight
+        )
+        let pageViewportHeight = SettingsWindowLayout.pageViewportHeight(
+            windowHeight: windowHeight,
+            navigationHeight: navigationHeight
+        )
 
-            sessionsPage
-                .tabItem { Label("Sessions", systemImage: "timer") }
-                .tag(SettingsTab.sessions)
-                .accessibilityIdentifier("settingsTab_sessions")
+        VStack(spacing: 0) {
+            SettingsTabNavigation(
+                selectedTab: $selectedTab,
+                theme: presetSettings.theme
+            )
+            .background {
+                GeometryReader { geometry in
+                    Color.clear.preference(
+                        key: SettingsNavigationHeightPreferenceKey.self,
+                        value: geometry.size.height
+                    )
+                }
+            }
 
-            notificationsPage
-                .tabItem { Label("Notifications", systemImage: "bell") }
-                .tag(SettingsTab.notifications)
-                .accessibilityIdentifier("settingsTab_notifications")
+            Divider()
 
-            shortcutsPage
-                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
-                .tag(SettingsTab.shortcuts)
-                .accessibilityIdentifier("settingsTab_shortcuts")
-
-            advancedPage
-                .tabItem { Label("Advanced", systemImage: "slider.horizontal.3") }
-                .tag(SettingsTab.advanced)
-                .accessibilityIdentifier("settingsTab_advanced")
+            ScrollView {
+                activePage
+                    .background {
+                        GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: SettingsPageHeightPreferenceKey.self,
+                                value: geometry.size.height
+                            )
+                        }
+                    }
+            }
+            .frame(height: pageViewportHeight)
         }
+        .frame(height: windowHeight)
         .foregroundColor(palette.foreground)
         .tint(palette.accent)
         .background(palette.background)
         .preferredColorScheme(palette.colorScheme)
+        .animation(.easeInOut(duration: 0.2), value: windowHeight)
+        .onPreferenceChange(SettingsPageHeightPreferenceKey.self) { height in
+            guard height > 0 else { return }
+            pageContentHeight = ceil(height)
+        }
+        .onPreferenceChange(SettingsNavigationHeightPreferenceKey.self) { height in
+            guard height > 0 else { return }
+            navigationHeight = ceil(height)
+        }
         .task {
             await notificationService.refreshAuthorizationStatus()
         }
@@ -69,28 +96,42 @@ internal struct SettingsMenuView: View {
 }
 
 private extension SettingsMenuView {
+    @ViewBuilder
+    var activePage: some View {
+        switch selectedTab {
+        case .general:
+            generalPage
+        case .sessions:
+            sessionsPage
+        case .notifications:
+            notificationsPage
+        case .shortcuts:
+            shortcutsPage
+        case .advanced:
+            advancedPage
+        }
+    }
+
     func page(
         title: String,
         description: String,
         @ViewBuilder content: () -> some View
     ) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.title2.weight(.semibold))
-                Text(description)
-                    .font(.callout)
-                    .foregroundColor(palette.secondaryForeground)
-                    .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.title2.weight(.semibold))
+            Text(description)
+                .font(.callout)
+                .foregroundColor(palette.secondaryForeground)
+                .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 16) {
-                    content()
-                }
-                .padding(.top, 18)
+            VStack(alignment: .leading, spacing: 16) {
+                content()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
+            .padding(.top, 18)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
         .background(palette.background)
     }
 
@@ -241,7 +282,7 @@ private extension SettingsMenuView {
 
             settingsGroup(title: "About Oak", systemImage: "info.circle") {
                 settingRow("Version") {
-                    Text(currentVersion)
+                    Text(SettingsVersion.current)
                         .foregroundColor(palette.secondaryForeground)
                 }
 
@@ -437,28 +478,6 @@ private extension SettingsMenuView {
         )
     }
 
-    var currentVersion: String {
-        func getVersion(from bundle: Bundle) -> (String, String)? {
-            guard let shortVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String,
-                  let buildVersion = bundle.infoDictionary?["CFBundleVersion"] as? String
-            else {
-                return nil
-            }
-            return (shortVersion, buildVersion)
-        }
-
-        let appBundle = Bundle.main
-        let fallbackBundle = Bundle(identifier: "com.productsway.oak.app") ?? Bundle(for: FocusSessionViewModel.self)
-
-        if let (shortVersion, buildVersion) = getVersion(from: appBundle) {
-            return "v\(shortVersion) (\(buildVersion))"
-        } else if let (shortVersion, buildVersion) = getVersion(from: fallbackBundle) {
-            return "v\(shortVersion) (\(buildVersion))"
-        }
-
-        return "v0.0.0 (0)"
-    }
-
     var validRangeDescription: String {
         let focusRange = "\(PresetSettingsStore.minWorkMinutes)-\(PresetSettingsStore.maxWorkMinutes)"
         let breakRange = "\(PresetSettingsStore.minBreakMinutes)-\(PresetSettingsStore.maxBreakMinutes)"
@@ -466,12 +485,4 @@ private extension SettingsMenuView {
             + "-\(PresetSettingsStore.maxRoundsBeforeLongBreak)"
         return "Valid range: Focus \(focusRange) min, Break \(breakRange) min, Long cycle \(cycleRange) sessions"
     }
-}
-
-private enum SettingsTab: Hashable {
-    case general
-    case sessions
-    case notifications
-    case shortcuts
-    case advanced
 }

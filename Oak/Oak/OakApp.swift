@@ -14,8 +14,12 @@ internal struct OakApp: App {
                 keyboardShortcutService: appDelegate.keyboardShortcutService,
                 progressManager: appDelegate.notchWindowController?.viewModel.progressManager
             )
-            .frame(minWidth: 520, idealWidth: 560, minHeight: 520, idealHeight: 620)
+            .frame(
+                minWidth: SettingsWindowLayout.minimumWidth,
+                idealWidth: SettingsWindowLayout.idealWidth
+            )
         }
+        .windowResizability(.contentSize)
     }
 }
 

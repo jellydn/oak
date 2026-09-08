@@ -192,6 +192,7 @@ internal final class AccessibilityTests: XCTestCase {
             "autoStartCountdown",
             "presetToggleButton",
             "themePicker",
+            "settingsTabBar",
             "settingsTab_general",
             "settingsTab_sessions",
             "settingsTab_notifications",
@@ -205,5 +206,57 @@ internal final class AccessibilityTests: XCTestCase {
             uniqueIdentifiers.count,
             "All accessibility identifiers should be unique"
         )
+    }
+
+    internal func testSettingsWindowHeightFitsShortContent() {
+        let height = SettingsWindowLayout.windowHeight(
+            pageContentHeight: 180,
+            navigationHeight: 52,
+            screenHeight: 900
+        )
+
+        XCTAssertEqual(height, SettingsWindowLayout.minimumHeight)
+    }
+
+    internal func testSettingsWindowHeightTracksActiveTabContent() {
+        let height = SettingsWindowLayout.windowHeight(
+            pageContentHeight: 430,
+            navigationHeight: 52,
+            screenHeight: 900
+        )
+
+        XCTAssertEqual(height, 483)
+    }
+
+    internal func testSettingsWindowHeightBoundsLargeAccessibilityContent() {
+        let height = SettingsWindowLayout.windowHeight(
+            pageContentHeight: 1200,
+            navigationHeight: 80,
+            screenHeight: 700
+        )
+
+        XCTAssertEqual(height, 595)
+        XCTAssertEqual(
+            SettingsWindowLayout.pageViewportHeight(windowHeight: height, navigationHeight: 80),
+            514
+        )
+    }
+
+    internal func testSettingsTabNavigationHasStableLabelsAndMinimumWidth() {
+        XCTAssertEqual(
+            SettingsTab.allCases.map(\.title),
+            ["General", "Sessions", "Notifications", "Shortcuts", "Advanced"]
+        )
+        XCTAssertEqual(
+            SettingsTab.allCases.map(\.accessibilityIdentifier),
+            [
+                "settingsTab_general",
+                "settingsTab_sessions",
+                "settingsTab_notifications",
+                "settingsTab_shortcuts",
+                "settingsTab_advanced"
+            ]
+        )
+        XCTAssertGreaterThanOrEqual(SettingsWindowLayout.minimumWidth, 560)
     }
 }
