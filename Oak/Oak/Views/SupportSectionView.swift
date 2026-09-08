@@ -1,7 +1,7 @@
 import SwiftUI
 
 internal struct SupportSectionView: View {
-    var theme: AppTheme = .oak
+    internal let theme: AppTheme
 
     private var palette: ThemePalette { theme.palette }
 

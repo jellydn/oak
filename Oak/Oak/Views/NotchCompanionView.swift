@@ -48,7 +48,7 @@ internal struct NotchCompanionView: View {
         NotchVisualStyle.make(theme: viewModel.presetSettings.theme, isInsideNotch: isInsideNotch)
     }
 
-    var palette: ThemePalette { viewModel.presetSettings.theme.palette }
+    internal var palette: ThemePalette { viewModel.presetSettings.theme.palette }
 
     private var isInsideNotch: Bool {
         let settings = viewModel.presetSettings
@@ -109,7 +109,7 @@ internal struct NotchCompanionView: View {
         }
         .frame(height: NotchLayout.height)
         .tint(palette.accent)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(palette.colorScheme)
         .contentShape(Rectangle())
         .onChange(of: isExpanded) { expanded in
             notifyExpansionChanged(expanded)

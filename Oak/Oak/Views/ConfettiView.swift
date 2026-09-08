@@ -4,11 +4,11 @@ internal struct ConfettiView: View {
     static let animationDuration: Double = 1.2
 
     let count: Int
-    let colors: [Color]
+    internal let colors: [Color]
     @State private var animating = false
     @State private var particles: [ConfettiParticle] = []
 
-    init(count: Int = 30, colors: [Color] = ConfettiPiece.colors) {
+    internal init(count: Int = 30, colors: [Color] = ConfettiPiece.colors) {
         self.count = count
         self.colors = colors
     }
@@ -43,7 +43,7 @@ internal struct ConfettiParticle: Identifiable {
     let rotation: Double
     let color: Color
 
-    static func generate(count: Int, colors: [Color] = ConfettiPiece.colors) -> [ConfettiParticle] {
+    internal static func generate(count: Int, colors: [Color] = ConfettiPiece.colors) -> [ConfettiParticle] {
         guard count > 0, !colors.isEmpty else { return [] }
         return (0 ..< count).map { index in
             ConfettiParticle(

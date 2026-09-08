@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Selectable Oak, Kanagawa, Dracula, and Tokyo Night themes with persisted app-wide colors
+- Selectable Oak, Kanagawa Wave/Lotus, Dracula/Alucard, and Tokyo Night Moon/Day themes with persisted app-wide colors
 - Keyboard shortcuts for timer control — Space to start/pause/resume, Escape to reset. Configurable in Settings with optional global hotkeys (#142)
 - Progress data export/import — Export session history as JSON or CSV, import from backup files. Data section in Settings with NSSavePanel/NSOpenPanel (#141)
 - Domain glossary (`CONTEXT.md`) — formal definitions for Session State, Preset, Round, Display Target, and other core terms

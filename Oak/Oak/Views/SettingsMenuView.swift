@@ -109,7 +109,7 @@ internal struct SettingsMenuView: View {
         .foregroundColor(palette.foreground)
         .tint(palette.accent)
         .background(palette.background)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(palette.colorScheme)
         .task {
             await notificationService.refreshAuthorizationStatus()
         }

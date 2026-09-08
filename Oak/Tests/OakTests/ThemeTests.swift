@@ -26,25 +26,48 @@ internal final class ThemeTests: XCTestCase {
     }
 
     func testThemeChoicesHaveStableNames() {
-        XCTAssertEqual(AppTheme.allCases.map(\.displayName), ["Oak", "Kanagawa", "Dracula", "Tokyo Night"])
+        XCTAssertEqual(
+            AppTheme.allCases.map(\.displayName),
+            [
+                "Oak",
+                "Kanagawa",
+                "Kanagawa Lotus",
+                "Dracula",
+                "Alucard (Dracula Light)",
+                "Tokyo Night",
+                "Tokyo Night Day"
+            ]
+        )
     }
 
     func testThemeDefaultsToOak() {
         XCTAssertEqual(presetSettings.theme, .oak)
     }
 
-    func testNamedThemesUseCanonicalCoreColors() throws {
+    func testNamedThemesUseDocumentedCoreColors() throws {
         try assertColor(.kanagawa, background: 0x1F1F28, foreground: 0xDCD7BA, accent: 0x7E9CD8)
+        try assertColor(.kanagawaLotus, background: 0xF2ECBC, foreground: 0x43436C, accent: 0x4D699B)
         try assertColor(.dracula, background: 0x282A36, foreground: 0xF8F8F2, accent: 0x8BE9FD)
+        try assertColor(.alucard, background: 0xFFFBEB, foreground: 0x1F1F1F, accent: 0x036A96)
         try assertColor(.tokyoNight, background: 0x222436, foreground: 0xC8D3F5, accent: 0x82AAFF)
+        try assertColor(.tokyoNightDay, background: 0xE1E2E7, foreground: 0x2E5857, accent: 0x006A83)
     }
 
-    func testSelectedThemePersists() {
-        presetSettings.setTheme(.kanagawa)
+    func testEachSelectedThemePersists() {
+        for theme in AppTheme.allCases {
+            presetSettings.setTheme(theme)
 
-        let reloadedSettings = PresetSettingsStore(userDefaults: userDefaults)
+            let reloadedSettings = PresetSettingsStore(userDefaults: userDefaults)
 
-        XCTAssertEqual(reloadedSettings.theme, .kanagawa)
+            XCTAssertEqual(reloadedSettings.theme, theme)
+        }
+    }
+
+    func testThemeColorSchemesMatchTheirVariants() {
+        XCTAssertEqual(
+            AppTheme.allCases.filter { $0.palette.colorScheme == .light },
+            [.kanagawaLotus, .alucard, .tokyoNightDay]
+        )
     }
 
     func testUnknownPersistedThemeFallsBackToOak() {
@@ -66,33 +89,29 @@ internal final class ThemeTests: XCTestCase {
     func testThemeTextMeetsWCAGAAContrast() throws {
         for theme in AppTheme.allCases {
             let palette = theme.palette
-            XCTAssertGreaterThanOrEqual(
-                try contrastRatio(palette.foreground, over: palette.background),
-                4.5,
-                "\(theme.displayName) primary text must meet WCAG AA"
-            )
-            XCTAssertGreaterThanOrEqual(
-                try contrastRatio(palette.secondaryForeground, over: palette.background),
-                4.5,
-                "\(theme.displayName) secondary text must meet WCAG AA"
-            )
-            XCTAssertGreaterThanOrEqual(
-                try contrastRatio(palette.subtleForeground, over: palette.background),
-                4.5,
-                "\(theme.displayName) subtle text must meet WCAG AA"
-            )
+            for background in [palette.background, palette.surface] {
+                for color in [palette.foreground, palette.secondaryForeground, palette.subtleForeground] {
+                    XCTAssertGreaterThanOrEqual(
+                        try contrastRatio(color, over: background),
+                        4.5,
+                        "\(theme.displayName) text must meet WCAG AA on each app background"
+                    )
+                }
+            }
         }
     }
 
     func testThemeActionColorsMeetNonTextContrast() throws {
         for theme in AppTheme.allCases {
             let palette = theme.palette
-            for color in [palette.accent, palette.success, palette.warning, palette.error] {
-                XCTAssertGreaterThanOrEqual(
-                    try contrastRatio(color, over: palette.background),
-                    3,
-                    "\(theme.displayName) action colors must remain visible on the app background"
-                )
+            for background in [palette.background, palette.surface] {
+                for color in [palette.accent, palette.success, palette.warning, palette.error] {
+                    XCTAssertGreaterThanOrEqual(
+                        try contrastRatio(color, over: background),
+                        3,
+                        "\(theme.displayName) action colors must remain visible on each app background"
+                    )
+                }
             }
         }
     }

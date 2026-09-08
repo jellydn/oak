@@ -117,7 +117,7 @@ internal struct ProgressMenuView: View {
         .foregroundColor(palette.foreground)
         .tint(palette.accent)
         .background(palette.background)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(palette.colorScheme)
     }
 
     private func colorForSessionType(_ type: SessionType) -> Color {

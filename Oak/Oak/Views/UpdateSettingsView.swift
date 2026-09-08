@@ -2,7 +2,7 @@ import SwiftUI
 
 internal struct UpdateSettingsView: View {
     @ObservedObject var sparkleUpdater: SparkleUpdater
-    var theme: AppTheme = .oak
+    internal let theme: AppTheme
 
     private var palette: ThemePalette { theme.palette }
 

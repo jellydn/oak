@@ -1,13 +1,13 @@
 import SwiftUI
 
 internal extension NotchVisualStyle {
-    static func make(theme: AppTheme, isInsideNotch: Bool) -> NotchVisualStyle {
+    internal static func make(theme: AppTheme, isInsideNotch: Bool) -> NotchVisualStyle {
         let palette = theme.palette
         return NotchVisualStyle(
             isInsideNotchStyle: isInsideNotch,
             backgroundColors: [
                 palette.background,
-                palette.surface.opacity(0.92)
+                palette.surface
             ],
             borderColor: .clear,
             borderWidth: 0,

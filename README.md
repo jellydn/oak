@@ -53,8 +53,17 @@ In today's world of constant distractions, deep work has become increasingly rar
 - 📊 **Local tracking**: Track daily focus minutes, completed sessions, and 7-day streaks
 - 🕒 **Session timeline**: See each focus session and break from today with start/end times and durations
 - 💾 **Data export**: Export your progress as JSON or CSV, or import from a backup file
-- 🎨 **Themes**: Choose Oak, Kanagawa, Dracula, or Tokyo Night in Settings
+- 🎨 **Themes**: Choose Oak, Kanagawa, Dracula, Tokyo Night, or their light variants in Settings
 - 🔄 **Auto-update**: Seamless updates via Sparkle framework
+
+### Theme palettes
+
+Oak follows the official [Kanagawa Wave and Lotus](https://github.com/rebelot/kanagawa.nvim),
+[Dracula and Alucard](https://github.com/dracula/dracula-theme), and
+[Tokyo Night Moon and Day](https://github.com/folke/tokyonight.nvim) palettes. Alucard is Dracula's official
+open-source light counterpart, so Oak labels it “Alucard (Dracula Light).” Where an editor token has insufficient
+contrast in Oak's compact controls, Oak uses a stronger token from the same palette. Dracula's error red is minimally
+brightened because its canonical red does not reach 3:1 against the canonical current-line surface.
 
 ### Finding sounds to import
 

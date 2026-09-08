@@ -22,7 +22,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var alwaysOnTop: Bool
     @Published private(set) var showBelowNotch: Bool
     @Published private(set) var autoStartNextInterval: Bool
-    @Published private(set) var theme: AppTheme
+    @Published internal private(set) var theme: AppTheme
 
     private let userDefaults: UserDefaults
 
@@ -221,7 +221,7 @@ internal final class PresetSettingsStore: ObservableObject {
         BehaviorConfig.saveAutoStartNext(value, to: userDefaults)
     }
 
-    func setTheme(_ value: AppTheme) {
+    internal func setTheme(_ value: AppTheme) {
         guard theme != value else { return }
         theme = value
         ThemeConfig.save(value, to: userDefaults)

@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 internal struct AudioMenuView: View {
     @ObservedObject var audioManager: AudioManager
     @Binding var isImporting: Bool
-    var theme: AppTheme = .oak
+    internal let theme: AppTheme
     @State private var importError: String?
 
     private var palette: ThemePalette { theme.palette }
@@ -74,7 +74,7 @@ internal struct AudioMenuView: View {
         .foregroundColor(palette.foreground)
         .tint(palette.accent)
         .background(palette.background)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(palette.colorScheme)
         .fileImporter(
             isPresented: $isImporting,
             allowedContentTypes: [.audio],
