@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 internal enum SettingsTab: String, CaseIterable, Identifiable {
@@ -40,26 +41,97 @@ internal struct SettingsTabNavigation: View {
     }
 
     internal var body: some View {
-        Picker("Settings section", selection: $selectedTab) {
-            ForEach(SettingsTab.allCases) { tab in
-                Text(tab.title)
-                    .tag(tab)
-                    .accessibilityIdentifier(tab.accessibilityIdentifier)
-            }
+        SettingsSegmentedControl(selectedTab: $selectedTab, theme: theme)
+            .frame(height: 28)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, SettingsWindowLayout.navigationHorizontalPadding)
+            .padding(.vertical, 12)
+            .background(palette.surface)
+            .accessibilityIdentifier("settingsTabBar")
+    }
+}
+
+internal struct SettingsSegmentedControl: NSViewRepresentable {
+    @Binding internal var selectedTab: SettingsTab
+    internal let theme: AppTheme
+
+    internal init(selectedTab: Binding<SettingsTab>, theme: AppTheme) {
+        _selectedTab = selectedTab
+        self.theme = theme
+    }
+
+    internal func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    internal func makeNSView(context: Context) -> NSSegmentedControl {
+        let control = Self.makeControl(
+            target: context.coordinator,
+            action: #selector(Coordinator.selectionChanged(_:))
+        )
+        update(control)
+        return control
+    }
+
+    internal func updateNSView(_ control: NSSegmentedControl, context: Context) {
+        context.coordinator.parent = self
+        update(control)
+    }
+
+    internal func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        nsView _: NSSegmentedControl,
+        context _: Context
+    ) -> CGSize? {
+        guard let width = proposal.width else { return nil }
+        return CGSize(width: width, height: 28)
+    }
+
+    internal static func makeControl(target: AnyObject?, action: Selector?) -> NSSegmentedControl {
+        let control = NSSegmentedControl(
+            labels: SettingsTab.allCases.map(\.title),
+            trackingMode: .selectOne,
+            target: target,
+            action: action
+        )
+        control.segmentDistribution = .fillEqually
+        control.segmentStyle = .rounded
+        control.setAccessibilityLabel("Settings section")
+        control.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        control.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+        for (index, tab) in SettingsTab.allCases.enumerated() {
+            control.setWidth(0, forSegment: index)
+            control.setToolTip(tab.title, forSegment: index)
         }
-        .labelsHidden()
-        .pickerStyle(.segmented)
-        .controlSize(.large)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .background(palette.surface)
-        .accessibilityIdentifier("settingsTabBar")
+        return control
+    }
+
+    private func update(_ control: NSSegmentedControl) {
+        control.selectedSegment = SettingsTab.allCases.firstIndex(of: selectedTab) ?? 0
+        control.selectedSegmentBezelColor = NSColor(theme.palette.accent)
+    }
+
+    @MainActor
+    internal final class Coordinator: NSObject {
+        internal var parent: SettingsSegmentedControl
+
+        internal init(parent: SettingsSegmentedControl) {
+            self.parent = parent
+        }
+
+        @objc internal func selectionChanged(_ control: NSSegmentedControl) {
+            guard SettingsTab.allCases.indices.contains(control.selectedSegment) else { return }
+            parent.selectedTab = SettingsTab.allCases[control.selectedSegment]
+        }
     }
 }
 
 internal enum SettingsWindowLayout {
-    internal static let minimumWidth: CGFloat = 560
+    internal static let navigationHorizontalPadding: CGFloat = 20
+    internal static let minimumTabSegmentWidth: CGFloat = 104
+    internal static let minimumWidth = navigationHorizontalPadding * 2
+        + minimumTabSegmentWidth * CGFloat(SettingsTab.allCases.count)
     internal static let idealWidth: CGFloat = 600
     internal static let minimumHeight: CGFloat = 360
     internal static let maximumHeight: CGFloat = 760

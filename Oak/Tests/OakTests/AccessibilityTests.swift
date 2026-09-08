@@ -259,4 +259,23 @@ internal final class AccessibilityTests: XCTestCase {
         )
         XCTAssertGreaterThanOrEqual(SettingsWindowLayout.minimumWidth, 560)
     }
+
+    internal func testSettingsTabControlUsesFiveEqualSegments() {
+        let control = SettingsSegmentedControl.makeControl(target: nil, action: nil)
+
+        XCTAssertEqual(control.segmentCount, 5)
+        XCTAssertEqual(control.segmentDistribution, .fillEqually)
+        XCTAssertEqual(
+            (0 ..< control.segmentCount).compactMap { control.label(forSegment: $0) },
+            SettingsTab.allCases.map(\.title)
+        )
+        let minimumSegmentWidth = (SettingsWindowLayout.minimumWidth
+            - SettingsWindowLayout.navigationHorizontalPadding * 2)
+            / CGFloat(control.segmentCount)
+        let normalSegmentWidth = (SettingsWindowLayout.idealWidth
+            - SettingsWindowLayout.navigationHorizontalPadding * 2)
+            / CGFloat(control.segmentCount)
+        XCTAssertEqual(minimumSegmentWidth, SettingsWindowLayout.minimumTabSegmentWidth)
+        XCTAssertEqual(normalSegmentWidth, 112)
+    }
 }
