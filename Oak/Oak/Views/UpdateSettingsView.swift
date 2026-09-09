@@ -1,41 +1,56 @@
 import SwiftUI
 
 internal struct UpdateSettingsView: View {
-    @ObservedObject var sparkleUpdater: SparkleUpdater
+    @ObservedObject internal var sparkleUpdater: SparkleUpdater
+    internal let theme: AppTheme
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private var palette: ThemePalette {
+        theme.palette
+    }
+
+    internal var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
             if !sparkleUpdater.isConfigured {
                 Text("Update signing is not configured (missing SUPublicEDKey).")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.secondaryForeground)
             }
 
-            Toggle(
+            updateToggle(
                 "Automatically check for updates",
                 isOn: Binding(
                     get: { sparkleUpdater.automaticallyChecksForUpdates },
                     set: { sparkleUpdater.setAutomaticallyChecksForUpdates($0) }
                 )
             )
-            .font(.caption)
             .disabled(!sparkleUpdater.isConfigured)
 
-            Toggle(
+            updateToggle(
                 "Automatically download updates",
                 isOn: Binding(
                     get: { sparkleUpdater.automaticallyDownloadsUpdates },
                     set: { sparkleUpdater.setAutomaticallyDownloadsUpdates($0) }
                 )
             )
-            .font(.caption)
             .disabled(!sparkleUpdater.isConfigured || !sparkleUpdater.automaticallyChecksForUpdates)
 
             Button("Check for Updates Now") {
                 sparkleUpdater.checkForUpdates()
             }
-            .buttonStyle(.link)
+            .buttonStyle(.bordered)
             .disabled(!sparkleUpdater.isConfigured || !sparkleUpdater.canCheckForUpdates)
+        }
+    }
+
+    private func updateToggle(_ title: String, isOn: Binding<Bool>) -> some View {
+        HStack(spacing: 16) {
+            Text(title)
+
+            Spacer(minLength: 12)
+
+            Toggle(title, isOn: isOn)
+                .labelsHidden()
+                .toggleStyle(.switch)
         }
     }
 }

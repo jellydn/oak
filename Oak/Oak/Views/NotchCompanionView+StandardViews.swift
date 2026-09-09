@@ -11,10 +11,10 @@ extension NotchCompanionView {
                     action: { viewModel.startSession(using: presetSelection) },
                     label: {
                         Image(systemName: "play.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.background)
                             .font(.system(size: 9, weight: .bold))
                             .frame(width: 16, height: 16)
-                            .background(Circle().fill(Color.green.opacity(0.85)))
+                            .background(Circle().fill(palette.success))
                     }
                 )
                 .buttonStyle(.plain)
@@ -26,10 +26,10 @@ extension NotchCompanionView {
                     HStack(spacing: 4) {
                         Text("\(viewModel.autoStartCountdown)")
                             .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                            .foregroundColor(.blue.opacity(0.95))
+                            .foregroundColor(palette.accent)
                         Text("starting...")
                             .font(.system(size: 8, weight: .medium))
-                            .foregroundColor(.white.opacity(0.52))
+                            .foregroundColor(palette.subtleForeground)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Auto-starting in \(viewModel.autoStartCountdown) seconds")
@@ -45,10 +45,10 @@ extension NotchCompanionView {
                     action: { viewModel.startNextSession() },
                     label: {
                         Image(systemName: "forward.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.background)
                             .font(.system(size: 9, weight: .bold))
                             .frame(width: 16, height: 16)
-                            .background(Circle().fill(Color.blue.opacity(0.88)))
+                            .background(Circle().fill(palette.accent))
                     }
                 )
                 .buttonStyle(.plain)
@@ -78,15 +78,15 @@ extension NotchCompanionView {
                     CircularProgressRing(
                         progress: viewModel.progressPercentage,
                         lineWidth: 2.5,
-                        ringColor: viewModel.isPaused ? .orange : .white,
-                        backgroundColor: .white.opacity(0.2)
+                        ringColor: viewModel.isPaused ? palette.warning : palette.foreground,
+                        backgroundColor: palette.foreground.opacity(0.2)
                     )
                     .frame(width: size, height: size)
                     if showSessionType {
                         let sessionType = viewModel.currentSessionType
                         Text(sessionType == "Long Break" ? "Long\nBreak" : sessionType)
                             .font(.system(size: fontSize * 0.5, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.9))
+                            .foregroundColor(palette.foreground)
                             .lineLimit(2)
                             .minimumScaleFactor(0.65)
                             .multilineTextAlignment(.center)
@@ -101,8 +101,8 @@ extension NotchCompanionView {
                     .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
                     .foregroundColor(
                         viewModel.isPaused
-                            ? Color.orange.opacity(0.95)
-                            : Color.white.opacity(0.95)
+                            ? palette.warning
+                            : palette.foreground
                     )
                     .accessibilityLabel("Time remaining: \(viewModel.displayTime)")
                     .accessibilityValue(viewModel.isPaused ? "Paused" : "Running")
@@ -117,10 +117,10 @@ extension NotchCompanionView {
                 action: { viewModel.startSession(using: presetSelection) },
                 label: {
                     Image(systemName: "play.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(palette.background)
                         .font(.system(size: 10, weight: .bold))
                         .frame(width: controlSize, height: controlSize)
-                        .background(Color.green.opacity(0.88))
+                        .background(palette.success)
                         .clipShape(Circle())
                 }
             )
@@ -147,7 +147,7 @@ extension NotchCompanionView {
                         countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
                         Text(viewModel.currentSessionType)
                             .font(.system(size: 8, weight: .medium))
-                            .foregroundColor(.white.opacity(0.52))
+                            .foregroundColor(palette.subtleForeground)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
@@ -159,14 +159,14 @@ extension NotchCompanionView {
                         HStack(spacing: 4) {
                             Text("\(viewModel.autoStartCountdown)")
                                 .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                                .foregroundColor(.blue.opacity(0.95))
+                                .foregroundColor(palette.accent)
                             Text("starting...")
                                 .font(.system(size: 8, weight: .medium))
-                                .foregroundColor(.white.opacity(0.62))
+                                .foregroundColor(palette.secondaryForeground)
                         }
                         Text("Next: \(viewModel.currentSessionType)")
                             .font(.system(size: 8, weight: .medium))
-                            .foregroundColor(.white.opacity(0.52))
+                            .foregroundColor(palette.subtleForeground)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel(
@@ -186,7 +186,7 @@ extension NotchCompanionView {
                             countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
                             Text(viewModel.currentSessionType)
                                 .font(.system(size: 8, weight: .medium))
-                                .foregroundColor(.white.opacity(0.52))
+                                .foregroundColor(palette.subtleForeground)
                         }
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
@@ -206,7 +206,7 @@ extension NotchCompanionView {
                         countdownDisplay(mode: displayMode, size: expandedRingSize, fontSize: 14)
                         Text(viewModel.currentSessionType)
                             .font(.system(size: 8, weight: .medium))
-                            .foregroundColor(.white.opacity(0.52))
+                            .foregroundColor(palette.subtleForeground)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Time remaining: \(viewModel.displayTime), \(viewModel.currentSessionType)")
@@ -219,10 +219,10 @@ extension NotchCompanionView {
                     action: { viewModel.pauseSession() },
                     label: {
                         Image(systemName: "pause.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.background)
                             .font(.system(size: 9, weight: .bold))
                             .frame(width: controlSize, height: controlSize)
-                            .background(Color.orange.opacity(0.88))
+                            .background(palette.warning)
                             .clipShape(Circle())
                     }
                 )
@@ -234,10 +234,10 @@ extension NotchCompanionView {
                     action: { viewModel.resumeSession() },
                     label: {
                         Image(systemName: "play.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.background)
                             .font(.system(size: 9, weight: .bold))
                             .frame(width: controlSize, height: controlSize)
-                            .background(Color.green.opacity(0.88))
+                            .background(palette.success)
                             .clipShape(Circle())
                     }
                 )
@@ -249,10 +249,10 @@ extension NotchCompanionView {
                     action: { viewModel.startNextSession() },
                     label: {
                         Image(systemName: "forward.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(palette.background)
                             .font(.system(size: 9, weight: .bold))
                             .frame(width: controlSize, height: controlSize)
-                            .background(Color.blue.opacity(0.88))
+                            .background(palette.accent)
                             .clipShape(Circle())
                     }
                 )
@@ -265,10 +265,10 @@ extension NotchCompanionView {
                 action: { viewModel.resetSession() },
                 label: {
                     Image(systemName: "stop.fill")
-                        .foregroundColor(.white)
+                        .foregroundColor(palette.background)
                         .font(.system(size: 9, weight: .bold))
                         .frame(width: 18, height: 18)
-                        .background(Color.red.opacity(0.88))
+                        .background(palette.error)
                         .clipShape(Circle())
                 }
             )

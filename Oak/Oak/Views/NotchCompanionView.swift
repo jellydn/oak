@@ -45,7 +45,11 @@ internal struct NotchCompanionView: View {
     }
 
     var visualStyle: NotchVisualStyle {
-        NotchVisualStyle.make(isInsideNotch: isInsideNotch)
+        NotchVisualStyle.make(theme: viewModel.presetSettings.theme, isInsideNotch: isInsideNotch)
+    }
+
+    internal var palette: ThemePalette {
+        viewModel.presetSettings.theme.palette
     }
 
     private var isInsideNotch: Bool {
@@ -101,11 +105,13 @@ internal struct NotchCompanionView: View {
             .scaleEffect(animateCompletion ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: animateCompletion)
             if showConfetti {
-                ConfettiView()
+                ConfettiView(colors: palette.confettiColors)
                     .allowsHitTesting(false)
             }
         }
         .frame(height: NotchLayout.height)
+        .tint(palette.accent)
+        .preferredColorScheme(palette.colorScheme)
         .contentShape(Rectangle())
         .onChange(of: isExpanded) { expanded in
             notifyExpansionChanged(expanded)
@@ -151,7 +157,7 @@ extension NotchCompanionView {
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.system(size: 6, weight: .semibold))
                 }
-                .foregroundColor(.white.opacity(0.68))
+                .foregroundColor(palette.secondaryForeground)
             }
         )
         .buttonStyle(.plain)
@@ -168,13 +174,15 @@ extension NotchCompanionView {
                     Circle()
                         .fill(
                             viewModel.audioManager.isPlaying
-                                ? Color.blue.opacity(isExpanded ? 0.25 : 0.34)
-                                : Color.white.opacity(visualStyle.neutralControlOpacity)
+                                ? palette.accent.opacity(isExpanded ? 0.25 : 0.34)
+                                : palette.foreground.opacity(visualStyle.neutralControlOpacity)
                         )
                         .frame(width: controlSize, height: controlSize)
 
                     Image(systemName: viewModel.audioManager.selectedSound.systemImageName)
-                        .foregroundColor(viewModel.audioManager.isPlaying ? .blue : .white.opacity(0.7))
+                        .foregroundColor(
+                            viewModel.audioManager.isPlaying ? palette.accent : palette.secondaryForeground
+                        )
                         .font(.system(size: 9))
                 }
             }
@@ -186,12 +194,13 @@ extension NotchCompanionView {
         .popover(isPresented: $showAudioMenu) {
             AudioMenuView(
                 audioManager: viewModel.audioManager,
-                isImporting: $isAudioImporterPresented
+                isImporting: $isAudioImporterPresented,
+                theme: viewModel.presetSettings.theme
             )
-                .frame(width: 280)
-                .dismissOnClickOutside(isDismissalSuppressed: $isAudioImporterPresented) { [self] in
-                    showAudioMenu = false
-                }
+            .frame(width: 280)
+            .dismissOnClickOutside(isDismissalSuppressed: $isAudioImporterPresented) { [self] in
+                showAudioMenu = false
+            }
         }
     }
 
@@ -203,18 +212,18 @@ extension NotchCompanionView {
                     Circle()
                         .fill(
                             viewModel.streakDays > 0
-                                ? Color.orange.opacity(isExpanded ? 0.24 : 0.34)
-                                : Color.white.opacity(visualStyle.neutralControlOpacity)
+                                ? palette.warning.opacity(isExpanded ? 0.24 : 0.34)
+                                : palette.foreground.opacity(visualStyle.neutralControlOpacity)
                         )
                         .frame(width: controlSize, height: controlSize)
 
                     if viewModel.streakDays > 0 {
                         Text("\(viewModel.streakDays)")
                             .font(.system(size: 8, weight: .semibold))
-                            .foregroundColor(.orange)
+                            .foregroundColor(palette.warning)
                     } else {
                         Image(systemName: "chart.bar.fill")
-                            .foregroundColor(.white.opacity(0.7))
+                            .foregroundColor(palette.secondaryForeground)
                             .font(.system(size: 9))
                     }
                 }
@@ -243,11 +252,11 @@ extension NotchCompanionView {
             label: {
                 ZStack {
                     Circle()
-                        .fill(Color.white.opacity(visualStyle.neutralControlOpacity))
+                        .fill(palette.foreground.opacity(visualStyle.neutralControlOpacity))
                         .frame(width: controlSize, height: controlSize)
 
                     Image(systemName: "gearshape.fill")
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(palette.secondaryForeground)
                         .font(.system(size: 9))
                 }
             }
@@ -286,11 +295,11 @@ extension NotchCompanionView {
             label: {
                 Image(systemName: isExpanded ? "chevron.compact.left" : "chevron.compact.right")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.75))
+                    .foregroundColor(palette.secondaryForeground)
                     .frame(width: controlSize, height: controlSize)
                     .background(
                         Circle()
-                            .fill(Color.white.opacity(visualStyle.toggleControlOpacity))
+                            .fill(palette.foreground.opacity(visualStyle.toggleControlOpacity))
                     )
             }
         )
@@ -312,7 +321,7 @@ extension NotchCompanionView {
         .padding(2)
         .background(
             Capsule(style: .continuous)
-                .fill(Color.white.opacity(visualStyle.presetCapsuleOpacity))
+                .fill(palette.foreground.opacity(visualStyle.presetCapsuleOpacity))
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Preset selector")
@@ -327,11 +336,11 @@ extension NotchCompanionView {
             label: {
                 Text(presetName)
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(isSelected ? .white : .white.opacity(0.62))
+                    .foregroundColor(isSelected ? palette.foreground : palette.secondaryForeground)
                     .frame(minWidth: 54, minHeight: 18)
                     .background(
                         Capsule(style: .continuous)
-                            .fill(isSelected ? Color.white.opacity(0.16) : Color.clear)
+                            .fill(isSelected ? palette.selectedBackground : Color.clear)
                     )
             }
         )

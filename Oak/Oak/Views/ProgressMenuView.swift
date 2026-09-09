@@ -1,13 +1,17 @@
 import SwiftUI
 
 internal struct ProgressMenuView: View {
-    @ObservedObject var viewModel: FocusSessionViewModel
+    @ObservedObject internal var viewModel: FocusSessionViewModel
+    private var palette: ThemePalette {
+        viewModel.presetSettings.theme.palette
+    }
+
     private var completedSessionsText: String {
         let suffix = viewModel.todayCompletedSessions == 1 ? "" : "s"
         return "\(viewModel.todayCompletedSessions) session\(suffix)"
     }
 
-    var body: some View {
+    internal var body: some View {
         VStack(spacing: 16) {
             Text("Today's Progress")
                 .font(.headline)
@@ -16,7 +20,7 @@ internal struct ProgressMenuView: View {
             VStack(spacing: 12) {
                 HStack {
                     Image(systemName: "clock.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(palette.accent)
                         .frame(width: 24)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("\(viewModel.todayFocusMinutes) min")
@@ -24,14 +28,14 @@ internal struct ProgressMenuView: View {
                             .fontWeight(.semibold)
                         Text("Focus Time")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(palette.secondaryForeground)
                     }
                     Spacer()
                 }
 
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundColor(palette.success)
                         .frame(width: 24)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(completedSessionsText)
@@ -39,14 +43,14 @@ internal struct ProgressMenuView: View {
                             .fontWeight(.semibold)
                         Text("Completed")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(palette.secondaryForeground)
                     }
                     Spacer()
                 }
 
                 HStack {
                     Image(systemName: "flame.fill")
-                        .foregroundColor(.orange)
+                        .foregroundColor(palette.warning)
                         .frame(width: 24)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(
@@ -56,7 +60,7 @@ internal struct ProgressMenuView: View {
                         .fontWeight(.semibold)
                         Text("Streak")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(palette.secondaryForeground)
                     }
                     Spacer()
                 }
@@ -71,7 +75,7 @@ internal struct ProgressMenuView: View {
                     Text(String(localized: "Timeline", comment: "Progress menu timeline section title"))
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(palette.secondaryForeground)
                         .padding(.horizontal, 8)
 
                     ScrollView {
@@ -88,18 +92,18 @@ internal struct ProgressMenuView: View {
                                             .fontWeight(.medium)
                                         Text(timeRangeString(start: session.startTime, end: session.endTime))
                                             .font(.caption2)
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(palette.secondaryForeground)
                                     }
 
                                     Spacer()
 
                                     Text("\(session.durationMinutes)m")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(palette.secondaryForeground)
                                 }
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color.secondary.opacity(0.1))
+                                .background(palette.controlBackground)
                                 .cornerRadius(8)
                             }
                         }
@@ -113,13 +117,17 @@ internal struct ProgressMenuView: View {
             }
         }
         .padding()
+        .foregroundColor(palette.foreground)
+        .tint(palette.accent)
+        .background(palette.background)
+        .preferredColorScheme(palette.colorScheme)
     }
 
     private func colorForSessionType(_ type: SessionType) -> Color {
         switch type {
-        case .work: .blue
-        case .shortBreak: .green
-        case .longBreak: .orange
+        case .work: palette.accent
+        case .shortBreak: palette.success
+        case .longBreak: palette.warning
         }
     }
 

@@ -190,7 +190,14 @@ internal final class AccessibilityTests: XCTestCase {
             "startNextButton",
             "countdownDisplay",
             "autoStartCountdown",
-            "presetToggleButton"
+            "presetToggleButton",
+            "themePicker",
+            "settingsTabBar",
+            "settingsTab_general",
+            "settingsTab_sessions",
+            "settingsTab_notifications",
+            "settingsTab_shortcuts",
+            "settingsTab_advanced"
         ]
 
         let uniqueIdentifiers = Set(identifiers)
@@ -198,6 +205,77 @@ internal final class AccessibilityTests: XCTestCase {
             identifiers.count,
             uniqueIdentifiers.count,
             "All accessibility identifiers should be unique"
+        )
+    }
+
+    internal func testSettingsWindowHeightFitsShortContent() {
+        let height = SettingsWindowLayout.windowHeight(
+            pageContentHeight: 180,
+            navigationHeight: 52,
+            screenHeight: 900
+        )
+
+        XCTAssertEqual(height, SettingsWindowLayout.minimumHeight)
+    }
+
+    internal func testSettingsWindowHeightTracksActiveTabContent() {
+        let height = SettingsWindowLayout.windowHeight(
+            pageContentHeight: 430,
+            navigationHeight: 52,
+            screenHeight: 900
+        )
+
+        XCTAssertEqual(height, 483)
+    }
+
+    internal func testSettingsWindowHeightBoundsLargeAccessibilityContent() {
+        let height = SettingsWindowLayout.windowHeight(
+            pageContentHeight: 1200,
+            navigationHeight: 80,
+            screenHeight: 700
+        )
+
+        XCTAssertEqual(height, 595)
+        XCTAssertEqual(
+            SettingsWindowLayout.pageViewportHeight(windowHeight: height, navigationHeight: 80),
+            514
+        )
+    }
+
+    internal func testSettingsTabNavigationHasStableLabelsAndMinimumWidth() {
+        XCTAssertEqual(
+            SettingsTab.allCases.map(\.title),
+            ["General", "Sessions", "Notifications", "Shortcuts", "Advanced"]
+        )
+        XCTAssertEqual(
+            SettingsTab.allCases.map(\.accessibilityIdentifier),
+            [
+                "settingsTab_general",
+                "settingsTab_sessions",
+                "settingsTab_notifications",
+                "settingsTab_shortcuts",
+                "settingsTab_advanced"
+            ]
+        )
+        XCTAssertEqual(
+            SettingsTab.allCases.map(\.symbolName),
+            ["gearshape", "timer", "bell", "keyboard", "slider.horizontal.3"]
+        )
+        XCTAssertGreaterThanOrEqual(SettingsWindowLayout.minimumWidth, 560)
+    }
+
+    internal func testSettingsTabNavigationDividesConstrainedWidthsEqually() {
+        XCTAssertEqual(SettingsTab.allCases.count, 5)
+        XCTAssertEqual(SettingsWindowLayout.tabItemWidth(containerWidth: 400), 67.6, accuracy: 0.001)
+        XCTAssertEqual(
+            SettingsWindowLayout.tabItemWidth(containerWidth: SettingsWindowLayout.minimumWidth),
+            99.6,
+            accuracy: 0.001
+        )
+        XCTAssertEqual(
+            SettingsWindowLayout.tabItemWidth(containerWidth: SettingsWindowLayout.idealWidth),
+            107.6,
+            accuracy: 0.001
         )
     }
 }

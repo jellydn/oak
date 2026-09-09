@@ -22,6 +22,7 @@ internal final class PresetSettingsStore: ObservableObject {
     @Published private(set) var alwaysOnTop: Bool
     @Published private(set) var showBelowNotch: Bool
     @Published private(set) var autoStartNextInterval: Bool
+    @Published internal private(set) var theme: AppTheme
 
     private let userDefaults: UserDefaults
 
@@ -42,6 +43,7 @@ internal final class PresetSettingsStore: ObservableObject {
         SessionDurationConfig.registerDefaults(in: userDefaults)
         DisplayConfig.registerDefaults(in: userDefaults)
         BehaviorConfig.registerDefaults(in: userDefaults)
+        ThemeConfig.registerDefaults(in: userDefaults)
 
         let duration = SessionDurationConfig.read(from: userDefaults)
         shortWorkMinutes = duration.shortWork
@@ -64,6 +66,7 @@ internal final class PresetSettingsStore: ObservableObject {
         playSoundOnSessionCompletion = behavior.playSoundOnSession
         playSoundOnBreakCompletion = behavior.playSoundOnBreak
         autoStartNextInterval = behavior.autoStartNext
+        theme = ThemeConfig.read(from: userDefaults)
 
         ensureDisplayIDsInitialized()
     }
@@ -218,6 +221,12 @@ internal final class PresetSettingsStore: ObservableObject {
         BehaviorConfig.saveAutoStartNext(value, to: userDefaults)
     }
 
+    internal func setTheme(_ value: AppTheme) {
+        guard theme != value else { return }
+        theme = value
+        ThemeConfig.save(value, to: userDefaults)
+    }
+
     // MARK: - Reset
 
     func resetToDefault() {
@@ -235,6 +244,7 @@ internal final class PresetSettingsStore: ObservableObject {
         setAlwaysOnTop(true)
         setShowBelowNotch(false)
         setAutoStartNextInterval(false)
+        setTheme(.oak)
     }
 
     // MARK: - Private helpers
