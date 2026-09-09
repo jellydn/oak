@@ -71,7 +71,7 @@ internal struct SettingsTabNavigation: View {
                 .focused($focusedTab, equals: tab)
                 .help(tab.title)
                 .accessibilityLabel(Text(tab.title))
-                .accessibilityValue(selectedTab == tab ? "Selected" : "")
+                .accessibilityAddTraits(selectedTab == tab ? .isSelected : [])
                 .accessibilityIdentifier(tab.accessibilityIdentifier)
                 .onHover { isHovered in
                     if isHovered {
