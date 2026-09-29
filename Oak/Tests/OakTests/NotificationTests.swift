@@ -117,6 +117,59 @@ internal final class NotificationTests: XCTestCase {
         XCTAssertTrue(notificationService.isAuthorized)
     }
 
+    func testAuthorizationRequestReportsActivationFailure() async {
+        notificationService = NotificationService(
+            applicationActivator: { false },
+            authorizationRequester: {
+                XCTFail("Authorization must not be requested when activation fails")
+                return true
+            },
+            authorizationStatusProvider: { .notDetermined }
+        )
+
+        await notificationService.requestAuthorization()
+
+        XCTAssertEqual(
+            notificationService.authorizationErrorMessage,
+            "Oak could not become active. Close Settings and try again."
+        )
+    }
+
+    func testAuthorizationRequestReportsUnsignedAppError() async {
+        let notificationError = NSError(
+            domain: UNErrorDomain,
+            code: UNError.Code.notificationsNotAllowed.rawValue
+        )
+        notificationService = NotificationService(
+            applicationActivator: { true },
+            authorizationRequester: { throw notificationError },
+            authorizationStatusProvider: { .notDetermined }
+        )
+
+        await notificationService.requestAuthorization()
+
+        XCTAssertEqual(
+            notificationService.authorizationErrorMessage,
+            "Oak cannot request notifications because this copy is not correctly signed. " +
+                "Install the latest release and try again."
+        )
+    }
+
+    func testAuthorizationRequestReportsIncompleteSystemRequest() async {
+        notificationService = NotificationService(
+            applicationActivator: { true },
+            authorizationRequester: { false },
+            authorizationStatusProvider: { .notDetermined }
+        )
+
+        await notificationService.requestAuthorization()
+
+        XCTAssertEqual(
+            notificationService.authorizationErrorMessage,
+            "macOS did not complete the notification permission request. Try again."
+        )
+    }
+
     private func releaseAndDrain(
         _ requestTask: Task<Void, Never>,
         _ activationGate: NotificationTestGate,

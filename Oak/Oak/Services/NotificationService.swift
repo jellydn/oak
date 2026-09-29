@@ -12,6 +12,7 @@ internal protocol SessionCompletionNotifying {
 internal class NotificationService: ObservableObject, SessionCompletionNotifying {
     @Published private(set) var isAuthorized: Bool = false
     @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
+    @Published private(set) var authorizationErrorMessage: String?
 
     private let logger = Logger(subsystem: "com.productsway.oak.app", category: "NotificationService")
     private let applicationActivator: @MainActor () async -> Bool
@@ -39,20 +40,34 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
     }
 
     internal func requestAuthorization() async {
+        authorizationErrorMessage = nil
+
         guard await applicationActivator() else {
-            logger.error("Failed to activate Oak before requesting notification permission")
+            reportAuthorizationError("Oak could not become active. Close Settings and try again.")
             await refreshAuthorizationStatus()
             return
         }
 
         do {
-            _ = try await authorizationRequester()
+            let isGranted = try await authorizationRequester()
             await refreshAuthorizationStatus()
+
+            if !isGranted, authorizationStatus == .notDetermined {
+                reportAuthorizationError("macOS did not complete the notification permission request. Try again.")
+            }
         } catch {
-            if let notificationError = error as? UNError, notificationError.code == .notificationsNotAllowed {
-                logger.info("Notification permission is unavailable for this app configuration.")
+            let nsError = error as NSError
+            if nsError.domain == UNErrorDomain, nsError.code == UNError.Code.notificationsNotAllowed.rawValue {
+                reportAuthorizationError(
+                    "Oak cannot request notifications because this copy is not correctly signed. " +
+                        "Install the latest release and try again.",
+                    error: nsError
+                )
             } else {
-                logger.error("Failed to request notification permission: \(error.localizedDescription)")
+                reportAuthorizationError(
+                    "Oak could not request notification permission. \(error.localizedDescription)",
+                    error: nsError
+                )
             }
             await refreshAuthorizationStatus()
         }
@@ -119,6 +134,18 @@ internal class NotificationService: ObservableObject, SessionCompletionNotifying
             return false
         @unknown default:
             return false
+        }
+    }
+
+    private func reportAuthorizationError(_ message: String, error: NSError? = nil) {
+        authorizationErrorMessage = message
+
+        if let error {
+            logger.error(
+                "\(message, privacy: .public) Domain: \(error.domain, privacy: .public), code: \(error.code)"
+            )
+        } else {
+            logger.error("\(message, privacy: .public)")
         }
     }
 
