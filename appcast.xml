@@ -7,6 +7,27 @@
     <language>en</language>
     <!-- Latest release will be added here by CI/CD -->
 <item>
+  <title>Version 0.5.53</title>
+  <link>https://github.com/jellydn/oak/releases/tag/v0.5.53</link>
+  <sparkle:version>5053</sparkle:version>
+  <sparkle:shortVersionString>0.5.53</sparkle:shortVersionString>
+  <description><![CDATA[
+    <h2>Oak 0.5.53</h2>
+              <h2>What's Changed</h2>
+              <ul>
+              <li>fix(notifications): sign release app before packaging by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/jellydn/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jellydn">@jellydn</a> in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="5630553690" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/159" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/159/hovercard" href="https://github.com/jellydn/oak/pull/159">#159</a></li>
+              </ul>
+              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.52...v0.5.53"><tt>v0.5.52...v0.5.53</tt></a></p>
+  ]]></description>
+  <pubDate>Tue, 29 Sep 2026 12:38:36 +0000</pubDate>
+  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.53/Oak-0.5.53.dmg"
+             sparkle:version="5053"
+             sparkle:shortVersionString="0.5.53"
+             sparkle:edSignature="Grizp9cx+ziLNgCp9jA2Mm6tEd91LzldgqlZqpHT3cwnrdP3Tqk2rO5LW7DVYsHBqDNeYw3+8wFrgazUIpTWAQ=="
+             length="9349685"
+             type="application/octet-stream" />
+</item>
+<item>
   <title>Version 0.5.52</title>
   <link>https://github.com/jellydn/oak/releases/tag/v0.5.52</link>
   <sparkle:version>5052</sparkle:version>
@@ -38,27 +59,6 @@
              sparkle:shortVersionString="0.5.51"
              sparkle:edSignature="oPmff/vEc3AJvl/NZEGdiOmDIvhvJHdQYl6oYK8VigRqREU/NfmwbHMd+8VarcEMbn3d5tyr/geAi30HcUKqDQ=="
              length="9378931"
-             type="application/octet-stream" />
-</item>
-<item>
-  <title>Version 0.5.50</title>
-  <link>https://github.com/jellydn/oak/releases/tag/v0.5.50</link>
-  <sparkle:version>5050</sparkle:version>
-  <sparkle:shortVersionString>0.5.50</sparkle:shortVersionString>
-  <description><![CDATA[
-    <h2>Oak 0.5.50</h2>
-              <h2>What's Changed</h2>
-              <ul>
-              <li>chore(deps): update dependency sparkle to v2.10.0 by <a class="user-mention notranslate" data-hovercard-type="user" data-hovercard-url="/users/renovate/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/renovate">@renovate</a>[bot] in <a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="5444575596" data-permission-text="Title is private" data-url="https://github.com/jellydn/oak/issues/158" data-hovercard-type="pull_request" data-hovercard-url="/jellydn/oak/pull/158/hovercard" href="https://github.com/jellydn/oak/pull/158">#158</a></li>
-              </ul>
-              <p><strong>Full Changelog</strong>: <a class="commit-link" href="https://github.com/jellydn/oak/compare/v0.5.49...v0.5.50"><tt>v0.5.49...v0.5.50</tt></a></p>
-  ]]></description>
-  <pubDate>Tue, 15 Sep 2026 22:17:37 +0000</pubDate>
-  <enclosure url="https://github.com/jellydn/oak/releases/download/v0.5.50/Oak-0.5.50.dmg"
-             sparkle:version="5050"
-             sparkle:shortVersionString="0.5.50"
-             sparkle:edSignature="PCJPv3p25yoltA0Fycl4m4UJu/5gHzGp50ir1vAT3T61HDodArFipTKDGGuA+HDXlQe67FuFsploNI/Bzy1rCw=="
-             length="9375555"
              type="application/octet-stream" />
 </item>
   </channel>
