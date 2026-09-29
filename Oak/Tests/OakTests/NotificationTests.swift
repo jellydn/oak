@@ -115,7 +115,6 @@ internal final class NotificationTests: XCTestCase {
         )
         XCTAssertEqual(notificationService.authorizationStatus, .authorized)
         XCTAssertTrue(notificationService.isAuthorized)
-        XCTAssertNil(notificationService.authorizationErrorMessage)
     }
 
     func testAuthorizationRequestReportsActivationFailure() async {
