@@ -94,7 +94,7 @@ brew install --cask oak
 
 ### From Source
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed build instructions and development setup.
+See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed build instructions and development setup. The guide also explains how to build the early iOS target and install it on a personal iPhone with a free Apple Account.
 
 ## Auto-Update
 

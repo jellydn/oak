@@ -40,3 +40,40 @@ targets:
       - target: Oak
     settings:
       GENERATE_INFOPLIST_FILE: true
+
+  OakIOS:
+    type: application
+    platform: iOS
+    deploymentTarget: '16.0'
+    sources:
+      - path: OakIOS
+        excludes:
+          - Info.plist
+      - path: Oak/Resources/Sounds
+        excludes:
+          - README.md
+        buildPhase: resources
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.productsway.oak.ios
+      MARKETING_VERSION: 0.1.0
+      CURRENT_PROJECT_VERSION: 1
+      INFOPLIST_FILE: OakIOS/Info.plist
+      TARGETED_DEVICE_FAMILY: '1,2'
+      CODE_SIGN_STYLE: Automatic
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    scheme:
+      testTargets:
+        - OakIOSTests
+
+  OakIOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: '16.0'
+    sources:
+      - path: Tests/OakIOSTests
+    dependencies:
+      - target: OakIOS
+    settings:
+      GENERATE_INFOPLIST_FILE: true
+      PRODUCT_BUNDLE_IDENTIFIER: com.productsway.oak.ios.tests
+      CODE_SIGN_STYLE: Automatic

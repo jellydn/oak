@@ -62,6 +62,71 @@ just open
 just check-sounds
 ```
 
+## iOS App
+
+The `OakIOS` target is a native iOS 16+ first version with the two Oak presets, pause and resume, work/break cycles, built-in ambient audio, completion notifications, and local daily progress. It is intentionally separate from the macOS notch presentation and its AppKit-only services.
+
+```bash
+# Generate the project and build for iOS Simulator
+just build-ios
+
+# Run the iOS unit tests on the default iPhone 17 Pro Simulator
+just test-ios
+
+# Or select another installed Simulator
+IOS_SIMULATOR='iPhone 16' just test-ios
+```
+
+To run the app interactively, regenerate the project with `cd Oak && xcodegen generate`, open `Oak.xcodeproj`, select the `OakIOS` scheme and an iPhone or iPad Simulator, then Run.
+
+### Test on a physical iPhone with a free Apple Account
+
+The recommended free workflow is to build and install Oak directly from Xcode. A paid Apple Developer Program membership is not required for personal testing on an iPhone that you own.
+
+Requirements:
+
+- A Mac with the full current Xcode release and iOS platform support installed.
+- XcodeGen (`brew install xcodegen`).
+- An Apple Account that has accepted the Apple Developer Agreement. Xcode shows this account as a **Personal Team**.
+- An iPhone running iOS 16 or newer and a USB cable for initial pairing.
+
+Set up and install Oak:
+
+1. Run `cd Oak && xcodegen generate`, then open `Oak.xcodeproj`.
+2. In **Xcode → Settings → Accounts**, add your Apple Account.
+3. Connect the iPhone, accept **Trust This Computer**, and select it in Xcode's Device Hub.
+4. On the iPhone, enable **Settings → Privacy & Security → Developer Mode**, restart the phone, then confirm Developer Mode with the device passcode. Apple notes that Developer Mode reduces device security; use a spare device when possible, or turn it off after testing.
+5. Select the `OakIOS` and `OakIOSTests` targets in turn and open **Signing & Capabilities**. For both targets, enable **Automatically manage signing** and select your Personal Team. If Xcode reports that `com.productsway.oak.ios` is unavailable, set a unique local bundle ID, such as `com.yourname.oak.dev`. Do not commit your Personal Team ID or personal bundle ID.
+6. Select the `OakIOS` scheme and the connected iPhone as the run destination, then choose **Product → Run**. Xcode registers the phone, creates the development profile, installs Oak, and starts it.
+7. Choose **Product → Test** to install and run `OakIOSTests` on the phone.
+
+After the first Xcode setup, tests can also run from Terminal. Replace the placeholders with the values from Xcode's Device Hub and Signing settings. Do not regenerate the project between the Xcode signing setup and this command, because generation can replace the local bundle ID selection.
+
+```bash
+cd Oak
+xcodebuild \
+  -project Oak.xcodeproj \
+  -scheme OakIOS \
+  -destination 'platform=iOS,id=<DEVICE_UDID>' \
+  -allowProvisioningUpdates \
+  -allowProvisioningDeviceRegistration \
+  DEVELOPMENT_TEAM=<PERSONAL_TEAM_ID> \
+  CODE_SIGN_STYLE=Automatic \
+  test
+```
+
+Apple applies these limits to a free Personal Team:
+
+- Up to 10 registered App IDs, which expire after 7 days.
+- Up to 3 registered devices, which expire after 7 days.
+- Up to 3 Personal Team apps installed on each device.
+- Development provisioning profiles expire after 7 days. Reconnect the phone and run Oak from Xcode again to rebuild and reinstall it.
+- No App Store, TestFlight, Ad Hoc, enterprise, or general app distribution.
+
+Oak's local completion notifications are not APNs push notifications, and its background audio does not require a paid distribution capability. A development-signed IPA may be available through **Archive → Distribute App → Debugging**, but it remains device-bound and expires with the 7-day profile. Direct Xcode installation is the safer, supported workflow for a Personal Team.
+
+See Apple's documentation for [Personal Team limits](https://developer.apple.com/help/account/basics/about-your-developer-account), [running on a physical device](https://developer.apple.com/documentation/xcode/running-your-app-on-simulated-or-physical-devices), and [Developer Mode](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device).
+
 ## Test a Pull Request Build
 
 The `macOS Test Build` workflow runs for pull requests and manual workflow dispatches. It uploads an Apple Silicon

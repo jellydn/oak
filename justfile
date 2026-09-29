@@ -2,6 +2,7 @@
 derived-data := "/tmp/oak-derived"
 marketing_version := `sh -c 'tag=$(git describe --tags --match "v*" --abbrev=0 2>/dev/null || true); if [ -n "$tag" ]; then echo "${tag#v}"; else echo "0.4.3"; fi'`
 current_project_version := `sh -c 'git rev-list --count HEAD 2>/dev/null || echo 1'`
+ios_simulator := env_var_or_default("IOS_SIMULATOR", "iPhone 17 Pro")
 
 # Default recipe - shows available commands
 default:
@@ -11,9 +12,19 @@ default:
 build:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} build MARKETING_VERSION={{marketing_version}} CURRENT_PROJECT_VERSION={{current_project_version}}
 
+# Generate and build the iOS app for Simulator
+build-ios:
+    cd Oak && xcodegen generate
+    cd Oak && xcodebuild -project Oak.xcodeproj -scheme OakIOS -destination 'generic/platform=iOS Simulator' -derivedDataPath {{derived-data}} build
+
 # Run all tests
 test:
     cd Oak && xcodebuild -project Oak.xcodeproj -scheme Oak -destination 'platform=macOS' -derivedDataPath {{derived-data}} test MARKETING_VERSION={{marketing_version}} CURRENT_PROJECT_VERSION={{current_project_version}}
+
+# Generate and test the iOS app on an available Simulator
+test-ios:
+    cd Oak && xcodegen generate
+    cd Oak && xcodebuild -project Oak.xcodeproj -scheme OakIOS -destination 'platform=iOS Simulator,name={{ios_simulator}}' -derivedDataPath {{derived-data}} test
 
 # Run a specific test class (usage: just test-class FocusSessionViewModelTests)
 test-class CLASS:
