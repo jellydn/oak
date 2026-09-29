@@ -60,8 +60,7 @@ internal final class NotificationTests: XCTestCase {
     func testAuthorizationRequestActivatesAppBeforeShowingPromptAndRefreshesStatus() async {
         var events: [String] = []
         var authorizationStatus: UNAuthorizationStatus = .notDetermined
-        let activationGate = NotificationTestGate()
-        let authorizationGate = NotificationTestGate()
+        let activationGate = NotificationTestGate(), authorizationGate = NotificationTestGate()
 
         notificationService = NotificationService(
             applicationActivator: {
@@ -92,9 +91,7 @@ internal final class NotificationTests: XCTestCase {
         }
 
         guard await waitUntil({ events.contains("activationStarted") }) else {
-            activationGate.open()
-            authorizationGate.open()
-            await requestTask.value
+            await releaseAndDrain(requestTask, activationGate, authorizationGate)
             XCTFail("Authorization flow did not start activation")
             return
         }
@@ -102,8 +99,7 @@ internal final class NotificationTests: XCTestCase {
 
         activationGate.open()
         guard await waitUntil({ events.contains("authorizationRequested") }) else {
-            authorizationGate.open()
-            await requestTask.value
+            await releaseAndDrain(requestTask, activationGate, authorizationGate)
             XCTFail("Authorization request did not start after activation")
             return
         }
@@ -119,6 +115,16 @@ internal final class NotificationTests: XCTestCase {
         )
         XCTAssertEqual(notificationService.authorizationStatus, .authorized)
         XCTAssertTrue(notificationService.isAuthorized)
+    }
+
+    private func releaseAndDrain(
+        _ requestTask: Task<Void, Never>,
+        _ activationGate: NotificationTestGate,
+        _ authorizationGate: NotificationTestGate
+    ) async {
+        activationGate.open()
+        authorizationGate.open()
+        await requestTask.value
     }
 
     private func waitUntil(_ condition: () -> Bool) async -> Bool {
