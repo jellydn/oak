@@ -40,6 +40,11 @@ xcodebuild archive \
   CODE_SIGNING_REQUIRED=NO \
   CODE_SIGN_IDENTITY=""
 
+# UNUserNotificationCenter rejects unsigned macOS apps. Apply an ad-hoc
+# signature until release builds can use a Developer ID certificate.
+codesign --force --deep --sign - "$APP_PATH"
+codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+
 cp -R "$APP_PATH" "$STAGING_DIR/"
 ln -s /Applications "$STAGING_DIR/Applications"
 

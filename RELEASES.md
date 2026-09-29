@@ -19,7 +19,7 @@ The appcast feed is served from `appcast.xml` in the repository root and is auto
   - Automatically increments the patch version (e.g., `v0.1.0` → `v0.1.1`)
   - Creates a Git tag
   - Builds and publishes artifacts to GitHub Releases
-- Manual release workflow (`.github/workflows/release.yml`) builds and publishes unsigned artifacts on:
+- Manual release workflow (`.github/workflows/release.yml`) builds and publishes ad-hoc signed artifacts on:
   - tag push: `v*` (example: `v0.1.0`)
   - manual dispatch with a `version` input (example: `v0.1.0`)
 
@@ -39,7 +39,7 @@ The release uploads:
 
 ## No Apple Account Notes
 
-- Artifacts are built unsigned (`CODE_SIGNING_ALLOWED=NO`).
+- Artifacts are built without an Apple identity, then ad-hoc signed so macOS local notifications work.
 - The app is not notarized.
 - Users will need to bypass Gatekeeper on first launch (Right-click app -> Open).
 

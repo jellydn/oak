@@ -23,6 +23,13 @@ internal struct NotificationSettingsView: View {
 
             notificationActions
 
+            if let errorMessage = notificationService.authorizationErrorMessage {
+                Label(errorMessage, systemImage: "xmark.circle.fill")
+                    .font(.caption)
+                    .foregroundColor(palette.warning)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             Divider()
 
             notificationToggle(
